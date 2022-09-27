@@ -10,7 +10,7 @@ import (
 
 func main() {
 	err := providerserver.Serve(context.Background(), stackit.New, providerserver.ServeOpts{
-		Address: "github.com/providers/stackit",
+		Address: "github.com/schwarzit/stackit",
 	})
 
 	if err != nil {
