@@ -1,3 +1,12 @@
+terraform {
+  required_providers {
+    stackit = {
+      source  = "registry.terraform.io/schwarzit/stackit"
+      version = ">=0.1.2"
+    }
+  }
+}
+
 provider "stackit" {
   service_account_id    = var.service_account_id
   service_account_token = var.service_account_token
