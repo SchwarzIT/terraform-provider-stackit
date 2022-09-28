@@ -6,6 +6,7 @@ The provider is built using Terraform's plugin framework, therefore we recommend
 
 * [Terraform Website](https://www.terraform.io)
 * [STACKIT Community Client](https://github.com/SchwarzIT/community-stackit-go-client)
+* [Provider Documentation](https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs)
 
 ## Usage Example
 
