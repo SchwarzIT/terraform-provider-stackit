@@ -45,7 +45,7 @@ func (j *Job) ToClientJob() jobs.Job {
 
 	if j.SAML2 != nil && !j.SAML2.EnableURLParameters.Value {
 		if job.Params == nil {
-			job.Params = make(map[string]interface{}, 1)
+			job.Params = map[string]interface{}{}
 		}
 		job.Params["saml2"] = []string{"disabled"}
 	}
@@ -101,8 +101,7 @@ func (j *Job) handleBasicAuth(cj jobs.Job) {
 }
 
 func (j *Job) handleSAML2(cj jobs.Job) {
-	if cj.Params == nil {
-		j.SAML2 = nil
+	if cj.Params == nil && j.SAML2 == nil {
 		return
 	}
 
@@ -111,10 +110,11 @@ func (j *Job) handleSAML2(cj jobs.Job) {
 	}
 
 	flag := true
-	v, ok1 := cj.Params["saml2"]
-	if sl, ok2 := v.([]string); ok1 && ok2 {
-		if len(sl) == 1 && sl[0] == "disabled" {
-			flag = false
+	if v, ok := cj.Params["saml2"]; ok {
+		if sl, ok := v.([]string); ok {
+			if len(sl) == 1 && sl[0] == "disabled" {
+				flag = false
+			}
 		}
 	}
 

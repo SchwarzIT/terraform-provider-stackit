@@ -84,6 +84,10 @@ resource "stackit_argus_job" "example" {
 		urls = ["url1", "url2"]
 	  }
 	]
+
+	saml2 = {
+	  enable_url_parameters = true
+	}
 }
   
 	  `,
