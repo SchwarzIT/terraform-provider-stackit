@@ -43,4 +43,9 @@ test:
 testacc:
 	@TF_ACC=1 TF_ACC_LOG=INFO TF_LOG=INFO STACKIT_SERVICE_ACCOUNT_ID="$(STACKIT_SERVICE_ACCOUNT_ID)" STACKIT_SERVICE_ACCOUNT_TOKEN="$(STACKIT_SERVICE_ACCOUNT_TOKEN)" STACKIT_CUSTOMER_ACCOUNT_ID="$(STACKIT_CUSTOMER_ACCOUNT_ID)" go test -timeout 99999s -v ./... 
 
+quality:
+	@goreportcard-cli -v ./...
+
+pre-commit: docs quality
+
 .PHONY: all docs testacc

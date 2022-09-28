@@ -16,6 +16,15 @@ The provider is built using Terraform's plugin framework, therefore we recommend
 ## Example Usage
 
 ```terraform
+terraform {
+  required_providers {
+    stackit = {
+      source  = "SchwarzIT/stackit"
+      version = "=0.1.4"
+    }
+  }
+}
+
 provider "stackit" {
   service_account_id    = var.service_account_id
   service_account_token = var.service_account_token
