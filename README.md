@@ -1,5 +1,7 @@
 # Terraform Provider for STACKIT
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/SchwarzIT/terraform-provider-stackit)](https://goreportcard.com/report/github.com/SchwarzIT/terraform-provider-stackit) [![GitHub go.mod Go version of a Go module](https://img.shields.io/github/go-mod/go-version/gomods/athens.svg)](https://github.com/gomods/athens) [![License](https://img.shields.io/badge/License-Apache_2.0-lightgray.svg)](https://opensource.org/licenses/Apache-2.0)
+
 This provider is built and maintained by the STACKIT community in Schwarz IT and is not an official STACKIT provider
 
 The provider is built using Terraform's plugin framework, therefore we recommend using [Terraform CLI v1.x](https://www.terraform.io/downloads) which supports Protocol v6

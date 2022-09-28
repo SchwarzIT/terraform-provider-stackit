@@ -10,7 +10,7 @@ import (
 
 func main() {
 	err := providerserver.Serve(context.Background(), stackit.New, providerserver.ServeOpts{
-		Address: "github.com/schwarzit/stackit",
+		Address: "registry.terraform.io/schwarzit/stackit",
 	})
 
 	if err != nil {
