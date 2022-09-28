@@ -17,8 +17,8 @@ The provider is built using Terraform's plugin framework, therefore we recommend
 terraform {
   required_providers {
     stackit = {
-      source  = "github.com/schwarzit/stackit"
-      version = ">=0.0.1"
+      source  = "registry.terraform.io/schwarzit/stackit"
+      version = ">=0.1.2"
     }
   }
 }
