@@ -3,12 +3,15 @@
 page_title: "STACKIT Provider"
 subcategory: ""
 description: |-
-  The STACKIT Provider is an unofficial community provider maintained primarily by ODJ team @ Schwarz IT
+  This provider is built and maintained by the STACKIT community in Schwarz IT and is not an official STACKIT provider
+  The provider is built using Terraform's plugin framework, therefore we recommend using Terraform CLI v1.x which supports Protocol v6
 ---
 
 # STACKIT Provider
 
-The STACKIT Provider is an unofficial community provider maintained primarily by ODJ team @ Schwarz IT
+This provider is built and maintained by the STACKIT community in Schwarz IT and is not an official STACKIT provider
+
+The provider is built using Terraform's plugin framework, therefore we recommend using Terraform CLI v1.x which supports Protocol v6
 
 ## Example Usage
 

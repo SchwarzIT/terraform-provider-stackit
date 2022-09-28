@@ -42,7 +42,11 @@ var _ = common.Provider(&StackitProvider{})
 // GetSchema returns the provider's schema
 func (p *StackitProvider) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "The STACKIT Provider is an unofficial community provider maintained primarily by ODJ team @ Schwarz IT",
+		MarkdownDescription: `
+This provider is built and maintained by the STACKIT community in Schwarz IT and is not an official STACKIT provider
+
+The provider is built using Terraform's plugin framework, therefore we recommend using Terraform CLI v1.x which supports Protocol v6
+		`,
 		Attributes: map[string]tfsdk.Attribute{
 			"service_account_id": {
 				Type:        types.StringType,
