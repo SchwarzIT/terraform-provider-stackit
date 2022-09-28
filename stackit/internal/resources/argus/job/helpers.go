@@ -5,6 +5,7 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus/jobs"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -136,6 +137,9 @@ func (j *Job) handleTargets(cj jobs.Job) {
 			nt.Labels = j.Targets[i].Labels
 		} else {
 			nt.Labels = types.Map{ElemType: types.StringType}
+			if len(sc.Labels) > 0 {
+				nt.Labels.Elems = make(map[string]attr.Value, len(sc.Labels))
+			}
 			for k, v := range sc.Labels {
 				nt.Labels.Elems[k] = types.String{Value: v}
 			}
