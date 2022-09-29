@@ -31,7 +31,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		if err != nil {
 			return helper.RetryableError(err)
 		}
-		config.Transform(cl)
+		transform(&config, cl)
 		return nil
 	}); err != nil {
 		resp.Diagnostics.AddError("failed to read cluster", err.Error())

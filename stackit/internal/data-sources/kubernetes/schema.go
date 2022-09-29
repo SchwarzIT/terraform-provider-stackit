@@ -16,6 +16,11 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 	return tfsdk.Schema{
 		Description: "Data source for kubernetes clusters",
 		Attributes: map[string]tfsdk.Attribute{
+			"id": {
+				Description: "Specified the resource ID",
+				Type:        types.StringType,
+				Computed:    true,
+			},
 			"name": {
 				Description: "Specifies the cluster name",
 				Type:        types.StringType,
@@ -145,26 +150,26 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 			},
 
 			"maintenance": {
-				Description: "A maintenance block",
-				Optional:    true,
+				Description: "A single maintenance block as defined below",
+				Computed:    true,
 				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
 					"enable_kubernetes_version_updates": {
-						Description: "Is auto-update of the Kubernetes version enabled?",
+						Description: "Flag to enable/disable auto-updates of the Kubernetes version",
 						Type:        types.BoolType,
 						Computed:    true,
 					},
 					"enable_machine_image_version_updates": {
-						Description: "Is auto-update of the OS image version enabled?",
+						Description: "Flag to enable/disable auto-updates of the OS image version",
 						Type:        types.BoolType,
 						Computed:    true,
 					},
 					"start": {
-						Description: "RFC3339 Date time for maintenance window start",
+						Description: "RFC3339 Date time for maintenance window start. i.e. `2019-08-24T23:00:00Z`",
 						Type:        types.StringType,
 						Computed:    true,
 					},
 					"end": {
-						Description: "RFC3339 Date time for maintenance window end",
+						Description: "RFC3339 Date time for maintenance window end. i.e. `2019-08-24T23:30:00Z`",
 						Type:        types.StringType,
 						Computed:    true,
 					},
@@ -173,7 +178,7 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 
 			"hibernations": {
 				Description: "One or more hibernation blocks",
-				Optional:    true,
+				Computed:    true,
 				Attributes: tfsdk.ListNestedAttributes(map[string]tfsdk.Attribute{
 					"start": {
 						Description: "Start time of cluster hibernation",
@@ -195,7 +200,7 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 
 			"extensions": {
 				Description: "A single extensions block",
-				Optional:    true,
+				Computed:    true,
 				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
 					"argus": {
 						Description: "A single argus block",
