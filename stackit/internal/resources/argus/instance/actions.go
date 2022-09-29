@@ -365,18 +365,18 @@ func (r Resource) updateInstance(ctx context.Context, diags *diag.Diagnostics, p
 		return
 	}
 
-	updated := false
+	updated := types.Bool{Value: false}
 	if err := helper.RetryContext(ctx, common.DURATION_20M, r.updateInstanceRetry(ctx, diags, plan, &updated)); err != nil {
 		diags.AddError("failed during instance update", err.Error())
 		return
 	}
 }
 
-func (r Resource) updateInstanceRetry(ctx context.Context, diags *diag.Diagnostics, plan *Instance, updated *bool) func() *helper.RetryError {
+func (r Resource) updateInstanceRetry(ctx context.Context, diags *diag.Diagnostics, plan *Instance, updated *types.Bool) func() *helper.RetryError {
 	c := r.Provider.Client()
 
 	return func() *helper.RetryError {
-		if !*updated {
+		if !updated.Value {
 			_, err := c.Argus.Instances.Update(ctx, plan.ProjectID.Value, plan.ID.Value, plan.Name.Value, plan.PlanID.Value, map[string]string{})
 			if err != nil {
 				if common.IsNonRetryable(err) {
@@ -388,8 +388,7 @@ func (r Resource) updateInstanceRetry(ctx context.Context, diags *diag.Diagnosti
 				}
 				return helper.RetryableError(err)
 			}
-			x := true
-			updated = &x
+			updated.Value = true
 		}
 
 		// Give API time to start updating
@@ -407,8 +406,7 @@ func (r Resource) updateInstanceRetry(ctx context.Context, diags *diag.Diagnosti
 			if plan.isEqual(got) {
 				return nil
 			}
-			x := false
-			updated = &x
+			updated.Value = false
 			return helper.RetryableError(fmt.Errorf("received status %s but update didn't happen for Instance ID: %s", got.Status, plan.ID.Value))
 		case consts.ARGUS_INSTANCE_STATUS_UPDATING:
 			return helper.RetryableError(fmt.Errorf("received status %s", got.Status))
@@ -431,7 +429,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		resp.Diagnostics.AddError("can't perform deletion", "argus instance id is unknown or null")
 	}
 
-	deleted := false
+	deleted := types.Bool{Value: false}
 	if err := helper.RetryContext(ctx, common.DURATION_30M, r.delete(ctx, &deleted, &state)); err != nil {
 		resp.Diagnostics.AddError("failed to delete instance", err.Error())
 		return
@@ -440,11 +438,11 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	resp.State.RemoveResource(ctx)
 }
 
-func (r *Resource) delete(ctx context.Context, deleted *bool, state *Instance) func() *helper.RetryError {
+func (r *Resource) delete(ctx context.Context, deleted *types.Bool, state *Instance) func() *helper.RetryError {
 	c := r.Provider.Client()
 
 	return func() *helper.RetryError {
-		if !*deleted {
+		if !deleted.Value {
 			_, err := c.Argus.Instances.Delete(ctx, state.ProjectID.Value, state.ID.Value)
 			if err != nil {
 				if strings.Contains(err.Error(), "instance is not in the right state") ||
@@ -456,8 +454,7 @@ func (r *Resource) delete(ctx context.Context, deleted *bool, state *Instance) f
 				}
 				return helper.RetryableError(err)
 			}
-			x := true
-			deleted = &x
+			deleted.Value = true
 		}
 
 		// give API a couple of seconds to process
@@ -479,8 +476,7 @@ func (r *Resource) delete(ctx context.Context, deleted *bool, state *Instance) f
 				return nil
 			}
 			if i.Status == consts.ARGUS_INSTANCE_STATUS_CREATE_SUCCEEDED {
-				x := false
-				deleted = &x
+				deleted.Value = false
 			}
 			return helper.RetryableError(fmt.Errorf("deletion incomplete. instance %s has status %s", i.Name, i.Status))
 

@@ -35,7 +35,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	created := false
+	created := types.Bool{Value: false}
 	if err := helper.RetryContext(ctx, default_retry_duration, r.createCredentialGroup(ctx, &data, &created)); err != nil {
 		resp.Diagnostics.AddError("failed to create credential group", err.Error())
 		return
@@ -49,19 +49,19 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 }
 
-func (r Resource) createCredentialGroup(ctx context.Context, data *CredentialsGroup, created *bool) func() *helper.RetryError {
+func (r Resource) createCredentialGroup(ctx context.Context, data *CredentialsGroup, created *types.Bool) func() *helper.RetryError {
 	c := r.Provider.Client()
 	return func() *helper.RetryError {
-		if !*created {
+		if !created.Value {
 			if err := c.ObjectStorage.CredentialsGroup.Create(ctx, data.ProjectID.Value, data.Name.Value); err != nil {
 				if common.IsNonRetryable(err) {
 					return helper.NonRetryableError(err)
 				}
 				return helper.RetryableError(err)
 			}
-			x := true
-			created = &x
+			created.Value = true
 		}
+
 		res, err := c.ObjectStorage.CredentialsGroup.List(ctx, data.ProjectID.Value)
 		if err != nil {
 			if common.IsNonRetryable(err) {
@@ -78,8 +78,7 @@ func (r Resource) createCredentialGroup(ctx context.Context, data *CredentialsGr
 			}
 		}
 
-		y := false
-		created = &y
+		created.Value = false
 		return nil
 	}
 }
