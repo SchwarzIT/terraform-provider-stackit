@@ -75,8 +75,8 @@ func TestAcc_kubernetes(t *testing.T) {
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.taints.0.value", "value1"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "maintenance.enable_kubernetes_version_updates", "true"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "maintenance.enable_machine_image_version_updates", "true"),
-					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "hibernations.0.start", "15 18 * * *"),
-					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "hibernations.0.end", "30 18 * * *"),
+					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "hibernations.0.start", "15 6 * * *"),
+					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "hibernations.0.end", "30 20 * * *"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "hibernations.0.timezone", "Europe/Berlin"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "extensions.argus.enabled", "false"),
 					resource.TestCheckResourceAttrSet("stackit_kubernetes_cluster.example", "status"),
@@ -157,8 +157,8 @@ resource "stackit_kubernetes_cluster" "example" {
 	}
 
 	hibernations = [{
-		start    = "15 18 * * *"
-		end      = "30 18 * * *"
+		start    = "15 6 * * *"
+		end      = "30 20 * * *"
 		timezone = "Europe/Berlin"
 	}]
 
