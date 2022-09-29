@@ -108,7 +108,7 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 		}
 
 		cl.Status = types.String{Value: s.Status.Aggregated}
-		if cl.isHealthyStatus(s.Status.Aggregated) {
+		if !cl.isHealthyStatus(s.Status.Aggregated) {
 			return helper.RetryableError(fmt.Errorf("expected cluster to be active & healthy but it was in state %s", s.Status.Aggregated))
 		}
 
@@ -144,15 +144,9 @@ func (r Resource) getCredential(ctx context.Context, diags *diag.Diagnostics, cl
 // Read - lifecycle function
 func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	c := r.Provider.Client()
-	var state, plan Cluster
+	var state Cluster
 
 	diags := req.State.Get(ctx, &state)
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	diags = req.State.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
