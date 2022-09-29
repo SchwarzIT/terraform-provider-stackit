@@ -1,14 +1,10 @@
 # Terraform Provider for STACKIT
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/SchwarzIT/terraform-provider-stackit)](https://goreportcard.com/report/github.com/SchwarzIT/terraform-provider-stackit) [![Build Status](https://dev.azure.com/schwarzit/schwarzit.odj.core/_apis/build/status/Stackit/Stackit%20E2E%20Test?branchName=main&label=E2E%20Tests)](https://dev.azure.com/schwarzit/schwarzit.odj.core/_build/latest?definitionId=17957&branchName=main) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/SchwarzIT/terraform-provider-stackit) [![GitHub go.mod Go version of a Go module](https://img.shields.io/github/go-mod/go-version/gomods/athens.svg)](https://github.com/gomods/athens) [![License](https://img.shields.io/badge/License-Apache_2.0-lightgray.svg)](https://opensource.org/licenses/Apache-2.0) 
+[![Go Report Card](https://goreportcard.com/badge/github.com/SchwarzIT/terraform-provider-stackit)](https://goreportcard.com/report/github.com/SchwarzIT/terraform-provider-stackit) [![Build Status](https://dev.azure.com/schwarzit/schwarzit.odj.core/_apis/build/status/Stackit/Stackit%20E2E%20Test?branchName=main&label=E2E%20Tests)](https://dev.azure.com/schwarzit/schwarzit.odj.core/_build/latest?definitionId=17957&branchName=main) [![GitHub release (latest by date)](https://img.shields.io/github/v/release/SchwarzIT/terraform-provider-stackit)](https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs) [![GitHub go.mod Go version of a Go module](https://img.shields.io/github/go-mod/go-version/gomods/athens.svg)](https://github.com/gomods/athens) [![License](https://img.shields.io/badge/License-Apache_2.0-lightgray.svg)](https://opensource.org/licenses/Apache-2.0) 
 
 This provider is built and maintained by the STACKIT community in Schwarz IT and is not an official STACKIT provider
 
-The provider is built using Terraform's plugin framework, therefore we recommend using [Terraform CLI v1.x](https://www.terraform.io/downloads) which supports Protocol v6
-
-* [Terraform Website](https://www.terraform.io)
-* [STACKIT Community Go Client](https://github.com/SchwarzIT/community-stackit-go-client)
-* [Provider Documentation](https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs)
+> **_NOTE:_** The provider is built using Terraform's plugin framework, therefore we recommend using [Terraform CLI v1.x](https://www.terraform.io/downloads) which supports Protocol v6
 
 ## Usage Example
 
@@ -51,3 +47,9 @@ resource "stackit_kubernetes_cluster" "example" {
 }
 
 ```
+
+## External Links
+
+* [Terraform Website](https://www.terraform.io)
+* [STACKIT Community Go Client](https://github.com/SchwarzIT/community-stackit-go-client)
+* [Provider Documentation](https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs)

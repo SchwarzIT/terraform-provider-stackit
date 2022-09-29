@@ -45,27 +45,27 @@ func (p *StackitProvider) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagn
 		MarkdownDescription: `
 This provider is built and maintained by the STACKIT community in Schwarz IT and is not an official STACKIT provider
 
-The provider is built using Terraform's plugin framework, therefore we recommend using Terraform CLI v1.x which supports Protocol v6
+~> **Note:** The provider is built using Terraform's plugin framework, therefore we recommend using Terraform CLI v1.x which supports Protocol v6
 		`,
 		Attributes: map[string]tfsdk.Attribute{
 			"service_account_id": {
-				Type:        types.StringType,
-				Optional:    true,
-				Computed:    true,
-				Description: "Service Account ID",
+				Type:                types.StringType,
+				Optional:            true,
+				Computed:            true,
+				MarkdownDescription: "Service Account ID.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_ID` environment variable instead.",
 			},
 			"service_account_token": {
-				Type:        types.StringType,
-				Optional:    true,
-				Computed:    true,
-				Sensitive:   true,
-				Description: "Service Account Token",
+				Type:                types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Sensitive:           true,
+				MarkdownDescription: "Service Account Token.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_TOKEN` environment variable instead.",
 			},
 			"customer_account_id": {
-				Type:        types.StringType,
-				Optional:    true,
-				Computed:    true,
-				Description: "Customer Account ID (Previously referred to as Organization ID)",
+				Type:                types.StringType,
+				Optional:            true,
+				Computed:            true,
+				MarkdownDescription: "Customer Account ID (Organization ID).<br />This attribute can also be loaded from `STACKIT_CUSTOMER_ACCOUNT_ID` environment variable instead.",
 			},
 		},
 	}, nil

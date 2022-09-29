@@ -4,14 +4,14 @@ page_title: "STACKIT Provider"
 subcategory: ""
 description: |-
   This provider is built and maintained by the STACKIT community in Schwarz IT and is not an official STACKIT provider
-  The provider is built using Terraform's plugin framework, therefore we recommend using Terraform CLI v1.x which supports Protocol v6
+  ~> Note: The provider is built using Terraform's plugin framework, therefore we recommend using Terraform CLI v1.x which supports Protocol v6
 ---
 
 # STACKIT Provider
 
 This provider is built and maintained by the STACKIT community in Schwarz IT and is not an official STACKIT provider
 
-The provider is built using Terraform's plugin framework, therefore we recommend using Terraform CLI v1.x which supports Protocol v6
+~> **Note:** The provider is built using Terraform's plugin framework, therefore we recommend using Terraform CLI v1.x which supports Protocol v6
 
 ## Example Usage
 
@@ -37,6 +37,6 @@ provider "stackit" {
 
 ### Optional
 
-- `customer_account_id` (String) Customer Account ID (Previously referred to as Organization ID)
-- `service_account_id` (String) Service Account ID
-- `service_account_token` (String, Sensitive) Service Account Token
+- `customer_account_id` (String) Customer Account ID (Organization ID).<br />This attribute can also be loaded from `STACKIT_CUSTOMER_ACCOUNT_ID` environment variable instead.
+- `service_account_id` (String) Service Account ID.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_ID` environment variable instead.
+- `service_account_token` (String, Sensitive) Service Account Token.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_TOKEN` environment variable instead.

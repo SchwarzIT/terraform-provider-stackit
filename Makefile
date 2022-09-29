@@ -33,7 +33,7 @@ install: build
 docs:
 	@tfplugindocs generate --rendered-provider-name "STACKIT" --provider-name stackit
 
-preview-docs:
+preview-docs: docs
 	@tfplugindocs serve 	
 
 test: 
