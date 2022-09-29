@@ -6,12 +6,6 @@ This provider is built and maintained by the STACKIT community in Schwarz IT and
 
 > **_NOTE:_** The provider is built using Terraform's plugin framework, therefore we recommend using [Terraform CLI v1.x](https://www.terraform.io/downloads) which supports Protocol v6
 
-## External Links
-
-* [Terraform Website](https://www.terraform.io)
-* [STACKIT Community Go Client](https://github.com/SchwarzIT/community-stackit-go-client)
-* [Provider Documentation](https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs)
-
 ## Usage Example
 
 ```hcl
@@ -53,3 +47,9 @@ resource "stackit_kubernetes_cluster" "example" {
 }
 
 ```
+
+## External Links
+
+* [Terraform Website](https://www.terraform.io)
+* [STACKIT Community Go Client](https://github.com/SchwarzIT/community-stackit-go-client)
+* [Provider Documentation](https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs)
