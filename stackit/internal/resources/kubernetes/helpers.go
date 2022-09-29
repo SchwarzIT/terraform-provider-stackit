@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes/clusters"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -23,6 +24,11 @@ const (
 	default_cri                            = "containerd"
 	default_zone                           = "eu01-m"
 )
+
+func (c *Cluster) isHealthyStatus(status string) bool {
+	return status == consts.SKE_CLUSTER_STATUS_HEALTHY ||
+		status == consts.SKE_CLUSTER_STATUS_HIBERNATED
+}
 
 func (c *Cluster) clusterConfig() clusters.Kubernetes {
 	cfg := clusters.Kubernetes{

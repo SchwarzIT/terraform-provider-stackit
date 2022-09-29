@@ -108,7 +108,7 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 		}
 
 		cl.Status = types.String{Value: s.Status.Aggregated}
-		if s.Status.Aggregated != consts.SKE_CLUSTER_STATUS_HEALTHY {
+		if cl.isHealthyStatus(s.Status.Aggregated) {
 			return helper.RetryableError(fmt.Errorf("expected cluster to be active & healthy but it was in state %s", s.Status.Aggregated))
 		}
 
