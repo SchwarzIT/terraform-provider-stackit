@@ -3,7 +3,6 @@ package project
 import (
 	"context"
 
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -64,18 +63,12 @@ func (r Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) 
 				Description: "should kubernetes be enabled for this project? `false` by default.",
 				Type:        types.BoolType,
 				Optional:    true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					modifiers.BoolDefault(false),
-				},
 			},
 
 			"enable_object_storage": {
 				Description: "should object storage be enabled for this project? `false` by default.",
 				Type:        types.BoolType,
 				Optional:    true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					modifiers.BoolDefault(false),
-				},
 			},
 		},
 	}, nil
