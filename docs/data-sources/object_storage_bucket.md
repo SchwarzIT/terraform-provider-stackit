@@ -30,6 +30,7 @@ data "stackit_object_storage_bucket" "example" {
 ### Read-Only
 
 - `host_style_url` (String) url with dedicated host name
+- `id` (String) Specifies the resource ID
 - `path_style_url` (String) url with path to the bucket
 - `region` (String) the region where the bucket was created
 

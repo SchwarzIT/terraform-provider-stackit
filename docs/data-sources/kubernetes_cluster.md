@@ -33,17 +33,15 @@ data "stackit_kubernetes_cluster" "example" {
 - `name` (String) Specifies the cluster name
 - `project_id` (String) The project ID the cluster runs in
 
-### Optional
-
-- `extensions` (Attributes) A single extensions block (see [below for nested schema](#nestedatt--extensions))
-- `hibernations` (Attributes List) One or more hibernation blocks (see [below for nested schema](#nestedatt--hibernations))
-- `maintenance` (Attributes) A maintenance block (see [below for nested schema](#nestedatt--maintenance))
-
 ### Read-Only
 
 - `allow_privileged_containers` (Boolean) Are containers allowed to run in privileged mode?
+- `extensions` (Attributes) A single extensions block (see [below for nested schema](#nestedatt--extensions))
+- `hibernations` (Attributes List) One or more hibernation blocks (see [below for nested schema](#nestedatt--hibernations))
+- `id` (String) Specifies the resource ID
 - `kube_config` (String, Sensitive) Kube config file used for connecting to the cluster
 - `kubernetes_version` (String) Kubernetes version
+- `maintenance` (Attributes) A single maintenance block as defined below (see [below for nested schema](#nestedatt--maintenance))
 - `node_pools` (Attributes List) One or more `node_pool` blocks (see [below for nested schema](#nestedatt--node_pools))
 - `status` (String) The cluster aggregated status
 
@@ -79,10 +77,10 @@ Read-Only:
 
 Read-Only:
 
-- `enable_kubernetes_version_updates` (Boolean) Is auto-update of the Kubernetes version enabled?
-- `enable_machine_image_version_updates` (Boolean) Is auto-update of the OS image version enabled?
-- `end` (String) RFC3339 Date time for maintenance window end
-- `start` (String) RFC3339 Date time for maintenance window start
+- `enable_kubernetes_version_updates` (Boolean) Flag to enable/disable auto-updates of the Kubernetes version
+- `enable_machine_image_version_updates` (Boolean) Flag to enable/disable auto-updates of the OS image version
+- `end` (String) RFC3339 Date time for maintenance window end. i.e. `2019-08-24T23:30:00Z`
+- `start` (String) RFC3339 Date time for maintenance window start. i.e. `2019-08-24T23:00:00Z`
 
 
 <a id="nestedatt--node_pools"></a>
