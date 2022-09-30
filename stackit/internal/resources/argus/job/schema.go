@@ -50,7 +50,7 @@ func (r Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) 
 		Description: "Manages Argus Instances",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
-				Description: "Specified the Argus Job ID",
+				Description: "Specifies the Argus Job ID",
 				Type:        types.StringType,
 				Computed:    true,
 			},

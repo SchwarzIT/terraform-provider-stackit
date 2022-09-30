@@ -102,7 +102,7 @@ Read-Only:
 - `os_version` (String) The OS image version
 - `taints` (Attributes List) Taint blocks (see [below for nested schema](#nestedatt--node_pools--taints))
 - `volume_size_gb` (Number) The volume size in GB
-- `volume_type` (String) Specified the volume type
+- `volume_type` (String) Specifies the volume type
 - `zones` (List of String) List of availability zones
 
 <a id="nestedatt--node_pools--taints"></a>

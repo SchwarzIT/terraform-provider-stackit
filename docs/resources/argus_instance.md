@@ -26,7 +26,7 @@ resource "stackit_argus_instance" "example" {
 ### Required
 
 - `name` (String) Specifies the name of the Argus instance
-- `plan` (String) Specified the Argus plan. Available options are: `Monitoring-Medium-EU01`, `Monitoring-Large-EU01`, `Frontend-Starter-EU01`, `Monitoring-XL-EU01`, `Monitoring-XXL-EU01`, `Monitoring-Starter-EU01`, `Monitoring-Basic-EU01`, `Observability-Medium-EU01`, `Observability-Large-EU01 `, `Observability-XL-EU01`, `Observability-Starter-EU01`, `Observability-Basic-EU01`, `Observability-XXL-EU01`.
+- `plan` (String) Specifies the Argus plan. Available options are: `Monitoring-Medium-EU01`, `Monitoring-Large-EU01`, `Frontend-Starter-EU01`, `Monitoring-XL-EU01`, `Monitoring-XXL-EU01`, `Monitoring-Starter-EU01`, `Monitoring-Basic-EU01`, `Observability-Medium-EU01`, `Observability-Large-EU01 `, `Observability-XL-EU01`, `Observability-Starter-EU01`, `Observability-Basic-EU01`, `Observability-XXL-EU01`.
 - `project_id` (String) Specifies the Project ID the Argus instance belongs to
 
 ### Optional
@@ -41,7 +41,7 @@ resource "stackit_argus_instance" "example" {
 - `grafana_initial_admin_password` (String, Sensitive) Specifies an initial Grafana admin password.
 - `grafana_initial_admin_user` (String) Specifies an initial Grafana admin username.
 - `grafana_url` (String) Specifies Grafana URL.
-- `id` (String) Specified the Argus instance ID
+- `id` (String) Specifies the Argus instance ID
 - `is_updatable` (Boolean) Specifies if the instance can be updated.
 - `jaeger_traces_url` (String)
 - `jaeger_ui_url` (String)

@@ -27,7 +27,7 @@ func (r Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) 
 		Description: "Manages Object Storage buckets",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
-				Description: "Specified the resource ID",
+				Description: "Specifies the resource ID",
 				Type:        types.StringType,
 				Computed:    true,
 			},

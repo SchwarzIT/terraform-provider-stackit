@@ -17,7 +17,7 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 		Description: "Data source for kubernetes clusters",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
-				Description: "Specified the resource ID",
+				Description: "Specifies the resource ID",
 				Type:        types.StringType,
 				Computed:    true,
 			},
@@ -99,7 +99,7 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 						Computed:    true,
 					},
 					"volume_type": {
-						Description: "Specified the volume type",
+						Description: "Specifies the volume type",
 						Type:        types.StringType,
 						Computed:    true,
 					},

@@ -52,7 +52,7 @@ resource "stackit_argus_job" "example" {
 
 ### Read-Only
 
-- `id` (String) Specified the Argus Job ID
+- `id` (String) Specifies the Argus Job ID
 
 <a id="nestedatt--targets"></a>
 ### Nested Schema for `targets`
