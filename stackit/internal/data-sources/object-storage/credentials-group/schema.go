@@ -10,14 +10,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-// CredentialsGroup is the schema model
-type CredentialsGroup struct {
-	ID        types.String `tfsdk:"id"`
-	ProjectID types.String `tfsdk:"project_id"`
-	Name      types.String `tfsdk:"name"`
-	URN       types.String `tfsdk:"urn"`
-}
-
 // GetSchema returns the terraform schema structure
 func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
@@ -48,16 +40,12 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 				Description: "the credential group's display name",
 				Type:        types.StringType,
 				Computed:    true,
-				Optional:    false,
-				Required:    false,
 			},
 
 			"urn": {
 				Description: "credential group URN",
 				Type:        types.StringType,
 				Computed:    true,
-				Required:    false,
-				Optional:    false,
 			},
 		},
 	}, nil

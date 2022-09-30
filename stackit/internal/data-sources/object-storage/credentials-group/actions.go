@@ -4,7 +4,8 @@ import (
 	"context"
 	"time"
 
-	credentialsgroup "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage/credentials-group"
+	clientCredentialsGroup "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage/credentials-group"
+	credentialsGroup "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/credentials-group"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	helper "github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -17,8 +18,8 @@ const (
 // Read - lifecycle function
 func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	c := r.Provider.Client()
-	var data CredentialsGroup
-	var list credentialsgroup.CredentialsGroupResponse
+	var data credentialsGroup.CredentialsGroup
+	var list clientCredentialsGroup.CredentialsGroupResponse
 
 	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
