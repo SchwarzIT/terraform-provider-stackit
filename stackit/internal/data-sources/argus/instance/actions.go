@@ -55,9 +55,14 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	config.JaegerUIURL = types.String{Value: b.Instance.JaegerUIURL}
 	config.OtlpTracesURL = types.String{Value: b.Instance.OtlpTracesURL}
 	config.ZipkinSpansURL = types.String{Value: b.Instance.ZipkinSpansURL}
-	config.Grafana.EnablePublicAccess = types.Bool{Value: b.Instance.GrafanaPublicReadAccess}
-	config.Metrics.RetentionDays1hDownsampling = types.Int64{Value: int64(b.Instance.MetricsRetentionTime1h)}
-	config.Metrics.RetentionDays5mDownsampling = types.Int64{Value: int64(b.Instance.MetricsRetentionTime5m)}
+
+	config.Grafana = &instance.Grafana{
+		EnablePublicAccess: types.Bool{Value: b.Instance.GrafanaPublicReadAccess},
+	}
+	config.Metrics = &instance.Metrics{
+		RetentionDays1hDownsampling: types.Int64{Value: int64(b.Instance.MetricsRetentionTime1h)},
+		RetentionDays5mDownsampling: types.Int64{Value: int64(b.Instance.MetricsRetentionTime5m)},
+	}
 
 	diags = resp.State.Set(ctx, &config)
 	resp.Diagnostics.Append(diags...)
