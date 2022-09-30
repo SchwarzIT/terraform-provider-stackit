@@ -52,7 +52,7 @@ resource "stackit_kubernetes_cluster" "example" {
 
 ### Read-Only
 
-- `id` (String) Specified the resource ID
+- `id` (String) Specifies the resource ID
 - `kube_config` (String, Sensitive) Kube config file used for connecting to the cluster
 - `status` (String) The cluster's aggregated status
 
@@ -117,7 +117,7 @@ Optional:
 - `os_version` (String) The OS image version. Only `3139.2.0` is supported
 - `taints` (Attributes List) Specifies a taint list as defined below (see [below for nested schema](#nestedatt--node_pools--taints))
 - `volume_size_gb` (Number) The volume size in GB. Default is set to `20`
-- `volume_type` (String) Specified the volume type. Defaults to `storage_premium_perf1`. Available options are `storage_premium_perf0`, `storage_premium_perf1`, `storage_premium_perf2`, `storage_premium_perf4`, `storage_premium_perf6`
+- `volume_type` (String) Specifies the volume type. Defaults to `storage_premium_perf1`. Available options are `storage_premium_perf0`, `storage_premium_perf1`, `storage_premium_perf2`, `storage_premium_perf4`, `storage_premium_perf6`
 - `zones` (List of String) Specify a list of availability zones. Accepted options are `eu01-m` for metro, or `eu01-1`, `eu01-2`, `eu01-3`
 
 <a id="nestedatt--node_pools--taints"></a>

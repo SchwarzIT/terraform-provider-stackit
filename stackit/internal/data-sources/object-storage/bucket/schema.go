@@ -10,20 +10,16 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-// Bucket is the schema model
-type Bucket struct {
-	Name         types.String `tfsdk:"name"`
-	ProjectID    types.String `tfsdk:"project_id"`
-	Region       types.String `tfsdk:"region"`
-	HostStyleURL types.String `tfsdk:"host_style_url"`
-	PathStyleURL types.String `tfsdk:"path_style_url"`
-}
-
 // GetSchema returns the terraform schema structure
 func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		Description: "Data source for Object Storage buckets",
 		Attributes: map[string]tfsdk.Attribute{
+			"id": {
+				Description: "Specifies the resource ID",
+				Type:        types.StringType,
+				Computed:    true,
+			},
 			"name": {
 				Description: "the bucket name",
 				Type:        types.StringType,

@@ -79,7 +79,7 @@ func (r Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) 
 		Description: "Manages kubernetes clusters",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
-				Description: "Specified the resource ID",
+				Description: "Specifies the resource ID",
 				Type:        types.StringType,
 				Computed:    true,
 			},
@@ -192,7 +192,7 @@ func (r Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) 
 						},
 					},
 					"volume_type": {
-						Description: "Specified the volume type. Defaults to `storage_premium_perf1`. Available options are `storage_premium_perf0`, `storage_premium_perf1`, `storage_premium_perf2`, `storage_premium_perf4`, `storage_premium_perf6`",
+						Description: "Specifies the volume type. Defaults to `storage_premium_perf1`. Available options are `storage_premium_perf0`, `storage_premium_perf1`, `storage_premium_perf2`, `storage_premium_perf4`, `storage_premium_perf6`",
 						Type:        types.StringType,
 						Optional:    true,
 						Computed:    true,

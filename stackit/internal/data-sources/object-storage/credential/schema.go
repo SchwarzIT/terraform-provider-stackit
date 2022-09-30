@@ -45,8 +45,6 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 			"expiry": {
 				Type:     types.StringType,
 				Computed: true,
-				Required: false,
-				Optional: false,
 			},
 
 			"display_name": {

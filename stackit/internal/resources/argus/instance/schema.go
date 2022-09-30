@@ -54,7 +54,7 @@ func (r Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) 
 		Description: "Manages Argus Instances",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
-				Description: "Specified the Argus instance ID",
+				Description: "Specifies the Argus instance ID",
 				Type:        types.StringType,
 				Computed:    true,
 			},
@@ -84,7 +84,7 @@ func (r Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) 
 			},
 
 			"plan": {
-				Description: "Specified the Argus plan. Available options are: `Monitoring-Medium-EU01`, `Monitoring-Large-EU01`, `Frontend-Starter-EU01`, `Monitoring-XL-EU01`, `Monitoring-XXL-EU01`, `Monitoring-Starter-EU01`, `Monitoring-Basic-EU01`, `Observability-Medium-EU01`, `Observability-Large-EU01 `, `Observability-XL-EU01`, `Observability-Starter-EU01`, `Observability-Basic-EU01`, `Observability-XXL-EU01`.",
+				Description: "Specifies the Argus plan. Available options are: `Monitoring-Medium-EU01`, `Monitoring-Large-EU01`, `Frontend-Starter-EU01`, `Monitoring-XL-EU01`, `Monitoring-XXL-EU01`, `Monitoring-Starter-EU01`, `Monitoring-Basic-EU01`, `Observability-Medium-EU01`, `Observability-Large-EU01 `, `Observability-XL-EU01`, `Observability-Starter-EU01`, `Observability-Basic-EU01`, `Observability-XXL-EU01`.",
 				Type:        types.StringType,
 				Required:    true,
 			},
