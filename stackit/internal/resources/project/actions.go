@@ -301,27 +301,29 @@ func (r Resource) updateProject(ctx context.Context, plan, state Project, resp *
 }
 
 func (r Resource) updateKubernetesProject(ctx context.Context, plan, state Project, resp *resource.UpdateResponse) {
-	if plan.EnableKubernetes.Equal(state.EnableKubernetes) || plan.EnableKubernetes.IsNull() {
+	if plan.EnableKubernetes.Equal(state.EnableKubernetes) {
 		return
 	}
 
-	if plan.EnableKubernetes.Value {
-		r.createKubernetesProject(ctx, &resp.Diagnostics, plan.ID.Value)
-	} else {
+	if plan.EnableKubernetes.IsNull() || !plan.EnableKubernetes.Value {
 		r.deleteKubernetesProject(ctx, &resp.Diagnostics, plan.ID.Value)
+		return
 	}
+
+	r.createKubernetesProject(ctx, &resp.Diagnostics, plan.ID.Value)
 }
 
 func (r Resource) updateObjectStorageProject(ctx context.Context, plan, state Project, resp *resource.UpdateResponse) {
-	if plan.EnableObjectStorage.Equal(state.EnableObjectStorage) || plan.EnableObjectStorage.IsNull() {
+	if plan.EnableObjectStorage.Equal(state.EnableObjectStorage) {
 		return
 	}
 
-	if plan.EnableObjectStorage.Value {
-		r.createObjectStorageProject(ctx, &resp.Diagnostics, plan.ID.Value)
-	} else {
+	if plan.EnableObjectStorage.IsNull() || !plan.EnableObjectStorage.Value {
 		r.deleteObjectStorageProject(ctx, &resp.Diagnostics, plan.ID.Value)
+		return
 	}
+
+	r.createObjectStorageProject(ctx, &resp.Diagnostics, plan.ID.Value)
 }
 
 // Delete - lifecycle function
@@ -373,19 +375,25 @@ func (r Resource) deleteKubernetesProject(ctx context.Context, d *diag.Diagnosti
 		if !list {
 			res, err := c.Kubernetes.Clusters.List(ctx, projectID)
 			if err != nil {
+				if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+					list = true
+				}
 				return helper.RetryableError(err)
 			}
 			list = true
-			if len(res) > 0 {
+			if len(res.Items) > 0 {
 				canDelete = false
 				return nil
 			}
 		}
 		if err := c.Kubernetes.Projects.Delete(ctx, projectID); err != nil {
-			if strings.Contains(err.Error(), http.StatusText(http.StatusInternalServerError)) {
-				return helper.RetryableError(err)
+			if common.IsNonRetryable(err) {
+				return helper.NonRetryableError(err)
 			}
-			return helper.NonRetryableError(err)
+			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+				return nil
+			}
+			return helper.RetryableError(err)
 		}
 		return nil
 	}); err != nil {
@@ -407,6 +415,9 @@ func (r Resource) deleteObjectStorageProject(ctx context.Context, d *diag.Diagno
 		if !list {
 			res, err := c.ObjectStorage.Buckets.List(ctx, projectID)
 			if err != nil {
+				if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+					list = true
+				}
 				return helper.RetryableError(err)
 			}
 			list = true
@@ -416,10 +427,13 @@ func (r Resource) deleteObjectStorageProject(ctx context.Context, d *diag.Diagno
 			}
 		}
 		if err := c.ObjectStorage.Projects.Delete(ctx, projectID); err != nil {
-			if strings.Contains(err.Error(), http.StatusText(http.StatusInternalServerError)) {
-				return helper.RetryableError(err)
+			if common.IsNonRetryable(err) {
+				return helper.NonRetryableError(err)
 			}
-			return helper.NonRetryableError(err)
+			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+				return nil
+			}
+			return helper.RetryableError(err)
 		}
 		return nil
 	}); err != nil {

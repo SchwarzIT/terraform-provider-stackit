@@ -29,8 +29,8 @@ func TestAcc_Project(t *testing.T) {
 		t.Skip("Skipping TestAcc_Project: ACC_TEST_USER_UUID not specified")
 	}
 
-	name := "ODJ-AccTest " + acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
-	newName := "ODJ-AccTest " + acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
+	name := "ODJ AccTest " + acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
+	newName := "ODJ AccTest " + acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
 
 	resource.ParallelTest(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){
@@ -54,11 +54,42 @@ func TestAcc_Project(t *testing.T) {
 					resource.TestCheckResourceAttr("stackit_project.example", "billing_ref", billingRef),
 				),
 			},
+			// enabled services
+			{
+				Config: config2(newName, billingRef, user, true, false),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("stackit_project.example", "id"),
+					resource.TestCheckResourceAttr("stackit_project.example", "name", newName),
+					resource.TestCheckResourceAttr("stackit_project.example", "billing_ref", billingRef),
+					resource.TestCheckResourceAttr("stackit_project.example", "enable_kubernetes", "true"),
+					resource.TestCheckResourceAttr("stackit_project.example", "enable_object_storage", "false"),
+				),
+			},
+			{
+				Config: config2(newName, billingRef, user, false, true),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("stackit_project.example", "id"),
+					resource.TestCheckResourceAttr("stackit_project.example", "name", newName),
+					resource.TestCheckResourceAttr("stackit_project.example", "billing_ref", billingRef),
+					resource.TestCheckResourceAttr("stackit_project.example", "enable_kubernetes", "false"),
+					resource.TestCheckResourceAttr("stackit_project.example", "enable_object_storage", "true"),
+				),
+			},
+			// back to default
+			{
+				Config: config(newName, billingRef, user),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("stackit_project.example", "id"),
+					resource.TestCheckResourceAttr("stackit_project.example", "name", newName),
+					resource.TestCheckResourceAttr("stackit_project.example", "billing_ref", billingRef),
+				),
+			},
 			// test import
 			{
-				ResourceName:      "stackit_project.example",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "stackit_project.example",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"owner"},
 			},
 		},
 	})
@@ -75,5 +106,23 @@ func config(name, billingRef, user string) string {
 		name,
 		billingRef,
 		user,
+	)
+}
+
+func config2(name, billingRef, user string, enableKubernetes, enableObjectStorage bool) string {
+	return fmt.Sprintf(`
+	resource "stackit_project" "example" {
+		name        = "%s"
+		billing_ref = "%s"
+		owner       = "%s"
+		enable_kubernetes = %v
+		enable_object_storage = %v
+	}
+	`,
+		name,
+		billingRef,
+		user,
+		enableKubernetes,
+		enableObjectStorage,
 	)
 }

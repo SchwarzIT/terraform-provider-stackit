@@ -9,7 +9,7 @@ require (
 )
 
 require (
-	github.com/SchwarzIT/community-stackit-go-client v0.0.0-20220922175542-cfdbd9ef5671
+	github.com/SchwarzIT/community-stackit-go-client v0.1.1
 	github.com/agext/levenshtein v1.2.2 // indirect
 	github.com/apparentlymart/go-cidr v1.1.0 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
