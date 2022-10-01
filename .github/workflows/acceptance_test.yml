@@ -3,6 +3,7 @@ on:
   schedule:
     - cron: '30 19 * * *'
 
+jobs:
   test:
     runs-on: ubuntu-latest
     steps:
