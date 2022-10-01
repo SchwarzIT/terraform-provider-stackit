@@ -2,6 +2,8 @@ name: Acceptance Tests
 on:
   schedule:
     - cron: '30 19 * * *'
+  workflow_dispatch:
+    types: [requested]
 
 jobs:
   test:
