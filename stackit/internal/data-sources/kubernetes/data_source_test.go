@@ -15,7 +15,7 @@ import (
 const run_this_test = false
 
 func TestAcc_kubernetes(t *testing.T) {
-	if !run_this_test {
+	if !common.ShouldAccTestRun(run_this_test) {
 		t.Skip()
 		return
 	}
