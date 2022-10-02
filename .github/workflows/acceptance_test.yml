@@ -4,6 +4,9 @@ on:
     - cron: '30 19 * * *'
   workflow_dispatch:
 
+env:
+  ACC_TEST_CI: 1
+
 jobs:
   test:
     runs-on: ubuntu-latest
