@@ -42,8 +42,14 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	config.Scheme = types.String{Value: b.Data.Scheme}
 	config.ScrapeInterval = types.String{Value: b.Data.ScrapeInterval}
 	config.ScrapeTimeout = types.String{Value: b.Data.ScrapeTimeout}
-	config.BasicAuth.Username = types.String{Value: b.Data.BasicAuth.Username}
-	config.BasicAuth.Password = types.String{Value: b.Data.BasicAuth.Password}
+
+	if b.Data.BasicAuth == nil {
+		return
+	}
+	config.BasicAuth = &job.BasicAuth{
+		Username: types.String{Value: b.Data.BasicAuth.Username},
+		Password: types.String{Value: b.Data.BasicAuth.Password},
+	}
 
 	diags = resp.State.Set(ctx, &config)
 	resp.Diagnostics.Append(diags...)

@@ -55,7 +55,8 @@ resource "stackit_argus_instance" "example" {
 		retention_days_1h_downsampling = 10
 	}
 }
-	data "data.stackit_argus_instance" "example" {
+	
+data "data.stackit_argus_instance" "example" {	
 	depends_on = [stackit_argus_instance.example]
 	project_id = "%s"
 	name       = "%s"

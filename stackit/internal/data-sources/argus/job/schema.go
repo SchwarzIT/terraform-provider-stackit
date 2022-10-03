@@ -61,7 +61,6 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 			"metrics_path": {
 				Description: "Specifies the job scraping path. Defaults to `/metrics`",
 				Type:        types.StringType,
-				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					modifiers.StringDefault(default_metrics_path),
@@ -71,7 +70,6 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 			"scheme": {
 				Description: "Specifies the scheme. Default is `https`.",
 				Type:        types.StringType,
-				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					modifiers.StringDefault(default_scheme),
@@ -81,7 +79,6 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 			"scrape_interval": {
 				Description: "Specifies the scrape interval as duration string. Default is `5m`.",
 				Type:        types.StringType,
-				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					modifiers.StringDefault(default_scrape_interval),
@@ -91,7 +88,6 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 			"scrape_timeout": {
 				Description: "Specifies the scrape timeout as duration string. Default is `2m`.",
 				Type:        types.StringType,
-				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					modifiers.StringDefault(default_scrape_timeout),
@@ -100,12 +96,10 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 
 			"saml2": {
 				Description: "A saml2 configuration block",
-				Optional:    true,
 				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
 					"enable_url_parameters": {
 						Description: "Should URL parameters be enabled? Default is `true`",
 						Type:        types.BoolType,
-						Optional:    true,
 						Computed:    true,
 						PlanModifiers: []tfsdk.AttributePlanModifier{
 							modifiers.BoolDefault(default_saml2_enable_url_parameters),
@@ -116,34 +110,33 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 
 			"basic_auth": {
 				Description: "A basic_auth block",
-				Optional:    true,
 				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
 					"username": {
 						Description: "Specifies basic auth username",
 						Type:        types.StringType,
-						Required:    true,
+						Computed:    true,
 					},
 					"password": {
 						Description: "Specifies basic auth password",
 						Type:        types.StringType,
-						Required:    true,
+						Computed:    true,
 					},
 				}),
 			},
 
 			"targets": {
 				Description: "targets list",
-				Required:    true,
+				Computed:    true,
 				Attributes: tfsdk.ListNestedAttributes(map[string]tfsdk.Attribute{
 					"urls": {
 						Description: "Specifies basic auth username",
 						Type:        types.ListType{ElemType: types.StringType},
-						Required:    true,
+						Computed:    true,
 					},
 					"labels": {
 						Description: "Specifies basic auth password",
 						Type:        types.MapType{ElemType: types.StringType},
-						Optional:    true,
+						Computed:    true,
 					},
 				}),
 			},

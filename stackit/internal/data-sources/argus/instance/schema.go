@@ -54,12 +54,10 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 
 			"grafana": {
 				Description: "A Grafana configuration block",
-				Optional:    true,
 				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
 					"enable_public_access": {
 						Description: "If true, anyone can access Grafana dashboards without logging in. Default is set to `false`.",
 						Type:        types.BoolType,
-						Optional:    true,
 						Computed:    true,
 						PlanModifiers: []tfsdk.AttributePlanModifier{
 							modifiers.BoolDefault(default_grafana_enable_public_access),
@@ -70,12 +68,10 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 
 			"metrics": {
 				Description: "Metrics configuration block",
-				Optional:    true,
 				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
 					"retention_days": {
 						Description: "Specifies for how many days the raw metrics are kept. Default is set to `90`",
 						Type:        types.Int64Type,
-						Optional:    true,
 						Computed:    true,
 						PlanModifiers: []tfsdk.AttributePlanModifier{
 							modifiers.Int64Default(default_metrics_retention_days),
@@ -84,7 +80,6 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 					"retention_days_5m_downsampling": {
 						Description: "Specifies for how many days the 5m downsampled metrics are kept. must be less than the value of the general retention. Default is set to `0` (disabled).",
 						Type:        types.Int64Type,
-						Optional:    true,
 						Computed:    true,
 						PlanModifiers: []tfsdk.AttributePlanModifier{
 							modifiers.Int64Default(default_metrics_retention_days_5m_downsampling),
@@ -93,7 +88,6 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 					"retention_days_1h_downsampling": {
 						Description: "Specifies for how many days the 1h downsampled metrics are kept. must be less than the value of the 5m downsampling retention. Default is set to `0` (disabled).",
 						Type:        types.Int64Type,
-						Optional:    true,
 						Computed:    true,
 						PlanModifiers: []tfsdk.AttributePlanModifier{
 							modifiers.Int64Default(default_metrics_retention_days_1h_downsampling),
