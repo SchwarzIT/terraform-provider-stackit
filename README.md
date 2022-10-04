@@ -38,7 +38,7 @@ resource "stackit_project" "example" {
 resource "stackit_kubernetes_cluster" "example" {
   name               = "my-cluster"
   project_id         = stackit_project.example.id
-  kubernetes_version = "1.23.5"
+  kubernetes_version = "1.23.12"
 
   node_pools = [{
     name         = "example"

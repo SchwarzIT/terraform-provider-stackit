@@ -110,7 +110,7 @@ func configMinimal(name string) string {
 resource "stackit_kubernetes_cluster" "example" {
 	project_id         = "%s"
 	name               = "%s"
-	kubernetes_version = "1.23.5"
+	kubernetes_version = "1.23.12"
 	
 	node_pools = [{
 		name         = "example-np"
@@ -128,7 +128,7 @@ func configExtended(name, nodepoolName, machineType string) string {
 resource "stackit_kubernetes_cluster" "example" {
 	project_id         = "%s"
 	name               = "%s"
-	kubernetes_version = "1.23.5"
+	kubernetes_version = "1.23.12"
 	allow_privileged_containers = false
 	
 	node_pools = [{
