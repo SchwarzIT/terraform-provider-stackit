@@ -8,8 +8,10 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/projects"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
+	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	helper "github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -38,14 +40,25 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	if plan.EnableKubernetes.Value {
+	p := Project{
+		ID:                  types.String{Value: plan.ID.Value},
+		Name:                types.String{Value: plan.Name.Value},
+		BillingRef:          types.String{Value: plan.BillingRef.Value},
+		Owner:               types.String{Value: plan.Owner.Value},
+		EnableKubernetes:    types.Bool{Null: true},
+		EnableObjectStorage: types.Bool{Null: true},
+	}
+
+	if !plan.EnableKubernetes.IsNull() {
+		p.EnableKubernetes = types.Bool{Value: plan.EnableKubernetes.Value}
 		r.createKubernetesProject(ctx, &resp.Diagnostics, plan.ID.Value)
 		if resp.Diagnostics.HasError() {
 			return
 		}
 	}
 
-	if plan.EnableObjectStorage.Value {
+	if !plan.EnableObjectStorage.IsNull() {
+		p.EnableObjectStorage = types.Bool{Value: plan.EnableObjectStorage.Value}
 		r.createObjectStorageProject(ctx, &resp.Diagnostics, plan.ID.Value)
 		if resp.Diagnostics.HasError() {
 			return
@@ -53,14 +66,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	// update state
-	diags = resp.State.Set(ctx, Project{
-		ID:                  types.String{Value: plan.ID.Value},
-		Name:                types.String{Value: plan.Name.Value},
-		BillingRef:          types.String{Value: plan.BillingRef.Value},
-		Owner:               types.String{Value: plan.Owner.Value},
-		EnableKubernetes:    types.Bool{Value: plan.EnableKubernetes.Value},
-		EnableObjectStorage: types.Bool{Value: plan.EnableObjectStorage.Value},
-	})
+	diags = resp.State.Set(ctx, p)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -212,21 +218,25 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	kubernetesEnabled := false
-	if res, err := c.Kubernetes.Projects.Get(ctx, p.ID.Value); err == nil && res.State == consts.SKE_PROJECT_STATUS_CREATED {
-		kubernetesEnabled = true
+	if !p.EnableKubernetes.IsNull() {
+		kubernetesEnabled := false
+		if res, err := c.Kubernetes.Projects.Get(ctx, p.ID.Value); err == nil && res.State == consts.SKE_PROJECT_STATUS_CREATED {
+			kubernetesEnabled = true
+		}
+		p.EnableKubernetes = types.Bool{Value: kubernetesEnabled}
 	}
 
-	obejctStorageEnabled := false
-	if _, err := c.ObjectStorage.Projects.Get(ctx, p.ID.Value); err == nil {
-		obejctStorageEnabled = true
+	if !p.EnableObjectStorage.IsNull() {
+		obejctStorageEnabled := false
+		if _, err := c.ObjectStorage.Projects.Get(ctx, p.ID.Value); err == nil {
+			obejctStorageEnabled = true
+		}
+		p.EnableObjectStorage = types.Bool{Value: obejctStorageEnabled}
 	}
 
 	p.ID = types.String{Value: project.ID}
 	p.Name = types.String{Value: project.Name}
 	p.BillingRef = types.String{Value: project.BillingReference}
-	p.EnableKubernetes = types.Bool{Value: kubernetesEnabled}
-	p.EnableObjectStorage = types.Bool{Value: obejctStorageEnabled}
 
 	diags = resp.State.Set(ctx, &p)
 	resp.Diagnostics.Append(diags...)
@@ -294,22 +304,26 @@ func (r Resource) updateKubernetesProject(ctx context.Context, plan, state Proje
 	if plan.EnableKubernetes.Equal(state.EnableKubernetes) {
 		return
 	}
-	if plan.EnableKubernetes.Value {
-		r.createKubernetesProject(ctx, &resp.Diagnostics, plan.ID.Value)
-	} else {
+
+	if plan.EnableKubernetes.IsNull() || !plan.EnableKubernetes.Value {
 		r.deleteKubernetesProject(ctx, &resp.Diagnostics, plan.ID.Value)
+		return
 	}
+
+	r.createKubernetesProject(ctx, &resp.Diagnostics, plan.ID.Value)
 }
 
 func (r Resource) updateObjectStorageProject(ctx context.Context, plan, state Project, resp *resource.UpdateResponse) {
 	if plan.EnableObjectStorage.Equal(state.EnableObjectStorage) {
 		return
 	}
-	if plan.EnableObjectStorage.Value {
-		r.createObjectStorageProject(ctx, &resp.Diagnostics, plan.ID.Value)
-	} else {
+
+	if plan.EnableObjectStorage.IsNull() || !plan.EnableObjectStorage.Value {
 		r.deleteObjectStorageProject(ctx, &resp.Diagnostics, plan.ID.Value)
+		return
 	}
+
+	r.createObjectStorageProject(ctx, &resp.Diagnostics, plan.ID.Value)
 }
 
 // Delete - lifecycle function
@@ -361,19 +375,25 @@ func (r Resource) deleteKubernetesProject(ctx context.Context, d *diag.Diagnosti
 		if !list {
 			res, err := c.Kubernetes.Clusters.List(ctx, projectID)
 			if err != nil {
+				if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+					list = true
+				}
 				return helper.RetryableError(err)
 			}
 			list = true
-			if len(res) > 0 {
+			if len(res.Items) > 0 {
 				canDelete = false
 				return nil
 			}
 		}
 		if err := c.Kubernetes.Projects.Delete(ctx, projectID); err != nil {
-			if strings.Contains(err.Error(), http.StatusText(http.StatusInternalServerError)) {
-				return helper.RetryableError(err)
+			if common.IsNonRetryable(err) {
+				return helper.NonRetryableError(err)
 			}
-			return helper.NonRetryableError(err)
+			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+				return nil
+			}
+			return helper.RetryableError(err)
 		}
 		return nil
 	}); err != nil {
@@ -395,6 +415,9 @@ func (r Resource) deleteObjectStorageProject(ctx context.Context, d *diag.Diagno
 		if !list {
 			res, err := c.ObjectStorage.Buckets.List(ctx, projectID)
 			if err != nil {
+				if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+					list = true
+				}
 				return helper.RetryableError(err)
 			}
 			list = true
@@ -404,10 +427,13 @@ func (r Resource) deleteObjectStorageProject(ctx context.Context, d *diag.Diagno
 			}
 		}
 		if err := c.ObjectStorage.Projects.Delete(ctx, projectID); err != nil {
-			if strings.Contains(err.Error(), http.StatusText(http.StatusInternalServerError)) {
-				return helper.RetryableError(err)
+			if common.IsNonRetryable(err) {
+				return helper.NonRetryableError(err)
 			}
-			return helper.NonRetryableError(err)
+			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+				return nil
+			}
+			return helper.RetryableError(err)
 		}
 		return nil
 	}); err != nil {
@@ -419,4 +445,20 @@ func (r Resource) deleteObjectStorageProject(ctx context.Context, d *diag.Diagno
 Therefor, in order to prevent them from automatically being deleted, we ignored your setting "enable_object_storage=false".
 If you wish for the change to be applied, please delete all existing buckets first & re-run the plan.`)
 	}
+}
+
+// ImportState handles terraform import
+func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	// validate project id
+	if err := clientValidate.ProjectID(req.ID); err != nil {
+		resp.Diagnostics.AddError(
+			"Unexpected Import Identifier",
+			fmt.Sprintf("Couldn't validate project_id.\n%s", err.Error()),
+		)
+		return
+	}
+
+	// set main attributes
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+
 }
