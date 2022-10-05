@@ -42,6 +42,8 @@ func (r Resource) validate(
 		return err
 	}
 
+	clusterConfig.Version = maxVersionOption(clusterConfig.Version, opts.KubernetesVersions)
+
 	for _, np := range nodePools {
 		if err := validateMachineImage(np.Machine.Image.Name, np.Machine.Image.Version, opts.MachineImages); err != nil {
 			return err
@@ -58,6 +60,21 @@ func (r Resource) validate(
 	}
 
 	return nil
+}
+
+// maxVersionOption returns the maximal version that matches the given version.
+// If the given version only contains major and minor version, the latest patch version is returned.
+func maxVersionOption(version string, versionOptions []options.KubernetesVersion) string {
+	if strings.Count(version, ".") == 2 {
+		return version
+	}
+	ret := version
+	for _, v := range versionOptions {
+		if len(v.Version) > len(version) && strings.HasPrefix(v.Version, version+".") && v.Version > ret {
+			ret = v.Version
+		}
+	}
+	return ret
 }
 
 func validateKubernetesVersion(version string, versionOptions []options.KubernetesVersion) error {
