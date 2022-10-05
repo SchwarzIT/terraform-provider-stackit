@@ -34,7 +34,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		}
 		return nil
 	}); err != nil {
-		resp.Diagnostics.AddError("failed to read instance", err.Error())
+		resp.Diagnostics.AddError("failed to read job", err.Error())
 		return
 	}
 	config.Name = types.String{Value: b.Data.JobName}

@@ -11,9 +11,9 @@ import (
 	"testing"
 )
 
-const run_this_test = true
+const run_this_test = false
 
-func TestAcc_Argus_Instances(t *testing.T) {
+func TestAcc_ArgusInstances(t *testing.T) {
 	if !run_this_test {
 		t.Skip()
 		return
@@ -28,12 +28,12 @@ func TestAcc_Argus_Instances(t *testing.T) {
 			{
 				Config: config(name, "Monitoring-Medium-EU01"),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("data.stackit_argus_instance.example", "name", name),
 					resource.TestCheckResourceAttr("data.stackit_argus_instance.example", "project_id", common.ACC_TEST_PROJECT_ID),
 					resource.TestCheckResourceAttr("data.stackit_argus_instance.example", "grafana.enable_public_access", "true"),
-					resource.TestCheckResourceAttr("data.stackit_argus_instance.example", "metrics.retention_days", "60"),
-					resource.TestCheckResourceAttr("data.stackit_argus_instance.example", "metrics.retention_days_5m_downsampling", "20"),
-					resource.TestCheckResourceAttr("data.stackit_argus_instance.example", "metrics.retention_days_1h_downsampling", "10"),
+					resource.TestCheckResourceAttrSet("data.stackit_argus_instance.example", "id"),
+					resource.TestCheckResourceAttrSet("data.stackit_argus_instance.example", "metrics.retention_days"),
+					resource.TestCheckResourceAttrSet("data.stackit_argus_instance.example", "metrics.retention_days_5m_downsampling"),
+					resource.TestCheckResourceAttrSet("data.stackit_argus_instance.example", "metrics.retention_days_1h_downsampling"),
 				),
 			},
 		},
@@ -58,15 +58,12 @@ resource "stackit_argus_instance" "example" {
 data "stackit_argus_instance" "example" {
 	depends_on = [stackit_argus_instance.example]
 	project_id = "%s"
-	name       = "%s"
-	plan       = "%s"
+	id		   = stackit_argus_instance.example.id
 }
 	  `,
 		common.ACC_TEST_PROJECT_ID,
 		name,
 		plan,
 		common.ACC_TEST_PROJECT_ID,
-		name,
-		plan,
 	)
 }

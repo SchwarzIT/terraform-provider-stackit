@@ -96,6 +96,7 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 
 			"saml2": {
 				Description: "A saml2 configuration block",
+				Optional:    true,
 				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
 					"enable_url_parameters": {
 						Description: "Should URL parameters be enabled? Default is `true`",
@@ -110,6 +111,7 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 
 			"basic_auth": {
 				Description: "A basic_auth block",
+				Optional:    true,
 				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
 					"username": {
 						Description: "Specifies basic auth username",

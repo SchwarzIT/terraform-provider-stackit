@@ -17,15 +17,15 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 		Description: "Manages Argus Instances",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
-				Description: "Specified the Argus instance ID",
+				Description: "Specifies the Argus instance ID",
 				Type:        types.StringType,
-				Computed:    true,
+				Required:    true,
 			},
 
 			"name": {
 				Description: "Specifies the name of the Argus instance",
 				Type:        types.StringType,
-				Required:    true,
+				Computed:    true,
 				Validators: []tfsdk.AttributeValidator{
 					validate.StringWith(
 						instances.ValidateInstanceName,
@@ -47,14 +47,14 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 			},
 
 			"plan": {
-				Description: "Specified the Argus plan. Available options are: `Monitoring-Medium-EU01`, `Monitoring-Large-EU01`, `Frontend-Starter-EU01`, `Monitoring-XL-EU01`, `Monitoring-XXL-EU01`, `Monitoring-Starter-EU01`, `Monitoring-Basic-EU01`, `Observability-Medium-EU01`, `Observability-Large-EU01 `, `Observability-XL-EU01`, `Observability-Starter-EU01`, `Observability-Basic-EU01`, `Observability-XXL-EU01`.",
+				Description: "Specifies the Argus plan. Available options are: `Monitoring-Medium-EU01`, `Monitoring-Large-EU01`, `Frontend-Starter-EU01`, `Monitoring-XL-EU01`, `Monitoring-XXL-EU01`, `Monitoring-Starter-EU01`, `Monitoring-Basic-EU01`, `Observability-Medium-EU01`, `Observability-Large-EU01 `, `Observability-XL-EU01`, `Observability-Starter-EU01`, `Observability-Basic-EU01`, `Observability-XXL-EU01`.",
 				Type:        types.StringType,
-				Required:    true,
+				Computed:    true,
 			},
 
 			"grafana": {
 				Description: "A Grafana configuration block",
-				Computed:    true,
+				Optional:    true,
 				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
 					"enable_public_access": {
 						Description: "If true, anyone can access Grafana dashboards without logging in. Default is set to `false`.",
@@ -69,7 +69,7 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 
 			"metrics": {
 				Description: "Metrics configuration block",
-				Computed:    true,
+				Optional:    true,
 				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
 					"retention_days": {
 						Description: "Specifies for how many days the raw metrics are kept. Default is set to `90`",
