@@ -114,6 +114,7 @@ resource "stackit_argus_job" "example" {
 	  }
 	]
 }
+	
 	  `,
 		common.ACC_TEST_PROJECT_ID,
 		name,
