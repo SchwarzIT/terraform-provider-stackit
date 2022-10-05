@@ -11,9 +11,9 @@ import (
 	"testing"
 )
 
-const run_this_test = false
+const run_this_test = true
 
-func TestAcc_kubernetes(t *testing.T) {
+func TestAcc_Argus_Instances(t *testing.T) {
 	if !run_this_test {
 		t.Skip()
 		return
@@ -26,14 +26,14 @@ func TestAcc_kubernetes(t *testing.T) {
 		},
 		Steps: []resource.TestStep{
 			{
-				Config: config(name, "instancepl"),
+				Config: config(name, "Monitoring-Medium-EU01"),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("data.stackit_argus_instance", "name", name),
-					resource.TestCheckResourceAttr("data.stackit_argus_instance", "project_id", common.ACC_TEST_PROJECT_ID),
-					resource.TestCheckResourceAttr("data.stackit_argus_instance", "grafana.enable_public_access", "true"),
-					resource.TestCheckResourceAttr("data.stackit_argus_instance", "metrics.retention_days", "60"),
-					resource.TestCheckResourceAttr("data.stackit_argus_instance", "metrics.retention_days_5m_downsampling", "20"),
-					resource.TestCheckResourceAttr("data.stackit_argus_instance", "metrics.retention_days_1h_downsampling", "10"),
+					resource.TestCheckResourceAttr("data.stackit_argus_instance.example", "name", name),
+					resource.TestCheckResourceAttr("data.stackit_argus_instance.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("data.stackit_argus_instance.example", "grafana.enable_public_access", "true"),
+					resource.TestCheckResourceAttr("data.stackit_argus_instance.example", "metrics.retention_days", "60"),
+					resource.TestCheckResourceAttr("data.stackit_argus_instance.example", "metrics.retention_days_5m_downsampling", "20"),
+					resource.TestCheckResourceAttr("data.stackit_argus_instance.example", "metrics.retention_days_1h_downsampling", "10"),
 				),
 			},
 		},
@@ -45,7 +45,7 @@ func config(name, plan string) string {
 resource "stackit_argus_instance" "example" {
 	project_id = "%s"
 	name       = "%s"
-	plan       = "instancepl"
+	plan       = "%s"
 	grafana	   = {
 		enable_public_access = true
 	}
@@ -55,16 +55,18 @@ resource "stackit_argus_instance" "example" {
 		retention_days_1h_downsampling = 10
 	}
 }
-	
-data "data.stackit_argus_instance" "example" {	
+data "stackit_argus_instance" "example" {
 	depends_on = [stackit_argus_instance.example]
 	project_id = "%s"
 	name       = "%s"
+	plan       = "%s"
 }
 	  `,
 		common.ACC_TEST_PROJECT_ID,
 		name,
+		plan,
 		common.ACC_TEST_PROJECT_ID,
 		name,
+		plan,
 	)
 }

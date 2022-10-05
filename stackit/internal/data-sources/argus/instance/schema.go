@@ -54,6 +54,7 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 
 			"grafana": {
 				Description: "A Grafana configuration block",
+				Computed:    true,
 				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
 					"enable_public_access": {
 						Description: "If true, anyone can access Grafana dashboards without logging in. Default is set to `false`.",
@@ -68,6 +69,7 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 
 			"metrics": {
 				Description: "Metrics configuration block",
+				Computed:    true,
 				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
 					"retention_days": {
 						Description: "Specifies for how many days the raw metrics are kept. Default is set to `90`",

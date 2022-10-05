@@ -89,7 +89,6 @@ resource "stackit_argus_job" "example" {
 	  enable_url_parameters = true
 	}
 }
-  
 	  `,
 		common.ACC_TEST_PROJECT_ID,
 		name,
