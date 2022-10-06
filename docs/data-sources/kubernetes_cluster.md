@@ -41,6 +41,7 @@ data "stackit_kubernetes_cluster" "example" {
 - `id` (String) Specifies the resource ID
 - `kube_config` (String, Sensitive) Kube config file used for connecting to the cluster
 - `kubernetes_version` (String) Kubernetes version
+- `kubernetes_version_used` (String) Full Kubernetes version used. For the data source, it'll always match `kubernetes_version`
 - `maintenance` (Attributes) A single maintenance block as defined below (see [below for nested schema](#nestedatt--maintenance))
 - `node_pools` (Attributes List) One or more `node_pool` blocks (see [below for nested schema](#nestedatt--node_pools))
 - `status` (String) The cluster aggregated status
