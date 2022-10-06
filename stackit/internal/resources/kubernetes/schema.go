@@ -19,6 +19,7 @@ type Cluster struct {
 	Name                      types.String  `tfsdk:"name"`
 	ProjectID                 types.String  `tfsdk:"project_id"`
 	KubernetesVersion         types.String  `tfsdk:"kubernetes_version"`
+	KubernetesVersionUsed     types.String  `tfsdk:"kubernetes_version_used"`
 	AllowPrivilegedContainers types.Bool    `tfsdk:"allow_privileged_containers"`
 	NodePools                 []NodePool    `tfsdk:"node_pools"`
 	Maintenance               *Maintenance  `tfsdk:"maintenance"`
@@ -112,6 +113,14 @@ func (r Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) 
 				Validators: []tfsdk.AttributeValidator{
 					validate.StringWith(clientValidate.SemVer, "validate container runtime"),
 				},
+				PlanModifiers: []tfsdk.AttributePlanModifier{
+					modifiers.StringDefault(default_version),
+				},
+			},
+			"kubernetes_version_used": {
+				Description: "Full Kubernetes version used. For example, if `1.22` was selected, this value may result to `1.22.15`",
+				Type:        types.StringType,
+				Computed:    true,
 			},
 			"allow_privileged_containers": {
 				Description: "Should containers be allowed to run in privileged mode? Default is `true`",

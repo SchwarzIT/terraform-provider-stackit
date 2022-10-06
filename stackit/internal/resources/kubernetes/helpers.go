@@ -3,7 +3,9 @@ package kubernetes
 import (
 	"context"
 	"fmt"
+
 	"github.com/Masterminds/semver"
+	"github.com/pkg/errors"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes/clusters"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
@@ -25,6 +27,7 @@ const (
 	default_volume_size_gb           int64 = 20
 	default_cri                            = "containerd"
 	default_zone                           = "eu01-m"
+	default_version                        = "1.23"
 )
 
 func (c *Cluster) isHealthyStatus(status string) bool {
@@ -32,7 +35,30 @@ func (c *Cluster) isHealthyStatus(status string) bool {
 		status == consts.SKE_CLUSTER_STATUS_HIBERNATED
 }
 
+func (r Resource) loadAvaiableVersions(ctx context.Context) ([]*semver.Version, error) {
+	c := r.Provider.Client()
+	var versionOptions []*semver.Version
+	opts, err := c.Kubernetes.Options.List(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "Couldn't fetch K8s options")
+	}
+
+	versionOptions = make([]*semver.Version, len(opts.KubernetesVersions))
+	for i, v := range opts.KubernetesVersions {
+		versionOption, err := semver.NewVersion(v.Version)
+		if err != nil {
+			return nil, err
+		}
+		versionOptions[i] = versionOption
+	}
+	return versionOptions, nil
+}
+
 func (c *Cluster) clusterConfig(versionOptions []*semver.Version) (clusters.Kubernetes, error) {
+	if c.KubernetesVersion.IsNull() || c.KubernetesVersion.IsUnknown() {
+		c.KubernetesVersion = types.String{Value: default_version}
+	}
+
 	clusterConfigVersion, err := semver.NewVersion(c.KubernetesVersion.Value)
 	if err != nil {
 		return clusters.Kubernetes{}, err
@@ -233,7 +259,10 @@ func (c *Cluster) maintenance() *clusters.Maintenance {
 // Transform transforms clusters.Cluster structure to Cluster
 func (c *Cluster) Transform(cl clusters.Cluster) {
 	c.ID = types.String{Value: cl.Name}
-	c.KubernetesVersion = types.String{Value: cl.Kubernetes.Version}
+	if c.KubernetesVersion.IsNull() || c.KubernetesVersion.IsUnknown() {
+		c.KubernetesVersion = types.String{Value: cl.Kubernetes.Version}
+	}
+	c.KubernetesVersionUsed = types.String{Value: cl.Kubernetes.Version}
 	c.AllowPrivilegedContainers = types.Bool{Value: cl.Kubernetes.AllowPrivilegedContainers}
 	c.Status = types.String{Value: cl.Status.Aggregated}
 
