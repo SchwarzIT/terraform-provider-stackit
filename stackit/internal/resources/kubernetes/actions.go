@@ -62,7 +62,11 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 	// cluster vars
 	projectID := cl.ProjectID.Value
 	clusterName := cl.Name.Value
-	clusterConfig := cl.clusterConfig()
+	clusterConfig, err := cl.clusterConfig()
+	if err != nil {
+		diags.AddError("Failed to create cluster config", err.Error())
+		return
+	}
 	nodePools := setNodepoolDefaults(cl.nodePools())
 	maintenance := cl.maintenance()
 	hibernations := cl.hibernations()

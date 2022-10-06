@@ -30,7 +30,7 @@ func (c *Cluster) isHealthyStatus(status string) bool {
 		status == consts.SKE_CLUSTER_STATUS_HIBERNATED
 }
 
-func (c *Cluster) clusterConfig() clusters.Kubernetes {
+func (c *Cluster) clusterConfig() (clusters.Kubernetes, error) {
 	cfg := clusters.Kubernetes{
 		Version:                   c.KubernetesVersion.Value,
 		AllowPrivilegedContainers: c.AllowPrivilegedContainers.Value,
@@ -39,7 +39,7 @@ func (c *Cluster) clusterConfig() clusters.Kubernetes {
 	if c.AllowPrivilegedContainers.IsNull() || c.AllowPrivilegedContainers.IsUnknown() {
 		cfg.AllowPrivilegedContainers = default_allow_privileged
 	}
-	return cfg
+	return cfg, nil
 }
 
 func (c *Cluster) nodePools() []clusters.NodePool {
