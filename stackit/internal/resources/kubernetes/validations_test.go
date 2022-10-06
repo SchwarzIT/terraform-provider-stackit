@@ -23,6 +23,11 @@ func Test_maxVersionOption(t *testing.T) {
 			{Version: "1.18.1"},
 			{Version: "1.18.0"},
 		}}, want: "1.18.1"},
+		{name: "regression", args: args{version: "1.23", versionOptions: []options.KubernetesVersion{
+			{Version: "1.23.3"},
+			{Version: "1.23.2"},
+			{Version: "1.23.1"},
+		}}, want: "1.23.3"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

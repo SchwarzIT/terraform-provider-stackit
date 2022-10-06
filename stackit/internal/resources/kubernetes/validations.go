@@ -38,11 +38,11 @@ func (r Resource) validate(
 		return nil
 	}
 
+	clusterConfig.Version = maxVersionOption(clusterConfig.Version, opts.KubernetesVersions)
+
 	if err := validateKubernetesVersion(clusterConfig.Version, opts.KubernetesVersions); err != nil {
 		return err
 	}
-
-	clusterConfig.Version = maxVersionOption(clusterConfig.Version, opts.KubernetesVersions)
 
 	for _, np := range nodePools {
 		if err := validateMachineImage(np.Machine.Image.Name, np.Machine.Image.Version, opts.MachineImages); err != nil {
