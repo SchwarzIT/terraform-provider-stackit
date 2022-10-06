@@ -8,6 +8,8 @@ require (
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.21.0
 )
 
+require github.com/Masterminds/semver v1.5.0 // indirect
+
 require (
 	github.com/SchwarzIT/community-stackit-go-client v0.1.1
 	github.com/agext/levenshtein v1.2.2 // indirect
