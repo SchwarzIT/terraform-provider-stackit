@@ -48,6 +48,11 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 				Type:        types.StringType,
 				Computed:    true,
 			},
+			"kubernetes_version_used": {
+				Description: "Full Kubernetes version used. For the data source, it'll always match `kubernetes_version`",
+				Type:        types.StringType,
+				Computed:    true,
+			},
 			"allow_privileged_containers": {
 				Description: "Are containers allowed to run in privileged mode?",
 				Type:        types.BoolType,

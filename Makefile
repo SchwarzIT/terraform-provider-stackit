@@ -47,7 +47,7 @@ testacc:
 		STACKIT_SERVICE_ACCOUNT_ID="$(STACKIT_SERVICE_ACCOUNT_ID)" \
 		STACKIT_SERVICE_ACCOUNT_TOKEN="$(STACKIT_SERVICE_ACCOUNT_TOKEN)" \
 		STACKIT_CUSTOMER_ACCOUNT_ID="$(STACKIT_CUSTOMER_ACCOUNT_ID)" \
-		go test -timeout 99999s -v ./... 
+		go test -timeout 99999s -v $(TEST)
 
 quality:
 	@goreportcard-cli -v ./...

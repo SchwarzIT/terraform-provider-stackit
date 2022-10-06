@@ -15,7 +15,7 @@ import (
 const run_this_test = false
 
 func TestAcc_kubernetes(t *testing.T) {
-	if !run_this_test {
+	if !common.ShouldAccTestRun(run_this_test) {
 		t.Skip()
 		return
 	}
@@ -68,7 +68,7 @@ func config(name, nodepoolName, machineType string) string {
 resource "stackit_kubernetes_cluster" "example" {
 	project_id         = "%s"
 	name               = "%s"
-	kubernetes_version = "1.23.5"
+	kubernetes_version = "1.23"
 	allow_privileged_containers = false
 	
 	node_pools = [{

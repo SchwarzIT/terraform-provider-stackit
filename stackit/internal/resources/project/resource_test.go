@@ -6,16 +6,17 @@ import (
 	"testing"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-const run_this_test = true
+const run_this_test = false
 
 func TestAcc_Project(t *testing.T) {
-	if !run_this_test {
+	if !common.ShouldAccTestRun(run_this_test) {
 		t.Skip()
 	}
 

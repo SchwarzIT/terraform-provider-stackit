@@ -17,7 +17,7 @@ import (
 const run_this_test = false
 
 func TestAcc_ArgusJob(t *testing.T) {
-	if !run_this_test {
+	if !common.ShouldAccTestRun(run_this_test) {
 		t.Skip()
 		return
 	}
@@ -89,7 +89,6 @@ resource "stackit_argus_job" "example" {
 	  enable_url_parameters = true
 	}
 }
-  
 	  `,
 		common.ACC_TEST_PROJECT_ID,
 		name,
@@ -115,6 +114,7 @@ resource "stackit_argus_job" "example" {
 	  }
 	]
 }
+	
 	  `,
 		common.ACC_TEST_PROJECT_ID,
 		name,

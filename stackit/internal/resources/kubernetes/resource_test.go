@@ -15,7 +15,7 @@ import (
 const run_this_test = false
 
 func TestAcc_kubernetes(t *testing.T) {
-	if !run_this_test {
+	if !common.ShouldAccTestRun(run_this_test) {
 		t.Skip()
 		return
 	}
@@ -99,7 +99,7 @@ func TestAcc_kubernetes(t *testing.T) {
 				ImportStateId:           fmt.Sprintf("%s,%s", common.ACC_TEST_PROJECT_ID, name),
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"status", "extensions"},
+				ImportStateVerifyIgnore: []string{"status", "extensions", "kubernetes_version"},
 			},
 		},
 	})
@@ -110,7 +110,7 @@ func configMinimal(name string) string {
 resource "stackit_kubernetes_cluster" "example" {
 	project_id         = "%s"
 	name               = "%s"
-	kubernetes_version = "1.23.5"
+	kubernetes_version = "1.23"
 	
 	node_pools = [{
 		name         = "example-np"
@@ -128,7 +128,7 @@ func configExtended(name, nodepoolName, machineType string) string {
 resource "stackit_kubernetes_cluster" "example" {
 	project_id         = "%s"
 	name               = "%s"
-	kubernetes_version = "1.23.5"
+	kubernetes_version = "1.23"
 	allow_privileged_containers = false
 	
 	node_pools = [{
