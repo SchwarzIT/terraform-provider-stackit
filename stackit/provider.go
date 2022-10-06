@@ -5,6 +5,8 @@ import (
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
+	dataArgusInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/argus/instance"
+	dataArgusJob "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/argus/job"
 	dataKubernetes "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/kubernetes"
 	dataObjectStorageBucket "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/object-storage/bucket"
 	dataObjectStorageCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/object-storage/credential"
@@ -74,8 +76,8 @@ This provider is built and maintained by the STACKIT community in Schwarz IT and
 // GetResources - Defines provider resources
 func (p *StackitProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
-		resourceArgusJob.New(p),
 		resourceArgusInstance.New(p),
+		resourceArgusJob.New(p),
 		resourceKubernetes.New(p),
 		resourceObjectStorageBucket.New(p),
 		resourceObjectStorageCredential.New(p),
@@ -87,6 +89,8 @@ func (p *StackitProvider) Resources(ctx context.Context) []func() resource.Resou
 // GetDataSources - Defines provider data sources
 func (p *StackitProvider) DataSources(context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
+		dataArgusInstance.New(p),
+		dataArgusJob.New(p),
 		dataObjectStorageBucket.New(p),
 		dataObjectStorageCredential.New(p),
 		dataObjectStorageCredentialsGroup.New(p),
