@@ -2,6 +2,7 @@ package stackit
 
 import (
 	"context"
+
 	client "github.com/SchwarzIT/community-stackit-go-client"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	dataArgusInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/argus/instance"
@@ -75,8 +76,8 @@ This provider is built and maintained by the STACKIT community in Schwarz IT and
 // GetResources - Defines provider resources
 func (p *StackitProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
-		resourceArgusJob.New(p),
 		resourceArgusInstance.New(p),
+		resourceArgusJob.New(p),
 		resourceKubernetes.New(p),
 		resourceObjectStorageBucket.New(p),
 		resourceObjectStorageCredential.New(p),

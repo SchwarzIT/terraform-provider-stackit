@@ -2,14 +2,15 @@ package instance
 
 import (
 	"context"
+	"net/http"
+	"strings"
+
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus/instances"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/instance"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	helper "github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"net/http"
-	"strings"
 )
 
 func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
@@ -37,7 +38,9 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		resp.Diagnostics.AddError("failed to read instance", err.Error())
 		return
 	}
+
 	config.ID = types.String{Value: b.ID}
+	config.Name = types.String{Value: b.Name}
 	config.Plan = types.String{Value: b.PlanName}
 	config.PlanID = types.String{Value: b.PlanID}
 	config.DashboardURL = types.String{Value: b.DashboardURL}
@@ -60,6 +63,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		EnablePublicAccess: types.Bool{Value: b.Instance.GrafanaPublicReadAccess},
 	}
 	config.Metrics = &instance.Metrics{
+		RetentionDays:               types.Int64{Value: int64(b.Instance.MetricsRetentionTimeRaw)},
 		RetentionDays1hDownsampling: types.Int64{Value: int64(b.Instance.MetricsRetentionTime1h)},
 		RetentionDays5mDownsampling: types.Int64{Value: int64(b.Instance.MetricsRetentionTime5m)},
 	}
