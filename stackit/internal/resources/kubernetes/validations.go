@@ -3,7 +3,6 @@ package kubernetes
 import (
 	"context"
 	"fmt"
-	"github.com/Masterminds/semver"
 	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes/clusters"
@@ -39,24 +38,6 @@ func (r Resource) validate(
 		return nil
 	}
 
-	clusterConfigVersion, err := semver.NewVersion(clusterConfig.Version)
-	if err != nil {
-		return err
-	}
-	clusterVersionConstraint, err := toVersionConstraint(clusterConfigVersion)
-	if err != nil {
-		return err
-	}
-	versionOptions := make([]*semver.Version, len(opts.KubernetesVersions))
-	for i, v := range opts.KubernetesVersions {
-		versionOption, err := semver.NewVersion(v.Version)
-		if err != nil {
-			return err
-		}
-		versionOptions[i] = versionOption
-	}
-	clusterConfig.Version = maxVersionOption(clusterVersionConstraint, versionOptions).String()
-
 	if err := validateKubernetesVersion(clusterConfig.Version, opts.KubernetesVersions); err != nil {
 		return err
 	}
@@ -77,27 +58,6 @@ func (r Resource) validate(
 	}
 
 	return nil
-}
-
-// toVersionConstraint matches the patch version if given, or else any version with same major and minor version.
-func toVersionConstraint(version *semver.Version) (*semver.Constraints, error) {
-	if version.String() == version.Original() { // patch version given
-		return semver.NewConstraint(fmt.Sprintf("= %s", version.String()))
-	}
-	nextVersion := version.IncMinor()
-	return semver.NewConstraint(fmt.Sprintf(">= %s, < %s", version.String(), nextVersion.String()))
-}
-
-// maxVersionOption returns the maximal version that matches the given version. A matching option is required.
-// If the given version only contains major and minor version, the latest patch version is returned.
-func maxVersionOption(versionConstraint *semver.Constraints, versionOptions []*semver.Version) *semver.Version {
-	ret := versionOptions[0]
-	for _, v := range versionOptions[1:] {
-		if versionConstraint.Check(v) && v.GreaterThan(ret) {
-			ret = v
-		}
-	}
-	return ret
 }
 
 func validateKubernetesVersion(version string, versionOptions []options.KubernetesVersion) error {

@@ -2,6 +2,8 @@ package kubernetes
 
 import (
 	"context"
+	"fmt"
+	"github.com/Masterminds/semver"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes/clusters"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
@@ -30,9 +32,19 @@ func (c *Cluster) isHealthyStatus(status string) bool {
 		status == consts.SKE_CLUSTER_STATUS_HIBERNATED
 }
 
-func (c *Cluster) clusterConfig() (clusters.Kubernetes, error) {
+func (c *Cluster) clusterConfig(versionOptions []*semver.Version) (clusters.Kubernetes, error) {
+	clusterConfigVersion, err := semver.NewVersion(c.KubernetesVersion.Value)
+	if err != nil {
+		return clusters.Kubernetes{}, err
+	}
+	clusterVersionConstraint, err := toVersionConstraint(clusterConfigVersion)
+	if err != nil {
+		return clusters.Kubernetes{}, err
+	}
+	clusterConfigVersion = maxVersionOption(clusterVersionConstraint, versionOptions)
+
 	cfg := clusters.Kubernetes{
-		Version:                   c.KubernetesVersion.Value,
+		Version:                   clusterConfigVersion.String(),
 		AllowPrivilegedContainers: c.AllowPrivilegedContainers.Value,
 	}
 
@@ -40,6 +52,27 @@ func (c *Cluster) clusterConfig() (clusters.Kubernetes, error) {
 		cfg.AllowPrivilegedContainers = default_allow_privileged
 	}
 	return cfg, nil
+}
+
+// toVersionConstraint matches the patch version if given, or else any version with same major and minor version.
+func toVersionConstraint(version *semver.Version) (*semver.Constraints, error) {
+	if version.String() == version.Original() { // patch version given
+		return semver.NewConstraint(fmt.Sprintf("= %s", version.String()))
+	}
+	nextVersion := version.IncMinor()
+	return semver.NewConstraint(fmt.Sprintf(">= %s, < %s", version.String(), nextVersion.String()))
+}
+
+// maxVersionOption returns the maximal version that matches the given version. A matching option is required.
+// If the given version only contains major and minor version, the latest patch version is returned.
+func maxVersionOption(versionConstraint *semver.Constraints, versionOptions []*semver.Version) *semver.Version {
+	ret := versionOptions[0]
+	for _, v := range versionOptions[1:] {
+		if versionConstraint.Check(v) && v.GreaterThan(ret) {
+			ret = v
+		}
+	}
+	return ret
 }
 
 func (c *Cluster) nodePools() []clusters.NodePool {

@@ -3,6 +3,7 @@ package kubernetes
 import (
 	"context"
 	"fmt"
+	"github.com/Masterminds/semver"
 	"net/http"
 	"strings"
 
@@ -59,10 +60,27 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 	c := r.Provider.Client()
 	created := false
 
+	var versionOptions []*semver.Version
+	opts, err := c.Kubernetes.Options.List(ctx)
+	if err != nil {
+		diags.AddWarning("Couldn't fetch K8s options", err.Error())
+		// maxVersionOption needs a non-empty list of versionOptions
+		versionOptions = []*semver.Version{semver.MustParse(cl.KubernetesVersion.Value)}
+	} else {
+		versionOptions = make([]*semver.Version, len(opts.KubernetesVersions))
+		for i, v := range opts.KubernetesVersions {
+			versionOption, err := semver.NewVersion(v.Version)
+			if err != nil {
+				return
+			}
+			versionOptions[i] = versionOption
+		}
+	}
+
 	// cluster vars
 	projectID := cl.ProjectID.Value
 	clusterName := cl.Name.Value
-	clusterConfig, err := cl.clusterConfig()
+	clusterConfig, err := cl.clusterConfig(versionOptions)
 	if err != nil {
 		diags.AddError("Failed to create cluster config", err.Error())
 		return
