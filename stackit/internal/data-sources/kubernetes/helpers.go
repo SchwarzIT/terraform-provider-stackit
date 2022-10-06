@@ -11,6 +11,7 @@ import (
 func transform(c *kubernetes.Cluster, cl clusters.Cluster) {
 	c.ID = types.String{Value: cl.Name}
 	c.KubernetesVersion = types.String{Value: cl.Kubernetes.Version}
+	c.KubernetesVersionUsed = types.String{Value: cl.Kubernetes.Version}
 	c.AllowPrivilegedContainers = types.Bool{Value: cl.Kubernetes.AllowPrivilegedContainers}
 	c.Status = types.String{Value: cl.Status.Aggregated}
 

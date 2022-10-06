@@ -12,7 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-const run_this_test = true
+const run_this_test = false
 
 func TestAcc_kubernetes(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
@@ -99,7 +99,7 @@ func TestAcc_kubernetes(t *testing.T) {
 				ImportStateId:           fmt.Sprintf("%s,%s", common.ACC_TEST_PROJECT_ID, name),
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"status", "extensions"},
+				ImportStateVerifyIgnore: []string{"status", "extensions", "kubernetes_version"},
 			},
 		},
 	})
