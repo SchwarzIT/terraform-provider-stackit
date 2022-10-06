@@ -59,10 +59,20 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 	c := r.Provider.Client()
 	created := false
 
+	versions, err := r.loadAvaiableVersions(ctx)
+	if err != nil {
+		diags.AddError("failed while loading version options", err.Error())
+		return
+	}
+
 	// cluster vars
 	projectID := cl.ProjectID.Value
 	clusterName := cl.Name.Value
-	clusterConfig := cl.clusterConfig()
+	clusterConfig, err := cl.clusterConfig(versions)
+	if err != nil {
+		diags.AddError("Failed to create cluster config", err.Error())
+		return
+	}
 	nodePools := setNodepoolDefaults(cl.nodePools())
 	maintenance := cl.maintenance()
 	hibernations := cl.hibernations()
