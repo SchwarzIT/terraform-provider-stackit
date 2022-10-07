@@ -315,7 +315,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 
 	wait, err := c.Projects.DeleteAndWait(ctx, state.ID.Value)
 	if err != nil {
-		resp.Diagnostics.AddError("failed to verify project deletion", err.Error())
+		resp.Diagnostics.AddError("failed to delete project", err.Error())
 		return
 	}
 
