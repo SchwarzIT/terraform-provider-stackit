@@ -3,15 +3,15 @@ module github.com/SchwarzIT/terraform-provider-stackit
 go 1.19
 
 require (
+	github.com/Masterminds/semver v1.5.0
+	github.com/SchwarzIT/community-stackit-go-client v0.2.2
 	github.com/hashicorp/terraform-plugin-framework v0.13.0
 	github.com/hashicorp/terraform-plugin-go v0.14.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.21.0
+	github.com/pkg/errors v0.9.1
 )
 
-require github.com/Masterminds/semver v1.5.0 // indirect
-
 require (
-	github.com/SchwarzIT/community-stackit-go-client v0.2.2
 	github.com/agext/levenshtein v1.2.2 // indirect
 	github.com/apparentlymart/go-cidr v1.1.0 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
@@ -47,7 +47,6 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/oklog/run v1.0.0 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/vmihailenco/msgpack/v4 v4.3.12 // indirect
 	github.com/vmihailenco/tagparser v0.1.1 // indirect
