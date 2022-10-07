@@ -74,7 +74,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 }
 
 func (r Resource) createProject(ctx context.Context, resp *resource.CreateResponse, plan Project) Project {
-	owners := []projects.ProjectRole{{
+	owners := projects.ProjectRole{
 		Name: consts.ROLE_PROJECT_OWNER,
 		Users: []projects.ProjectRoleMember{
 			{ID: plan.Owner.Value},
@@ -82,18 +82,17 @@ func (r Resource) createProject(ctx context.Context, resp *resource.CreateRespon
 		ServiceAccounts: []projects.ProjectRoleMember{ // service account is added automatically
 			{ID: r.Provider.ServiceAccountID()},
 		},
-	}}
+	}
 
 	c := r.Provider.Client()
-	project, wait, err := c.Projects.CreateAndWait(ctx, plan.Name.Value, plan.BillingRef.Value, owners)
+	project, active, err := c.Projects.Create(ctx, plan.Name.Value, plan.BillingRef.Value, owners)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to create project", err.Error())
 		return plan
 	}
 
-	// wait for project to be active
-	if _, err := wait.Run(); err != nil {
-		resp.Diagnostics.AddError("failed to verify project creation", err.Error())
+	if _, err := active.Wait(); err != nil {
+		resp.Diagnostics.AddError("failed to verify project is active", err.Error())
 		return plan
 	}
 
@@ -258,14 +257,10 @@ func (r Resource) updateProject(ctx context.Context, plan, state Project, resp *
 		return
 	}
 	c := r.Provider.Client()
-	wait, err := c.Projects.UpdateAndWait(ctx, plan.ID.Value, plan.Name.Value, plan.BillingRef.Value)
+	err := c.Projects.Update(ctx, plan.ID.Value, plan.Name.Value, plan.BillingRef.Value)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to update project", err.Error())
 		return
-	}
-
-	if _, err := wait.Run(); err != nil {
-		resp.Diagnostics.AddError("failed to verify project update", err.Error())
 	}
 }
 
@@ -313,13 +308,13 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		_ = c.ObjectStorage.Projects.Delete(ctx, state.ID.Value)
 	}
 
-	wait, err := c.Projects.DeleteAndWait(ctx, state.ID.Value)
+	deleted, err := c.Projects.Delete(ctx, state.ID.Value)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete project", err.Error())
 		return
 	}
 
-	if _, err := wait.Run(); err != nil {
+	if _, err := deleted.Wait(); err != nil {
 		resp.Diagnostics.AddError("failed to verify project deletion", err.Error())
 	}
 
