@@ -74,7 +74,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 }
 
 func (r Resource) createProject(ctx context.Context, resp *resource.CreateResponse, plan Project) Project {
-	owners := projects.ProjectRole{
+	owners := []projects.ProjectRole{{
 		Name: consts.ROLE_PROJECT_OWNER,
 		Users: []projects.ProjectRoleMember{
 			{ID: plan.Owner.Value},
@@ -82,50 +82,25 @@ func (r Resource) createProject(ctx context.Context, resp *resource.CreateRespon
 		ServiceAccounts: []projects.ProjectRoleMember{ // service account is added automatically
 			{ID: r.Provider.ServiceAccountID()},
 		},
-	}
+	}}
 
 	c := r.Provider.Client()
-	created := false
-	var project projects.Project
+	project, wait, err := c.Projects.CreateAndWait(ctx, plan.Name.Value, plan.BillingRef.Value, owners)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to create project", err.Error())
+		return plan
+	}
 
-	if err := helper.RetryContext(ctx, common.DURATION_30M, func() *helper.RetryError {
-		// Create project
-		if !created {
-			var err error
-			project, err = c.Projects.Create(ctx, plan.Name.Value, plan.BillingRef.Value, owners)
-			if err != nil {
-				if strings.Contains(err.Error(), http.StatusText(http.StatusBadRequest)) {
-					return helper.NonRetryableError(err)
-				}
-				return helper.RetryableError(err)
-			}
-			created = true
-			plan.ID.Value = project.ID
+	// wait for project to be active
+	if _, done, err := wait.Run(); err != nil || !done {
+		if err == nil {
+			err = fmt.Errorf("failed to verify project creation for project ID '%s'", project.ID)
 		}
-
-		// Check project state
-		state, err := c.Projects.GetLifecycleState(ctx, project.ID)
-		if err != nil {
-			if strings.Contains(err.Error(), http.StatusText(http.StatusForbidden)) {
-				// access permissions are assigned to a project after it's created
-				// therefore a 403 is expected during project creation
-				return helper.RetryableError(err)
-			}
-			if strings.Contains(err.Error(), http.StatusText(http.StatusInternalServerError)) {
-				return helper.RetryableError(err)
-			}
-			return helper.NonRetryableError(fmt.Errorf("error receiving lifecycle state: %s", err))
-		}
-
-		if state != consts.PROJECT_STATUS_ACTIVE {
-			return helper.RetryableError(fmt.Errorf("expected project to be active but was in state %s", state))
-		}
-		return nil
-	}); err != nil {
 		resp.Diagnostics.AddError("failed to verify project creation", err.Error())
 		return plan
 	}
 
+	plan.ID = types.String{Value: project.ID}
 	return plan
 }
 

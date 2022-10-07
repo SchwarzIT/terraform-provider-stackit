@@ -13,7 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-const run_this_test = false
+const run_this_test = true
 
 func TestAcc_Project(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
