@@ -92,10 +92,7 @@ func (r Resource) createProject(ctx context.Context, resp *resource.CreateRespon
 	}
 
 	// wait for project to be active
-	if _, done, err := wait.Run(); err != nil || !done {
-		if err == nil {
-			err = fmt.Errorf("failed to verify project creation for project ID '%s'", project.ID)
-		}
+	if _, err := wait.Run(); err != nil {
 		resp.Diagnostics.AddError("failed to verify project creation", err.Error())
 		return plan
 	}
@@ -261,17 +258,14 @@ func (r Resource) updateProject(ctx context.Context, plan, state Project, resp *
 		return
 	}
 	c := r.Provider.Client()
-	if err := helper.RetryContext(ctx, common.DURATION_20M, func() *helper.RetryError {
-		if err := c.Projects.Update(ctx, plan.ID.Value, plan.Name.Value, plan.BillingRef.Value); err != nil {
-			if strings.Contains(err.Error(), http.StatusText(http.StatusInternalServerError)) {
-				return helper.RetryableError(err)
-			}
-			return helper.NonRetryableError(err)
-		}
-		return nil
-	}); err != nil {
+	wait, err := c.Projects.UpdateAndWait(ctx, plan.ID.Value, plan.Name.Value, plan.BillingRef.Value)
+	if err != nil {
 		resp.Diagnostics.AddError("failed to update project", err.Error())
 		return
+	}
+
+	if _, err := wait.Run(); err != nil {
+		resp.Diagnostics.AddError("failed to verify project update", err.Error())
 	}
 }
 
@@ -319,24 +313,14 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		_ = c.ObjectStorage.Projects.Delete(ctx, state.ID.Value)
 	}
 
-	deleted := false
-	if err := helper.RetryContext(ctx, common.DURATION_1H, func() *helper.RetryError {
-		if !deleted {
-			if err := c.Projects.Delete(ctx, state.ID.Value); err != nil {
-				return helper.RetryableError(err)
-			}
-			deleted = true
-		}
-
-		// Verify project deletion
-		s, err := c.Projects.GetLifecycleState(ctx, state.ID.Value)
-		if err != nil {
-			return nil
-		}
-		return helper.RetryableError(fmt.Errorf("expected project to be deleted, but was it was in state %s", s))
-	}); err != nil {
+	wait, err := c.Projects.DeleteAndWait(ctx, state.ID.Value)
+	if err != nil {
 		resp.Diagnostics.AddError("failed to verify project deletion", err.Error())
 		return
+	}
+
+	if _, err := wait.Run(); err != nil {
+		resp.Diagnostics.AddError("failed to verify project deletion", err.Error())
 	}
 
 	resp.State.RemoveResource(ctx)
