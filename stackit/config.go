@@ -5,6 +5,7 @@ import (
 	"os"
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/retry"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -76,6 +77,8 @@ func (p *StackitProvider) Configure(ctx context.Context, req provider.ConfigureR
 		)
 		return
 	}
+
+	c.SetRetry(retry.New()) // auto-retry when possible
 
 	p.client = c
 	p.configured = true

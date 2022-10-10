@@ -3,8 +3,6 @@ package project
 import (
 	"context"
 	"fmt"
-	"net/http"
-	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/projects"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
@@ -102,41 +100,14 @@ func (r Resource) createProject(ctx context.Context, resp *resource.CreateRespon
 
 func (r Resource) createKubernetesProject(ctx context.Context, d *diag.Diagnostics, projectID string) {
 	c := r.Provider.Client()
-	created := false
-
-	if err := helper.RetryContext(ctx, common.DURATION_10M, func() *helper.RetryError {
-		if !created {
-			if _, err := c.Kubernetes.Projects.Create(ctx, projectID); err != nil {
-				return helper.RetryableError(err)
-			}
-			created = true
-		}
-
-		// get SKE project status
-		res, err := c.Kubernetes.Projects.Get(ctx, projectID)
-		if err != nil {
-			return helper.RetryableError(err)
-		}
-
-		// parse states
-		errMsg := fmt.Errorf("received state: %s for project ID: %s", res.State, res.ProjectID)
-		switch res.State {
-		case consts.SKE_PROJECT_STATUS_FAILED:
-			fallthrough
-		case consts.SKE_PROJECT_STATUS_DELETING:
-			return helper.NonRetryableError(errMsg)
-		case "":
-			fallthrough
-		case consts.SKE_PROJECT_STATUS_UNSPECIFIED:
-			fallthrough
-		case consts.SKE_PROJECT_STATUS_CREATING:
-			return helper.RetryableError(errMsg)
-		case consts.SKE_PROJECT_STATUS_CREATED:
-			return nil
-		}
-		return helper.RetryableError(errMsg)
-	}); err != nil {
+	_, process, err := c.Kubernetes.Projects.Create(ctx, projectID)
+	if err != nil {
 		d.AddError("failed to verify kubernetes is enabled for project", err.Error())
+		return
+	}
+
+	if _, err := process.Wait(); err != nil {
+		d.AddError("failed to validate kubernetes is enabled for project", err.Error())
 		return
 	}
 }
@@ -301,7 +272,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	c := r.Provider.Client()
 
 	if state.EnableKubernetes.Value {
-		_ = c.Kubernetes.Projects.Delete(ctx, state.ID.Value)
+		_, _ = c.Kubernetes.Projects.Delete(ctx, state.ID.Value)
 	}
 
 	if state.EnableObjectStorage.Value {
@@ -323,81 +294,38 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 
 func (r Resource) deleteKubernetesProject(ctx context.Context, d *diag.Diagnostics, projectID string) {
 	c := r.Provider.Client()
-	list := false
-	canDelete := true
-	if err := helper.RetryContext(ctx, common.DURATION_20M, func() *helper.RetryError {
-		if !list {
-			res, err := c.Kubernetes.Clusters.List(ctx, projectID)
-			if err != nil {
-				if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
-					list = true
-				}
-				return helper.RetryableError(err)
-			}
-			list = true
-			if len(res.Items) > 0 {
-				canDelete = false
-				return nil
-			}
-		}
-		if err := c.Kubernetes.Projects.Delete(ctx, projectID); err != nil {
-			if common.IsNonRetryable(err) {
-				return helper.NonRetryableError(err)
-			}
-			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
-				return nil
-			}
-			return helper.RetryableError(err)
-		}
-		return nil
-	}); err != nil {
-		d.AddError("failed to disable kubernetes", err.Error())
+	res, err := c.Kubernetes.Clusters.List(ctx, projectID)
+	if err == nil && len(res.Items) > 0 {
+		d.AddWarning("Kubernetes disabling considerations", `We detected active Kubernetes clusters in your project
+Therefore, in order to prevent them from automatically being deleted, we ignored your setting "enable_kubernetes=false".
+If you wish for the change to be applied, please delete all existing clusters first & re-run the plan.`)
 		return
 	}
-	if !canDelete {
-		d.AddWarning("Kubernetes disabling considerations", `We detected active Kubernetes clusters in your project
-Therefor, in order to prevent them from automatically being deleted, we ignored your setting "enable_kubernetes=false".
-If you wish for the change to be applied, please delete all existing clusters first & re-run the plan.`)
+
+	process, err := c.Kubernetes.Projects.Delete(ctx, projectID)
+	if err != nil {
+		d.AddError("error disabling kubernetes", err.Error())
+		return
+	}
+
+	if _, err := process.Wait(); err != nil {
+		d.AddError("kubernetes disabling validation failed", err.Error())
+		return
 	}
 }
 
 func (r Resource) deleteObjectStorageProject(ctx context.Context, d *diag.Diagnostics, projectID string) {
 	c := r.Provider.Client()
-	list := false
-	canDelete := true
-	if err := helper.RetryContext(ctx, common.DURATION_20M, func() *helper.RetryError {
-		if !list {
-			res, err := c.ObjectStorage.Buckets.List(ctx, projectID)
-			if err != nil {
-				if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
-					list = true
-				}
-				return helper.RetryableError(err)
-			}
-			list = true
-			if len(res.Buckets) > 0 {
-				canDelete = false
-				return nil
-			}
-		}
-		if err := c.ObjectStorage.Projects.Delete(ctx, projectID); err != nil {
-			if common.IsNonRetryable(err) {
-				return helper.NonRetryableError(err)
-			}
-			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
-				return nil
-			}
-			return helper.RetryableError(err)
-		}
-		return nil
-	}); err != nil {
-		d.AddError("failed to disable object storage", err.Error())
-		return
-	}
-	if !canDelete {
+	res, err := c.ObjectStorage.Buckets.List(ctx, projectID)
+	if err == nil && len(res.Buckets) > 0 {
 		d.AddWarning("Object Storage disabling considerations", `We detected active buckets in your project
 Therefor, in order to prevent them from automatically being deleted, we ignored your setting "enable_object_storage=false".
 If you wish for the change to be applied, please delete all existing buckets first & re-run the plan.`)
+		return
+	}
+	if err := c.ObjectStorage.Projects.Delete(ctx, projectID); err != nil {
+		d.AddError("failed to disable object storage", err.Error())
+		return
 	}
 }
 
