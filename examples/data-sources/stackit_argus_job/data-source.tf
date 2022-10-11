@@ -5,6 +5,7 @@ resource "stackit_argus_instance" "example" {
 }
 
 data "stackit_argus_job" "example" {
+  name              = "example"
   project_id        = stackit_project.example.id
   argus_instance_id = stackit_argus_instance.example.id
 }

@@ -1,4 +1,4 @@
 data "stackit_argus_instance" "example" {
-  name       = "example"
+  id         = "argus-instance-id"
   project_id = stackit_project.example.id
 }
