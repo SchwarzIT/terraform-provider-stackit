@@ -3,7 +3,6 @@ package kubernetes
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes/clusters"
@@ -57,8 +56,6 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnostics, cl *Cluster) {
 	c := r.Provider.Client()
-	created := false
-
 	versions, err := r.loadAvaiableVersions(ctx)
 	if err != nil {
 		diags.AddError("failed while loading version options", err.Error())
@@ -86,48 +83,34 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 		return
 	}
 
-	if err := helper.RetryContext(ctx, default_retry_duration, func() *helper.RetryError {
-		// Create cluster
-		if !created {
-			_, err := c.Kubernetes.Clusters.Create(ctx,
-				projectID,
-				clusterName,
-				clusterConfig,
-				nodePools,
-				maintenance,
-				hibernations,
-				extensions,
-			)
-
-			if err != nil {
-				if common.IsNonRetryable(err) {
-					return helper.NonRetryableError(err)
-				}
-				return helper.RetryableError(err)
-			}
-			created = true
-		}
-
-		// Check cluster status
-		s, err := c.Kubernetes.Clusters.Get(ctx, cl.ProjectID.Value, cl.Name.Value)
-		if err != nil {
-			if common.IsNonRetryable(err) {
-				return helper.NonRetryableError(fmt.Errorf("error receiving cluster state: %s", err))
-			}
-			return helper.RetryableError(err)
-		}
-
-		cl.Status = types.String{Value: s.Status.Aggregated}
-		if !cl.isHealthyStatus(s.Status.Aggregated) {
-			return helper.RetryableError(fmt.Errorf("expected cluster to be active & healthy but it was in state %s", s.Status.Aggregated))
-		}
-
-		cl.Transform(s)
-		return nil
-	}); err != nil {
-		diags.AddError("failed to verify cluster", err.Error())
+	_, process, err := c.Kubernetes.Clusters.CreateOrUpdate(ctx,
+		projectID,
+		clusterName,
+		clusterConfig,
+		nodePools,
+		maintenance,
+		hibernations,
+		extensions,
+	)
+	if err != nil {
+		diags.AddError("failed during SKE Create/Update", err.Error())
 		return
 	}
+
+	res, err := process.Wait()
+	if err != nil {
+		diags.AddError("failed to validate SKE Create/Update", err.Error())
+		return
+	}
+
+	result, ok := res.(clusters.Cluster)
+	if !ok {
+		diags.AddError("failed to parse Wait() response", "response is not clusters.Cluster")
+		return
+	}
+
+	cl.Status = types.String{Value: result.Status.Aggregated}
+	cl.Transform(result)
 }
 
 func (r Resource) getCredential(ctx context.Context, diags *diag.Diagnostics, cl *Cluster) {
@@ -230,25 +213,13 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	c := r.Provider.Client()
-	deleted := false
-	if err := helper.RetryContext(ctx, default_retry_duration, func() *helper.RetryError {
-		if !deleted {
-			if err := c.Kubernetes.Clusters.Delete(ctx, state.ProjectID.Value, state.Name.Value); err != nil {
-				return helper.RetryableError(err)
-			}
-			deleted = true
-		}
+	process, err := c.Kubernetes.Clusters.Delete(ctx, state.ProjectID.Value, state.Name.Value)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to delete cluster", err.Error())
+		return
+	}
 
-		// Verify cluster deletion
-		s, err := c.Kubernetes.Clusters.Get(ctx, state.ProjectID.Value, state.Name.Value)
-		if err != nil {
-			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
-				return nil
-			}
-			return helper.RetryableError(err)
-		}
-		return helper.RetryableError(fmt.Errorf("expected cluster to be deleted, but was it was in state %s", s.Status.Aggregated))
-	}); err != nil {
+	if _, err := process.Wait(); err != nil {
 		resp.Diagnostics.AddError("failed to verify cluster deletion", err.Error())
 		return
 	}

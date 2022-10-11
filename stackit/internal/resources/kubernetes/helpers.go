@@ -8,7 +8,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes/clusters"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -29,11 +28,6 @@ const (
 	default_zone                           = "eu01-m"
 	default_version                        = "1.23"
 )
-
-func (c *Cluster) isHealthyStatus(status string) bool {
-	return status == consts.SKE_CLUSTER_STATUS_HEALTHY ||
-		status == consts.SKE_CLUSTER_STATUS_HIBERNATED
-}
 
 func (r Resource) loadAvaiableVersions(ctx context.Context) ([]*semver.Version, error) {
 	c := r.Provider.Client()
