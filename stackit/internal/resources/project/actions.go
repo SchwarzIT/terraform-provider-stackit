@@ -9,12 +9,10 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/projects"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	helper "github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
 // Create - lifecycle function
@@ -116,24 +114,15 @@ func (r Resource) createKubernetesProject(ctx context.Context, d *diag.Diagnosti
 
 func (r Resource) createObjectStorageProject(ctx context.Context, d *diag.Diagnostics, projectID string) {
 	c := r.Provider.Client()
-	created := false
+	if _, err := c.ObjectStorage.Projects.Create(ctx, projectID); err != nil {
+		d.AddError("failed to enable object storage in project", err.Error())
+		return
+	}
 
-	if err := helper.RetryContext(ctx, common.DURATION_10M, func() *helper.RetryError {
-		if !created {
-			if _, err := c.ObjectStorage.Projects.Create(ctx, projectID); err != nil {
-				return helper.RetryableError(err)
-			}
-			created = true
-		}
-
-		// get object storage project
-		_, err := c.ObjectStorage.Projects.Get(ctx, projectID)
-		if err != nil {
-			return helper.RetryableError(err)
-		}
-		return nil
-	}); err != nil {
-		d.AddError("failed to verify object storage is enabled for project", err.Error())
+	// verify
+	_, err := c.ObjectStorage.Projects.Get(ctx, projectID)
+	if err != nil {
+		d.AddError("failed to verify object storage is enabled", err.Error())
 		return
 	}
 }
@@ -150,14 +139,8 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	if err := helper.RetryContext(ctx, common.DURATION_1M, func() *helper.RetryError {
-		var err error
-		project, err = c.Projects.Get(ctx, p.ID.Value)
-		if err != nil {
-			return helper.RetryableError(err)
-		}
-		return nil
-	}); err != nil {
+	project, err := c.Projects.Get(ctx, p.ID.Value)
+	if err != nil {
 		resp.Diagnostics.AddError("failed to read project", err.Error())
 		return
 	}
