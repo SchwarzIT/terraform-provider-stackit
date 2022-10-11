@@ -85,13 +85,13 @@ func (r Resource) createProject(ctx context.Context, resp *resource.CreateRespon
 	}
 
 	c := r.Provider.Client()
-	project, active, err := c.Projects.Create(ctx, plan.Name.Value, plan.BillingRef.Value, owners)
+	project, process, err := c.Projects.Create(ctx, plan.Name.Value, plan.BillingRef.Value, owners)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to create project", err.Error())
 		return plan
 	}
 
-	if _, err := active.Wait(); err != nil {
+	if _, err := process.Wait(); err != nil {
 		resp.Diagnostics.AddError("failed to verify project is active", err.Error())
 		return plan
 	}
@@ -281,13 +281,13 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		_ = c.ObjectStorage.Projects.Delete(ctx, state.ID.Value)
 	}
 
-	deleted, err := c.Projects.Delete(ctx, state.ID.Value)
+	process, err := c.Projects.Delete(ctx, state.ID.Value)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete project", err.Error())
 		return
 	}
 
-	if _, err := deleted.Wait(); err != nil {
+	if _, err := process.Wait(); err != nil {
 		resp.Diagnostics.AddError("failed to verify project deletion", err.Error())
 	}
 
