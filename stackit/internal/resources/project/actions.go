@@ -3,6 +3,8 @@ package project
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/projects"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
@@ -324,6 +326,9 @@ If you wish for the change to be applied, please delete all existing buckets fir
 		return
 	}
 	if err := c.ObjectStorage.Projects.Delete(ctx, projectID); err != nil {
+		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+			return
+		}
 		d.AddError("failed to disable object storage", err.Error())
 		return
 	}
