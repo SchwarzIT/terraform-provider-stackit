@@ -56,30 +56,22 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 func (r Resource) createBucket(ctx context.Context, resp *resource.CreateResponse, plan Bucket) buckets.BucketResponse {
 	c := r.Provider.Client()
-	created := false
 	var b buckets.BucketResponse
 
-	if err := helper.RetryContext(ctx, common.DURATION_10M, func() *helper.RetryError {
-		var err error
-
-		// Create bucket
-		if !created {
-			if err = c.ObjectStorage.Buckets.Create(ctx, plan.ProjectID.Value, plan.Name.Value); err != nil {
-				if strings.Contains(err.Error(), http.StatusText(http.StatusBadRequest)) {
-					return helper.NonRetryableError(err)
-				}
-				return helper.RetryableError(err)
-			}
-			created = true
-		}
-
-		// Get bucket
-		b, err = c.ObjectStorage.Buckets.Get(ctx, plan.ProjectID.Value, plan.Name.Value)
-		if err != nil {
-			return helper.RetryableError(err)
-		}
-		return nil
-	}); err != nil {
+	// Create bucket
+	process, err := c.ObjectStorage.Buckets.Create(ctx, plan.ProjectID.Value, plan.Name.Value)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to verify bucket creation", err.Error())
+		return b
+	}
+	process.SetTimeout(10 * time.Minute)
+	tmp, err := process.Wait()
+	if err != nil {
+		resp.Diagnostics.AddError("failed to verify bucket creation", err.Error())
+		return b
+	}
+	b = tmp.(buckets.BucketResponse)
+	if err != nil {
 		resp.Diagnostics.AddError("failed to verify bucket creation", err.Error())
 		return b
 	}
@@ -148,37 +140,19 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	httpClient := c.GetHTTPClient()
 	t := httpClient.Timeout
 
-	deleted := false
-	if err := helper.RetryContext(ctx, common.DURATION_10M, func() *helper.RetryError {
-		if !deleted {
-			httpClient.Timeout = time.Minute
-			if err := c.ObjectStorage.Buckets.Delete(ctx, state.ProjectID.Value, state.Name.Value); err != nil {
-				if !strings.Contains(err.Error(), common.ERR_CLIENT_TIMEOUT) {
-					return helper.RetryableError(err)
-				}
-			}
-			httpClient.Timeout = t
-			deleted = true
-		}
-
-		// Verify bucket deletion
-		res, err := c.ObjectStorage.Buckets.List(ctx, state.ProjectID.Value)
-		if err != nil {
-			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
-				return nil
-			}
-			return helper.RetryableError(err)
-		}
-		for _, b := range res.Buckets {
-			if b.Name == state.Name.Value {
-				return helper.RetryableError(fmt.Errorf("bucket %s is still available", b.Name))
-			}
-		}
-		return nil
-	}); err != nil {
+	httpClient.Timeout = time.Minute
+	process, err := c.ObjectStorage.Buckets.Delete(ctx, state.ProjectID.Value, state.Name.Value)
+	if err != nil {
 		resp.Diagnostics.AddError("failed to verify bucket deletion", err.Error())
 		return
 	}
+	process.SetTimeout(10 * time.Minute)
+	_, err = process.Wait()
+	if err != nil {
+		resp.Diagnostics.AddError("failed to verify bucket deletion", err.Error())
+		return
+	}
+	httpClient.Timeout = t
 
 	resp.State.RemoveResource(ctx)
 }
