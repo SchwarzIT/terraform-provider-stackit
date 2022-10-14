@@ -47,7 +47,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	jobRes, ok := res.(jobs.GetJobResponse)
 	if !ok {
-		resp.Diagnostics.AddError("convertion failure", "failed to convert wait process response")
+		resp.Diagnostics.AddError("conversion failure", "failed to convert wait process response")
 		return
 	}
 

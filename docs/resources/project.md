@@ -27,7 +27,7 @@ resource "stackit_project" "example" {
 
 - `billing_ref` (String) billing reference for cost transparency
 - `name` (String) the project name
-- `owner` (String) user ID of the owner of the project. This value is only considered during creation. changing it afterwards will have no effect.
+- `owner_id` (String) user ID of the owner of the project. This value is only considered during creation. changing it afterwards will have no effect.
 
 ### Optional
 
