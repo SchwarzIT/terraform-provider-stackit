@@ -35,7 +35,7 @@ func TestAcc_Project(t *testing.T) {
 
 	resource.ParallelTest(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){
-			"stackit": providerserver.NewProtocol6WithError(stackit.New()),
+			"stackit": providerserver.NewProtocol6WithError(stackit.New("test")()),
 		},
 		Steps: []resource.TestStep{
 			{
