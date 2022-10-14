@@ -14,7 +14,7 @@ type Project struct {
 	ID                  types.String `tfsdk:"id"`
 	Name                types.String `tfsdk:"name"`
 	BillingRef          types.String `tfsdk:"billing_ref"`
-	Owner               types.String `tfsdk:"owner"`
+	OwnerID             types.String `tfsdk:"owner_id"`
 	EnableKubernetes    types.Bool   `tfsdk:"enable_kubernetes"`
 	EnableObjectStorage types.Bool   `tfsdk:"enable_object_storage"`
 }
@@ -50,7 +50,7 @@ func (r Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) 
 				},
 			},
 
-			"owner": {
+			"owner_id": {
 				Description: "user ID of the owner of the project. This value is only considered during creation. changing it afterwards will have no effect.",
 				Type:        types.StringType,
 				Required:    true,

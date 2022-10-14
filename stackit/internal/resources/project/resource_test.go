@@ -90,7 +90,7 @@ func TestAcc_Project(t *testing.T) {
 				ResourceName:            "stackit_project.example",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"owner"},
+				ImportStateVerifyIgnore: []string{"owner_id"},
 			},
 		},
 	})
@@ -101,7 +101,7 @@ func config(name, billingRef, user string) string {
 	resource "stackit_project" "example" {
 		name        = "%s"
 		billing_ref = "%s"
-		owner       = "%s"
+		owner_id    = "%s"
 	}
 	`,
 		name,
@@ -115,7 +115,7 @@ func config2(name, billingRef, user string, enableKubernetes, enableObjectStorag
 	resource "stackit_project" "example" {
 		name        = "%s"
 		billing_ref = "%s"
-		owner       = "%s"
+		owner_id    = "%s"
 		enable_kubernetes = %v
 		enable_object_storage = %v
 	}
