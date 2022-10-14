@@ -42,7 +42,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		ID:                  types.String{Value: plan.ID.Value},
 		Name:                types.String{Value: plan.Name.Value},
 		BillingRef:          types.String{Value: plan.BillingRef.Value},
-		Owner:               types.String{Value: plan.Owner.Value},
+		OwnerID:             types.String{Value: plan.OwnerID.Value},
 		EnableKubernetes:    types.Bool{Null: true},
 		EnableObjectStorage: types.Bool{Null: true},
 	}
@@ -75,7 +75,7 @@ func (r Resource) createProject(ctx context.Context, resp *resource.CreateRespon
 	owners := projects.ProjectRole{
 		Name: consts.ROLE_PROJECT_OWNER,
 		Users: []projects.ProjectRoleMember{
-			{ID: plan.Owner.Value},
+			{ID: plan.OwnerID.Value},
 		},
 		ServiceAccounts: []projects.ProjectRoleMember{ // service account is added automatically
 			{ID: r.Provider.ServiceAccountID()},
