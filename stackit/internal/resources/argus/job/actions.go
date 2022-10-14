@@ -3,9 +3,9 @@ package job
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"strings"
 
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus/jobs"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -32,30 +32,26 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	c := r.Provider.Client()
 	job := plan.ToClientJob()
-	created := false
-	if err := helper.RetryContext(ctx, common.DURATION_20M, func() *helper.RetryError {
-		if !created {
-			if _, err := c.Argus.Jobs.Create(ctx, plan.ProjectID.Value, plan.ArgusInstanceID.Value, job); err != nil {
-				if strings.Contains(err.Error(), http.StatusText(http.StatusBadRequest)) {
-					return helper.NonRetryableError(err)
-				}
-				return helper.RetryableError(err)
-			}
-			created = true
-		}
 
-		// Validate
-		res, err := c.Argus.Jobs.Get(ctx, plan.ProjectID.Value, plan.ArgusInstanceID.Value, plan.Name.Value)
-		if err != nil {
-			return helper.RetryableError(err)
-		}
-		plan.FromClientJob(res.Data)
-		return nil
-	}); err != nil {
+	_, process, err := c.Argus.Jobs.Create(ctx, plan.ProjectID.Value, plan.ArgusInstanceID.Value, job)
+	if err != nil {
 		resp.Diagnostics.AddError("failed to create job", err.Error())
 		return
 	}
 
+	res, err := process.Wait()
+	if err != nil {
+		resp.Diagnostics.AddError("failed to validate job creation", err.Error())
+		return
+	}
+
+	jobRes, ok := res.(jobs.GetJobResponse)
+	if !ok {
+		resp.Diagnostics.AddError("convertion failure", "failed to convert wait process response")
+		return
+	}
+
+	plan.FromClientJob(jobRes.Data)
 	diags = resp.State.Set(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -104,26 +100,20 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 
 	c := r.Provider.Client()
 	job := plan.ToClientJob()
-	updated := false
-	if err := helper.RetryContext(ctx, common.DURATION_10M, func() *helper.RetryError {
-		if !updated {
-			if _, err := c.Argus.Jobs.Update(ctx, plan.ProjectID.Value, plan.ArgusInstanceID.Value, job); err != nil {
-				return helper.RetryableError(err)
-			}
-			updated = true
-		}
 
-		// read
-		res, err := c.Argus.Jobs.Get(ctx, plan.ProjectID.Value, plan.ArgusInstanceID.Value, plan.Name.Value)
-		if err != nil {
-			return helper.RetryableError(err)
-		}
-		plan.FromClientJob(res.Data)
-		return nil
-	}); err != nil {
+	if _, err := c.Argus.Jobs.Update(ctx, plan.ProjectID.Value, plan.ArgusInstanceID.Value, job); err != nil {
 		resp.Diagnostics.AddError("failed to update job", err.Error())
 		return
 	}
+
+	// read job to verify update
+	res, err := c.Argus.Jobs.Get(ctx, plan.ProjectID.Value, plan.ArgusInstanceID.Value, plan.Name.Value)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to verify job update", err.Error())
+		return
+	}
+	plan.FromClientJob(res.Data)
+
 	// update state
 	diags = resp.State.Set(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
@@ -142,13 +132,15 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 
 	c := r.Provider.Client()
 	job := state.ToClientJob()
-	if err := helper.RetryContext(ctx, common.DURATION_10M, func() *helper.RetryError {
-		if _, err := c.Argus.Jobs.Update(ctx, state.ProjectID.Value, state.ArgusInstanceID.Value, job); err != nil {
-			return helper.RetryableError(err)
-		}
-		return nil
-	}); err != nil {
+
+	_, process, err := c.Argus.Jobs.Delete(ctx, state.ProjectID.Value, state.ArgusInstanceID.Value, job.JobName)
+	if err != nil {
 		resp.Diagnostics.AddError("failed to delete job", err.Error())
+		return
+	}
+
+	if _, err := process.Wait(); err != nil {
+		resp.Diagnostics.AddError("failed to verify job deletion", err.Error())
 		return
 	}
 
