@@ -27,15 +27,20 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-// New returns a new STACKIT provider
-func New() provider.Provider {
-	return &StackitProvider{}
+// New returns a new STACKIT provider function
+func New(version string) func() provider.Provider {
+	return func() provider.Provider {
+		return &StackitProvider{
+			version: version,
+		}
+	}
 }
 
 type StackitProvider struct {
 	configured       bool
 	client           *client.Client
 	serviceAccountID string
+	version          string
 }
 
 var _ = provider.Provider(&StackitProvider{})
@@ -71,6 +76,11 @@ This provider is built and maintained by the STACKIT community in Schwarz IT and
 			},
 		},
 	}, nil
+}
+
+func (p *StackitProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
+	resp.TypeName = "stackit"
+	resp.Version = p.version
 }
 
 // GetResources - Defines provider resources
