@@ -8,12 +8,10 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes/clusters"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	helper "github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
 // Create - lifecycle function
@@ -115,19 +113,8 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 
 func (r Resource) getCredential(ctx context.Context, diags *diag.Diagnostics, cl *Cluster) {
 	c := r.Provider.Client()
-
-	var cred clusters.Credentials
-	if err := helper.RetryContext(ctx, common.DURATION_5M, func() *helper.RetryError {
-		var err error
-		cred, err = c.Kubernetes.Clusters.GetCredential(ctx, cl.ProjectID.Value, cl.Name.Value)
-		if err != nil {
-			if common.IsNonRetryable(err) {
-				return helper.NonRetryableError(err)
-			}
-			return helper.RetryableError(err)
-		}
-		return nil
-	}); err != nil {
+	cred, err := c.Kubernetes.Clusters.GetCredential(ctx, cl.ProjectID.Value, cl.Name.Value)
+	if err != nil {
 		diags.AddError("failed to get cluster credentials", err.Error())
 		return
 	}
@@ -146,20 +133,12 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	// read cluster
-	if err := helper.RetryContext(ctx, common.DURATION_1M, func() *helper.RetryError {
-		cl, err := c.Kubernetes.Clusters.Get(ctx, state.ProjectID.Value, state.Name.Value)
-		if err != nil {
-			if common.IsNonRetryable(err) {
-				return helper.NonRetryableError(err)
-			}
-			return helper.RetryableError(err)
-		}
-		state.Transform(cl)
-		return nil
-	}); err != nil {
+	cl, err := c.Kubernetes.Clusters.Get(ctx, state.ProjectID.Value, state.Name.Value)
+	if err != nil {
 		resp.Diagnostics.AddError("failed to read cluster", err.Error())
 		return
 	}
+	state.Transform(cl)
 
 	// read credential
 	r.getCredential(ctx, &resp.Diagnostics, &state)

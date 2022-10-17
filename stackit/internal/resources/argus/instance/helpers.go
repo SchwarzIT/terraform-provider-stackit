@@ -7,10 +7,8 @@ import (
 	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus/instances"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	helper "github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
 const (
@@ -22,25 +20,23 @@ const (
 
 func (r Resource) loadPlanID(ctx context.Context, diags *diag.Diagnostics, s *Instance) {
 	c := r.Provider.Client()
-	if err := helper.RetryContext(ctx, common.DURATION_1M, func() *helper.RetryError {
-		res, err := c.Argus.Plans.List(ctx, s.ProjectID.Value)
-		if err != nil {
-			return helper.RetryableError(err)
-		}
 
-		avl := ""
-		for _, v := range res.Plans {
-			if v.Name == s.Plan.Value {
-				s.PlanID = types.String{Value: v.PlanID}
-				return nil
-			}
-			avl = fmt.Sprintf("%s\n- %s", avl, v.Name)
+	res, err := c.Argus.Plans.List(ctx, s.ProjectID.Value)
+	if err != nil {
+		diags.AddError("failed to list plans", err.Error())
+		return
+	}
+
+	avl := ""
+	for _, v := range res.Plans {
+		if v.Name == s.Plan.Value {
+			s.PlanID = types.String{Value: v.PlanID}
+			break
 		}
-		return helper.NonRetryableError(
-			fmt.Errorf("couldn't find plan '%s'.\navailable names are:%s", s.Plan.Value, avl),
-		)
-	}); err != nil {
-		diags.AddError("failed to read plan ID", err.Error())
+		avl = fmt.Sprintf("%s\n- %s", avl, v.Name)
+	}
+	if s.PlanID.Value == "" {
+		diags.AddError("invalid plan", fmt.Sprintf("couldn't find plan '%s'.\navailable names are:%s", s.Plan.Value, avl))
 		return
 	}
 }

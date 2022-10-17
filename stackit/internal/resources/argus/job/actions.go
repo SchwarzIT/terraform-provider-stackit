@@ -7,10 +7,8 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus/jobs"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	helper "github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
 // Create - lifecycle function
@@ -70,17 +68,13 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	c := r.Provider.Client()
-	if err := helper.RetryContext(ctx, common.DURATION_1M, func() *helper.RetryError {
-		res, err := c.Argus.Jobs.Get(ctx, state.ProjectID.Value, state.ArgusInstanceID.Value, state.Name.Value)
-		if err != nil {
-			return helper.RetryableError(err)
-		}
-		state.FromClientJob(res.Data)
-		return nil
-	}); err != nil {
+
+	res, err := c.Argus.Jobs.Get(ctx, state.ProjectID.Value, state.ArgusInstanceID.Value, state.Name.Value)
+	if err != nil {
 		resp.Diagnostics.AddError("failed to read job", err.Error())
 		return
 	}
+	state.FromClientJob(res.Data)
 
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
