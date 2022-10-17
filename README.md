@@ -14,7 +14,7 @@ terraform {
   required_providers {
     stackit = {
       source  = "SchwarzIT/stackit"
-      version = "=0.3.0"
+      version = "=0.3.1"
     }
   }
 }
@@ -24,26 +24,6 @@ provider "stackit" {
   service_account_id    = var.service_account_id
   service_account_token = var.service_account_token
   customer_account_id   = var.customer_account_id
-}
-
-# create a project
-resource "stackit_project" "example" {
-  name                  = var.project_name
-  billing_ref           = var.project_billing_ref
-  owner                 = var.project_owner
-  enable_kubernetes     = true
-}
-
-# create a SKE cluster
-resource "stackit_kubernetes_cluster" "example" {
-  name               = "my-cluster"
-  project_id         = stackit_project.example.id
-  kubernetes_version = "1.23.12"
-
-  node_pools = [{
-    name         = "example"
-    machine_type = "c1.2"
-  }]
 }
 
 ```
