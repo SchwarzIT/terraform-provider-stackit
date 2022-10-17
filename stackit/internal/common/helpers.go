@@ -3,9 +3,7 @@ package common
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"os"
-	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -28,21 +26,6 @@ func ToString(ctx context.Context, v attr.Value) (string, error) {
 		return "", err
 	}
 	return s, nil
-}
-
-// IsNonRetryable is a helper function to determine if an error
-// returned from the client is expected (the operation can try to run again)
-// or an unexpected error that should end further retries
-func IsNonRetryable(err error) bool {
-	if strings.Contains(err.Error(), http.StatusText(http.StatusBadRequest)) {
-		if !strings.Contains(err.Error(), ERR_NO_SUCH_HOST) {
-			return true
-		}
-	}
-	if strings.Contains(err.Error(), http.StatusText(http.StatusUnauthorized)) {
-		return true
-	}
-	return false
 }
 
 // ShouldAccTestRun returns true of the provided flag is true or if
