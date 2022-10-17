@@ -2,15 +2,12 @@ package kubernetes
 
 import (
 	"context"
-	"time"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/kubernetes"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
-
-const default_retry_duration = 10 * time.Minute
 
 // Read - lifecycle function
 func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
