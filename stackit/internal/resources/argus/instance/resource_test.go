@@ -23,7 +23,7 @@ func TestAcc_ArgusInstances(t *testing.T) {
 	}
 
 	name := "e1-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
-	// newName := "e2-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
+	newName := "e2-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
 
 	resource.ParallelTest(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){
@@ -54,37 +54,37 @@ func TestAcc_ArgusInstances(t *testing.T) {
 					resource.TestCheckResourceAttrSet("stackit_argus_instance.example", "zipkin_spans_url"),
 				),
 			},
-			// // check update
-			// {
-			// 	Config: configExtended(name, "Monitoring-Medium-EU01"),
-			// 	Check: resource.ComposeTestCheckFunc(
-			// 		resource.TestCheckResourceAttr("stackit_argus_instance.example", "name", name),
-			// 		resource.TestCheckResourceAttr("stackit_argus_instance.example", "project_id", common.ACC_TEST_PROJECT_ID),
-			// 		resource.TestCheckResourceAttr("stackit_argus_instance.example", "plan", "Monitoring-Medium-EU01"),
-			// 		resource.TestCheckResourceAttr("stackit_argus_instance.example", "grafana.enable_public_access", "true"),
-			// 		resource.TestCheckResourceAttr("stackit_argus_instance.example", "metrics.retention_days", "60"),
-			// 		resource.TestCheckResourceAttr("stackit_argus_instance.example", "metrics.retention_days_5m_downsampling", "20"),
-			// 		resource.TestCheckResourceAttr("stackit_argus_instance.example", "metrics.retention_days_1h_downsampling", "10"),
-			// 	),
-			// },
-			// // new name
-			// {
-			// 	Config: configExtended(newName, "Monitoring-Medium-EU01"),
-			// 	Check: resource.ComposeTestCheckFunc(
-			// 		resource.TestCheckResourceAttr("stackit_argus_instance.example", "name", newName),
-			// 		resource.TestCheckResourceAttr("stackit_argus_instance.example", "project_id", common.ACC_TEST_PROJECT_ID),
-			// 		resource.TestCheckResourceAttr("stackit_argus_instance.example", "plan", "Monitoring-Medium-EU01"),
-			// 	),
-			// },
-			// // new plan
-			// {
-			// 	Config: configExtended(newName, "Monitoring-Basic-EU01"),
-			// 	Check: resource.ComposeTestCheckFunc(
-			// 		resource.TestCheckResourceAttr("stackit_argus_instance.example", "name", newName),
-			// 		resource.TestCheckResourceAttr("stackit_argus_instance.example", "project_id", common.ACC_TEST_PROJECT_ID),
-			// 		resource.TestCheckResourceAttr("stackit_argus_instance.example", "plan", "Monitoring-Basic-EU01"),
-			// 	),
-			// },
+			// check update
+			{
+				Config: configExtended(name, "Monitoring-Medium-EU01"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("stackit_argus_instance.example", "name", name),
+					resource.TestCheckResourceAttr("stackit_argus_instance.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("stackit_argus_instance.example", "plan", "Monitoring-Medium-EU01"),
+					resource.TestCheckResourceAttr("stackit_argus_instance.example", "grafana.enable_public_access", "true"),
+					resource.TestCheckResourceAttr("stackit_argus_instance.example", "metrics.retention_days", "60"),
+					resource.TestCheckResourceAttr("stackit_argus_instance.example", "metrics.retention_days_5m_downsampling", "20"),
+					resource.TestCheckResourceAttr("stackit_argus_instance.example", "metrics.retention_days_1h_downsampling", "10"),
+				),
+			},
+			// new name
+			{
+				Config: configExtended(newName, "Monitoring-Medium-EU01"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("stackit_argus_instance.example", "name", newName),
+					resource.TestCheckResourceAttr("stackit_argus_instance.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("stackit_argus_instance.example", "plan", "Monitoring-Medium-EU01"),
+				),
+			},
+			// new plan
+			{
+				Config: configExtended(newName, "Monitoring-Basic-EU01"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("stackit_argus_instance.example", "name", newName),
+					resource.TestCheckResourceAttr("stackit_argus_instance.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("stackit_argus_instance.example", "plan", "Monitoring-Basic-EU01"),
+				),
+			},
 			// test import
 			{
 				ResourceName: "stackit_argus_instance.example",
@@ -120,24 +120,24 @@ resource "stackit_argus_instance" "example" {
 	)
 }
 
-// func configExtended(name, plan string) string {
-// 	return fmt.Sprintf(`
-// resource "stackit_argus_instance" "example" {
-// 	project_id = "%s"
-// 	name       = "%s"
-// 	plan       = "%s"
-// 	grafana	   = {
-// 		enable_public_access = true
-// 	}
-// 	metrics	   = {
-// 		retention_days 				   = 60
-// 		retention_days_5m_downsampling = 20
-// 		retention_days_1h_downsampling = 10
-// 	}
-// }
-// 	  `,
-// 		common.ACC_TEST_PROJECT_ID,
-// 		name,
-// 		plan,
-// 	)
-// }
+func configExtended(name, plan string) string {
+	return fmt.Sprintf(`
+resource "stackit_argus_instance" "example" {
+	project_id = "%s"
+	name       = "%s"
+	plan       = "%s"
+	grafana	   = {
+		enable_public_access = true
+	}
+	metrics	   = {
+		retention_days 				   = 60
+		retention_days_5m_downsampling = 20
+		retention_days_1h_downsampling = 10
+	}
+}
+	  `,
+		common.ACC_TEST_PROJECT_ID,
+		name,
+		plan,
+	)
+}
