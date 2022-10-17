@@ -2,21 +2,15 @@ package instance
 
 import (
 	"context"
-	"net/http"
-	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus/instances"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/instance"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	helper "github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
 func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	c := r.Provider.Client()
 	var config instance.Instance
-	var b instances.Instance
 
 	diags := req.Config.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
@@ -24,17 +18,8 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	if err := helper.RetryContext(ctx, common.DURATION_10M, func() *helper.RetryError {
-		var err error
-		b, err = c.Argus.Instances.Get(ctx, config.ProjectID.Value, config.ID.Value)
-		if err != nil {
-			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
-				return helper.NonRetryableError(err)
-			}
-			return helper.RetryableError(err)
-		}
-		return nil
-	}); err != nil {
+	b, err := c.Argus.Instances.Get(ctx, config.ProjectID.Value, config.ID.Value)
+	if err != nil {
 		resp.Diagnostics.AddError("failed to read instance", err.Error())
 		return
 	}

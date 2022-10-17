@@ -14,7 +14,6 @@ import (
 )
 
 const (
-	default_retry_duration                 = common.DURATION_20M
 	default_allow_privileged               = true
 	default_os_name                        = "flatcar"
 	default_os_version                     = "3139.2.0"

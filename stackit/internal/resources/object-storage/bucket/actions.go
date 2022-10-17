@@ -9,11 +9,9 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage/buckets"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	helper "github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
 // Create - lifecycle function
@@ -83,7 +81,6 @@ func (r Resource) createBucket(ctx context.Context, resp *resource.CreateRespons
 func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	c := r.Provider.Client()
 	var state Bucket
-	var b buckets.BucketResponse
 
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -91,25 +88,13 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	missing := false
-	if err := helper.RetryContext(ctx, common.DURATION_10M, func() *helper.RetryError {
-		var err error
-		b, err = c.ObjectStorage.Buckets.Get(ctx, state.ProjectID.Value, state.Name.Value)
-		if err != nil {
-			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
-				resp.State.RemoveResource(ctx)
-				missing = true
-				return nil
-			}
-			return helper.RetryableError(err)
+	b, err := c.ObjectStorage.Buckets.Get(ctx, state.ProjectID.Value, state.Name.Value)
+	if err != nil {
+		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+			resp.State.RemoveResource(ctx)
+			return
 		}
-		return nil
-	}); err != nil {
 		resp.Diagnostics.AddError("failed to read bucket", err.Error())
-		return
-	}
-
-	if missing {
 		return
 	}
 

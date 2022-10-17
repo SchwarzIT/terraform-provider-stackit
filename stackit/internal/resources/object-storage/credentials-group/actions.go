@@ -4,18 +4,12 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"time"
 
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	helper "github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-)
-
-const (
-	default_retry_duration = 10 * time.Minute
 )
 
 // Create - lifecycle function
@@ -35,9 +29,9 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	created := types.Bool{Value: false}
-	if err := helper.RetryContext(ctx, default_retry_duration, r.createCredentialGroup(ctx, &data, &created)); err != nil {
-		resp.Diagnostics.AddError("failed to create credential group", err.Error())
+	err := r.createCredentialGroup(ctx, &data)
+	if err != nil {
+		resp.Diagnostics.Append(err)
 		return
 	}
 
@@ -49,38 +43,27 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 }
 
-func (r Resource) createCredentialGroup(ctx context.Context, data *CredentialsGroup, created *types.Bool) func() *helper.RetryError {
+func (r Resource) createCredentialGroup(ctx context.Context, data *CredentialsGroup) diag.Diagnostic {
 	c := r.Provider.Client()
-	return func() *helper.RetryError {
-		if !created.Value {
-			if err := c.ObjectStorage.CredentialsGroup.Create(ctx, data.ProjectID.Value, data.Name.Value); err != nil {
-				if common.IsNonRetryable(err) {
-					return helper.NonRetryableError(err)
-				}
-				return helper.RetryableError(err)
-			}
-			created.Value = true
-		}
+	err := c.ObjectStorage.CredentialsGroup.Create(ctx, data.ProjectID.Value, data.Name.Value)
+	if err != nil {
+		return diag.NewErrorDiagnostic("failed to create credential group", err.Error())
 
-		res, err := c.ObjectStorage.CredentialsGroup.List(ctx, data.ProjectID.Value)
-		if err != nil {
-			if common.IsNonRetryable(err) {
-				return helper.NonRetryableError(err)
-			}
-			return helper.RetryableError(err)
-		}
-
-		for _, group := range res.CredentialsGroups {
-			if group.DisplayName == data.Name.Value {
-				data.ID = types.String{Value: group.CredentialsGroupID}
-				data.URN = types.String{Value: group.URN}
-				return nil
-			}
-		}
-
-		created.Value = false
-		return nil
 	}
+
+	res, err := c.ObjectStorage.CredentialsGroup.List(ctx, data.ProjectID.Value)
+	if err != nil {
+		return diag.NewErrorDiagnostic("failed to list credential groups", err.Error())
+	}
+
+	for _, group := range res.CredentialsGroups {
+		if group.DisplayName == data.Name.Value {
+			data.ID = types.String{Value: group.CredentialsGroupID}
+			data.URN = types.String{Value: group.URN}
+			break
+		}
+	}
+	return nil
 }
 
 // Read - lifecycle function
@@ -93,28 +76,20 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	found := false
-	if err := helper.RetryContext(ctx, default_retry_duration, func() *helper.RetryError {
-		var err error
-		res, err := c.ObjectStorage.CredentialsGroup.List(ctx, state.ProjectID.Value)
-		if err != nil {
-			if common.IsNonRetryable(err) {
-				return helper.NonRetryableError(err)
-			}
-			return helper.RetryableError(err)
-		}
-		for _, group := range res.CredentialsGroups {
-			if group.DisplayName == state.Name.Value {
-				found = true
-				state.ID = types.String{Value: group.CredentialsGroupID}
-				state.URN = types.String{Value: group.URN}
-				return nil
-			}
-		}
-		return nil
-	}); err != nil {
+	res, err := c.ObjectStorage.CredentialsGroup.List(ctx, state.ProjectID.Value)
+	if err != nil {
 		resp.Diagnostics.AddError("failed to read credential group", err.Error())
 		return
+	}
+
+	found := false
+	for _, group := range res.CredentialsGroups {
+		if group.DisplayName == state.Name.Value {
+			found = true
+			state.ID = types.String{Value: group.CredentialsGroupID}
+			state.URN = types.String{Value: group.URN}
+			break
+		}
 	}
 
 	if !found {
@@ -141,15 +116,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	c := r.Provider.Client()
-	if err := helper.RetryContext(ctx, default_retry_duration, func() *helper.RetryError {
-		if err := c.ObjectStorage.CredentialsGroup.Delete(ctx, state.ProjectID.Value, state.ID.Value); err != nil {
-			if common.IsNonRetryable(err) {
-				return helper.NonRetryableError(err)
-			}
-			return helper.RetryableError(err)
-		}
-		return nil
-	}); err != nil {
+	if err := c.ObjectStorage.CredentialsGroup.Delete(ctx, state.ProjectID.Value, state.ID.Value); err != nil {
 		resp.Diagnostics.AddError("failed to delete credential group", err.Error())
 		return
 	}
