@@ -3,12 +3,12 @@
 page_title: "stackit_object_storage_credential Data Source - stackit"
 subcategory: ""
 description: |-
-  Data source for Object Storage buckets
+  Data source for Object Storage credentials
 ---
 
 # stackit_object_storage_credential (Data Source)
 
-Data source for Object Storage buckets
+Data source for Object Storage credentials
 
 ## Example Usage
 

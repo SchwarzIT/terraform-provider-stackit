@@ -47,7 +47,7 @@ type BasicAuth struct {
 // GetSchema returns the terraform schema structure
 func (r Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		Description: "Manages Argus Instances",
+		Description: "Manages Argus Instance Jobs",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
 				Description: "Specifies the Argus Job ID",

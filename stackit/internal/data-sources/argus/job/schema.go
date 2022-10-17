@@ -13,7 +13,7 @@ import (
 // GetSchema returns the terraform schema structure
 func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		Description: "Data source for Argus Instances",
+		Description: "Data source for Argus Jobs",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
 				Description: "Specifies the Argus Job ID",

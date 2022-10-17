@@ -3,12 +3,12 @@
 page_title: "stackit_argus_job Resource - stackit"
 subcategory: ""
 description: |-
-  Manages Argus Instances
+  Manages Argus Instance Jobs
 ---
 
 # stackit_argus_job (Resource)
 
-Manages Argus Instances
+Manages Argus Instance Jobs
 
 ## Example Usage
 

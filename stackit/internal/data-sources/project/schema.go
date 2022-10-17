@@ -18,7 +18,7 @@ type Project struct {
 // GetSchema returns the terraform schema structure
 func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		Description: "Project data source",
+		Description: "Data source for projects",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
 				Description: "the project ID",

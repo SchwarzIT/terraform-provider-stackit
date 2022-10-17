@@ -3,12 +3,12 @@
 page_title: "stackit_argus_job Data Source - stackit"
 subcategory: ""
 description: |-
-  Data source for Argus Instances
+  Data source for Argus Jobs
 ---
 
 # stackit_argus_job (Data Source)
 
-Data source for Argus Instances
+Data source for Argus Jobs
 
 ## Example Usage
 
