@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus/grafana"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus/instances"
@@ -314,6 +315,7 @@ func (r Resource) updateInstance(ctx context.Context, diags *diag.Diagnostics, p
 		return
 	}
 
+	process.SetTimeout(2 * time.Hour)
 	res, err := process.Wait()
 	if err != nil {
 		diags.AddError("failed validating instance update", err.Error())
