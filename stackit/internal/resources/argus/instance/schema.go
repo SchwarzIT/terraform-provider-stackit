@@ -57,6 +57,9 @@ func (r Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) 
 				Description: "Specifies the Argus instance ID",
 				Type:        types.StringType,
 				Computed:    true,
+				PlanModifiers: tfsdk.AttributePlanModifiers{
+					resource.UseStateForUnknown(),
+				},
 			},
 
 			"name": {
