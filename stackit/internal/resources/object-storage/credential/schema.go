@@ -34,6 +34,9 @@ func (r Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) 
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
+				PlanModifiers: tfsdk.AttributePlanModifiers{
+					resource.UseStateForUnknown(),
+				},
 			},
 
 			"project_id": {

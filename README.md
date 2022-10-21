@@ -14,7 +14,7 @@ terraform {
   required_providers {
     stackit = {
       source  = "SchwarzIT/stackit"
-      version = "=0.3.2"
+      version = "=0.3.4"
     }
   }
 }
@@ -30,6 +30,5 @@ provider "stackit" {
 
 ## External Links
 
-* [Terraform Website](https://www.terraform.io)
-* [STACKIT Community Go Client](https://github.com/SchwarzIT/community-stackit-go-client)
 * [Provider Documentation](https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs)
+* [STACKIT Community Go Client](https://github.com/SchwarzIT/community-stackit-go-client)
