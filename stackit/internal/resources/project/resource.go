@@ -25,6 +25,7 @@ func (r *Resource) Metadata(_ context.Context, req resource.MetadataRequest, res
 	res.TypeName = "stackit_project"
 }
 
+// Configure the resource client
 func (r *Resource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	// Prevent panic if the provider has not been configured.
 	if req.ProviderData == nil {
