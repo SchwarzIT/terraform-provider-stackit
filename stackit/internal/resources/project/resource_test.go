@@ -14,7 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-const run_this_test = true
+const run_this_test = false
 
 func TestAcc_Project(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
@@ -91,7 +91,7 @@ func TestAcc_Project(t *testing.T) {
 				ResourceName:            "stackit_project.example",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"owner_id"},
+				ImportStateVerifyIgnore: []string{"owner_email"},
 			},
 		},
 	})

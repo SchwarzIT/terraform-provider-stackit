@@ -163,6 +163,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 	p.ID = types.String{Value: project.ProjectID}
 	p.ContainerID = types.String{Value: project.ContainerID}
+	p.ParentContainerID = types.String{Value: project.Parent.ContainerID}
 	p.Name = types.String{Value: project.Name}
 	p.BillingRef = types.String{Value: project.Labels["billingReference"]}
 
