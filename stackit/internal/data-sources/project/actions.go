@@ -9,7 +9,7 @@ import (
 
 // Read - lifecycle function
 func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	c := r.Provider.Client()
+	c := r.client
 	var p Project
 
 	diags := req.Config.Get(ctx, &p)
@@ -18,15 +18,18 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	project, err := c.Projects.Get(ctx, p.ID.Value)
+	project, err := c.ResourceManager.Projects.Get(ctx, p.ID.Value)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to read project", err.Error())
 		return
 	}
 
-	p.ID = types.String{Value: project.ID}
+	p.ID = types.String{Value: project.ProjectID}
 	p.Name = types.String{Value: project.Name}
-	p.BillingRef = types.String{Value: project.BillingReference}
+
+	if billing, ok := project.Labels["billingReference"]; ok {
+		p.BillingRef = types.String{Value: billing}
+	}
 
 	diags = resp.State.Set(ctx, &p)
 	resp.Diagnostics.Append(diags...)

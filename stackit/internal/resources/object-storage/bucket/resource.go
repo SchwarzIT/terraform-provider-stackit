@@ -3,22 +3,18 @@ package bucket
 import (
 	"context"
 
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
+	client "github.com/SchwarzIT/community-stackit-go-client"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 )
 
 // New returns a new configured resource
-func New(p common.Provider) func() resource.Resource {
-	return func() resource.Resource {
-		return &Resource{
-			Provider: p,
-		}
-	}
+func New() resource.Resource {
+	return &Resource{}
 }
 
 // Resource is the exported resource
 type Resource struct {
-	Provider common.Provider
+	client *client.Client
 }
 
 var _ = resource.Resource(&Resource{})

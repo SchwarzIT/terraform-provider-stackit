@@ -10,14 +10,6 @@ import (
 
 // Create - lifecycle function
 func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	if !r.Provider.IsConfigured() {
-		resp.Diagnostics.AddError(
-			"Provider not configured",
-			"The provider hasn't been configured before apply, likely because it depends on another resource.",
-		)
-		return
-	}
-
 	var data Credential
 	diags := req.Plan.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
@@ -48,7 +40,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 }
 
 func (r Resource) createAccessKey(ctx context.Context, resp *resource.CreateResponse, key Credential) keys.AccessKeyCreateResponse {
-	c := r.Provider.Client()
+	c := r.client
 	res, err := c.ObjectStorage.AccessKeys.Create(ctx, key.ProjectID.Value, key.Expiry.Value, key.CredentialsGroupID.Value)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to create credential", err.Error())
@@ -59,7 +51,7 @@ func (r Resource) createAccessKey(ctx context.Context, resp *resource.CreateResp
 
 // Read - lifecycle function
 func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	c := r.Provider.Client()
+	c := r.client
 	var state Credential
 
 	diags := req.State.Get(ctx, &state)
@@ -107,7 +99,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	c := r.Provider.Client()
+	c := r.client
 	err := c.ObjectStorage.AccessKeys.Delete(ctx, state.ProjectID.Value, state.ID.Value, state.CredentialsGroupID.Value)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete credential", err.Error())

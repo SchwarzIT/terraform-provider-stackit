@@ -2,27 +2,46 @@ package instance
 
 import (
 	"context"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
+	"fmt"
+
+	client "github.com/SchwarzIT/community-stackit-go-client"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 )
 
 // New returns a new configured data source
-func New(p common.Provider) func() datasource.DataSource {
-	return func() datasource.DataSource {
-		return &DataSource{
-			Provider: p,
-		}
-	}
+func New() datasource.DataSource {
+	return &DataSource{}
 }
 
 // DataSource is the exported data source
 type DataSource struct {
-	Provider common.Provider
+	client *client.Client
 }
 
 var _ = datasource.DataSource(&DataSource{})
 
 // Metadata returns data resource metadata
-func (r DataSource) Metadata(_ context.Context, req datasource.MetadataRequest, res *datasource.MetadataResponse) {
+func (r *DataSource) Metadata(_ context.Context, req datasource.MetadataRequest, res *datasource.MetadataResponse) {
 	res.TypeName = "stackit_argus_instance"
+}
+
+// Configure configures the data source client
+func (d *DataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
+	if req.ProviderData == nil {
+		return
+	}
+
+	client, ok := req.ProviderData.(*client.Client)
+
+	if !ok {
+		resp.Diagnostics.AddError(
+			"Unexpected Data Source Configure Type",
+			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+		)
+
+		return
+	}
+
+	d.client = client
 }

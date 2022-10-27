@@ -29,7 +29,7 @@ const (
 )
 
 func (r Resource) loadAvaiableVersions(ctx context.Context) ([]*semver.Version, error) {
-	c := r.Provider.Client()
+	c := r.client
 	var versionOptions []*semver.Version
 	opts, err := c.Kubernetes.Options.List(ctx)
 	if err != nil {

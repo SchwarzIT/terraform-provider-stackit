@@ -16,14 +16,6 @@ import (
 
 // Create - lifecycle function
 func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	if !r.Provider.IsConfigured() {
-		resp.Diagnostics.AddError(
-			"Provider not configured",
-			"The provider hasn't been configured before apply, likely because it depends on another resource.",
-		)
-		return
-	}
-
 	var plan Cluster
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
@@ -53,7 +45,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 }
 
 func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnostics, cl *Cluster) {
-	c := r.Provider.Client()
+	c := r.client
 	versions, err := r.loadAvaiableVersions(ctx)
 	if err != nil {
 		diags.AddError("failed while loading version options", err.Error())
@@ -112,7 +104,7 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 }
 
 func (r Resource) getCredential(ctx context.Context, diags *diag.Diagnostics, cl *Cluster) {
-	c := r.Provider.Client()
+	c := r.client
 	cred, err := c.Kubernetes.Clusters.GetCredential(ctx, cl.ProjectID.Value, cl.Name.Value)
 	if err != nil {
 		diags.AddError("failed to get cluster credentials", err.Error())
@@ -123,7 +115,7 @@ func (r Resource) getCredential(ctx context.Context, diags *diag.Diagnostics, cl
 
 // Read - lifecycle function
 func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	c := r.Provider.Client()
+	c := r.client
 	var state Cluster
 
 	diags := req.State.Get(ctx, &state)
@@ -191,7 +183,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	c := r.Provider.Client()
+	c := r.client
 	process, err := c.Kubernetes.Clusters.Delete(ctx, state.ProjectID.Value, state.Name.Value)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete cluster", err.Error())
@@ -246,7 +238,7 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 	}
 
 	// pre-read imports
-	c := r.Provider.Client()
+	c := r.client
 	res, err := c.Kubernetes.Clusters.Get(ctx, idParts[0], idParts[1])
 	if err != nil {
 		resp.Diagnostics.AddError("Error during import", err.Error())

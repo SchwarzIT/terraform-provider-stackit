@@ -19,14 +19,6 @@ import (
 
 // Create - lifecycle function
 func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	if !r.Provider.IsConfigured() {
-		resp.Diagnostics.AddError(
-			"Provider not configured",
-			"The provider hasn't been configured before apply, likely because it depends on another resource.",
-		)
-		return
-	}
-
 	var plan Instance
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
@@ -63,7 +55,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 }
 
 func (r Resource) createInstance(ctx context.Context, diags *diag.Diagnostics, plan *Instance) {
-	c := r.Provider.Client()
+	c := r.client
 
 	_, process, err := c.Argus.Instances.Create(ctx, plan.ProjectID.Value, plan.Name.Value, plan.PlanID.Value, map[string]string{})
 	if err != nil {
@@ -99,7 +91,7 @@ func (r Resource) setGrafanaConfig(ctx context.Context, diags *diag.Diagnostics,
 		}
 	}
 
-	c := r.Provider.Client()
+	c := r.client
 	cfg := grafana.Config{
 		PublicReadAccess: s.Grafana.EnablePublicAccess.Value,
 	}
@@ -131,7 +123,7 @@ func (r Resource) setMetricsConfig(ctx context.Context, diags *diag.Diagnostics,
 		}
 	}
 
-	c := r.Provider.Client()
+	c := r.client
 	cfg := metrics.Config{
 		MetricsRetentionTimeRaw: fmt.Sprintf("%dd", s.Metrics.RetentionDays.Value),
 		MetricsRetentionTime5m:  fmt.Sprintf("%dd", s.Metrics.RetentionDays5mDownsampling.Value),
@@ -183,7 +175,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 }
 
 func (r Resource) readInstance(ctx context.Context, diags *diag.Diagnostics, s *Instance) {
-	c := r.Provider.Client()
+	c := r.client
 	res, err := c.Argus.Instances.Get(ctx, s.ProjectID.Value, s.ID.Value)
 	if err != nil {
 		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
@@ -206,7 +198,7 @@ func (r Resource) readGrafana(ctx context.Context, diags *diag.Diagnostics, s *I
 		return
 	}
 
-	c := r.Provider.Client()
+	c := r.client
 	res, err := c.Argus.Grafana.GetConfig(ctx, s.ProjectID.Value, s.ID.Value)
 	if err != nil {
 		diags.AddError("failed to read grafana config", err.Error())
@@ -225,7 +217,7 @@ func (r Resource) readMetrics(ctx context.Context, diags *diag.Diagnostics, s *I
 		return
 	}
 
-	c := r.Provider.Client()
+	c := r.client
 	res, err := c.Argus.Metrics.GetConfig(ctx, s.ProjectID.Value, s.ID.Value)
 	if err != nil {
 		diags.AddError("failed to read grafana config", err.Error())
@@ -308,7 +300,7 @@ func (r Resource) updateInstance(ctx context.Context, diags *diag.Diagnostics, p
 		return
 	}
 
-	c := r.Provider.Client()
+	c := r.client
 	_, process, err := c.Argus.Instances.Update(ctx, plan.ProjectID.Value, plan.ID.Value, plan.Name.Value, plan.PlanID.Value, map[string]string{})
 	if err != nil {
 		diags.AddError("failed during instance update", err.Error())
@@ -345,7 +337,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		resp.Diagnostics.AddError("can't perform deletion", "argus instance id is unknown or null")
 	}
 
-	c := r.Provider.Client()
+	c := r.client
 	_, process, err := c.Argus.Instances.Delete(ctx, state.ProjectID.Value, state.ID.Value)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete instance", err.Error())
