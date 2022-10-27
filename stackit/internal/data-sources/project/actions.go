@@ -18,7 +18,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	project, err := c.ResourceManagement.Projects.Get(ctx, p.ID.Value)
+	project, err := c.ResourceManagement.Projects.Get(ctx, p.ContainerID.Value)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to read project", err.Error())
 		return
@@ -26,6 +26,8 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 
 	p.ID = types.String{Value: project.ProjectID}
 	p.Name = types.String{Value: project.Name}
+	p.ParentContainerID = types.String{Value: project.Parent.ContainerID}
+	p.ContainerID = types.String{Value: project.ContainerID}
 
 	if billing, ok := project.Labels["billingReference"]; ok {
 		p.BillingRef = types.String{Value: billing}

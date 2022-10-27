@@ -59,7 +59,7 @@ This provider is built and maintained by the STACKIT community in Schwarz IT and
 				Type:                types.StringType,
 				Optional:            true,
 				Computed:            true,
-				MarkdownDescription: "Service Account ID.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_ID` environment variable instead.",
+				MarkdownDescription: "Service Account Email.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_EMAIL` environment variable instead.",
 			},
 			"service_account_token": {
 				Type:                types.StringType,

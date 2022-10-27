@@ -10,9 +10,11 @@ import (
 
 // Project is the schema model
 type Project struct {
-	ID         types.String `tfsdk:"id"`
-	Name       types.String `tfsdk:"name"`
-	BillingRef types.String `tfsdk:"billing_ref"`
+	ID                types.String `tfsdk:"id"`
+	ContainerID       types.String `tfsdk:"container_id"`
+	ParentContainerID types.String `tfsdk:"parent_container_id"`
+	Name              types.String `tfsdk:"name"`
+	BillingRef        types.String `tfsdk:"billing_ref"`
 }
 
 // GetSchema returns the terraform schema structure
@@ -21,9 +23,21 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 		Description: "Data source for projects",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
-				Description: "the project ID",
+				Description: "the project UUID",
+				Type:        types.StringType,
+				Computed:    true,
+			},
+
+			"container_id": {
+				Description: "the project container ID",
 				Type:        types.StringType,
 				Required:    true,
+			},
+
+			"parent_container_id": {
+				Description: "the project's parent container ID",
+				Type:        types.StringType,
+				Computed:    true,
 			},
 
 			"name": {
