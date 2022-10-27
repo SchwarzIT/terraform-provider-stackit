@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
@@ -13,7 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-const run_this_test = false
+const run_this_test = true
 
 func TestAcc_Project(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
@@ -25,9 +26,9 @@ func TestAcc_Project(t *testing.T) {
 		t.Skip("Skipping TestAcc_Project: ACC_TEST_BILLING_REF not specified")
 	}
 
-	user, ok := os.LookupEnv("ACC_TEST_USER_UUID")
+	user, ok := os.LookupEnv("ACC_TEST_USER_EMAIL")
 	if !ok {
-		t.Skip("Skipping TestAcc_Project: ACC_TEST_USER_UUID not specified")
+		t.Skip("Skipping TestAcc_Project: ACC_TEST_USER_EMAIL not specified")
 	}
 
 	name := "ODJ AccTest " + acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
@@ -101,12 +102,14 @@ func config(name, billingRef, user string) string {
 	resource "stackit_project" "example" {
 		name        = "%s"
 		billing_ref = "%s"
-		owner_id    = "%s"
+		owner_email = "%s"
+		parent_container_id = "%s"
 	}
 	`,
 		name,
 		billingRef,
 		user,
+		consts.SCHWARZ_CONTAINER_ID,
 	)
 }
 
@@ -115,9 +118,10 @@ func config2(name, billingRef, user string, enableKubernetes, enableObjectStorag
 	resource "stackit_project" "example" {
 		name        = "%s"
 		billing_ref = "%s"
-		owner_id    = "%s"
+		owner_email = "%s"
 		enable_kubernetes = %v
 		enable_object_storage = %v
+		parent_container_id = "%s"
 	}
 	`,
 		name,
@@ -125,5 +129,6 @@ func config2(name, billingRef, user string, enableKubernetes, enableObjectStorag
 		user,
 		enableKubernetes,
 		enableObjectStorage,
+		consts.SCHWARZ_CONTAINER_ID,
 	)
 }

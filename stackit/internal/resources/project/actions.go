@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/resource-manager/projects"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/resource-management/projects"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -32,6 +32,8 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	p := Project{
 		ID:                  types.String{Value: plan.ID.Value},
+		ContainerID:         types.String{Value: plan.ContainerID.Value},
+		ParentContainerID:   types.String{Value: plan.ParentContainerID.Value},
 		Name:                types.String{Value: plan.Name.Value},
 		BillingRef:          types.String{Value: plan.BillingRef.Value},
 		OwnerEmail:          types.String{Value: plan.OwnerEmail.Value},
@@ -81,7 +83,7 @@ func (r Resource) createProject(ctx context.Context, resp *resource.CreateRespon
 	}
 
 	c := r.client
-	project, process, err := c.ResourceManager.Projects.Create(ctx, plan.ParentContainerID.Value, plan.Name.Value, labels, members...)
+	project, process, err := c.ResourceManagement.Projects.Create(ctx, plan.ParentContainerID.Value, plan.Name.Value, labels, members...)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to create project", err.Error())
 		return plan
@@ -137,7 +139,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	project, err := c.ResourceManager.Projects.Get(ctx, p.ID.Value)
+	project, err := c.ResourceManagement.Projects.Get(ctx, p.ID.Value)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to read project", err.Error())
 		return
@@ -160,6 +162,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	p.ID = types.String{Value: project.ProjectID}
+	p.ContainerID = types.String{Value: project.ContainerID}
 	p.Name = types.String{Value: project.Name}
 	p.BillingRef = types.String{Value: project.Labels["billingReference"]}
 
@@ -217,7 +220,7 @@ func (r Resource) updateProject(ctx context.Context, plan, state Project, resp *
 		"scope":            "PUBLIC",
 	}
 
-	_, err := c.ResourceManager.Projects.Update(ctx, plan.ParentContainerID.Value, plan.ContainerID.Value, plan.Name.Value, labels)
+	_, err := c.ResourceManagement.Projects.Update(ctx, plan.ParentContainerID.Value, plan.ContainerID.Value, plan.Name.Value, labels)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to update project", err.Error())
 		return
@@ -268,7 +271,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		_ = c.ObjectStorage.Projects.Delete(ctx, state.ID.Value)
 	}
 
-	process, err := c.ResourceManager.Projects.Delete(ctx, state.ID.Value)
+	process, err := c.ResourceManagement.Projects.Delete(ctx, state.ID.Value)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete project", err.Error())
 		return
