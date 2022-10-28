@@ -11,7 +11,7 @@ import (
 
 // Read - lifecycle function
 func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	c := r.Provider.Client()
+	c := r.client
 	var config kubernetes.Cluster
 
 	diags := req.Config.Get(ctx, &config)
@@ -42,7 +42,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 }
 
 func (r DataSource) getCredential(ctx context.Context, diags *diag.Diagnostics, cl *kubernetes.Cluster) {
-	c := r.Provider.Client()
+	c := r.client
 	cred, err := c.Kubernetes.Clusters.GetCredential(ctx, cl.ProjectID.Value, cl.Name.Value)
 	if err != nil {
 		diags.AddError("failed to get cluster credentials", err.Error())

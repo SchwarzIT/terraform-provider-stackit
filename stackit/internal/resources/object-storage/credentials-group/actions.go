@@ -14,14 +14,6 @@ import (
 
 // Create - lifecycle function
 func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	if !r.Provider.IsConfigured() {
-		resp.Diagnostics.AddError(
-			"Provider not configured",
-			"The provider hasn't been configured before apply, likely because it depends on another resource.",
-		)
-		return
-	}
-
 	var data CredentialsGroup
 	diags := req.Plan.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
@@ -44,7 +36,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 }
 
 func (r Resource) createCredentialGroup(ctx context.Context, data *CredentialsGroup) diag.Diagnostic {
-	c := r.Provider.Client()
+	c := r.client
 	err := c.ObjectStorage.CredentialsGroup.Create(ctx, data.ProjectID.Value, data.Name.Value)
 	if err != nil {
 		return diag.NewErrorDiagnostic("failed to create credential group", err.Error())
@@ -68,7 +60,7 @@ func (r Resource) createCredentialGroup(ctx context.Context, data *CredentialsGr
 
 // Read - lifecycle function
 func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	c := r.Provider.Client()
+	c := r.client
 	var state CredentialsGroup
 
 	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
@@ -115,7 +107,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	c := r.Provider.Client()
+	c := r.client
 	if err := c.ObjectStorage.CredentialsGroup.Delete(ctx, state.ProjectID.Value, state.ID.Value); err != nil {
 		resp.Diagnostics.AddError("failed to delete credential group", err.Error())
 		return

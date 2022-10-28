@@ -14,7 +14,7 @@ Data source for projects
 
 ```terraform
 data "stackit_project" "example" {
-  id = "b7a601ed-27af-400d-bf6d-0bb701589783"
+  container_id = "container-id"
 }
 ```
 
@@ -23,11 +23,13 @@ data "stackit_project" "example" {
 
 ### Required
 
-- `id` (String) the project ID
+- `container_id` (String) the project container ID
 
 ### Read-Only
 
 - `billing_ref` (String) billing reference for cost transparency
+- `id` (String) the project UUID
 - `name` (String) the project name
+- `parent_container_id` (String) the project's parent container ID
 
 

@@ -10,7 +10,7 @@ import (
 )
 
 func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	c := r.Provider.Client()
+	c := r.client
 	var config job.Job
 
 	diags := req.Config.Get(ctx, &config)

@@ -24,7 +24,7 @@ type Credential struct {
 }
 
 // GetSchema returns the terraform schema structure
-func (r Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
+func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		Description: "Manages Object Storage credentials",
 		Attributes: map[string]tfsdk.Attribute{

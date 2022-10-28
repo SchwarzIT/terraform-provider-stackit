@@ -2,28 +2,46 @@ package credentialsgroup
 
 import (
 	"context"
+	"fmt"
 
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
+	client "github.com/SchwarzIT/community-stackit-go-client"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 )
 
 // New returns a new configured resource
-func New(p common.Provider) func() resource.Resource {
-	return func() resource.Resource {
-		return &Resource{
-			Provider: p,
-		}
-	}
+func New() resource.Resource {
+	return &Resource{}
 }
 
 // Resource is the exported resource
 type Resource struct {
-	Provider common.Provider
+	client *client.Client
 }
 
 var _ = resource.Resource(&Resource{})
 
 // Metadata returns data resource metadata
-func (r Resource) Metadata(_ context.Context, req resource.MetadataRequest, res *resource.MetadataResponse) {
+func (r *Resource) Metadata(_ context.Context, req resource.MetadataRequest, res *resource.MetadataResponse) {
 	res.TypeName = "stackit_object_storage_credentials_group"
+}
+
+// Configure the resource client
+func (r *Resource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
+	if req.ProviderData == nil {
+		return
+	}
+
+	c, ok := req.ProviderData.(*client.Client)
+
+	if !ok {
+		resp.Diagnostics.AddError(
+			"Unexpected Resource Configure Type",
+			fmt.Sprintf("Expected *client.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+		)
+
+		return
+	}
+
+	r.client = c
 }

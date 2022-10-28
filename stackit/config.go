@@ -10,13 +10,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-// Provider schema struct
-type providerSchema struct {
-	ServiceAccountID    types.String `tfsdk:"service_account_id"`
-	ServiceAccountToken types.String `tfsdk:"service_account_token"`
-	CustomerAccountID   types.String `tfsdk:"customer_account_id"`
-}
-
 func (p *StackitProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
 	// Retrieve provider data from configuration
 	var config providerSchema
@@ -26,16 +19,16 @@ func (p *StackitProvider) Configure(ctx context.Context, req provider.ConfigureR
 		return
 	}
 
-	var id string
-	if config.ServiceAccountID.IsUnknown() || config.ServiceAccountID.IsNull() {
-		id = os.Getenv("STACKIT_SERVICE_ACCOUNT_ID")
-		config.ServiceAccountID = types.String{Value: id}
+	var email string
+	if config.ServiceAccountEmail.IsUnknown() || config.ServiceAccountEmail.IsNull() {
+		email = os.Getenv("STACKIT_SERVICE_ACCOUNT_EMAIL")
+		config.ServiceAccountEmail = types.String{Value: email}
 	} else {
-		id = config.ServiceAccountID.Value
+		email = config.ServiceAccountEmail.Value
 	}
 
-	if id == "" {
-		resp.Diagnostics.AddError("missing mandatory field", "STACKIT service account ID must be provided")
+	if email == "" {
+		resp.Diagnostics.AddError("missing mandatory field", "STACKIT service account email must be provided")
 		return
 	}
 
@@ -52,23 +45,9 @@ func (p *StackitProvider) Configure(ctx context.Context, req provider.ConfigureR
 		return
 	}
 
-	var ca string
-	if config.CustomerAccountID.IsUnknown() || config.CustomerAccountID.IsNull() {
-		ca = os.Getenv("STACKIT_CUSTOMER_ACCOUNT_ID")
-		config.CustomerAccountID = types.String{Value: ca}
-	} else {
-		ca = config.CustomerAccountID.Value
-	}
-
-	if ca == "" {
-		resp.Diagnostics.AddError("missing mandatory field", "STACKIT customer account ID must be provided")
-		return
-	}
-
 	c, err := client.New(context.Background(), &client.Config{
-		ServiceAccountID: id,
-		Token:            token,
-		OrganizationID:   ca,
+		ServiceAccountEmail: email,
+		ServiceAccountToken: token,
 	})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -78,9 +57,8 @@ func (p *StackitProvider) Configure(ctx context.Context, req provider.ConfigureR
 		return
 	}
 
-	c.SetRetry(retry.New()) // auto-retry when possible
+	c.SetRetry(retry.New())
 
-	p.client = c
-	p.configured = true
-	p.serviceAccountID = id
+	resp.DataSourceData = c
+	resp.ResourceData = c
 }

@@ -16,14 +16,6 @@ import (
 
 // Create - lifecycle function
 func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	if !r.Provider.IsConfigured() {
-		resp.Diagnostics.AddError(
-			"Provider not configured",
-			"The provider hasn't been configured before apply, likely because it depends on another resource.",
-		)
-		return
-	}
-
 	var bucket Bucket
 	diags := req.Plan.Get(ctx, &bucket)
 	resp.Diagnostics.Append(diags...)
@@ -53,7 +45,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 }
 
 func (r Resource) createBucket(ctx context.Context, resp *resource.CreateResponse, plan Bucket) buckets.BucketResponse {
-	c := r.Provider.Client()
+	c := r.client
 	var b buckets.BucketResponse
 
 	// Create bucket
@@ -79,7 +71,7 @@ func (r Resource) createBucket(ctx context.Context, resp *resource.CreateRespons
 
 // Read - lifecycle function
 func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	c := r.Provider.Client()
+	c := r.client
 	var state Bucket
 
 	diags := req.State.Get(ctx, &state)
@@ -120,7 +112,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	c := r.Provider.Client()
+	c := r.client
 
 	httpClient := c.GetHTTPClient()
 	t := httpClient.Timeout

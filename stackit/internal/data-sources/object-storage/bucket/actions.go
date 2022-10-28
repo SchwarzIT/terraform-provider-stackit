@@ -11,7 +11,7 @@ import (
 
 // Read - lifecycle function
 func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	c := r.Provider.Client()
+	c := r.client
 	var config bucket.Bucket
 	var b buckets.BucketResponse
 

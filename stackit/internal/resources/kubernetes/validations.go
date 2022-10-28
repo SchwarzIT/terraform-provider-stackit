@@ -31,7 +31,7 @@ func (r Resource) validate(
 	}
 
 	// Validate against real options
-	c := r.Provider.Client()
+	c := r.client
 	opts, err := c.Kubernetes.Options.List(ctx)
 	if err != nil {
 		// if options cannot be fetched, skip validation

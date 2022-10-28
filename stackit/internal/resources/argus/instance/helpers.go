@@ -19,7 +19,7 @@ const (
 )
 
 func (r Resource) loadPlanID(ctx context.Context, diags *diag.Diagnostics, s *Instance) {
-	c := r.Provider.Client()
+	c := r.client
 
 	res, err := c.Argus.Plans.List(ctx, s.ProjectID.Value)
 	if err != nil {

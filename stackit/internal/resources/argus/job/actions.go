@@ -13,14 +13,6 @@ import (
 
 // Create - lifecycle function
 func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	if !r.Provider.IsConfigured() {
-		resp.Diagnostics.AddError(
-			"Provider not configured",
-			"The provider hasn't been configured before apply, likely because it depends on another resource.",
-		)
-		return
-	}
-
 	var plan Job
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
@@ -28,7 +20,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	c := r.Provider.Client()
+	c := r.client
 	job := plan.ToClientJob()
 
 	_, process, err := c.Argus.Jobs.Create(ctx, plan.ProjectID.Value, plan.ArgusInstanceID.Value, job)
@@ -67,7 +59,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	c := r.Provider.Client()
+	c := r.client
 
 	res, err := c.Argus.Jobs.Get(ctx, state.ProjectID.Value, state.ArgusInstanceID.Value, state.Name.Value)
 	if err != nil {
@@ -92,7 +84,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		return
 	}
 
-	c := r.Provider.Client()
+	c := r.client
 	job := plan.ToClientJob()
 
 	if _, err := c.Argus.Jobs.Update(ctx, plan.ProjectID.Value, plan.ArgusInstanceID.Value, job); err != nil {
@@ -124,7 +116,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	c := r.Provider.Client()
+	c := r.client
 	job := state.ToClientJob()
 
 	_, process, err := c.Argus.Jobs.Delete(ctx, state.ProjectID.Value, state.ArgusInstanceID.Value, job.JobName)

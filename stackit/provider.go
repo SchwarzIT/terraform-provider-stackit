@@ -3,8 +3,6 @@ package stackit
 import (
 	"context"
 
-	client "github.com/SchwarzIT/community-stackit-go-client"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	dataArgusInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/argus/instance"
 	dataArgusJob "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/argus/job"
 	dataKubernetes "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/kubernetes"
@@ -37,14 +35,16 @@ func New(version string) func() provider.Provider {
 }
 
 type StackitProvider struct {
-	configured       bool
-	client           *client.Client
-	serviceAccountID string
-	version          string
+	version string
 }
 
 var _ = provider.Provider(&StackitProvider{})
-var _ = common.Provider(&StackitProvider{})
+
+// Provider schema struct
+type providerSchema struct {
+	ServiceAccountEmail types.String `tfsdk:"service_account_email"`
+	ServiceAccountToken types.String `tfsdk:"service_account_token"`
+}
 
 // GetSchema returns the provider's schema
 func (p *StackitProvider) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -55,11 +55,11 @@ This provider is built and maintained by the STACKIT community in Schwarz IT and
 ~> **Note:** The provider is built using Terraform's plugin framework, therefore we recommend using Terraform CLI v1.x which supports Protocol v6
 		`,
 		Attributes: map[string]tfsdk.Attribute{
-			"service_account_id": {
+			"service_account_email": {
 				Type:                types.StringType,
 				Optional:            true,
 				Computed:            true,
-				MarkdownDescription: "Service Account ID.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_ID` environment variable instead.",
+				MarkdownDescription: "Service Account Email.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_EMAIL` environment variable instead.",
 			},
 			"service_account_token": {
 				Type:                types.StringType,
@@ -67,12 +67,6 @@ This provider is built and maintained by the STACKIT community in Schwarz IT and
 				Computed:            true,
 				Sensitive:           true,
 				MarkdownDescription: "Service Account Token.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_TOKEN` environment variable instead.",
-			},
-			"customer_account_id": {
-				Type:                types.StringType,
-				Optional:            true,
-				Computed:            true,
-				MarkdownDescription: "Customer Account ID (Organization ID).<br />This attribute can also be loaded from `STACKIT_CUSTOMER_ACCOUNT_ID` environment variable instead.",
 			},
 		},
 	}, nil
@@ -86,40 +80,25 @@ func (p *StackitProvider) Metadata(ctx context.Context, req provider.MetadataReq
 // GetResources - Defines provider resources
 func (p *StackitProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
-		resourceArgusInstance.New(p),
-		resourceArgusJob.New(p),
-		resourceKubernetes.New(p),
-		resourceObjectStorageBucket.New(p),
-		resourceObjectStorageCredential.New(p),
-		resourceObjectStorageCredentialsGroup.New(p),
-		resourceProject.New(p),
+		resourceArgusInstance.New,
+		resourceArgusJob.New,
+		resourceKubernetes.New,
+		resourceObjectStorageBucket.New,
+		resourceObjectStorageCredential.New,
+		resourceObjectStorageCredentialsGroup.New,
+		resourceProject.New,
 	}
 }
 
 // GetDataSources - Defines provider data sources
 func (p *StackitProvider) DataSources(context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
-		dataArgusInstance.New(p),
-		dataArgusJob.New(p),
-		dataObjectStorageBucket.New(p),
-		dataObjectStorageCredential.New(p),
-		dataObjectStorageCredentialsGroup.New(p),
-		dataKubernetes.New(p),
-		dataProject.New(p),
+		dataArgusInstance.New,
+		dataArgusJob.New,
+		dataObjectStorageBucket.New,
+		dataObjectStorageCredential.New,
+		dataObjectStorageCredentialsGroup.New,
+		dataKubernetes.New,
+		dataProject.New,
 	}
-}
-
-// IsConfigured - returns true when the provider has been configured
-func (p *StackitProvider) IsConfigured() bool {
-	return p.configured
-}
-
-// Client - returns the STACKIT client
-func (p *StackitProvider) Client() *client.Client {
-	return p.client
-}
-
-// ServiceAccountID - returns the service account id
-func (p *StackitProvider) ServiceAccountID() string {
-	return p.serviceAccountID
 }

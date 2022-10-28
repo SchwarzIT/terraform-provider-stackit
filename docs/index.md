@@ -20,15 +20,14 @@ terraform {
   required_providers {
     stackit = {
       source  = "SchwarzIT/stackit"
-      version = "=0.3.4"
+      version = "=1.0.0"
     }
   }
 }
 
 provider "stackit" {
-  service_account_id    = var.service_account_id
+  service_account_email = var.service_account_email
   service_account_token = var.service_account_token
-  customer_account_id   = var.customer_account_id
 }
 ```
 
@@ -37,6 +36,5 @@ provider "stackit" {
 
 ### Optional
 
-- `customer_account_id` (String) Customer Account ID (Organization ID).<br />This attribute can also be loaded from `STACKIT_CUSTOMER_ACCOUNT_ID` environment variable instead.
-- `service_account_id` (String) Service Account ID.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_ID` environment variable instead.
+- `service_account_email` (String) Service Account Email.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_EMAIL` environment variable instead.
 - `service_account_token` (String, Sensitive) Service Account Token.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_TOKEN` environment variable instead.

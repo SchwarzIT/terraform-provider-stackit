@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/projects"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/resource-management/projects"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -17,14 +17,6 @@ import (
 
 // Create - lifecycle function
 func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	if !r.Provider.IsConfigured() {
-		resp.Diagnostics.AddError(
-			"Provider not configured",
-			"The provider hasn't been configured before apply, likely because it depends on another resource.",
-		)
-		return
-	}
-
 	var plan Project
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
@@ -40,9 +32,11 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	p := Project{
 		ID:                  types.String{Value: plan.ID.Value},
+		ContainerID:         types.String{Value: plan.ContainerID.Value},
+		ParentContainerID:   types.String{Value: plan.ParentContainerID.Value},
 		Name:                types.String{Value: plan.Name.Value},
 		BillingRef:          types.String{Value: plan.BillingRef.Value},
-		OwnerID:             types.String{Value: plan.OwnerID.Value},
+		OwnerEmail:          types.String{Value: plan.OwnerEmail.Value},
 		EnableKubernetes:    types.Bool{Null: true},
 		EnableObjectStorage: types.Bool{Null: true},
 	}
@@ -72,18 +66,24 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 }
 
 func (r Resource) createProject(ctx context.Context, resp *resource.CreateResponse, plan Project) Project {
-	owners := projects.ProjectRole{
-		Name: consts.ROLE_PROJECT_OWNER,
-		Users: []projects.ProjectRoleMember{
-			{ID: plan.OwnerID.Value},
+	labels := map[string]string{
+		"billingReference": plan.BillingRef.Value,
+		"scope":            "PUBLIC",
+	}
+
+	members := []projects.ProjectMember{
+		{
+			Subject: r.client.GetConfig().ServiceAccountEmail,
+			Role:    consts.ROLE_PROJECT_OWNER,
 		},
-		ServiceAccounts: []projects.ProjectRoleMember{ // service account is added automatically
-			{ID: r.Provider.ServiceAccountID()},
+		{
+			Subject: plan.OwnerEmail.Value,
+			Role:    consts.ROLE_PROJECT_OWNER,
 		},
 	}
 
-	c := r.Provider.Client()
-	project, process, err := c.Projects.Create(ctx, plan.Name.Value, plan.BillingRef.Value, owners)
+	c := r.client
+	project, process, err := c.ResourceManagement.Projects.Create(ctx, plan.ParentContainerID.Value, plan.Name.Value, labels, members...)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to create project", err.Error())
 		return plan
@@ -94,12 +94,13 @@ func (r Resource) createProject(ctx context.Context, resp *resource.CreateRespon
 		return plan
 	}
 
-	plan.ID = types.String{Value: project.ID}
+	plan.ID = types.String{Value: project.ProjectID}
+	plan.ContainerID = types.String{Value: project.ContainerID}
 	return plan
 }
 
 func (r Resource) createKubernetesProject(ctx context.Context, d *diag.Diagnostics, projectID string) {
-	c := r.Provider.Client()
+	c := r.client
 	_, process, err := c.Kubernetes.Projects.Create(ctx, projectID)
 	if err != nil {
 		d.AddError("failed to verify kubernetes is enabled for project", err.Error())
@@ -113,7 +114,7 @@ func (r Resource) createKubernetesProject(ctx context.Context, d *diag.Diagnosti
 }
 
 func (r Resource) createObjectStorageProject(ctx context.Context, d *diag.Diagnostics, projectID string) {
-	c := r.Provider.Client()
+	c := r.client
 	if _, err := c.ObjectStorage.Projects.Create(ctx, projectID); err != nil {
 		d.AddError("failed to enable object storage in project", err.Error())
 		return
@@ -129,8 +130,7 @@ func (r Resource) createObjectStorageProject(ctx context.Context, d *diag.Diagno
 
 // Read - lifecycle function
 func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	c := r.Provider.Client()
-	var project projects.Project
+	c := r.client
 	var p Project
 
 	diags := req.State.Get(ctx, &p)
@@ -139,7 +139,16 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	project, err := c.Projects.Get(ctx, p.ID.Value)
+	if p.ContainerID.Value == "" && p.ID.Value != "" {
+		res, err := c.Archived.ResourceManagementV1.Projects.Get(ctx, p.ID.Value)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to fetch container ID", err.Error())
+			return
+		}
+		p.ContainerID = types.String{Value: res.ContainerID}
+	}
+
+	project, err := c.ResourceManagement.Projects.Get(ctx, p.ContainerID.Value)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to read project", err.Error())
 		return
@@ -161,9 +170,11 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		p.EnableObjectStorage = types.Bool{Value: obejctStorageEnabled}
 	}
 
-	p.ID = types.String{Value: project.ID}
+	p.ID = types.String{Value: project.ProjectID}
+	p.ContainerID = types.String{Value: project.ContainerID}
+	p.ParentContainerID = types.String{Value: project.Parent.ContainerID}
 	p.Name = types.String{Value: project.Name}
-	p.BillingRef = types.String{Value: project.BillingReference}
+	p.BillingRef = types.String{Value: project.Labels["billingReference"]}
 
 	diags = resp.State.Set(ctx, &p)
 	resp.Diagnostics.Append(diags...)
@@ -192,6 +203,10 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		plan.ID = state.ID
 	}
 
+	if plan.ContainerID.IsUnknown() {
+		plan.ID = state.ContainerID
+	}
+
 	r.updateProject(ctx, plan, state, resp)
 	r.updateKubernetesProject(ctx, plan, state, resp)
 	r.updateObjectStorageProject(ctx, plan, state, resp)
@@ -212,8 +227,14 @@ func (r Resource) updateProject(ctx context.Context, plan, state Project, resp *
 	if plan.Name.Equal(state.Name) && plan.BillingRef.Equal(state.BillingRef) {
 		return
 	}
-	c := r.Provider.Client()
-	err := c.Projects.Update(ctx, plan.ID.Value, plan.Name.Value, plan.BillingRef.Value)
+	c := r.client
+
+	labels := map[string]string{
+		"billingReference": plan.BillingRef.Value,
+		"scope":            "PUBLIC",
+	}
+
+	_, err := c.ResourceManagement.Projects.Update(ctx, plan.ParentContainerID.Value, plan.ContainerID.Value, plan.Name.Value, labels)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to update project", err.Error())
 		return
@@ -254,7 +275,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	c := r.Provider.Client()
+	c := r.client
 
 	if state.EnableKubernetes.Value {
 		_, _ = c.Kubernetes.Projects.Delete(ctx, state.ID.Value)
@@ -264,7 +285,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		_ = c.ObjectStorage.Projects.Delete(ctx, state.ID.Value)
 	}
 
-	process, err := c.Projects.Delete(ctx, state.ID.Value)
+	process, err := c.ResourceManagement.Projects.Delete(ctx, state.ContainerID.Value)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete project", err.Error())
 		return
@@ -278,7 +299,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 }
 
 func (r Resource) deleteKubernetesProject(ctx context.Context, d *diag.Diagnostics, projectID string) {
-	c := r.Provider.Client()
+	c := r.client
 	res, err := c.Kubernetes.Clusters.List(ctx, projectID)
 	if err == nil && len(res.Items) > 0 {
 		d.AddWarning("Kubernetes disabling considerations", `We detected active Kubernetes clusters in your project
@@ -300,7 +321,7 @@ If you wish for the change to be applied, please delete all existing clusters fi
 }
 
 func (r Resource) deleteObjectStorageProject(ctx context.Context, d *diag.Diagnostics, projectID string) {
-	c := r.Provider.Client()
+	c := r.client
 	res, err := c.ObjectStorage.Buckets.List(ctx, projectID)
 	if err == nil && len(res.Buckets) > 0 {
 		d.AddWarning("Object Storage disabling considerations", `We detected active buckets in your project

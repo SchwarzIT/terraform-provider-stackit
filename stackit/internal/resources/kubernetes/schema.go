@@ -75,7 +75,7 @@ type ArgusExtension struct {
 }
 
 // GetSchema returns the terraform schema structure
-func (r Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
+func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		Description: "Manages kubernetes clusters",
 		Attributes: map[string]tfsdk.Attribute{

@@ -14,9 +14,10 @@ Manages projects
 
 ```terraform
 resource "stackit_project" "example" {
-  name        = "example"
-  billing_ref = var.project_billing_ref
-  owner_id    = var.project_owner
+  name                = "example"
+  parent_container_id = "parent-contaier-id"
+  billing_ref         = var.project_billing_ref
+  owner_email         = var.project_owner_email
 }
 ```
 
@@ -27,7 +28,8 @@ resource "stackit_project" "example" {
 
 - `billing_ref` (String) billing reference for cost transparency
 - `name` (String) the project name
-- `owner_id` (String) user ID of the owner of the project. This value is only considered during creation. changing it afterwards will have no effect.
+- `owner_email` (String) Email address of owner of the project. This value is only considered during creation. changing it afterwards will have no effect.
+- `parent_container_id` (String) the container ID in which the project will be created
 
 ### Optional
 
@@ -36,6 +38,7 @@ resource "stackit_project" "example" {
 
 ### Read-Only
 
+- `container_id` (String) the project container ID
 - `id` (String) the project ID
 
 
