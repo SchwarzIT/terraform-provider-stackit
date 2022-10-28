@@ -3,6 +3,7 @@ package kubernetes
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes/clusters"
@@ -127,6 +128,10 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	// read cluster
 	cl, err := c.Kubernetes.Clusters.Get(ctx, state.ProjectID.Value, state.Name.Value)
 	if err != nil {
+		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+			resp.State.RemoveResource(ctx)
+			return
+		}
 		resp.Diagnostics.AddError("failed to read cluster", err.Error())
 		return
 	}
