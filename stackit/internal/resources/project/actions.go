@@ -139,7 +139,16 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	project, err := c.ResourceManagement.Projects.Get(ctx, p.ID.Value)
+	if p.ContainerID.Value == "" && p.ID.Value != "" {
+		res, err := c.Archived.ResourceManagementV1.Projects.Get(ctx, p.ID.Value)
+		if err != nil {
+			resp.Diagnostics.AddError("failed to fetch container ID", err.Error())
+			return
+		}
+		p.ContainerID = types.String{Value: res.ContainerID}
+	}
+
+	project, err := c.ResourceManagement.Projects.Get(ctx, p.ContainerID.Value)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to read project", err.Error())
 		return
@@ -192,6 +201,10 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 
 	if plan.ID.IsUnknown() {
 		plan.ID = state.ID
+	}
+
+	if plan.ContainerID.IsUnknown() {
+		plan.ID = state.ContainerID
 	}
 
 	r.updateProject(ctx, plan, state, resp)
@@ -272,7 +285,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		_ = c.ObjectStorage.Projects.Delete(ctx, state.ID.Value)
 	}
 
-	process, err := c.ResourceManagement.Projects.Delete(ctx, state.ID.Value)
+	process, err := c.ResourceManagement.Projects.Delete(ctx, state.ContainerID.Value)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete project", err.Error())
 		return
