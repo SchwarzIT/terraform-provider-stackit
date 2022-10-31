@@ -32,7 +32,8 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		resp.Diagnostics.AddError("failed Postgres instance creation", err.Error())
 		return
 	}
-	// update state
+
+	// set state
 	plan.ID = types.String{Value: res.ID}
 	diags = resp.State.Set(ctx, plan)
 	resp.Diagnostics.Append(diags...)
@@ -68,6 +69,30 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	_ = instance
+	state.ACL = instance.Item.ACL.Items
+	state.BackupSchedule = types.String{Value: instance.Item.BackupSchedule}
+	state.FlavorID = types.String{Value: instance.Item.Flavor.ID}
+	state.Name = types.String{Value: instance.Item.Name}
+	state.Replicas = types.Int64{Value: int64(instance.Item.Replicas)}
+	state.Storage = Storage{
+		Class: types.String{Value: instance.Item.Storage.Class},
+		Size:  types.Int64{Value: int64(instance.Item.Storage.Size)},
+	}
+	state.Version = types.String{Value: instance.Item.Version}
+	state.Users = []User{}
+
+	for _, user := range instance.Item.Users {
+		state.Users = append(state.Users, User{
+			ID:       types.String{Value: user.ID},
+			Username: types.String{Value: user.Username},
+			Password: types.String{Value: user.Password},
+			Hostname: types.String{Value: user.Hostname},
+			Database: types.String{Value: user.Database},
+			Port:     types.Int64{Value: int64(user.Port)},
+			URI:      types.String{Value: user.URI},
+			Roles:    user.Roles,
+		})
+	}
 
 	// update state
 	diags = resp.State.Set(ctx, &state)
@@ -83,6 +108,18 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// handle creation
+	_, wait, err := r.client.Incubator.Postgres.Instances.Update(ctx, plan.ProjectID.Value, plan.ID.Value, plan.FlavorID.Value, plan.BackupSchedule.Value, plan.Labels, plan.Options, instances.ACL{Items: plan.ACL})
+	if err != nil {
+		resp.Diagnostics.AddError("failed Postgres instance update", err.Error())
+		return
+	}
+
+	if _, err := wait.Wait(); err != nil {
+		resp.Diagnostics.AddError("failed Postgres instance update validation", err.Error())
 		return
 	}
 

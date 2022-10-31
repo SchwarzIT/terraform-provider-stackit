@@ -26,12 +26,25 @@ type PostgresInstance struct {
 	Labels         map[string]string `tfsdk:"labels"`
 	ACL            []string          `tfsdk:"labels"`
 	Storage        Storage           `tfsdk:"storage"`
+	Users          []User            `tfsdk:"users"`
 }
 
 // Storage represent instance storage
 type Storage struct {
 	Class types.String `tfsdk:"class"`
 	Size  types.Int64  `tfsdk:"size"`
+}
+
+// User represent database user
+type User struct {
+	ID       types.String `tfsdk:"id"`
+	Password types.String `tfsdk:"password"`
+	Username types.String `tfsdk:"username"`
+	Database types.String `tfsdk:"database"`
+	Hostname types.String `tfsdk:"hostname"`
+	Port     types.Int64  `tfsdk:"port"`
+	URI      types.String `tfsdk:"uri"`
+	Roles    []string     `tfsdk:"roles"`
 }
 
 // GetSchema returns the terraform schema structure
@@ -45,7 +58,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Computed:    true,
 			},
 			"name": {
-				Description: "Specifies the cluster name (lower case, alphanumeric, hypens allowed, up to 11 chars)",
+				Description: "Specifies the instance name. Changing this value requires the resource to be recreated.",
 				Type:        types.StringType,
 				Required:    true,
 				Validators: []tfsdk.AttributeValidator{
@@ -56,7 +69,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				},
 			},
 			"project_id": {
-				Description: "The project ID the cluster runs in",
+				Description: "The project ID the cluster runs in. Changing this value requires the resource to be recreated.",
 				Type:        types.StringType,
 				Required:    true,
 				Validators: []tfsdk.AttributeValidator{
@@ -72,19 +85,23 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Required:    true,
 			},
 			"version": {
-				Description: "Postgres version",
+				Description: "Postgres version. Changing this value requires the resource to be recreated.",
 				Type:        types.StringType,
 				Optional:    true,
 				Validators: []tfsdk.AttributeValidator{
 					validate.StringWith(clientValidate.SemVer, "validate postgres version"),
 				},
+				PlanModifiers: []tfsdk.AttributePlanModifier{
+					resource.RequiresReplace(),
+				},
 			},
 			"replicas": {
-				Description: "How many replicas of the database should exist",
+				Description: "How many replicas of the database should exist. Changing this value requires the resource to be recreated.",
 				Type:        types.Int64Type,
 				Optional:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					modifiers.Int64Default(1),
+					resource.RequiresReplace(),
 				},
 			},
 			"backup_schedule": {
@@ -94,9 +111,9 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Computed:    true,
 			},
 			"storage": {
-				Description: "One or more `node_pool` block as defined below",
+				Description: "A signle `storage` block as defined below. Changing this value requires the resource to be recreated.",
 				Optional:    true,
-				Attributes: tfsdk.ListNestedAttributes(map[string]tfsdk.Attribute{
+				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
 					"class": {
 						Description: "Specifies the storage class",
 						Type:        types.StringType,
@@ -110,6 +127,59 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 						PlanModifiers: []tfsdk.AttributePlanModifier{
 							modifiers.Int64Default(20),
 						},
+					},
+				}),
+				PlanModifiers: []tfsdk.AttributePlanModifier{
+					resource.RequiresReplace(),
+				},
+			},
+			"users": {
+				Description: "One or more databse users",
+				Optional:    true,
+				Attributes: tfsdk.ListNestedAttributes(map[string]tfsdk.Attribute{
+					"id": {
+						Description: "Specifies the user id",
+						Type:        types.StringType,
+						Computed:    true,
+					},
+					"username": {
+						Description: "Specifies the user's username",
+						Type:        types.StringType,
+						Computed:    true,
+					},
+					"password": {
+						Description: "Specifies the user's password",
+						Type:        types.StringType,
+						Computed:    true,
+						Sensitive:   true,
+					},
+					"database": {
+						Description: "Specifies the database the user can access",
+						Type:        types.StringType,
+						Computed:    true,
+					},
+					"hostname": {
+						Description: "Specifies the allowed user hostname",
+						Type:        types.StringType,
+						Computed:    true,
+					},
+					"port": {
+						Description: "Specifies the port",
+						Type:        types.Int64Type,
+						Computed:    true,
+					},
+					"uri": {
+						Description: "Specifies connection URI",
+						Type:        types.StringType,
+						Computed:    true,
+						Sensitive:   true,
+					},
+					"roles": {
+						Description: "Specifies the roles assigned to the user",
+						Type: types.ListType{
+							ElemType: types.StringType,
+						},
+						Optional: true,
 					},
 				}),
 			},
