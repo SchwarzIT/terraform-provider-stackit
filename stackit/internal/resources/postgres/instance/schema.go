@@ -80,7 +80,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Required:    true,
 			},
 			"version": {
-				Description: "Postgres version. Changing this value requires the resource to be recreated.",
+				Description: "Postgres version. Options: `13`, `14`. Changing this value requires the resource to be recreated.",
 				Type:        types.StringType,
 				Optional:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
