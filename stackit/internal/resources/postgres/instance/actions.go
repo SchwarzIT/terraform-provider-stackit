@@ -8,6 +8,7 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres/instances"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -22,11 +23,28 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
+	// validate
+	if err := r.validate(ctx, plan); err != nil {
+		resp.Diagnostics.AddError("failed postgres validation", err.Error())
+		return
+	}
+
+	acl := []string{}
+	if !plan.ACL.IsNull() || !plan.ACL.IsUnknown() {
+		for _, v := range plan.ACL.Elems {
+			s, err := common.ToString(ctx, v)
+			if err != nil {
+				continue
+			}
+			acl = append(acl, s)
+		}
+	}
+
 	// handle creation
-	res, wait, err := r.client.Incubator.Postgres.Instances.Create(ctx, plan.ProjectID.Value, plan.Name.Value, plan.FlavorID.Value, instances.Storage{
+	res, wait, err := r.client.Incubator.Postgres.Instances.Create(ctx, plan.ProjectID.Value, plan.Name.Value, plan.MachineType.Value, instances.Storage{
 		Class: plan.Storage.Class.Value,
 		Size:  int(plan.Storage.Size.Value),
-	}, plan.Version.Value, int(plan.Replicas.Value), plan.BackupSchedule.Value, plan.Labels, plan.Options, instances.ACL{Items: plan.ACL})
+	}, plan.Version.Value, int(plan.Replicas.Value), plan.BackupSchedule.Value, plan.Labels, plan.Options, instances.ACL{Items: acl})
 
 	if err != nil {
 		resp.Diagnostics.AddError("failed Postgres instance creation", err.Error())
@@ -35,14 +53,24 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	// set state
 	plan.ID = types.String{Value: res.ID}
-	diags = resp.State.Set(ctx, plan)
+	diags = resp.State.Set(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
-
-	if _, err := wait.Wait(); err != nil {
+	instance, err := wait.Wait()
+	if err != nil {
 		resp.Diagnostics.AddError("failed Postgres instance creation validation", err.Error())
+		return
+	}
+
+	i := instance.(instances.Instance)
+	plan.ApplyClientResponse(i)
+
+	// update state
+	diags = resp.State.Set(ctx, &plan)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 }
@@ -68,31 +96,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	_ = instance
-	state.ACL = instance.Item.ACL.Items
-	state.BackupSchedule = types.String{Value: instance.Item.BackupSchedule}
-	state.FlavorID = types.String{Value: instance.Item.Flavor.ID}
-	state.Name = types.String{Value: instance.Item.Name}
-	state.Replicas = types.Int64{Value: int64(instance.Item.Replicas)}
-	state.Storage = Storage{
-		Class: types.String{Value: instance.Item.Storage.Class},
-		Size:  types.Int64{Value: int64(instance.Item.Storage.Size)},
-	}
-	state.Version = types.String{Value: instance.Item.Version}
-	state.Users = []User{}
-
-	for _, user := range instance.Item.Users {
-		state.Users = append(state.Users, User{
-			ID:       types.String{Value: user.ID},
-			Username: types.String{Value: user.Username},
-			Password: types.String{Value: user.Password},
-			Hostname: types.String{Value: user.Hostname},
-			Database: types.String{Value: user.Database},
-			Port:     types.Int64{Value: int64(user.Port)},
-			URI:      types.String{Value: user.URI},
-			Roles:    user.Roles,
-		})
-	}
+	state.ApplyClientResponse(instance.Item)
 
 	// update state
 	diags = resp.State.Set(ctx, &state)
@@ -104,27 +108,50 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 // Update - lifecycle function
 func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	var plan PostgresInstance
-	diags := req.Plan.Get(ctx, &plan)
-	resp.Diagnostics.Append(diags...)
+	var plan, state PostgresInstance
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	// handle creation
-	_, wait, err := r.client.Incubator.Postgres.Instances.Update(ctx, plan.ProjectID.Value, plan.ID.Value, plan.FlavorID.Value, plan.BackupSchedule.Value, plan.Labels, plan.Options, instances.ACL{Items: plan.ACL})
+	plan.ID = state.ID
+
+	// validate
+	if err := r.validate(ctx, plan); err != nil {
+		resp.Diagnostics.AddError("failed postgres validation", err.Error())
+		return
+	}
+
+	acl := []string{}
+	if !plan.ACL.IsNull() || !plan.ACL.IsUnknown() {
+		for _, v := range plan.ACL.Elems {
+			s, err := common.ToString(ctx, v)
+			if err != nil {
+				continue
+			}
+			acl = append(acl, s)
+		}
+	}
+
+	// handle update
+	_, wait, err := r.client.Incubator.Postgres.Instances.Update(ctx, plan.ProjectID.Value, plan.ID.Value, plan.MachineType.Value, plan.BackupSchedule.Value, plan.Labels, plan.Options, instances.ACL{Items: acl})
 	if err != nil {
 		resp.Diagnostics.AddError("failed Postgres instance update", err.Error())
 		return
 	}
 
-	if _, err := wait.Wait(); err != nil {
+	instance, err := wait.Wait()
+	if err != nil {
 		resp.Diagnostics.AddError("failed Postgres instance update validation", err.Error())
 		return
 	}
 
+	i := instance.(instances.Instance)
+	plan.ApplyClientResponse(i)
+
 	// update state
-	diags = resp.State.Set(ctx, &plan)
+	diags := resp.State.Set(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return

@@ -3,8 +3,6 @@ package postgresinstance
 import (
 	"context"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes/clusters"
-	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -18,13 +16,13 @@ type PostgresInstance struct {
 	ID             types.String      `tfsdk:"id"`
 	Name           types.String      `tfsdk:"name"`
 	ProjectID      types.String      `tfsdk:"project_id"`
-	FlavorID       types.String      `tfsdk:"flavor_id"`
+	MachineType    types.String      `tfsdk:"machine_type"`
 	Version        types.String      `tfsdk:"version"`
-	Replicas       types.Int64       `tfsdk:"version"`
+	Replicas       types.Int64       `tfsdk:"replicas"`
 	BackupSchedule types.String      `tfsdk:"backup_schedule"`
 	Options        map[string]string `tfsdk:"options"`
 	Labels         map[string]string `tfsdk:"labels"`
-	ACL            []string          `tfsdk:"labels"`
+	ACL            types.List        `tfsdk:"acl"`
 	Storage        Storage           `tfsdk:"storage"`
 	Users          []User            `tfsdk:"users"`
 }
@@ -61,9 +59,6 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Description: "Specifies the instance name. Changing this value requires the resource to be recreated.",
 				Type:        types.StringType,
 				Required:    true,
-				Validators: []tfsdk.AttributeValidator{
-					validate.StringWith(clusters.ValidateClusterName, "validate cluster name"),
-				},
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					resource.RequiresReplace(),
 				},
@@ -79,8 +74,8 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 					resource.RequiresReplace(),
 				},
 			},
-			"flavor_id": {
-				Description: "The Flavor ID",
+			"machine_type": {
+				Description: "The Machine Type. Available options: `c1.2` `m1.2`, `c1.3`, `m1.3`, `c1.4`, `c1.5`, `m1.5`",
 				Type:        types.StringType,
 				Required:    true,
 			},
@@ -88,9 +83,6 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Description: "Postgres version. Changing this value requires the resource to be recreated.",
 				Type:        types.StringType,
 				Optional:    true,
-				Validators: []tfsdk.AttributeValidator{
-					validate.StringWith(clientValidate.SemVer, "validate postgres version"),
-				},
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					resource.RequiresReplace(),
 				},
@@ -109,13 +101,16 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Type:        types.StringType,
 				Optional:    true,
 				Computed:    true,
+				PlanModifiers: []tfsdk.AttributePlanModifier{
+					modifiers.StringDefault("0 2 * * *"),
+				},
 			},
 			"storage": {
 				Description: "A signle `storage` block as defined below. Changing this value requires the resource to be recreated.",
 				Optional:    true,
 				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
 					"class": {
-						Description: "Specifies the storage class",
+						Description: "Specifies the storage class. Available option: `premium-perf6-stackit`",
 						Type:        types.StringType,
 						Required:    true,
 					},
@@ -203,6 +198,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 					ElemType: types.StringType,
 				},
 				Optional: true,
+				Computed: true,
 			},
 		},
 	}, nil
