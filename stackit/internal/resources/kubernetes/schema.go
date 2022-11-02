@@ -2,6 +2,7 @@ package kubernetes
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes/clusters"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
@@ -156,7 +157,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 						},
 					},
 					"os_version": {
-						Description: "The OS image version. Only `3139.2.0` is supported",
+						Description: fmt.Sprintf("The OS image version. Default is `%s`.", default_os_version),
 						Type:        types.StringType,
 						Optional:    true,
 						Computed:    true,

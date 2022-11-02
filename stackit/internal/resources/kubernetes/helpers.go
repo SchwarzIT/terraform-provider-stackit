@@ -16,7 +16,7 @@ import (
 const (
 	default_allow_privileged               = true
 	default_os_name                        = "flatcar"
-	default_os_version                     = "3139.2.0"
+	default_os_version                     = "3227.2.4"
 	default_nodepool_min             int64 = 1
 	default_nodepool_max             int64 = 2
 	default_nodepool_max_surge       int64 = 1
