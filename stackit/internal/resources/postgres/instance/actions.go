@@ -30,14 +30,12 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	acl := []string{}
-	if !plan.ACL.IsNull() || !plan.ACL.IsUnknown() {
-		for _, v := range plan.ACL.Elems {
-			s, err := common.ToString(ctx, v)
-			if err != nil {
-				continue
-			}
-			acl = append(acl, s)
+	for _, v := range plan.ACL.Elems {
+		nv, err := common.ToString(context.Background(), v)
+		if err != nil {
+			continue
 		}
+		acl = append(acl, nv)
 	}
 
 	// handle creation
@@ -53,19 +51,24 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	// set state
 	plan.ID = types.String{Value: res.ID}
-	diags = resp.State.Set(ctx, &plan)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), res.ID)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
 	instance, err := wait.Wait()
 	if err != nil {
 		resp.Diagnostics.AddError("failed Postgres instance creation validation", err.Error())
 		return
 	}
 
-	i := instance.(instances.Instance)
-	if err := plan.ApplyClientResponse(i); err != nil {
+	i, ok := instance.(instances.Instance)
+	if !ok {
+		resp.Diagnostics.AddError("failed to parse client response", "response is not of instances.Instance")
+		return
+	}
+
+	if err := applyClientResponse(&plan, i); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
 	}
@@ -99,7 +102,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	if err := state.ApplyClientResponse(instance.Item); err != nil {
+	if err := applyClientResponse(&state, instance.Item); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
 	}
@@ -130,14 +133,12 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	acl := []string{}
-	if !plan.ACL.IsNull() || !plan.ACL.IsUnknown() {
-		for _, v := range plan.ACL.Elems {
-			s, err := common.ToString(ctx, v)
-			if err != nil {
-				continue
-			}
-			acl = append(acl, s)
+	for _, v := range plan.ACL.Elems {
+		nv, err := common.ToString(context.Background(), v)
+		if err != nil {
+			continue
 		}
+		acl = append(acl, nv)
 	}
 
 	// handle update
@@ -153,8 +154,13 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		return
 	}
 
-	i := instance.(instances.Instance)
-	if err := plan.ApplyClientResponse(i); err != nil {
+	i, ok := instance.(instances.Instance)
+	if !ok {
+		resp.Diagnostics.AddError("failed to parse client response", "response is not of instances.Instance")
+		return
+	}
+
+	if err := applyClientResponse(&plan, i); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
 	}

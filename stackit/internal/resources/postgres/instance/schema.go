@@ -23,8 +23,8 @@ type PostgresInstance struct {
 	Options        map[string]string `tfsdk:"options"`
 	Labels         map[string]string `tfsdk:"labels"`
 	ACL            types.List        `tfsdk:"acl"`
-	Storage        Storage           `tfsdk:"storage"`
-	User           User              `tfsdk:"user"`
+	Storage        *Storage          `tfsdk:"storage"`
+	User           *User             `tfsdk:"user"`
 }
 
 // Storage represent instance storage
@@ -42,7 +42,7 @@ type User struct {
 	Hostname types.String `tfsdk:"hostname"`
 	Port     types.Int64  `tfsdk:"port"`
 	URI      types.String `tfsdk:"uri"`
-	Roles    []string     `tfsdk:"roles"`
+	Roles    types.List   `tfsdk:"roles"`
 }
 
 // GetSchema returns the terraform schema structure
@@ -54,6 +54,9 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Description: "Specifies the resource ID",
 				Type:        types.StringType,
 				Computed:    true,
+				PlanModifiers: tfsdk.AttributePlanModifiers{
+					resource.UseStateForUnknown(),
+				},
 			},
 			"name": {
 				Description: "Specifies the instance name. Changing this value requires the resource to be recreated.",
@@ -102,7 +105,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
-					modifiers.StringDefault("0 2 * * *"),
+					modifiers.StringDefault(default_backup_schedule),
 				},
 			},
 			"storage": {
@@ -130,7 +133,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 			},
 			"user": {
 				Description: "The databse admin user",
-				Computed:    true,
+				Optional:    true,
 				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
 					"id": {
 						Description: "Specifies the user id",
@@ -171,10 +174,8 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 					},
 					"roles": {
 						Description: "Specifies the roles assigned to the user",
-						Type: types.ListType{
-							ElemType: types.StringType,
-						},
-						Optional: true,
+						Type:        types.ListType{ElemType: types.StringType},
+						Computed:    true,
 					},
 				}),
 			},
@@ -194,11 +195,9 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 			},
 			"acl": {
 				Description: "Instance Labels",
-				Type: types.ListType{
-					ElemType: types.StringType,
-				},
-				Optional: true,
-				Computed: true,
+				Type:        types.ListType{ElemType: types.StringType},
+				Optional:    true,
+				Computed:    true,
 			},
 		},
 	}, nil

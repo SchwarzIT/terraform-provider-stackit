@@ -7,12 +7,12 @@ import (
 	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres/instances"
-	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 const (
-	default_username = "stackit"
+	default_username        = "stackit"
+	default_backup_schedule = "0 2 * * *"
 )
 
 func (r Resource) validate(ctx context.Context, data PostgresInstance) error {
@@ -80,18 +80,16 @@ func (r Resource) validateStorageClass(ctx context.Context, projectID, machineTy
 	return fmt.Errorf("couldn't find version '%s'. Available options are:%s\n", storageClass, opts)
 }
 
-func (pi *PostgresInstance) ApplyClientResponse(i instances.Instance) error {
+func applyClientResponse(pi *PostgresInstance, i instances.Instance) error {
 	pi.ACL = types.List{ElemType: types.StringType}
-	els := []attr.Value{}
 	for _, v := range i.ACL.Items {
-		els = append(els, types.String{Value: v})
+		pi.ACL.Elems = append(pi.ACL.Elems, types.String{Value: v})
 	}
-	pi.ACL.Elems = els
 	pi.BackupSchedule = types.String{Value: i.BackupSchedule}
 	pi.MachineType = types.String{Value: i.Flavor.ID}
 	pi.Name = types.String{Value: i.Name}
 	pi.Replicas = types.Int64{Value: int64(i.Replicas)}
-	pi.Storage = Storage{
+	pi.Storage = &Storage{
 		Class: types.String{Value: i.Storage.Class},
 		Size:  types.Int64{Value: int64(i.Storage.Size)},
 	}
@@ -101,6 +99,7 @@ func (pi *PostgresInstance) ApplyClientResponse(i instances.Instance) error {
 		return errors.New("failed to process database user")
 	}
 
+	pi.User = &User{}
 	for _, user := range i.Users {
 		if user.Username != default_username {
 			continue
@@ -113,7 +112,11 @@ func (pi *PostgresInstance) ApplyClientResponse(i instances.Instance) error {
 		pi.User.Database = types.String{Value: user.Database}
 		pi.User.Port = types.Int64{Value: int64(user.Port)}
 		pi.User.URI = types.String{Value: user.URI}
-		pi.User.Roles = user.Roles
+		pi.User.Roles = types.List{ElemType: types.StringType}
+		for _, v := range user.Roles {
+			pi.User.Roles.Elems = append(pi.User.Roles.Elems, types.String{Value: v})
+		}
+
 	}
 
 	return nil
