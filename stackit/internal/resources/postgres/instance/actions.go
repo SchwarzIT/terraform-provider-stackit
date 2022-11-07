@@ -65,7 +65,10 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	i := instance.(instances.Instance)
-	plan.ApplyClientResponse(i)
+	if err := plan.ApplyClientResponse(i); err != nil {
+		resp.Diagnostics.AddError("failed to process client response", err.Error())
+		return
+	}
 
 	// update state
 	diags = resp.State.Set(ctx, &plan)
@@ -96,7 +99,10 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	state.ApplyClientResponse(instance.Item)
+	if err := state.ApplyClientResponse(instance.Item); err != nil {
+		resp.Diagnostics.AddError("failed to process client response", err.Error())
+		return
+	}
 
 	// update state
 	diags = resp.State.Set(ctx, &state)
@@ -148,7 +154,10 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	i := instance.(instances.Instance)
-	plan.ApplyClientResponse(i)
+	if err := plan.ApplyClientResponse(i); err != nil {
+		resp.Diagnostics.AddError("failed to process client response", err.Error())
+		return
+	}
 
 	// update state
 	diags := resp.State.Set(ctx, &plan)

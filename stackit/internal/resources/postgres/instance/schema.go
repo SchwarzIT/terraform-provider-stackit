@@ -24,7 +24,7 @@ type PostgresInstance struct {
 	Labels         map[string]string `tfsdk:"labels"`
 	ACL            types.List        `tfsdk:"acl"`
 	Storage        Storage           `tfsdk:"storage"`
-	Users          []User            `tfsdk:"users"`
+	User           User              `tfsdk:"user"`
 }
 
 // Storage represent instance storage
@@ -128,10 +128,10 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 					resource.RequiresReplace(),
 				},
 			},
-			"users": {
-				Description: "One or more databse users",
-				Optional:    true,
-				Attributes: tfsdk.ListNestedAttributes(map[string]tfsdk.Attribute{
+			"user": {
+				Description: "The databse admin user",
+				Computed:    true,
+				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
 					"id": {
 						Description: "Specifies the user id",
 						Type:        types.StringType,

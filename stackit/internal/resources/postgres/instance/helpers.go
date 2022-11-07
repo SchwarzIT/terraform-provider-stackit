@@ -2,12 +2,17 @@ package postgresinstance
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres/instances"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+)
+
+const (
+	default_username = "stackit"
 )
 
 func (r Resource) validate(ctx context.Context, data PostgresInstance) error {
@@ -75,7 +80,7 @@ func (r Resource) validateStorageClass(ctx context.Context, projectID, machineTy
 	return fmt.Errorf("couldn't find version '%s'. Available options are:%s\n", storageClass, opts)
 }
 
-func (pi *PostgresInstance) ApplyClientResponse(i instances.Instance) {
+func (pi *PostgresInstance) ApplyClientResponse(i instances.Instance) error {
 	pi.ACL = types.List{ElemType: types.StringType}
 	els := []attr.Value{}
 	for _, v := range i.ACL.Items {
@@ -93,21 +98,23 @@ func (pi *PostgresInstance) ApplyClientResponse(i instances.Instance) {
 	pi.Version = types.String{Value: i.Version}
 
 	if len(i.Users) == 0 {
-		pi.Users = nil
-		return
+		return errors.New("failed to process database user")
 	}
 
-	pi.Users = []User{}
 	for _, user := range i.Users {
-		pi.Users = append(pi.Users, User{
-			ID:       types.String{Value: user.ID},
-			Username: types.String{Value: user.Username},
-			Password: types.String{Value: user.Password},
-			Hostname: types.String{Value: user.Hostname},
-			Database: types.String{Value: user.Database},
-			Port:     types.Int64{Value: int64(user.Port)},
-			URI:      types.String{Value: user.URI},
-			Roles:    user.Roles,
-		})
+		if user.Username != default_username {
+			continue
+		}
+
+		pi.User.ID = types.String{Value: user.ID}
+		pi.User.Username = types.String{Value: user.Username}
+		pi.User.Password = types.String{Value: user.Password}
+		pi.User.Hostname = types.String{Value: user.Hostname}
+		pi.User.Database = types.String{Value: user.Database}
+		pi.User.Port = types.Int64{Value: int64(user.Port)}
+		pi.User.URI = types.String{Value: user.URI}
+		pi.User.Roles = user.Roles
 	}
+
+	return nil
 }
