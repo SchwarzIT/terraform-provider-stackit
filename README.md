@@ -14,7 +14,7 @@ terraform {
   required_providers {
     stackit = {
       source  = "SchwarzIT/stackit"
-      version = "=1.0.1"
+      version = "=1.1.0"
     }
   }
 }
