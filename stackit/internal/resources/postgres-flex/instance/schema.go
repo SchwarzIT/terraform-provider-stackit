@@ -197,7 +197,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Optional: true,
 			},
 			"acl": {
-				Description: "Instance Labels",
+				Description: "Access Control rules to whitelist IP addresses",
 				Type:        types.ListType{ElemType: types.StringType},
 				Optional:    true,
 				Computed:    true,

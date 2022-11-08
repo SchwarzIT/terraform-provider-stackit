@@ -26,7 +26,7 @@ Manages kubernetes clusters
 
 ### Optional
 
-- `acl` (List of String) Instance Labels
+- `acl` (List of String) Access Control rules to whitelist IP addresses
 - `backup_schedule` (String) Specifies the backup schedule (cron style)
 - `labels` (Map of String) Instance Labels
 - `options` (Map of String) Specifies postgres instance options
