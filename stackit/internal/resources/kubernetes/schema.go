@@ -157,13 +157,10 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 						},
 					},
 					"os_version": {
-						Description: fmt.Sprintf("The OS image version. Default is `%s`.", default_os_version),
+						Description: "The OS image version.",
 						Type:        types.StringType,
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []tfsdk.AttributePlanModifier{
-							modifiers.StringDefault(default_os_version),
-						},
 					},
 					"minimum": {
 						Description: "Minimum nodes in the pool. Defaults to 1. (Value must be between 1-100)",
