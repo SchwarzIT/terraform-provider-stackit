@@ -22,7 +22,7 @@ var _ = resource.Resource(&Resource{})
 
 // Metadata returns data resource metadata
 func (r *Resource) Metadata(_ context.Context, req resource.MetadataRequest, res *resource.MetadataResponse) {
-	res.TypeName = "stackit_postgres_instance"
+	res.TypeName = "stackit_postgres_flex_instance"
 }
 
 // Configure the resource client
