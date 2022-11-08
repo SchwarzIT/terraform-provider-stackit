@@ -16,7 +16,6 @@ import (
 const (
 	default_allow_privileged               = true
 	default_os_name                        = "flatcar"
-	default_os_version                     = "3139.2.0"
 	default_nodepool_min             int64 = 1
 	default_nodepool_max             int64 = 2
 	default_nodepool_max_surge       int64 = 1
@@ -165,9 +164,6 @@ func setNodepoolDefaults(nps []clusters.NodePool) []clusters.NodePool {
 	for i, np := range nps {
 		if np.Machine.Image.Name == "" {
 			nps[i].Machine.Image.Name = default_os_name
-		}
-		if np.Machine.Image.Version == "" {
-			nps[i].Machine.Image.Version = default_os_version
 		}
 		if np.Minimum == 0 {
 			nps[i].Minimum = int(default_nodepool_min)

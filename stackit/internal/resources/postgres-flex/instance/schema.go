@@ -50,7 +50,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 	return tfsdk.Schema{
 		MarkdownDescription: `Manages kubernetes clusters
 		
-~> **Note:** Postgres Flex is being actively developed and is currently in 'alpha' stage
+~> **Note:** Postgres Flex is being actively developed and is currently in 'alpha' stage, therefore, this resource is not ready for production usage
 `,
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {

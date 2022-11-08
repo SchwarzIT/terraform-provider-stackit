@@ -12,7 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-const run_this_test = false
+const run_this_test = true
 
 func TestAcc_kubernetes(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
@@ -36,7 +36,7 @@ func TestAcc_kubernetes(t *testing.T) {
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.name", "example-np"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.machine_type", "c1.2"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.os_name", "flatcar"),
-					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.os_version", "3139.2.0"),
+					resource.TestCheckResourceAttrSet("stackit_kubernetes_cluster.example", "node_pools.0.os_version"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.minimum", "1"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.maximum", "2"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.max_surge", "1"),
@@ -59,7 +59,7 @@ func TestAcc_kubernetes(t *testing.T) {
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.name", "new-nodepl"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.machine_type", "c1.2"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.os_name", "flatcar"),
-					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.os_version", "3139.2.0"),
+					resource.TestCheckResourceAttrSet("stackit_kubernetes_cluster.example", "node_pools.0.os_version"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.minimum", "1"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.maximum", "1"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.max_surge", "1"),

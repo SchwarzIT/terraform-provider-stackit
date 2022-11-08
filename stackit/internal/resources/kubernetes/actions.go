@@ -66,7 +66,7 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 	hibernations := cl.hibernations()
 	extensions := cl.extensions()
 
-	if err := r.validate(ctx, projectID, clusterName, clusterConfig, nodePools, maintenance, hibernations, extensions); err != nil {
+	if err := r.validate(ctx, projectID, clusterName, clusterConfig, &nodePools, maintenance, hibernations, extensions); err != nil {
 		diags.AddError(
 			"Failed cluster validation",
 			err.Error(),

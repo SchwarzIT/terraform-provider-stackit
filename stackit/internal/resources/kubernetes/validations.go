@@ -16,7 +16,7 @@ func (r Resource) validate(
 	projectID string,
 	clusterName string,
 	clusterConfig clusters.Kubernetes,
-	nodePools []clusters.NodePool,
+	nodePools *[]clusters.NodePool,
 	maintenance *clusters.Maintenance,
 	hibernation *clusters.Hibernation,
 	extensions *clusters.Extensions,
@@ -24,9 +24,6 @@ func (r Resource) validate(
 
 	// General validation
 	if err := validate.ProjectID(projectID); err != nil {
-		return err
-	}
-	if err := clusters.ValidateCluster(clusterName, clusterConfig, nodePools, maintenance, hibernation, extensions); err != nil {
 		return err
 	}
 
@@ -42,9 +39,13 @@ func (r Resource) validate(
 		return err
 	}
 
-	for _, np := range nodePools {
-		if err := validateMachineImage(np.Machine.Image.Name, np.Machine.Image.Version, opts.MachineImages); err != nil {
+	for i, np := range *nodePools {
+		versionOption, err := validateMachineImage(np.Machine.Image.Name, np.Machine.Image.Version, opts.MachineImages)
+		if err != nil {
 			return err
+		}
+		if np.Machine.Image.Version == "" {
+			(*nodePools)[i].Machine.Image.Version = versionOption
 		}
 		if err := validateMachineType(np.Machine.Type, opts.MachineTypes); err != nil {
 			return err
@@ -55,6 +56,11 @@ func (r Resource) validate(
 		if err := validateZones(np.AvailabilityZones, opts.AvailabilityZones); err != nil {
 			return err
 		}
+	}
+
+	// General cluster validations
+	if err := clusters.ValidateCluster(clusterName, clusterConfig, *nodePools, maintenance, hibernation, extensions); err != nil {
+		return err
 	}
 
 	return nil
@@ -82,16 +88,20 @@ func validateKubernetesVersion(version string, versionOptions []options.Kubernet
 	return nil
 }
 
-func validateMachineImage(image, version string, imageOptions []options.MachineImage) error {
+func validateMachineImage(image, version string, imageOptions []options.MachineImage) (versionOption string, err error) {
 	foundImage := false
 	foundVersion := false
 	acceptedImages := ""
 	acceptedVersions := ""
+	supportedVersion := ""
 	for _, v := range imageOptions {
 		if v.Name == image {
 			foundImage = true
 			for _, v2 := range v.Versions {
 				if strings.EqualFold(v2.State, consts.SKE_VERSION_STATE_SUPPORTED) {
+					if supportedVersion == "" {
+						supportedVersion = v2.Version
+					}
 					if v2.Version == version {
 						foundVersion = true
 						break
@@ -104,20 +114,22 @@ func validateMachineImage(image, version string, imageOptions []options.MachineI
 		acceptedImages = fmt.Sprintf("%s- %s (versions: %v)\n", acceptedImages, v.Name, v.Versions)
 	}
 	if !foundImage {
-		return fmt.Errorf(
+		return "", fmt.Errorf(
 			"incorrect machine image '%s'\naccepted options are:\n%v",
 			image,
 			imageOptions,
 		)
 	}
 	if !foundVersion {
-		return fmt.Errorf(
-			"incorrect version '%s'\naccepted options are:\n%s",
-			version,
-			acceptedVersions,
-		)
+		if version != "" {
+			return "", fmt.Errorf(
+				"incorrect version '%s'\naccepted options are:\n%s",
+				version,
+				acceptedVersions,
+			)
+		}
 	}
-	return nil
+	return supportedVersion, nil
 }
 
 func validateMachineType(machine string, machineTypes []options.MachineType) error {
