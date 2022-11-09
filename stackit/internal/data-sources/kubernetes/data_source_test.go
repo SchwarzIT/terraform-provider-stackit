@@ -35,7 +35,7 @@ func TestAcc_kubernetes(t *testing.T) {
 					resource.TestCheckResourceAttr("data.stackit_kubernetes_cluster.example", "node_pools.0.name", "nodepl"),
 					resource.TestCheckResourceAttr("data.stackit_kubernetes_cluster.example", "node_pools.0.machine_type", "c1.2"),
 					resource.TestCheckResourceAttr("data.stackit_kubernetes_cluster.example", "node_pools.0.os_name", "flatcar"),
-					resource.TestCheckResourceAttr("data.stackit_kubernetes_cluster.example", "node_pools.0.os_version", "3139.2.0"),
+					resource.TestCheckResourceAttrSet("data.stackit_kubernetes_cluster.example", "node_pools.0.os_version"),
 					resource.TestCheckResourceAttr("data.stackit_kubernetes_cluster.example", "node_pools.0.minimum", "1"),
 					resource.TestCheckResourceAttr("data.stackit_kubernetes_cluster.example", "node_pools.0.maximum", "1"),
 					resource.TestCheckResourceAttr("data.stackit_kubernetes_cluster.example", "node_pools.0.max_surge", "1"),
