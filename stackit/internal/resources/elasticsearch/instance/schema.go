@@ -20,9 +20,10 @@ type Instance struct {
 	PlanID             types.String `tfsdk:"plan_id"`
 	Version            types.String `tfsdk:"version"`
 	ACL                types.List   `tfsdk:"acl"`
-	CFGUID             types.String `tfsdk:"cf_guid,omitempty"`
-	CFSpaceGUID        types.String `tfsdk:"cf_space_guid,omitempty"`
-	CFOrganizationGUID types.String `tfsdk:"cf_organization_guid,omitempty"`
+	DashboardURL       types.String `tfsdk:"dashboard_url"`
+	CFGUID             types.String `tfsdk:"cf_guid"`
+	CFSpaceGUID        types.String `tfsdk:"cf_space_guid"`
+	CFOrganizationGUID types.String `tfsdk:"cf_organization_guid"`
 }
 
 // GetSchema returns the terraform schema structure
@@ -80,6 +81,11 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Description: "Access Control rules to whitelist IP addresses",
 				Type:        types.ListType{ElemType: types.StringType},
 				Optional:    true,
+				Computed:    true,
+			},
+			"dashboard_url": {
+				Description: "Dashboard URL",
+				Type:        types.StringType,
 				Computed:    true,
 			},
 			"cf_guid": {

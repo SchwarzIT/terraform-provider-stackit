@@ -12,6 +12,7 @@ import (
 	dataProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/project"
 	resourceArgusInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/instance"
 	resourceArgusJob "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/job"
+	resourceElasticsearchInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/elasticsearch/instance"
 	resourceKubernetes "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/kubernetes"
 	resourceObjectStorageBucket "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/bucket"
 	resourceObjectStorageCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/credential"
@@ -83,6 +84,7 @@ func (p *StackitProvider) Resources(ctx context.Context) []func() resource.Resou
 	return []func() resource.Resource{
 		resourceArgusInstance.New,
 		resourceArgusJob.New,
+		resourceElasticsearchInstance.New,
 		resourceKubernetes.New,
 		resourceObjectStorageBucket.New,
 		resourceObjectStorageCredential.New,

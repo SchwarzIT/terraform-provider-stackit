@@ -64,9 +64,9 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	i, ok := instance.(instances.Instance)
+	i, ok := instance.(instances.GetResponse)
 	if !ok {
-		resp.Diagnostics.AddError("failed to parse client response", "response is not of instances.Instance")
+		resp.Diagnostics.AddError("failed to parse client response", "response is not of instances.GetResponse")
 		return
 	}
 
@@ -95,7 +95,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	es := r.client.DataServices.ElasticSearch
 
 	// read instance
-	instance, err := es.Instances.Get(ctx, state.ProjectID.Value, state.ID.Value)
+	i, err := es.Instances.Get(ctx, state.ProjectID.Value, state.ID.Value)
 	if err != nil {
 		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.State.RemoveResource(ctx)
@@ -105,7 +105,6 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	i := instances.Instance(instance)
 	if err := applyClientResponse(&state, i); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
@@ -132,7 +131,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 
 	// validate
 	if err := r.validate(ctx, &plan); err != nil {
-		resp.Diagnostics.AddError("failed postgres validation", err.Error())
+		resp.Diagnostics.AddError("failed validation", err.Error())
 		return
 	}
 
@@ -148,7 +147,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	es := r.client.DataServices.ElasticSearch
 
 	// handle update
-	_, wait, err := es.Instances.Update(ctx, plan.ProjectID.Value, plan.ID.Value, plan.PlanID.Value, map[string]string{
+	_, wait, err := es.Instances.Update(ctx, state.ProjectID.Value, state.ID.Value, plan.PlanID.Value, map[string]string{
 		"sgw_acl": strings.Join(acl, ","),
 	})
 	if err != nil {
@@ -162,9 +161,9 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		return
 	}
 
-	i, ok := instance.(instances.Instance)
+	i, ok := instance.(instances.GetResponse)
 	if !ok {
-		resp.Diagnostics.AddError("failed to parse client response", "response is not of instances.Instance")
+		resp.Diagnostics.AddError("failed to parse client response", "response is not of instances.GetResponse")
 		return
 	}
 
@@ -194,13 +193,15 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	// handle deletion
 	process, err := es.Instances.Delete(ctx, state.ProjectID.Value, state.ID.Value)
 	if err != nil {
-		resp.Diagnostics.AddError("failed to delete postgres instance", err.Error())
+		resp.Diagnostics.AddError("failed to delete instance", err.Error())
 		return
 	}
 
 	if _, err := process.Wait(); err != nil {
-		resp.Diagnostics.AddError("failed to verify postgres instance deletion", err.Error())
-		return
+		if !strings.Contains(err.Error(), http.StatusText(http.StatusGone)) {
+			resp.Diagnostics.AddError("failed to verify instance deletion", err.Error())
+			return
+		}
 	}
 
 	resp.State.RemoveResource(ctx)
@@ -213,7 +214,7 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 	if len(idParts) != 2 || idParts[0] == "" || idParts[1] == "" {
 		resp.Diagnostics.AddError(
 			"Unexpected Import Identifier",
-			fmt.Sprintf("Expected import identifier with format: `project_id,postgres_instance_id`.\nInstead got: %q", req.ID),
+			fmt.Sprintf("Expected import identifier with format: `project_id,instance_id`.\nInstead got: %q", req.ID),
 		)
 		return
 	}

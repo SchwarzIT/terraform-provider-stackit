@@ -64,7 +64,7 @@ func (r Resource) validatePlan(ctx context.Context, offers []options.Offer, vers
 	return "", fmt.Errorf("couldn't find plan name '%s'. Available options are:\n%s\n", version, strings.Join(opts, "\n"))
 }
 
-func applyClientResponse(pi *Instance, i instances.Instance) error {
+func applyClientResponse(pi *Instance, i instances.GetResponse) error {
 	pi.ACL = types.List{ElemType: types.StringType}
 	if aclString, ok := i.Parameters["sgw_acl"]; ok {
 		items := strings.Split(aclString, ",")
@@ -77,8 +77,9 @@ func applyClientResponse(pi *Instance, i instances.Instance) error {
 
 	pi.Name = types.String{Value: i.Name}
 	pi.PlanID = types.String{Value: i.PlanID}
+	pi.DashboardURL = types.String{Value: i.DashboardURL}
 	pi.CFGUID = types.String{Value: i.CFGUID}
 	pi.CFSpaceGUID = types.String{Value: i.CFSpaceGUID}
-	pi.CFOrganizationGUID = types.String{Value: i.OrganizationGUID}
+	pi.CFOrganizationGUID = types.String{Value: i.CFOrganizationGUID}
 	return nil
 }
