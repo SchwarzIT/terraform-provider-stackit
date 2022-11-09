@@ -13,13 +13,16 @@ import (
 
 // Instance is the schema model
 type Instance struct {
-	ID        types.String `tfsdk:"id"`
-	Name      types.String `tfsdk:"name"`
-	ProjectID types.String `tfsdk:"project_id"`
-	Plan      types.String `tfsdk:"plan"`
-	PlanID    types.String `tfsdk:"plan_id"`
-	Version   types.String `tfsdk:"version"`
-	ACL       types.List   `tfsdk:"acl"`
+	ID                 types.String `tfsdk:"id"`
+	Name               types.String `tfsdk:"name"`
+	ProjectID          types.String `tfsdk:"project_id"`
+	Plan               types.String `tfsdk:"plan"`
+	PlanID             types.String `tfsdk:"plan_id"`
+	Version            types.String `tfsdk:"version"`
+	ACL                types.List   `tfsdk:"acl"`
+	CFGUID             types.String `tfsdk:"cf_guid,omitempty"`
+	CFSpaceGUID        types.String `tfsdk:"cf_space_guid,omitempty"`
+	CFOrganizationGUID types.String `tfsdk:"cf_organization_guid,omitempty"`
 }
 
 // GetSchema returns the terraform schema structure
@@ -77,6 +80,21 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Description: "Access Control rules to whitelist IP addresses",
 				Type:        types.ListType{ElemType: types.StringType},
 				Optional:    true,
+				Computed:    true,
+			},
+			"cf_guid": {
+				Description: "Cloud Foundry GUID",
+				Type:        types.StringType,
+				Computed:    true,
+			},
+			"cf_space_guid": {
+				Description: "Cloud Foundry Space GUID",
+				Type:        types.StringType,
+				Computed:    true,
+			},
+			"cf_organization_guid": {
+				Description: "Cloud Foundry Organization GUID",
+				Type:        types.StringType,
 				Computed:    true,
 			},
 		},

@@ -77,5 +77,8 @@ func applyClientResponse(pi *Instance, i instances.Instance) error {
 
 	pi.Name = types.String{Value: i.Name}
 	pi.PlanID = types.String{Value: i.PlanID}
+	pi.CFGUID = types.String{Value: i.CFGUID}
+	pi.CFSpaceGUID = types.String{Value: i.CFSpaceGUID}
+	pi.CFOrganizationGUID = types.String{Value: i.OrganizationGUID}
 	return nil
 }
