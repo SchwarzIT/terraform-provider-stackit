@@ -45,7 +45,7 @@ func (p *StackitProvider) Configure(ctx context.Context, req provider.ConfigureR
 		return
 	}
 
-	c, err := client.New(context.Background(), &client.Config{
+	c, err := client.New(context.Background(), client.Config{
 		ServiceAccountEmail: email,
 		ServiceAccountToken: token,
 	})
