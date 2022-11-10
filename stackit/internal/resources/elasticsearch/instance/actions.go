@@ -198,10 +198,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	if _, err := process.Wait(); err != nil {
-		if !strings.Contains(err.Error(), http.StatusText(http.StatusGone)) {
-			resp.Diagnostics.AddError("failed to verify instance deletion", err.Error())
-			return
-		}
+		resp.Diagnostics.AddError("failed to verify instance deletion", err.Error())
 	}
 
 	resp.State.RemoveResource(ctx)
