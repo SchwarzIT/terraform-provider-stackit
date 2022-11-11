@@ -17,6 +17,10 @@ const (
 )
 
 func (r Resource) validate(ctx context.Context, data *Instance) error {
+	if !data.ACL.IsUnknown() && len(data.ACL.Elems) == 0 {
+		return errors.New("at least 1 ip address must be specified for `acl`")
+	}
+
 	res, err := r.client.DataServices.ElasticSearch.Options.GetOfferings(ctx, data.ProjectID.Value)
 	if err != nil {
 		return errors.Wrap(err, "failed to fetch offerings")
@@ -64,7 +68,7 @@ func (r Resource) validatePlan(ctx context.Context, offers []options.Offer, vers
 	return "", fmt.Errorf("couldn't find plan name '%s'. Available options are:\n%s\n", version, strings.Join(opts, "\n"))
 }
 
-func applyClientResponse(pi *Instance, i instances.GetResponse) error {
+func applyClientResponse(pi *Instance, i instances.Instance) error {
 	pi.ACL = types.List{ElemType: types.StringType}
 	if aclString, ok := i.Parameters["sgw_acl"]; ok {
 		items := strings.Split(aclString, ",")

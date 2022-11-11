@@ -40,9 +40,12 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				},
 			},
 			"name": {
-				Description: "Specifies the instance name. Changing this value requires the resource to be recreated.",
+				Description: "Specifies the instance name. Changing this value requires the resource to be recreated. Changing this value requires the resource to be recreated.",
 				Type:        types.StringType,
 				Required:    true,
+				PlanModifiers: []tfsdk.AttributePlanModifier{
+					resource.RequiresReplace(),
+				},
 			},
 			"project_id": {
 				Description: "The project ID the cluster runs in. Changing this value requires the resource to be recreated.",

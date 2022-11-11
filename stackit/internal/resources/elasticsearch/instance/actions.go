@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/data-services/instances"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
@@ -64,9 +65,9 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	i, ok := instance.(instances.GetResponse)
+	i, ok := instance.(instances.Instance)
 	if !ok {
-		resp.Diagnostics.AddError("failed to parse client response", "response is not of instances.GetResponse")
+		resp.Diagnostics.AddError("failed to parse client response", "response is not of instances.Instance")
 		return
 	}
 
@@ -128,6 +129,10 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	plan.ID = state.ID
+	plan.PlanID = state.PlanID
+	if plan.ACL.IsUnknown() {
+		plan.ACL = state.ACL
+	}
 
 	// validate
 	if err := r.validate(ctx, &plan); err != nil {
@@ -143,11 +148,10 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		}
 		acl = append(acl, nv)
 	}
-
 	es := r.client.DataServices.ElasticSearch
 
 	// handle update
-	_, wait, err := es.Instances.Update(ctx, state.ProjectID.Value, state.ID.Value, plan.PlanID.Value, map[string]string{
+	_, process, err := es.Instances.Update(ctx, state.ProjectID.Value, state.ID.Value, state.PlanID.Value, map[string]string{
 		"sgw_acl": strings.Join(acl, ","),
 	})
 	if err != nil {
@@ -155,15 +159,22 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		return
 	}
 
-	instance, err := wait.Wait()
+	process.SetTimeout(10 * time.Minute)
+	instance, err := process.Wait()
 	if err != nil {
-		resp.Diagnostics.AddError("failed instance update validation", err.Error())
+		elaborate := ""
+		if i, ok := instance.(instances.Instance); ok {
+			elaborate = "\n- type: " + i.LastOperation.Type + "\n- state: " + i.LastOperation.State
+		} else {
+			elaborate = "\n- couldn't parst response as instances.Instance"
+		}
+		resp.Diagnostics.AddError("failed instance update validation"+elaborate, err.Error())
 		return
 	}
 
-	i, ok := instance.(instances.GetResponse)
+	i, ok := instance.(instances.Instance)
 	if !ok {
-		resp.Diagnostics.AddError("failed to parse client response", "response is not of instances.GetResponse")
+		resp.Diagnostics.AddError("failed to parse client response", "response is not of instances.Instance")
 		return
 	}
 
@@ -197,8 +208,14 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	if _, err := process.Wait(); err != nil {
+	process.SetTimeout(10 * time.Minute)
+	if instance, err := process.Wait(); err != nil {
 		resp.Diagnostics.AddError("failed to verify instance deletion", err.Error())
+		if i, ok := instance.(instances.Instance); ok {
+			resp.Diagnostics.AddError("instance delete response", "- type: "+i.LastOperation.Type+"\n- state: "+i.LastOperation.State)
+		} else {
+			resp.Diagnostics.AddError("instance delete response", "- couldn't parst response as instances.Instance")
+		}
 	}
 
 	resp.State.RemoveResource(ctx)
