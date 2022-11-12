@@ -68,7 +68,7 @@ func (r Resource) validatePlan(ctx context.Context, offers []options.Offer, vers
 	return "", fmt.Errorf("couldn't find plan name '%s'. Available options are:\n%s\n", version, strings.Join(opts, "\n"))
 }
 
-func applyClientResponse(pi *Instance, i instances.Instance) error {
+func (r Resource) applyClientResponse(ctx context.Context, pi *Instance, i instances.Instance) error {
 	pi.ACL = types.List{ElemType: types.StringType}
 	if aclString, ok := i.Parameters["sgw_acl"]; ok {
 		items := strings.Split(aclString, ",")
@@ -86,4 +86,28 @@ func applyClientResponse(pi *Instance, i instances.Instance) error {
 	pi.CFSpaceGUID = types.String{Value: i.CFSpaceGUID}
 	pi.CFOrganizationGUID = types.String{Value: i.CFOrganizationGUID}
 	return nil
+}
+
+func (r Resource) getPlanAndVersion(ctx context.Context, projectID, instanceID string) (plan, version string, err error) {
+	es := r.client.DataServices.ElasticSearch
+	i, err := es.Instances.Get(ctx, projectID, instanceID)
+	if err != nil {
+		return "", "", errors.Wrap(err, "failed to fetch instance")
+	}
+
+	res, err := es.Options.GetOfferings(ctx, projectID)
+	if err != nil {
+		return "", "", errors.Wrap(err, "failed to fetch offerings")
+	}
+
+	for _, offer := range res.Offerings {
+		for _, p := range offer.Plans {
+			if p.ID != i.PlanID {
+				continue
+			}
+			return p.Name, offer.Version, nil
+		}
+	}
+
+	return "", "", errors.Wrapf(err, "couldn't find plan ID %s", i.PlanID)
 }

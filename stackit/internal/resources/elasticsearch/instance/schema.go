@@ -85,6 +85,9 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Type:        types.ListType{ElemType: types.StringType},
 				Optional:    true,
 				Computed:    true,
+				PlanModifiers: tfsdk.AttributePlanModifiers{
+					resource.UseStateForUnknown(),
+				},
 			},
 			"dashboard_url": {
 				Description: "Dashboard URL",

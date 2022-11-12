@@ -67,9 +67,9 @@ func TestAcc_ElasticSearchJob(t *testing.T) {
 			{
 				ResourceName: "stackit_elasticsearch_instance.example",
 				ImportStateIdFunc: func(s *terraform.State) (string, error) {
-					r, ok := s.RootModule().Resources["stackit_argus_instance.example"]
+					r, ok := s.RootModule().Resources["stackit_elasticsearch_instance.example"]
 					if !ok {
-						return "", errors.New("couldn't find resource stackit_argus_instance.example")
+						return "", errors.New("couldn't find resource stackit_elasticsearch_instance.example")
 					}
 					id, ok := r.Primary.Attributes["id"]
 					if !ok {

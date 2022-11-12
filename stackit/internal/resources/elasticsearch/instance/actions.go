@@ -71,7 +71,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	if err := applyClientResponse(&plan, i); err != nil {
+	if err := r.applyClientResponse(ctx, &plan, i); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
 	}
@@ -106,7 +106,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	if err := applyClientResponse(&state, i); err != nil {
+	if err := r.applyClientResponse(ctx, &state, i); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
 	}
@@ -129,8 +129,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	plan.ID = state.ID
-	plan.PlanID = state.PlanID
-	if plan.ACL.IsUnknown() {
+	if plan.ACL.IsUnknown() || plan.ACL.IsNull() {
 		plan.ACL = state.ACL
 	}
 
@@ -151,7 +150,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	es := r.client.DataServices.ElasticSearch
 
 	// handle update
-	_, process, err := es.Instances.Update(ctx, state.ProjectID.Value, state.ID.Value, state.PlanID.Value, map[string]string{
+	_, process, err := es.Instances.Update(ctx, state.ProjectID.Value, state.ID.Value, plan.PlanID.Value, map[string]string{
 		"sgw_acl": strings.Join(acl, ","),
 	})
 	if err != nil {
@@ -159,8 +158,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		return
 	}
 
-	process.SetTimeout(10 * time.Minute)
-	instance, err := process.Wait()
+	instance, err := process.SetTimeout(15 * time.Minute).Wait()
 	if err != nil {
 		elaborate := ""
 		if i, ok := instance.(instances.Instance); ok {
@@ -178,8 +176,14 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		return
 	}
 
-	if err := applyClientResponse(&plan, i); err != nil {
+	planID := plan.PlanID
+	if err := r.applyClientResponse(ctx, &plan, i); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
+		return
+	}
+
+	if !plan.PlanID.Equal(planID) {
+		resp.Diagnostics.AddError("server returned wrong plan ID after update", fmt.Sprintf("expected plan ID %s but received %s", planID.Value, plan.PlanID.Value))
 		return
 	}
 
@@ -208,8 +212,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	process.SetTimeout(10 * time.Minute)
-	if instance, err := process.Wait(); err != nil {
+	if instance, err := process.SetTimeout(15 * time.Minute).Wait(); err != nil {
 		resp.Diagnostics.AddError("failed to verify instance deletion", err.Error())
 		if i, ok := instance.(instances.Instance); ok {
 			resp.Diagnostics.AddError("instance delete response", "- type: "+i.LastOperation.Type+"\n- state: "+i.LastOperation.State)
@@ -242,9 +245,19 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 		return
 	}
 
+	plan, version, err := r.getPlanAndVersion(ctx, idParts[0], idParts[1])
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error during import",
+			err.Error(),
+		)
+		return
+	}
 	// set main attributes
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project_id"), idParts[0])...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), idParts[1])...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("plan"), plan)...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("version"), version)...)
 
 	if resp.Diagnostics.HasError() {
 		return
