@@ -2,6 +2,7 @@ package instance
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -27,16 +28,21 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	}
 
 	found := -1
+	existing := ""
 	for i, instance := range list.Instances {
 		if instance.Name == config.Name.Value {
 			found = i
 			break
 		}
+		if existing == "" {
+			existing = "\navailable instances in the project are:"
+		}
+		existing = fmt.Sprintf("%s\n- %s", existing, instance.Name)
 	}
 
 	if found == -1 {
 		resp.State.RemoveResource(ctx)
-		diags.AddError("couldn't find instance", "instance could not be found")
+		diags.AddError("couldn't find instance", "instance could not be found."+existing)
 		resp.Diagnostics.Append(diags...)
 		return
 	}
@@ -75,5 +81,10 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		}
 	} else {
 		config.ACL.Null = true
+	}
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &config)...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
 }
