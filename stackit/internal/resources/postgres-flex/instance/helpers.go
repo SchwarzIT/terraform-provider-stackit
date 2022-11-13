@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres/instances"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres-flex/instances"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -33,7 +33,7 @@ func (r Resource) validate(ctx context.Context, data PostgresInstance) error {
 }
 
 func (r Resource) validateVersion(ctx context.Context, projectID, version string) error {
-	res, err := r.client.Incubator.Postgres.Options.GetVersions(ctx, projectID)
+	res, err := r.client.PostgresFlex.Options.GetVersions(ctx, projectID)
 	if err != nil {
 		return err
 	}
@@ -49,7 +49,7 @@ func (r Resource) validateVersion(ctx context.Context, projectID, version string
 }
 
 func (r Resource) validateMachineType(ctx context.Context, projectID, flavorID string) error {
-	res, err := r.client.Incubator.Postgres.Options.GetFlavors(ctx, projectID)
+	res, err := r.client.PostgresFlex.Options.GetFlavors(ctx, projectID)
 	if err != nil {
 		return err
 	}
@@ -65,7 +65,7 @@ func (r Resource) validateMachineType(ctx context.Context, projectID, flavorID s
 }
 
 func (r Resource) validateStorageClass(ctx context.Context, projectID, machineType, storageClass string) error {
-	res, err := r.client.Incubator.Postgres.Options.GetStorageClasses(ctx, projectID, machineType)
+	res, err := r.client.PostgresFlex.Options.GetStorageClasses(ctx, projectID, machineType)
 	if err != nil {
 		return err
 	}

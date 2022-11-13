@@ -140,7 +140,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	if p.ContainerID.Value == "" && p.ID.Value != "" {
-		res, err := c.Archived.ResourceManagementV1.Projects.Get(ctx, p.ID.Value)
+		res, err := c.ResourceManagement.Projects.Get(ctx, p.ID.Value)
 		if err != nil {
 			resp.Diagnostics.AddError("failed to fetch container ID", err.Error())
 			return

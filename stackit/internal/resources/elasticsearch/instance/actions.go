@@ -1,12 +1,13 @@
-package postgresinstance
+package instance
 
 import (
 	"context"
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres-flex/instances"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/data-services/instances"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -16,7 +17,8 @@ import (
 
 // Create - lifecycle function
 func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	var plan PostgresInstance
+	// load plan
+	var plan Instance
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -24,41 +26,42 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	// validate
-	if err := r.validate(ctx, plan); err != nil {
-		resp.Diagnostics.AddError("failed postgres validation", err.Error())
+	if err := r.validate(ctx, &plan); err != nil {
+		resp.Diagnostics.AddError("failed instance validation", err.Error())
 		return
 	}
 
 	acl := []string{}
 	for _, v := range plan.ACL.Elems {
-		nv, err := common.ToString(context.Background(), v)
+		nv, err := common.ToString(ctx, v)
 		if err != nil {
 			continue
 		}
 		acl = append(acl, nv)
 	}
 
+	es := r.client.DataServices.ElasticSearch
+
 	// handle creation
-	res, wait, err := r.client.PostgresFlex.Instances.Create(ctx, plan.ProjectID.Value, plan.Name.Value, plan.MachineType.Value, instances.Storage{
-		Class: plan.Storage.Class.Value,
-		Size:  int(plan.Storage.Size.Value),
-	}, plan.Version.Value, int(plan.Replicas.Value), plan.BackupSchedule.Value, plan.Labels, plan.Options, instances.ACL{Items: acl})
+	res, wait, err := es.Instances.Create(ctx, plan.ProjectID.Value, plan.Name.Value, plan.PlanID.Value, map[string]string{
+		"sgw_acl": strings.Join(acl, ","),
+	})
 
 	if err != nil {
-		resp.Diagnostics.AddError("failed Postgres instance creation", err.Error())
+		resp.Diagnostics.AddError("failed instance creation", err.Error())
 		return
 	}
 
 	// set state
-	plan.ID = types.String{Value: res.ID}
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), res.ID)...)
+	plan.ID = types.String{Value: res.InstanceID}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), res.InstanceID)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	instance, err := wait.Wait()
 	if err != nil {
-		resp.Diagnostics.AddError("failed Postgres instance creation validation", err.Error())
+		resp.Diagnostics.AddError("failed instance `create` validation", err.Error())
 		return
 	}
 
@@ -68,7 +71,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	if err := applyClientResponse(&plan, i); err != nil {
+	if err := r.applyClientResponse(ctx, &plan, i); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
 	}
@@ -83,26 +86,27 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 // Read - lifecycle function
 func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	var state PostgresInstance
-
+	var state Instance
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	// read cluster
-	instance, err := r.client.PostgresFlex.Instances.Get(ctx, state.ProjectID.Value, state.ID.Value)
+	es := r.client.DataServices.ElasticSearch
+
+	// read instance
+	i, err := es.Instances.Get(ctx, state.ProjectID.Value, state.ID.Value)
 	if err != nil {
 		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.State.RemoveResource(ctx)
 			return
 		}
-		resp.Diagnostics.AddError("failed to read postgres instance", err.Error())
+		resp.Diagnostics.AddError("failed to read instance", err.Error())
 		return
 	}
 
-	if err := applyClientResponse(&state, instance.Item); err != nil {
+	if err := r.applyClientResponse(ctx, &state, i); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
 	}
@@ -117,7 +121,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 // Update - lifecycle function
 func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	var plan, state PostgresInstance
+	var plan, state Instance
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 	if resp.Diagnostics.HasError() {
@@ -125,32 +129,44 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	plan.ID = state.ID
+	if plan.ACL.IsUnknown() || plan.ACL.IsNull() {
+		plan.ACL = state.ACL
+	}
 
 	// validate
-	if err := r.validate(ctx, plan); err != nil {
-		resp.Diagnostics.AddError("failed postgres validation", err.Error())
+	if err := r.validate(ctx, &plan); err != nil {
+		resp.Diagnostics.AddError("failed validation", err.Error())
 		return
 	}
 
 	acl := []string{}
 	for _, v := range plan.ACL.Elems {
-		nv, err := common.ToString(context.Background(), v)
+		nv, err := common.ToString(ctx, v)
 		if err != nil {
 			continue
 		}
 		acl = append(acl, nv)
 	}
+	es := r.client.DataServices.ElasticSearch
 
 	// handle update
-	_, wait, err := r.client.PostgresFlex.Instances.Update(ctx, plan.ProjectID.Value, plan.ID.Value, plan.MachineType.Value, plan.BackupSchedule.Value, plan.Labels, plan.Options, instances.ACL{Items: acl})
+	_, process, err := es.Instances.Update(ctx, state.ProjectID.Value, state.ID.Value, plan.PlanID.Value, map[string]string{
+		"sgw_acl": strings.Join(acl, ","),
+	})
 	if err != nil {
-		resp.Diagnostics.AddError("failed Postgres instance update", err.Error())
+		resp.Diagnostics.AddError("failed instance update", err.Error())
 		return
 	}
 
-	instance, err := wait.Wait()
+	instance, err := process.SetTimeout(15 * time.Minute).Wait()
 	if err != nil {
-		resp.Diagnostics.AddError("failed Postgres instance update validation", err.Error())
+		elaborate := ""
+		if i, ok := instance.(instances.Instance); ok {
+			elaborate = "\n- type: " + i.LastOperation.Type + "\n- state: " + i.LastOperation.State
+		} else {
+			elaborate = "\n- couldn't parst response as instances.Instance"
+		}
+		resp.Diagnostics.AddError("failed instance update validation"+elaborate, err.Error())
 		return
 	}
 
@@ -160,8 +176,14 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		return
 	}
 
-	if err := applyClientResponse(&plan, i); err != nil {
+	planID := plan.PlanID
+	if err := r.applyClientResponse(ctx, &plan, i); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
+		return
+	}
+
+	if !plan.PlanID.Equal(planID) {
+		resp.Diagnostics.AddError("server returned wrong plan ID after update", fmt.Sprintf("expected plan ID %s but received %s", planID.Value, plan.PlanID.Value))
 		return
 	}
 
@@ -175,21 +197,28 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 
 // Delete - lifecycle function
 func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var state PostgresInstance
+	var state Instance
 	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	process, err := r.client.PostgresFlex.Instances.Delete(ctx, state.ProjectID.Value, state.ID.Value)
+	es := r.client.DataServices.ElasticSearch
+
+	// handle deletion
+	process, err := es.Instances.Delete(ctx, state.ProjectID.Value, state.ID.Value)
 	if err != nil {
-		resp.Diagnostics.AddError("failed to delete postgres instance", err.Error())
+		resp.Diagnostics.AddError("failed to delete instance", err.Error())
 		return
 	}
 
-	if _, err := process.Wait(); err != nil {
-		resp.Diagnostics.AddError("failed to verify postgres instance deletion", err.Error())
-		return
+	if instance, err := process.SetTimeout(15 * time.Minute).Wait(); err != nil {
+		resp.Diagnostics.AddError("failed to verify instance deletion", err.Error())
+		if i, ok := instance.(instances.Instance); ok {
+			resp.Diagnostics.AddError("instance delete response", "- type: "+i.LastOperation.Type+"\n- state: "+i.LastOperation.State)
+		} else {
+			resp.Diagnostics.AddError("instance delete response", "- couldn't parst response as instances.Instance")
+		}
 	}
 
 	resp.State.RemoveResource(ctx)
@@ -202,7 +231,7 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 	if len(idParts) != 2 || idParts[0] == "" || idParts[1] == "" {
 		resp.Diagnostics.AddError(
 			"Unexpected Import Identifier",
-			fmt.Sprintf("Expected import identifier with format: `project_id,postgres_instance_id`.\nInstead got: %q", req.ID),
+			fmt.Sprintf("Expected import identifier with format: `project_id,instance_id`.\nInstead got: %q", req.ID),
 		)
 		return
 	}
@@ -216,9 +245,19 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 		return
 	}
 
+	plan, version, err := r.getPlanAndVersion(ctx, idParts[0], idParts[1])
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error during import",
+			err.Error(),
+		)
+		return
+	}
 	// set main attributes
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project_id"), idParts[0])...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), idParts[1])...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("plan"), plan)...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("version"), version)...)
 
 	if resp.Diagnostics.HasError() {
 		return
