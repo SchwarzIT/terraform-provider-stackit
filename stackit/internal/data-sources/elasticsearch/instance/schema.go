@@ -55,22 +55,22 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 				},
 			},
 			"plan": {
-				Description: "The ElasticSearch Plan. Options are: `stackit-elasticsearch-single-small`, `stackit-elasticsearch-cluster-small`, `stackit-elasticsearch-single-medium`, `stackit-elasticsearch-cluster-medium`, `stackit-elasticsearch-cluster-big`",
+				Description: "The ElasticSearch plan name",
 				Type:        types.StringType,
 				Computed:    true,
 			},
 			"plan_id": {
-				Description: "The selected plan ID",
+				Description: "ElasticSearch plan ID",
 				Type:        types.StringType,
 				Computed:    true,
 			},
 			"version": {
-				Description: "Elasticsearch version. Options: `5`, `6`, `7`. Changing this value requires the resource to be recreated.",
+				Description: "Elasticsearch version",
 				Type:        types.StringType,
 				Computed:    true,
 			},
 			"acl": {
-				Description: "Access Control rules to whitelist IP addresses",
+				Description: "Access control rules",
 				Type:        types.ListType{ElemType: types.StringType},
 				Computed:    true,
 			},

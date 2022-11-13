@@ -29,14 +29,14 @@ data "stackit_elasticsearch_instance" "example" {
 
 ### Read-Only
 
-- `acl` (List of String) Access Control rules to whitelist IP addresses
+- `acl` (List of String) Access control rules
 - `cf_guid` (String) Cloud Foundry GUID
 - `cf_organization_guid` (String) Cloud Foundry Organization GUID
 - `cf_space_guid` (String) Cloud Foundry Space GUID
 - `dashboard_url` (String) Dashboard URL
 - `id` (String) The instance ID
-- `plan` (String) The ElasticSearch Plan. Options are: `stackit-elasticsearch-single-small`, `stackit-elasticsearch-cluster-small`, `stackit-elasticsearch-single-medium`, `stackit-elasticsearch-cluster-medium`, `stackit-elasticsearch-cluster-big`
-- `plan_id` (String) The selected plan ID
-- `version` (String) Elasticsearch version. Options: `5`, `6`, `7`. Changing this value requires the resource to be recreated.
+- `plan` (String) The ElasticSearch plan name
+- `plan_id` (String) ElasticSearch plan ID
+- `version` (String) Elasticsearch version
 
 
