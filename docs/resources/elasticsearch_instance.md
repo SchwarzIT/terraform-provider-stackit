@@ -4,20 +4,23 @@ page_title: "stackit_elasticsearch_instance Resource - stackit"
 subcategory: ""
 description: |-
   Manages ElasticSearch instances
+  ~> Note: ElasticSearch API currently has issues reflecting updates correctly
 ---
 
 # stackit_elasticsearch_instance (Resource)
 
 Manages ElasticSearch instances
 
+~> **Note:** ElasticSearch API currently has issues reflecting updates correctly
+
 ## Example Usage
 
 ```terraform
 resource "stackit_elasticsearch_instance" "example" {
-  name       = "example"
+  name       = "some_name_2"
   project_id = var.project_id
   version    = "7"
-  plan       = "stackit-elasticsearch-single-small"
+  plan       = "stackit-elasticsearch-single-medium"
 }
 ```
 
@@ -26,9 +29,9 @@ resource "stackit_elasticsearch_instance" "example" {
 
 ### Required
 
-- `name` (String) Specifies the instance name. Changing this value requires the resource to be recreated.
+- `name` (String) Specifies the instance name. Changing this value requires the resource to be recreated. Changing this value requires the resource to be recreated.
 - `plan` (String) The ElasticSearch Plan. Options are: `stackit-elasticsearch-single-small`, `stackit-elasticsearch-cluster-small`, `stackit-elasticsearch-single-medium`, `stackit-elasticsearch-cluster-medium`, `stackit-elasticsearch-cluster-big`
-- `project_id` (String) The project ID the cluster runs in. Changing this value requires the resource to be recreated.
+- `project_id` (String) The project ID.
 
 ### Optional
 

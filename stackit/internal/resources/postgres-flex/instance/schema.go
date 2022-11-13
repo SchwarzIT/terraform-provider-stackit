@@ -48,9 +48,9 @@ type User struct {
 // GetSchema returns the terraform schema structure
 func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: `Manages kubernetes clusters
+		MarkdownDescription: `Manages Postgres Flex instances
 		
-~> **Note:** Postgres Flex is being actively developed and is currently in 'alpha' stage, therefore, this resource is not ready for production usage
+~> **Note:** Postgres Flex is in 'alpha' stage in STACKIT
 `,
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {

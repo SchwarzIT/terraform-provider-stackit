@@ -3,7 +3,6 @@ package instance
 import (
 	"context"
 
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -27,15 +26,12 @@ type Instance struct {
 }
 
 // GetSchema returns the terraform schema structure
-func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
+func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: `Manages ElasticSearch instances
-
-~> **Note:** ElasticSearch API currently has issues reflecting updates correctly
-		`,
+		Description: `Data source for ElasticSearch instances`,
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
-				Description: "Specifies the resource ID",
+				Description: "The instance ID",
 				Type:        types.StringType,
 				Computed:    true,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
@@ -57,17 +53,11 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Validators: []tfsdk.AttributeValidator{
 					validate.ProjectID(),
 				},
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
-				},
 			},
 			"plan": {
 				Description: "The ElasticSearch Plan. Options are: `stackit-elasticsearch-single-small`, `stackit-elasticsearch-cluster-small`, `stackit-elasticsearch-single-medium`, `stackit-elasticsearch-cluster-medium`, `stackit-elasticsearch-cluster-big`",
 				Type:        types.StringType,
-				Required:    true,
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					modifiers.StringDefault(default_plan),
-				},
+				Computed:    true,
 			},
 			"plan_id": {
 				Description: "The selected plan ID",
@@ -77,20 +67,12 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 			"version": {
 				Description: "Elasticsearch version. Options: `5`, `6`, `7`. Changing this value requires the resource to be recreated.",
 				Type:        types.StringType,
-				Optional:    true,
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
-					modifiers.StringDefault(default_version),
-				},
+				Computed:    true,
 			},
 			"acl": {
 				Description: "Access Control rules to whitelist IP addresses",
 				Type:        types.ListType{ElemType: types.StringType},
-				Optional:    true,
 				Computed:    true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
-				},
 			},
 			"dashboard_url": {
 				Description: "Dashboard URL",
