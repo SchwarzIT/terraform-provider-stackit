@@ -3,12 +3,15 @@
 page_title: "stackit_elasticsearch_instance Data Source - stackit"
 subcategory: ""
 description: |-
-  Data source for ElasticSearch instances
+  Data source for Elasticsearch instances
+  ~> Note: Elasticsearch API (DSA) currently has issues reflecting updates & configuration correctly. Therefore, this data source is not ready for production usage.
 ---
 
 # stackit_elasticsearch_instance (Data Source)
 
-Data source for ElasticSearch instances
+Data source for Elasticsearch instances
+
+~> **Note:** Elasticsearch API (DSA) currently has issues reflecting updates & configuration correctly. Therefore, this data source is not ready for production usage.
 
 ## Example Usage
 
@@ -35,8 +38,8 @@ data "stackit_elasticsearch_instance" "example" {
 - `cf_space_guid` (String) Cloud Foundry Space GUID
 - `dashboard_url` (String) Dashboard URL
 - `id` (String) The instance ID
-- `plan` (String) The ElasticSearch plan name
-- `plan_id` (String) ElasticSearch plan ID
+- `plan` (String) The Elasticsearch plan name
+- `plan_id` (String) Elasticsearch plan ID
 - `version` (String) Elasticsearch version
 
 

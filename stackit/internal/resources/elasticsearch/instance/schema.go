@@ -29,9 +29,9 @@ type Instance struct {
 // GetSchema returns the terraform schema structure
 func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: `Manages ElasticSearch instances
+		MarkdownDescription: `Manages Elasticsearch instances
 
-~> **Note:** ElasticSearch API currently has issues reflecting updates correctly
+~> **Note:** Elasticsearch API (DSA) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
 		`,
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
@@ -62,7 +62,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				},
 			},
 			"plan": {
-				Description: "The ElasticSearch Plan. Options are: `stackit-elasticsearch-single-small`, `stackit-elasticsearch-cluster-small`, `stackit-elasticsearch-single-medium`, `stackit-elasticsearch-cluster-medium`, `stackit-elasticsearch-cluster-big`",
+				Description: "The Elasticsearch Plan. Options are: `stackit-elasticsearch-single-small`, `stackit-elasticsearch-cluster-small`, `stackit-elasticsearch-single-medium`, `stackit-elasticsearch-cluster-medium`, `stackit-elasticsearch-cluster-big`",
 				Type:        types.StringType,
 				Required:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{

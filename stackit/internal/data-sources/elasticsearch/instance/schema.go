@@ -28,7 +28,10 @@ type Instance struct {
 // GetSchema returns the terraform schema structure
 func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		Description: `Data source for ElasticSearch instances`,
+		Description: `Data source for Elasticsearch instances
+
+~> **Note:** Elasticsearch API (DSA) currently has issues reflecting updates & configuration correctly. Therefore, this data source is not ready for production usage.		
+		`,
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
 				Description: "The instance ID",
@@ -55,12 +58,12 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 				},
 			},
 			"plan": {
-				Description: "The ElasticSearch plan name",
+				Description: "The Elasticsearch plan name",
 				Type:        types.StringType,
 				Computed:    true,
 			},
 			"plan_id": {
-				Description: "ElasticSearch plan ID",
+				Description: "Elasticsearch plan ID",
 				Type:        types.StringType,
 				Computed:    true,
 			},
