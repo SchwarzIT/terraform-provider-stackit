@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres/instances"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres-flex/instances"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -39,7 +39,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	// handle creation
-	res, wait, err := r.client.Incubator.Postgres.Instances.Create(ctx, plan.ProjectID.Value, plan.Name.Value, plan.MachineType.Value, instances.Storage{
+	res, wait, err := r.client.PostgresFlex.Instances.Create(ctx, plan.ProjectID.Value, plan.Name.Value, plan.MachineType.Value, instances.Storage{
 		Class: plan.Storage.Class.Value,
 		Size:  int(plan.Storage.Size.Value),
 	}, plan.Version.Value, int(plan.Replicas.Value), plan.BackupSchedule.Value, plan.Labels, plan.Options, instances.ACL{Items: acl})
@@ -92,7 +92,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	// read cluster
-	instance, err := r.client.Incubator.Postgres.Instances.Get(ctx, state.ProjectID.Value, state.ID.Value)
+	instance, err := r.client.PostgresFlex.Instances.Get(ctx, state.ProjectID.Value, state.ID.Value)
 	if err != nil {
 		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.State.RemoveResource(ctx)
@@ -142,7 +142,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	// handle update
-	_, wait, err := r.client.Incubator.Postgres.Instances.Update(ctx, plan.ProjectID.Value, plan.ID.Value, plan.MachineType.Value, plan.BackupSchedule.Value, plan.Labels, plan.Options, instances.ACL{Items: acl})
+	_, wait, err := r.client.PostgresFlex.Instances.Update(ctx, plan.ProjectID.Value, plan.ID.Value, plan.MachineType.Value, plan.BackupSchedule.Value, plan.Labels, plan.Options, instances.ACL{Items: acl})
 	if err != nil {
 		resp.Diagnostics.AddError("failed Postgres instance update", err.Error())
 		return
@@ -181,7 +181,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	process, err := r.client.Incubator.Postgres.Instances.Delete(ctx, state.ProjectID.Value, state.ID.Value)
+	process, err := r.client.PostgresFlex.Instances.Delete(ctx, state.ProjectID.Value, state.ID.Value)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete postgres instance", err.Error())
 		return
