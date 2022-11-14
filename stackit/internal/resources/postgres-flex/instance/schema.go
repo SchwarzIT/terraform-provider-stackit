@@ -23,8 +23,8 @@ type PostgresInstance struct {
 	Options        map[string]string `tfsdk:"options"`
 	Labels         map[string]string `tfsdk:"labels"`
 	ACL            types.List        `tfsdk:"acl"`
-	Storage        *Storage          `tfsdk:"storage"`
-	User           *User             `tfsdk:"user"`
+	Storage        types.Object      `tfsdk:"storage"`
+	User           types.Object      `tfsdk:"user"`
 }
 
 // Storage represent instance storage
@@ -114,11 +114,16 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 			"storage": {
 				Description: "A signle `storage` block as defined below. Changing this value requires the resource to be recreated.",
 				Optional:    true,
+				Computed:    true,
 				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
 					"class": {
 						Description: "Specifies the storage class. Available option: `premium-perf6-stackit`",
 						Type:        types.StringType,
-						Required:    true,
+						Optional:    true,
+						Computed:    true,
+						PlanModifiers: []tfsdk.AttributePlanModifier{
+							modifiers.StringDefault(default_storage_class),
+						},
 					},
 					"size": {
 						Description: "The storage size in GB",
@@ -126,7 +131,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 						Optional:    true,
 						Computed:    true,
 						PlanModifiers: []tfsdk.AttributePlanModifier{
-							modifiers.Int64Default(20),
+							modifiers.Int64Default(default_storage_size),
 						},
 					},
 				}),
@@ -136,7 +141,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 			},
 			"user": {
 				Description: "The databse admin user",
-				Optional:    true,
+				Computed:    true,
 				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
 					"id": {
 						Description: "Specifies the user id",

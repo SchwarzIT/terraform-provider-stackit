@@ -7,12 +7,15 @@ import (
 	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres-flex/instances"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 const (
-	default_username        = "stackit"
-	default_backup_schedule = "0 2 * * *"
+	default_username              = "stackit"
+	default_backup_schedule       = "0 2 * * *"
+	default_storage_class         = "premium-perf6-stackit"
+	default_storage_size    int64 = 20
 )
 
 func (r Resource) validate(ctx context.Context, data PostgresInstance) error {
@@ -23,10 +26,17 @@ func (r Resource) validate(ctx context.Context, data PostgresInstance) error {
 		return err
 	}
 
-	if data.Storage.Class.IsNull() || data.Storage.Class.IsUnknown() {
+	if data.Storage.IsNull() || data.Storage.IsUnknown() {
 		return nil
 	}
-	if err := r.validateStorageClass(ctx, data.ProjectID.Value, data.MachineType.Value, data.Storage.Class.Value); err != nil {
+
+	storage := Storage{}
+	diag := data.Storage.As(ctx, &storage, types.ObjectAsOptions{})
+	if diag.HasError() {
+		return errors.New("failed setting storage from object")
+	}
+
+	if err := r.validateStorageClass(ctx, data.ProjectID.Value, data.MachineType.Value, storage.Class.Value); err != nil {
 		return err
 	}
 	return nil
@@ -89,35 +99,20 @@ func applyClientResponse(pi *PostgresInstance, i instances.Instance) error {
 	pi.MachineType = types.String{Value: i.Flavor.ID}
 	pi.Name = types.String{Value: i.Name}
 	pi.Replicas = types.Int64{Value: int64(i.Replicas)}
-	pi.Storage = &Storage{
-		Class: types.String{Value: i.Storage.Class},
-		Size:  types.Int64{Value: int64(i.Storage.Size)},
+
+	storage, diags := types.ObjectValue(
+		map[string]attr.Type{
+			"class": types.StringType,
+			"size":  types.Int64Type,
+		},
+		map[string]attr.Value{
+			"class": types.String{Value: i.Storage.Class},
+			"size":  types.Int64{Value: int64(i.Storage.Size)},
+		})
+	if diags.HasError() {
+		return errors.New("failed setting storage object")
 	}
+	pi.Storage = storage
 	pi.Version = types.String{Value: i.Version}
-
-	if len(i.Users) == 0 {
-		return errors.New("failed to process database user")
-	}
-
-	pi.User = &User{}
-	for _, user := range i.Users {
-		if user.Username != default_username {
-			continue
-		}
-
-		pi.User.ID = types.String{Value: user.ID}
-		pi.User.Username = types.String{Value: user.Username}
-		pi.User.Password = types.String{Value: user.Password}
-		pi.User.Hostname = types.String{Value: user.Hostname}
-		pi.User.Database = types.String{Value: user.Database}
-		pi.User.Port = types.Int64{Value: int64(user.Port)}
-		pi.User.URI = types.String{Value: user.URI}
-		pi.User.Roles = types.List{ElemType: types.StringType}
-		for _, v := range user.Roles {
-			pi.User.Roles.Elems = append(pi.User.Roles.Elems, types.String{Value: v})
-		}
-
-	}
-
 	return nil
 }
