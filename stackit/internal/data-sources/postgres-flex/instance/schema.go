@@ -13,17 +13,15 @@ import (
 
 // Instance is the schema model
 type Instance struct {
-	ID             types.String      `tfsdk:"id"`
-	Name           types.String      `tfsdk:"name"`
-	ProjectID      types.String      `tfsdk:"project_id"`
-	MachineType    types.String      `tfsdk:"machine_type"`
-	Version        types.String      `tfsdk:"version"`
-	Replicas       types.Int64       `tfsdk:"replicas"`
-	BackupSchedule types.String      `tfsdk:"backup_schedule"`
-	Options        map[string]string `tfsdk:"options"`
-	Labels         map[string]string `tfsdk:"labels"`
-	ACL            types.List        `tfsdk:"acl"`
-	Storage        types.Object      `tfsdk:"storage"`
+	ID             types.String `tfsdk:"id"`
+	Name           types.String `tfsdk:"name"`
+	ProjectID      types.String `tfsdk:"project_id"`
+	MachineType    types.String `tfsdk:"machine_type"`
+	Version        types.String `tfsdk:"version"`
+	Replicas       types.Int64  `tfsdk:"replicas"`
+	BackupSchedule types.String `tfsdk:"backup_schedule"`
+	ACL            types.List   `tfsdk:"acl"`
+	Storage        types.Object `tfsdk:"storage"`
 }
 
 // GetSchema returns the terraform schema structure
@@ -98,24 +96,9 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 					},
 				}),
 			},
-			"options": {
-				Description: "Specifies postgres instance options",
-				Type: types.MapType{
-					ElemType: types.StringType,
-				},
-				Optional: true,
-			},
-			"labels": {
-				Description: "Instance Labels",
-				Type: types.MapType{
-					ElemType: types.StringType,
-				},
-				Optional: true,
-			},
 			"acl": {
 				Description: "Access Control rules to whitelist IP addresses",
 				Type:        types.ListType{ElemType: types.StringType},
-				Optional:    true,
 				Computed:    true,
 			},
 		},

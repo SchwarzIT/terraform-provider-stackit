@@ -30,14 +30,9 @@ data "stackit_postgres_flex_instance" "example" {
 - `name` (String) Specifies the instance name
 - `project_id` (String) The project ID
 
-### Optional
-
-- `acl` (List of String) Access Control rules to whitelist IP addresses
-- `labels` (Map of String) Instance Labels
-- `options` (Map of String) Specifies postgres instance options
-
 ### Read-Only
 
+- `acl` (List of String) Access Control rules to whitelist IP addresses
 - `backup_schedule` (String) Specifies the backup schedule (cron style)
 - `id` (String) Specifies the resource ID
 - `machine_type` (String) The Machine Type
