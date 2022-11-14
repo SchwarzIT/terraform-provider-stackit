@@ -5,10 +5,13 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres-flex/instances"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -38,10 +41,23 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		acl = append(acl, nv)
 	}
 
+	storage := Storage{}
+	if plan.Storage.IsUnknown() {
+		storage = Storage{
+			Class: types.String{Value: default_storage_class},
+			Size:  types.Int64{Value: default_storage_size},
+		}
+	} else {
+		resp.Diagnostics.Append(plan.Storage.As(ctx, &storage, types.ObjectAsOptions{})...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+	}
+
 	// handle creation
 	res, wait, err := r.client.PostgresFlex.Instances.Create(ctx, plan.ProjectID.Value, plan.Name.Value, plan.MachineType.Value, instances.Storage{
-		Class: plan.Storage.Class.Value,
-		Size:  int(plan.Storage.Size.Value),
+		Class: storage.Class.Value,
+		Size:  int(storage.Size.Value),
 	}, plan.Version.Value, int(plan.Replicas.Value), plan.BackupSchedule.Value, plan.Labels, plan.Options, instances.ACL{Items: acl})
 
 	if err != nil {
@@ -52,6 +68,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	// set state
 	plan.ID = types.String{Value: res.ID}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), res.ID)...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project_id"), plan.ProjectID.Value)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -73,11 +90,72 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	// update state
+	r.createUser(ctx, &plan, &resp.Diagnostics)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// update state with user
 	diags = resp.State.Set(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
+	}
+}
+
+func (r Resource) createUser(ctx context.Context, plan *PostgresInstance, d *diag.Diagnostics) {
+	// these are the default user values
+	// the current API doesn't read them yet, but in later releases
+	// this will be the way to get the default user and database credentials
+	// the default user credentials won't change
+	username := "stackit"
+	database := "stackit"
+	roles := []string{}
+
+	for maxTries := 10; maxTries > -1; maxTries-- {
+		res, err := r.client.PostgresFlex.Users.Create(ctx, plan.ProjectID.Value, plan.ID.Value, username, database, roles)
+		if err != nil {
+			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) && maxTries > 0 {
+				time.Sleep(time.Second * 5)
+				continue
+			}
+			if strings.Contains(err.Error(), http.StatusText(http.StatusBadRequest)) && maxTries > 0 {
+				time.Sleep(time.Second * 30)
+				continue
+			}
+			d.AddError("failed to create user", err.Error())
+			return
+		}
+
+		elems := []attr.Value{}
+		for _, v := range res.Item.Roles {
+			elems = append(elems, types.String{Value: v})
+		}
+		u, diags := types.ObjectValue(
+			map[string]attr.Type{
+				"id":       types.StringType,
+				"username": types.StringType,
+				"database": types.StringType,
+				"password": types.StringType,
+				"hostname": types.StringType,
+				"port":     types.Int64Type,
+				"uri":      types.StringType,
+				"roles":    types.ListType{ElemType: types.StringType},
+			},
+			map[string]attr.Value{
+				"id":       types.String{Value: res.Item.ID},
+				"username": types.String{Value: res.Item.Username},
+				"database": types.String{Value: res.Item.Database},
+				"password": types.String{Value: res.Item.Password},
+				"hostname": types.String{Value: res.Item.Hostname},
+				"port":     types.Int64{Value: int64(res.Item.Port)},
+				"uri":      types.String{Value: res.Item.URI},
+				"roles":    types.List{ElemType: types.StringType, Elems: elems},
+			},
+		)
+		plan.User = u
+		d.Append(diags...)
+		break
 	}
 }
 
@@ -105,6 +183,13 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	if err := applyClientResponse(&state, instance.Item); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
+	}
+
+	if state.User.IsNull() || state.User.IsUnknown() {
+		r.createUser(ctx, &state, &resp.Diagnostics)
+		if resp.Diagnostics.HasError() {
+			return
+		}
 	}
 
 	// update state

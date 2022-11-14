@@ -10,6 +10,7 @@ import (
 	dataObjectStorageBucket "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/object-storage/bucket"
 	dataObjectStorageCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/object-storage/credential"
 	dataObjectStorageCredentialsGroup "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/object-storage/credentials-group"
+	dataPostgresFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/postgres-flex/instance"
 	dataProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/project"
 	resourceArgusInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/instance"
 	resourceArgusJob "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/job"
@@ -101,10 +102,11 @@ func (p *StackitProvider) DataSources(context.Context) []func() datasource.DataS
 		dataArgusInstance.New,
 		dataArgusJob.New,
 		dataElasticSearchInstance.New,
+		dataKubernetes.New,
 		dataObjectStorageBucket.New,
 		dataObjectStorageCredential.New,
 		dataObjectStorageCredentialsGroup.New,
-		dataKubernetes.New,
+		dataPostgresFlexInstance.New,
 		dataProject.New,
 	}
 }
