@@ -70,7 +70,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				},
 			},
 			"project_id": {
-				Description: "The project ID the cluster runs in. Changing this value requires the resource to be recreated.",
+				Description: "The project ID the instance runs in. Changing this value requires the resource to be recreated.",
 				Type:        types.StringType,
 				Required:    true,
 				Validators: []tfsdk.AttributeValidator{
