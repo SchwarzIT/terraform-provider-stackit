@@ -107,7 +107,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				},
 			},
 			"kubernetes_version": {
-				Description: "Kubernetes version. Allowed Options are: `1.22`, `1.22.15`, `1.23`, `1.23.12`",
+				Description: "Kubernetes version. Allowed Options are: `1.22`, `1.23`, `1.24`, or a full version including patch (not recommended).",
 				Type:        types.StringType,
 				Optional:    true,
 				Validators: []tfsdk.AttributeValidator{
