@@ -28,9 +28,9 @@ type Instance struct {
 // GetSchema returns the terraform schema structure
 func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		Description: `Data source for Elasticsearch instances
+		Description: `Data source for RabbitMQ instances
 
-~> **Note:** Elasticsearch API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this data source is not ready for production usage.		
+~> **Note:** RabbitMQ API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this data source is not ready for production usage.		
 		`,
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
@@ -58,17 +58,17 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 				},
 			},
 			"plan": {
-				Description: "The Elasticsearch plan name",
+				Description: "The RabbitMQ plan name",
 				Type:        types.StringType,
 				Computed:    true,
 			},
 			"plan_id": {
-				Description: "Elasticsearch plan ID",
+				Description: "RabbitMQ plan ID",
 				Type:        types.StringType,
 				Computed:    true,
 			},
 			"version": {
-				Description: "Elasticsearch version",
+				Description: "RabbitMQ version",
 				Type:        types.StringType,
 				Computed:    true,
 			},

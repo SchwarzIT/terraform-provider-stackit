@@ -4,14 +4,14 @@ page_title: "stackit_elasticsearch_instance Data Source - stackit"
 subcategory: ""
 description: |-
   Data source for Elasticsearch instances
-  ~> Note: Elasticsearch API (DSA) currently has issues reflecting updates & configuration correctly. Therefore, this data source is not ready for production usage.
+  ~> Note: Elasticsearch API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this data source is not ready for production usage.
 ---
 
 # stackit_elasticsearch_instance (Data Source)
 
 Data source for Elasticsearch instances
 
-~> **Note:** Elasticsearch API (DSA) currently has issues reflecting updates & configuration correctly. Therefore, this data source is not ready for production usage.
+~> **Note:** Elasticsearch API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this data source is not ready for production usage.
 
 ## Example Usage
 
@@ -27,7 +27,7 @@ data "stackit_elasticsearch_instance" "example" {
 
 ### Required
 
-- `name` (String) Specifies the instance name. Changing this value requires the resource to be recreated. Changing this value requires the resource to be recreated.
+- `name` (String) Specifies the instance name.
 - `project_id` (String) The project ID.
 
 ### Read-Only

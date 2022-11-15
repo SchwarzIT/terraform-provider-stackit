@@ -12,6 +12,7 @@ import (
 	dataObjectStorageCredentialsGroup "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/object-storage/credentials-group"
 	dataPostgresFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/postgres-flex/instance"
 	dataProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/project"
+	dataRabbitMQInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/rabbitmq/instance"
 	resourceArgusInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/instance"
 	resourceArgusJob "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/job"
 	resourceElasticsearchInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/elasticsearch/instance"
@@ -21,6 +22,7 @@ import (
 	resourceObjectStorageCredentialsGroup "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/credentials-group"
 	resourcePostgresFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/postgres-flex/instance"
 	resourceProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/project"
+	resourceRabbitMQInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/rabbitmq/instance"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -93,6 +95,7 @@ func (p *StackitProvider) Resources(ctx context.Context) []func() resource.Resou
 		resourceObjectStorageCredentialsGroup.New,
 		resourceProject.New,
 		resourcePostgresFlexInstance.New,
+		resourceRabbitMQInstance.New,
 	}
 }
 
@@ -108,5 +111,6 @@ func (p *StackitProvider) DataSources(context.Context) []func() datasource.DataS
 		dataObjectStorageCredentialsGroup.New,
 		dataPostgresFlexInstance.New,
 		dataProject.New,
+		dataRabbitMQInstance.New,
 	}
 }

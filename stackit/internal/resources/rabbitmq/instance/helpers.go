@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	default_version = "7"
-	default_plan    = "stackit-elasticsearch-single-small"
+	default_version = "3.7"
+	default_plan    = "stackit-rabbitmq-single-small"
 )
 
 func (r Resource) validate(ctx context.Context, data *Instance) error {
@@ -21,7 +21,7 @@ func (r Resource) validate(ctx context.Context, data *Instance) error {
 		return errors.New("at least 1 ip address must be specified for `acl`")
 	}
 
-	res, err := r.client.DataServices.ElasticSearch.Options.GetOfferings(ctx, data.ProjectID.Value)
+	res, err := r.client.DataServices.RabbitMQ.Options.GetOfferings(ctx, data.ProjectID.Value)
 	if err != nil {
 		return errors.Wrap(err, "failed to fetch offerings")
 	}
@@ -89,13 +89,13 @@ func (r Resource) applyClientResponse(ctx context.Context, pi *Instance, i insta
 }
 
 func (r Resource) getPlanAndVersion(ctx context.Context, projectID, instanceID string) (plan, version string, err error) {
-	es := r.client.DataServices.ElasticSearch
-	i, err := es.Instances.Get(ctx, projectID, instanceID)
+	dsa := r.client.DataServices.RabbitMQ
+	i, err := dsa.Instances.Get(ctx, projectID, instanceID)
 	if err != nil {
 		return "", "", errors.Wrap(err, "failed to fetch instance")
 	}
 
-	res, err := es.Options.GetOfferings(ctx, projectID)
+	res, err := dsa.Options.GetOfferings(ctx, projectID)
 	if err != nil {
 		return "", "", errors.Wrap(err, "failed to fetch offerings")
 	}

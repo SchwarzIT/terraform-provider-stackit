@@ -2,6 +2,7 @@ package instance
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
@@ -31,7 +32,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 	return tfsdk.Schema{
 		MarkdownDescription: `Manages Elasticsearch instances
 
-~> **Note:** Elasticsearch API (DSA) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
+~> **Note:** Elasticsearch API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
 		`,
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
@@ -62,9 +63,9 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				},
 			},
 			"plan": {
-				Description: "The Elasticsearch Plan. Options are: `stackit-elasticsearch-single-small`, `stackit-elasticsearch-cluster-small`, `stackit-elasticsearch-single-medium`, `stackit-elasticsearch-cluster-medium`, `stackit-elasticsearch-cluster-big`",
+				Description: fmt.Sprintf("The Elasticsearch Plan. Default is `%s`.\nOptions are: `stackit-elasticsearch-single-small`, `stackit-elasticsearch-cluster-small`, `stackit-elasticsearch-single-medium`, `stackit-elasticsearch-cluster-medium`, `stackit-elasticsearch-cluster-big`", default_plan),
 				Type:        types.StringType,
-				Required:    true,
+				Optional:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					modifiers.StringDefault(default_plan),
 				},
