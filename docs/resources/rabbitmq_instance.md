@@ -3,12 +3,15 @@
 page_title: "stackit_rabbitmq_instance Resource - stackit"
 subcategory: ""
 description: |-
-  Manages RabbitMQ instances (Data Services Instance)
+  Manages RabbitMQ instances
+  ~> Note: RabbitMQ API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
 ---
 
 # stackit_rabbitmq_instance (Resource)
 
-Manages RabbitMQ instances (Data Services Instance)
+Manages RabbitMQ instances
+
+~> **Note:** RabbitMQ API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
 
 ## Example Usage
 

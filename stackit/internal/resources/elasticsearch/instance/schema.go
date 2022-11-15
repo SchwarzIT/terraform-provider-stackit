@@ -32,7 +32,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 	return tfsdk.Schema{
 		MarkdownDescription: `Manages Elasticsearch instances
 
-~> **Note:** Elasticsearch API (DSA) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
+~> **Note:** Elasticsearch API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
 		`,
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {

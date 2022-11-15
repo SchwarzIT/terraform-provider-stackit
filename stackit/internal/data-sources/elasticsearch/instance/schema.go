@@ -30,7 +30,7 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 	return tfsdk.Schema{
 		Description: `Data source for Elasticsearch instances
 
-~> **Note:** Elasticsearch API (DSA) currently has issues reflecting updates & configuration correctly. Therefore, this data source is not ready for production usage.		
+~> **Note:** Elasticsearch API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this data source is not ready for production usage.		
 		`,
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
@@ -42,7 +42,7 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 				},
 			},
 			"name": {
-				Description: "Specifies the instance name. Changing this value requires the resource to be recreated. Changing this value requires the resource to be recreated.",
+				Description: "Specifies the instance name.",
 				Type:        types.StringType,
 				Required:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{

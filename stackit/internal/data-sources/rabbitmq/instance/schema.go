@@ -2,9 +2,7 @@ package instance
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -28,15 +26,15 @@ type Instance struct {
 }
 
 // GetSchema returns the terraform schema structure
-func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
+func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: `Manages RabbitMQ instances
+		Description: `Data source for RabbitMQ instances
 
-~> **Note:** RabbitMQ API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
+~> **Note:** RabbitMQ API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this data source is not ready for production usage.		
 		`,
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
-				Description: "Specifies the resource ID",
+				Description: "The instance ID",
 				Type:        types.StringType,
 				Computed:    true,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
@@ -44,7 +42,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				},
 			},
 			"name": {
-				Description: "Specifies the instance name. Changing this value requires the resource to be recreated. Changing this value requires the resource to be recreated.",
+				Description: "Specifies the instance name.",
 				Type:        types.StringType,
 				Required:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
@@ -58,40 +56,26 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Validators: []tfsdk.AttributeValidator{
 					validate.ProjectID(),
 				},
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
-				},
 			},
 			"plan": {
-				Description: fmt.Sprintf("The RabbitMQ Plan. Default is `%s`.\nOptions are: `stackit-messaging-cluster-big`, `stackit-messaging-cluster-medium`, `stackit-messaging-cluster-small`, `stackit-messaging-single-medium`, `stackit-messaging-single-small`, `stackit-rabbitmq-cluster-medium`, `stackit-rabbitmq-single-medium`, `stackit-rabbitmq-cluster-big`,`stackit-rabbitmq-cluster-small`, `stackit-rabbitmq-single-small`", default_plan),
+				Description: "The RabbitMQ plan name",
 				Type:        types.StringType,
-				Required:    true,
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					modifiers.StringDefault(default_plan),
-				},
+				Computed:    true,
 			},
 			"plan_id": {
-				Description: "The selected plan ID",
+				Description: "RabbitMQ plan ID",
 				Type:        types.StringType,
 				Computed:    true,
 			},
 			"version": {
-				Description: fmt.Sprintf("RabbitMQ version. Default is %s.\nOptions: `3.10`, `3.8`, `3.7`. Changing this value requires the resource to be recreated.", default_version),
+				Description: "RabbitMQ version",
 				Type:        types.StringType,
-				Optional:    true,
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
-					modifiers.StringDefault(default_version),
-				},
+				Computed:    true,
 			},
 			"acl": {
-				Description: "Access Control rules to whitelist IP addresses",
+				Description: "Access control rules",
 				Type:        types.ListType{ElemType: types.StringType},
-				Optional:    true,
 				Computed:    true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
-				},
 			},
 			"dashboard_url": {
 				Description: "Dashboard URL",

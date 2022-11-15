@@ -4,14 +4,14 @@ page_title: "stackit_elasticsearch_instance Resource - stackit"
 subcategory: ""
 description: |-
   Manages Elasticsearch instances
-  ~> Note: Elasticsearch API (DSA) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
+  ~> Note: Elasticsearch API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
 ---
 
 # stackit_elasticsearch_instance (Resource)
 
 Manages Elasticsearch instances
 
-~> **Note:** Elasticsearch API (DSA) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
+~> **Note:** Elasticsearch API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
 
 ## Example Usage
 
