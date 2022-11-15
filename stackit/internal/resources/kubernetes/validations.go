@@ -70,13 +70,11 @@ func validateKubernetesVersion(version string, versionOptions []options.Kubernet
 	found := false
 	accepted := ""
 	for _, v := range versionOptions {
-		if strings.EqualFold(v.State, consts.SKE_VERSION_STATE_SUPPORTED) {
-			if v.Version == version {
-				found = true
-				break
-			}
-			accepted = fmt.Sprintf("%s- %s (state: %s, expires: %s)\n", accepted, v.Version, v.State, v.ExpirationDate)
+		if v.Version == version {
+			found = true
+			break
 		}
+		accepted = fmt.Sprintf("%s- %s (state: %s, expires: %s)\n", accepted, v.Version, v.State, v.ExpirationDate)
 	}
 	if !found {
 		return fmt.Errorf(
