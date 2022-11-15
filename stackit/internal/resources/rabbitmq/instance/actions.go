@@ -39,10 +39,10 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		acl = append(acl, nv)
 	}
 
-	es := r.client.DataServices.ElasticSearch
+	dsa := r.client.DataServices.RabbitMQ
 
 	// handle creation
-	res, wait, err := es.Instances.Create(ctx, plan.ProjectID.Value, plan.Name.Value, plan.PlanID.Value, map[string]string{
+	res, wait, err := dsa.Instances.Create(ctx, plan.ProjectID.Value, plan.Name.Value, plan.PlanID.Value, map[string]string{
 		"sgw_acl": strings.Join(acl, ","),
 	})
 
@@ -92,10 +92,10 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	es := r.client.DataServices.ElasticSearch
+	dsa := r.client.DataServices.RabbitMQ
 
 	// read instance
-	i, err := es.Instances.Get(ctx, state.ProjectID.Value, state.ID.Value)
+	i, err := dsa.Instances.Get(ctx, state.ProjectID.Value, state.ID.Value)
 	if err != nil {
 		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.State.RemoveResource(ctx)
@@ -146,10 +146,10 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		}
 		acl = append(acl, nv)
 	}
-	es := r.client.DataServices.ElasticSearch
+	dsa := r.client.DataServices.RabbitMQ
 
 	// handle update
-	_, process, err := es.Instances.Update(ctx, state.ProjectID.Value, state.ID.Value, plan.PlanID.Value, map[string]string{
+	_, process, err := dsa.Instances.Update(ctx, state.ProjectID.Value, state.ID.Value, plan.PlanID.Value, map[string]string{
 		"sgw_acl": strings.Join(acl, ","),
 	})
 	if err != nil {
@@ -202,10 +202,10 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	es := r.client.DataServices.ElasticSearch
+	dsa := r.client.DataServices.RabbitMQ
 
 	// handle deletion
-	process, err := es.Instances.Delete(ctx, state.ProjectID.Value, state.ID.Value)
+	process, err := dsa.Instances.Delete(ctx, state.ProjectID.Value, state.ID.Value)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete instance", err.Error())
 		return

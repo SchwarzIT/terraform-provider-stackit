@@ -30,10 +30,7 @@ type Instance struct {
 // GetSchema returns the terraform schema structure
 func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: `Manages Elasticsearch instances
-
-~> **Note:** Elasticsearch API (DSA) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
-		`,
+		MarkdownDescription: `Manages RabbitMQ instances (Data Services Instance)`,
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
 				Description: "Specifies the resource ID",
@@ -63,9 +60,9 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				},
 			},
 			"plan": {
-				Description: fmt.Sprintf("The Elasticsearch Plan. Default is `%s`.\nOptions are: `stackit-elasticsearch-single-small`, `stackit-elasticsearch-cluster-small`, `stackit-elasticsearch-single-medium`, `stackit-elasticsearch-cluster-medium`, `stackit-elasticsearch-cluster-big`", default_plan),
+				Description: fmt.Sprintf("The RabbitMQ Plan. Default is `%s`.\nOptions are: `stackit-messaging-cluster-big`, `stackit-messaging-cluster-medium`, `stackit-messaging-cluster-small`, `stackit-messaging-single-medium`, `stackit-messaging-single-small`, `stackit-rabbitmq-cluster-medium`, `stackit-rabbitmq-single-medium`, `stackit-rabbitmq-cluster-big`,`stackit-rabbitmq-cluster-small`, `stackit-rabbitmq-single-small`", default_plan),
 				Type:        types.StringType,
-				Optional:    true,
+				Required:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					modifiers.StringDefault(default_plan),
 				},
@@ -76,7 +73,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Computed:    true,
 			},
 			"version": {
-				Description: "Elasticsearch version. Options: `5`, `6`, `7`. Changing this value requires the resource to be recreated.",
+				Description: fmt.Sprintf("RabbitMQ version. Default is %s.\nOptions: `3.10`, `3.8`, `3.7`. Changing this value requires the resource to be recreated.", default_version),
 				Type:        types.StringType,
 				Optional:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{

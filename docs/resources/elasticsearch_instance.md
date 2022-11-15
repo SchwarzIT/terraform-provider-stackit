@@ -30,12 +30,13 @@ resource "stackit_elasticsearch_instance" "example" {
 ### Required
 
 - `name` (String) Specifies the instance name. Changing this value requires the resource to be recreated. Changing this value requires the resource to be recreated.
-- `plan` (String) The Elasticsearch Plan. Options are: `stackit-elasticsearch-single-small`, `stackit-elasticsearch-cluster-small`, `stackit-elasticsearch-single-medium`, `stackit-elasticsearch-cluster-medium`, `stackit-elasticsearch-cluster-big`
 - `project_id` (String) The project ID.
 
 ### Optional
 
 - `acl` (List of String) Access Control rules to whitelist IP addresses
+- `plan` (String) The Elasticsearch Plan. Default is `stackit-elasticsearch-single-small`.
+Options are: `stackit-elasticsearch-single-small`, `stackit-elasticsearch-cluster-small`, `stackit-elasticsearch-single-medium`, `stackit-elasticsearch-cluster-medium`, `stackit-elasticsearch-cluster-big`
 - `version` (String) Elasticsearch version. Options: `5`, `6`, `7`. Changing this value requires the resource to be recreated.
 
 ### Read-Only

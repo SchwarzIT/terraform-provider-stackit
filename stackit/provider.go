@@ -21,6 +21,7 @@ import (
 	resourceObjectStorageCredentialsGroup "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/credentials-group"
 	resourcePostgresFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/postgres-flex/instance"
 	resourceProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/project"
+	resourceRabbitMQInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/rabbitmq/instance"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -93,6 +94,7 @@ func (p *StackitProvider) Resources(ctx context.Context) []func() resource.Resou
 		resourceObjectStorageCredentialsGroup.New,
 		resourceProject.New,
 		resourcePostgresFlexInstance.New,
+		resourceRabbitMQInstance.New,
 	}
 }
 
