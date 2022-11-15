@@ -46,7 +46,7 @@ resource "stackit_kubernetes_cluster" "example" {
 - `allow_privileged_containers` (Boolean) Should containers be allowed to run in privileged mode? Default is `true`
 - `extensions` (Attributes) A single extensions block as defined below (see [below for nested schema](#nestedatt--extensions))
 - `hibernations` (Attributes List) One or more hibernation block as defined below (see [below for nested schema](#nestedatt--hibernations))
-- `kubernetes_version` (String) Kubernetes version. Allowed Options are: `1.22`, `1.22.15`, `1.23`, `1.23.12`
+- `kubernetes_version` (String) Kubernetes version. Allowed Options are: `1.22`, `1.23`, `1.24`, or a full version including patch (not recommended).
 - `maintenance` (Attributes) A single maintenance block as defined below (see [below for nested schema](#nestedatt--maintenance))
 - `node_pools` (Attributes List) One or more `node_pool` block as defined below (see [below for nested schema](#nestedatt--node_pools))
 
