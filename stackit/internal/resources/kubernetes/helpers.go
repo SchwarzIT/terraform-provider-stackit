@@ -3,11 +3,13 @@ package kubernetes
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/Masterminds/semver"
 	"github.com/pkg/errors"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes/clusters"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -35,13 +37,16 @@ func (r Resource) loadAvaiableVersions(ctx context.Context) ([]*semver.Version, 
 		return nil, errors.Wrap(err, "Couldn't fetch K8s options")
 	}
 
-	versionOptions = make([]*semver.Version, len(opts.KubernetesVersions))
-	for i, v := range opts.KubernetesVersions {
+	versionOptions = []*semver.Version{}
+	for _, v := range opts.KubernetesVersions {
+		if !strings.EqualFold(v.State, consts.SKE_VERSION_STATE_SUPPORTED) {
+			continue
+		}
 		versionOption, err := semver.NewVersion(v.Version)
 		if err != nil {
 			return nil, err
 		}
-		versionOptions[i] = versionOption
+		versionOptions = append(versionOptions, versionOption)
 	}
 	return versionOptions, nil
 }
@@ -60,6 +65,9 @@ func (c *Cluster) clusterConfig(versionOptions []*semver.Version) (clusters.Kube
 		return clusters.Kubernetes{}, err
 	}
 	clusterConfigVersion = maxVersionOption(clusterVersionConstraint, versionOptions)
+	if clusterConfigVersion == nil {
+		return clusters.Kubernetes{}, fmt.Errorf("returned version is nil\nthe options were: %+v", versionOptions)
+	}
 
 	cfg := clusters.Kubernetes{
 		Version:                   clusterConfigVersion.String(),
@@ -84,6 +92,9 @@ func toVersionConstraint(version *semver.Version) (*semver.Constraints, error) {
 // maxVersionOption returns the maximal version that matches the given version. A matching option is required.
 // If the given version only contains major and minor version, the latest patch version is returned.
 func maxVersionOption(versionConstraint *semver.Constraints, versionOptions []*semver.Version) *semver.Version {
+	if len(versionOptions) == 0 || versionOptions[0] == nil {
+		return nil
+	}
 	ret := versionOptions[0]
 	for _, v := range versionOptions[1:] {
 		if versionConstraint.Check(v) && v.GreaterThan(ret) {
