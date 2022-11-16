@@ -17,6 +17,7 @@ import (
 	resourceArgusJob "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/job"
 	resourceElasticsearchInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/elasticsearch/instance"
 	resourceKubernetes "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/kubernetes"
+	resourceMongoDBFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mongodb-flex/instance"
 	resourceObjectStorageBucket "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/bucket"
 	resourceObjectStorageCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/credential"
 	resourceObjectStorageCredentialsGroup "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/credentials-group"
@@ -90,6 +91,7 @@ func (p *StackitProvider) Resources(ctx context.Context) []func() resource.Resou
 		resourceArgusJob.New,
 		resourceElasticsearchInstance.New,
 		resourceKubernetes.New,
+		resourceMongoDBFlexInstance.New,
 		resourceObjectStorageBucket.New,
 		resourceObjectStorageCredential.New,
 		resourceObjectStorageCredentialsGroup.New,
