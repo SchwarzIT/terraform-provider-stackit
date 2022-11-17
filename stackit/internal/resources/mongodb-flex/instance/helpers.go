@@ -20,6 +20,20 @@ const (
 	default_storage_size    int64 = 10
 )
 
+func (i *Instance) setDefaults() {
+	if i.Version.IsNull() || i.Version.IsUnknown() {
+		i.Version = types.String{Value: default_version}
+	}
+
+	if i.Replicas.IsNull() || i.Replicas.IsUnknown() {
+		i.Replicas = types.Int64{Value: default_replicas}
+	}
+
+	if i.BackupSchedule.IsNull() || i.BackupSchedule.IsUnknown() {
+		i.BackupSchedule = types.String{Value: default_backup_schedule}
+	}
+}
+
 func (r Resource) validate(ctx context.Context, data Instance) error {
 	if err := r.validateVersion(ctx, data.ProjectID.Value, data.Version.Value); err != nil {
 		return err

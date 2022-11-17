@@ -26,17 +26,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	if plan.Version.IsNull() || plan.Version.IsUnknown() {
-		plan.Version = types.String{Value: default_version}
-	}
-
-	if plan.Replicas.IsNull() || plan.Replicas.IsUnknown() {
-		plan.Replicas = types.Int64{Value: default_replicas}
-	}
-
-	if plan.BackupSchedule.IsNull() || plan.BackupSchedule.IsUnknown() {
-		plan.BackupSchedule = types.String{Value: default_backup_schedule}
-	}
+	plan.setDefaults()
 
 	// validate
 	if err := r.validate(ctx, plan); err != nil {

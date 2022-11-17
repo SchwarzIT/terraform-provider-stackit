@@ -50,7 +50,7 @@ testacc:
 		go test -timeout 99999s -v $(TEST)
 
 quality:
-	@goreportcard-cli -v ./...
+	@goreportcard-cli -v .
 
 pre-commit: docs quality
 
