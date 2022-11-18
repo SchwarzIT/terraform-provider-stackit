@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	default_version = "7"
-	default_plan    = "stackit-elasticsearch-single-small"
+	default_version = "6.0"
+	default_plan    = "stackit-redis-single-small"
 )
 
 func (r Resource) validate(ctx context.Context, data *Instance) error {

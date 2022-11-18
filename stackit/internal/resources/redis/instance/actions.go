@@ -92,10 +92,10 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	es := r.client.DataServices.ElasticSearch
+	rds := r.client.DataServices.Redis
 
 	// read instance
-	i, err := es.Instances.Get(ctx, state.ProjectID.Value, state.ID.Value)
+	i, err := rds.Instances.Get(ctx, state.ProjectID.Value, state.ID.Value)
 	if err != nil {
 		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.State.RemoveResource(ctx)
@@ -146,10 +146,10 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		}
 		acl = append(acl, nv)
 	}
-	es := r.client.DataServices.ElasticSearch
+	rds := r.client.DataServices.Redis
 
 	// handle update
-	_, process, err := es.Instances.Update(ctx, state.ProjectID.Value, state.ID.Value, plan.PlanID.Value, map[string]string{
+	_, process, err := rds.Instances.Update(ctx, state.ProjectID.Value, state.ID.Value, plan.PlanID.Value, map[string]string{
 		"sgw_acl": strings.Join(acl, ","),
 	})
 	if err != nil {
@@ -202,10 +202,10 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	es := r.client.DataServices.ElasticSearch
+	rds := r.client.DataServices.Redis
 
 	// handle deletion
-	process, err := es.Instances.Delete(ctx, state.ProjectID.Value, state.ID.Value)
+	process, err := rds.Instances.Delete(ctx, state.ProjectID.Value, state.ID.Value)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete instance", err.Error())
 		return

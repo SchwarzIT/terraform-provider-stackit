@@ -23,7 +23,7 @@ func TestAcc_RedisInstance(t *testing.T) {
 	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
 	plan := "stackit-redis-single-small"
 	planID := "a59cf7bb-ae64-4f63-8503-fca8c936bf0c"
-	version := "7"
+	version := "6.0"
 
 	resource.ParallelTest(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){
