@@ -41,5 +41,3 @@ data "stackit_redis_instance" "example" {
 - `plan` (String) The Redis plan name
 - `plan_id` (String) Redis plan ID
 - `version` (String) Redis version
-
-
