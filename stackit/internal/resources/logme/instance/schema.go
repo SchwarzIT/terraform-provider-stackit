@@ -63,7 +63,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				},
 			},
 			"plan": {
-				Description: fmt.Sprintf("The Elasticsearch Plan. Default is `%s`.\nOptions are: `stackit-elasticsearch-single-small`, `stackit-elasticsearch-cluster-small`, `stackit-elasticsearch-single-medium`, `stackit-elasticsearch-cluster-medium`, `stackit-elasticsearch-cluster-big`", default_plan),
+				Description: fmt.Sprintf("The LogMe Plan. Default is `%s`.\nOptions are: `stackit-logme-platform-logging-non-ssl`, `stackit-logme-single-small-non-ssl`, `stackit-logme-single-medium-non-ssl`, `stackit-logme-cluster-big-non-ssl`, `stackit-logme-cluster-medium-non-ssl`, `stackit-logme-cluster-small-non-ssl`", default_plan),
 				Type:        types.StringType,
 				Optional:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
@@ -76,7 +76,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Computed:    true,
 			},
 			"version": {
-				Description: "Elasticsearch version. Options: `5`, `6`, `7`. Changing this value requires the resource to be recreated.",
+				Description: "LogMe version. Only Option: `LogMe`. Changing this value requires the resource to be recreated.",
 				Type:        types.StringType,
 				Optional:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{

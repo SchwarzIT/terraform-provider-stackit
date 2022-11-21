@@ -2,9 +2,7 @@ package instance
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -28,15 +26,15 @@ type Instance struct {
 }
 
 // GetSchema returns the terraform schema structure
-func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
+func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: `Manages LogMe instances
+		Description: `Data source for LogMe instances
 
-~> **Note:** LogMe API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
+~> **Note:** LogMe API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this data source is not ready for production usage.		
 		`,
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
-				Description: "Specifies the resource ID",
+				Description: "The instance ID",
 				Type:        types.StringType,
 				Computed:    true,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
@@ -44,7 +42,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				},
 			},
 			"name": {
-				Description: "Specifies the instance name. Changing this value requires the resource to be recreated. Changing this value requires the resource to be recreated.",
+				Description: "Specifies the instance name.",
 				Type:        types.StringType,
 				Required:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
@@ -58,40 +56,26 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Validators: []tfsdk.AttributeValidator{
 					validate.ProjectID(),
 				},
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
-				},
 			},
 			"plan": {
-				Description: fmt.Sprintf("The Elasticsearch Plan. Default is `%s`.\nOptions are: `stackit-elasticsearch-single-small`, `stackit-elasticsearch-cluster-small`, `stackit-elasticsearch-single-medium`, `stackit-elasticsearch-cluster-medium`, `stackit-elasticsearch-cluster-big`", default_plan),
+				Description: "The LogMe plan name",
 				Type:        types.StringType,
-				Optional:    true,
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					modifiers.StringDefault(default_plan),
-				},
+				Computed:    true,
 			},
 			"plan_id": {
-				Description: "The selected plan ID",
+				Description: "LogMe plan ID",
 				Type:        types.StringType,
 				Computed:    true,
 			},
 			"version": {
-				Description: "Elasticsearch version. Options: `5`, `6`, `7`. Changing this value requires the resource to be recreated.",
+				Description: "LogMe version",
 				Type:        types.StringType,
-				Optional:    true,
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
-					modifiers.StringDefault(default_version),
-				},
+				Computed:    true,
 			},
 			"acl": {
-				Description: "Access Control rules to whitelist IP addresses",
+				Description: "Access control rules",
 				Type:        types.ListType{ElemType: types.StringType},
-				Optional:    true,
 				Computed:    true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
-				},
 			},
 			"dashboard_url": {
 				Description: "Dashboard URL",
