@@ -89,13 +89,13 @@ func (r Resource) applyClientResponse(ctx context.Context, pi *Instance, i insta
 }
 
 func (r Resource) getPlanAndVersion(ctx context.Context, projectID, instanceID string) (plan, version string, err error) {
-	es := r.client.DataServices.Redis
-	i, err := es.Instances.Get(ctx, projectID, instanceID)
+	dsa := r.client.DataServices.Redis
+	i, err := dsa.Instances.Get(ctx, projectID, instanceID)
 	if err != nil {
 		return "", "", errors.Wrap(err, "failed to fetch instance")
 	}
 
-	res, err := es.Options.GetOfferings(ctx, projectID)
+	res, err := dsa.Options.GetOfferings(ctx, projectID)
 	if err != nil {
 		return "", "", errors.Wrap(err, "failed to fetch offerings")
 	}

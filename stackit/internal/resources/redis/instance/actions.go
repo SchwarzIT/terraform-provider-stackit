@@ -39,10 +39,10 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		acl = append(acl, nv)
 	}
 
-	es := r.client.DataServices.Redis
+	dsa := r.client.DataServices.Redis
 
 	// handle creation
-	res, wait, err := es.Instances.Create(ctx, plan.ProjectID.Value, plan.Name.Value, plan.PlanID.Value, map[string]string{
+	res, wait, err := dsa.Instances.Create(ctx, plan.ProjectID.Value, plan.Name.Value, plan.PlanID.Value, map[string]string{
 		"sgw_acl": strings.Join(acl, ","),
 	})
 
