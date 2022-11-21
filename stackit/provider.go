@@ -13,6 +13,8 @@ import (
 	dataPostgresFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/postgres-flex/instance"
 	dataProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/project"
 	dataRabbitMQInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/rabbitmq/instance"
+	dataRedisInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/redis/instance"
+
 	//dataRedisInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/redis/instance"
 	resourceArgusInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/instance"
 	resourceArgusJob "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/job"
@@ -115,6 +117,6 @@ func (p *StackitProvider) DataSources(context.Context) []func() datasource.DataS
 		dataPostgresFlexInstance.New,
 		dataProject.New,
 		dataRabbitMQInstance.New,
-		//dataRedisInstance.New,
+		dataRedisInstance.New,
 	}
 }

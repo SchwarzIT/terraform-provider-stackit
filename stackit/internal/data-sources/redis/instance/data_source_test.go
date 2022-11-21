@@ -8,8 +8,8 @@ import (
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform/helper/acctest"
 )
 
 const run_this_test = false
@@ -22,7 +22,7 @@ func TestAcc_RedisInstance(t *testing.T) {
 
 	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
 	plan := "stackit-redis-single-small"
-	planID := "a59cf7bb-ae64-4f63-8503-fca8c936bf0c"
+	planID := "09876364-e1ba-49ec-845c-e8ac45f84921"
 	version := "6.0"
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -45,6 +45,9 @@ func TestAcc_RedisInstance(t *testing.T) {
 					resource.TestCheckResourceAttrSet("data.stackit_redis_instance.example", "cf_space_guid"),
 					resource.TestCheckResourceAttrSet("data.stackit_redis_instance.example", "cf_organization_guid"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_redis_instance.example", "id", "data.stackit_redis_instance.example", "id"),
+					resource.TestCheckTypeSetElemAttrPair("stackit_redis_instance.example", "dashboard_url", "data.stackit_redis_instance.example", "dashboard_url"),
+					resource.TestCheckTypeSetElemAttrPair("stackit_redis_instance.example", "cf_space_guid", "data.stackit_redis_instance.example", "cf_space_guid"),
+					resource.TestCheckTypeSetElemAttrPair("stackit_redis_instance.example", "cf_organization_guid", "data.stackit_redis_instance.example", "cf_organization_guid"),
 				),
 			},
 		},
