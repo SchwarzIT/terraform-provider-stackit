@@ -2,6 +2,8 @@ package stackit
 
 import (
 	"context"
+	dataLogMeInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/logme/instance"
+	resourceLogMeInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/logme/instance"
 
 	dataArgusInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/argus/instance"
 	dataArgusJob "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/argus/job"
@@ -96,6 +98,7 @@ func (p *StackitProvider) Resources(ctx context.Context) []func() resource.Resou
 		resourceArgusJob.New,
 		resourceElasticsearchInstance.New,
 		resourceKubernetes.New,
+		resourceLogMeInstance.New,
 		resourceMongoDBFlexInstance.New,
 		resourceObjectStorageBucket.New,
 		resourceObjectStorageCredential.New,
@@ -114,6 +117,7 @@ func (p *StackitProvider) DataSources(context.Context) []func() datasource.DataS
 		dataArgusJob.New,
 		dataElasticSearchInstance.New,
 		dataKubernetes.New,
+		dataLogMeInstance.New,
 		dataMongoDBFlexInstance.New,
 		dataObjectStorageBucket.New,
 		dataObjectStorageCredential.New,
