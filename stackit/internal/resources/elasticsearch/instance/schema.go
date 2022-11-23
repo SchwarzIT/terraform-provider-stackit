@@ -30,9 +30,9 @@ type Instance struct {
 // GetSchema returns the terraform schema structure
 func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: `Manages LogMe instances
+		MarkdownDescription: `Manages Elasticsearch instances
 
-~> **Note:** LogMe API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
+~> **Note:** Elasticsearch API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
 		`,
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {

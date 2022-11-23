@@ -40,7 +40,7 @@ func TestAcc_LogMeJob(t *testing.T) {
 					resource.TestCheckResourceAttr("stackit_logme_instance.example", "version", "LogMe"),
 					resource.TestCheckResourceAttr("stackit_logme_instance.example", "plan", plan1),
 					resource.TestCheckResourceAttrSet("stackit_logme_instance.example", "id"),
-					resource.TestCheckResourceAttrSet("stackit_logme_instance.example", "839695A3-6943-4F55-8FB0-9469143178DE"),
+					resource.TestCheckResourceAttrSet("stackit_logme_instance.example", "plan_id"),
 					resource.TestCheckResourceAttrSet("stackit_logme_instance.example", "dashboard_url"),
 					resource.TestCheckResourceAttrSet("stackit_logme_instance.example", "cf_guid"),
 					resource.TestCheckResourceAttrSet("stackit_logme_instance.example", "cf_space_guid"),
