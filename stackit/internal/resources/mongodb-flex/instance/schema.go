@@ -62,12 +62,9 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				},
 			},
 			"name": {
-				Description: "Specifies the instance name. Changing this value requires the resource to be recreated.",
+				Description: "Specifies the instance name.",
 				Type:        types.StringType,
 				Required:    true,
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
-				},
 			},
 			"project_id": {
 				Description: "The project ID the instance runs in. Changing this value requires the resource to be recreated.",
@@ -86,7 +83,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Required:    true,
 			},
 			"version": {
-				Description: "MongoDB version. Only version `5` is supported",
+				Description: "MongoDB version. Version `5.0` and `6.0` are supported",
 				Type:        types.StringType,
 				Optional:    true,
 				Computed:    true,
@@ -96,12 +93,11 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				},
 			},
 			"replicas": {
-				Description: "Number of replicas (Default is `1`). Changing this value requires the resource to be recreated.",
+				Description: "Number of replicas (Default is `1`)",
 				Type:        types.Int64Type,
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
 					modifiers.Int64Default(default_replicas),
 				},
 			},
@@ -115,7 +111,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				},
 			},
 			"storage": {
-				Description: "A signle `storage` block as defined below. Changing this value requires the resource to be recreated.",
+				Description: "A signle `storage` block as defined below.",
 				Optional:    true,
 				Computed:    true,
 				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
@@ -138,9 +134,6 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 						},
 					},
 				}),
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
-				},
 			},
 			"user": {
 				Description: "The databse admin user",

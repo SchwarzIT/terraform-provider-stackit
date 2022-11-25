@@ -228,8 +228,24 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		acl = append(acl, nv)
 	}
 
+	storage := Storage{}
+	if plan.Storage.IsUnknown() {
+		storage = Storage{
+			Class: types.String{Value: default_storage_class},
+			Size:  types.Int64{Value: default_storage_size},
+		}
+	} else {
+		resp.Diagnostics.Append(plan.Storage.As(ctx, &storage, types.ObjectAsOptions{})...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+	}
+
 	// handle update
-	_, wait, err := r.client.MongoDBFlex.Instances.Update(ctx, plan.ProjectID.Value, plan.ID.Value, plan.MachineType.Value, plan.BackupSchedule.Value, plan.Labels, plan.Options, instances.ACL{Items: acl})
+	_, wait, err := r.client.MongoDBFlex.Instances.Update(ctx, plan.ProjectID.Value, plan.ID.Value, plan.Name.Value, plan.MachineType.Value, instances.Storage{
+		Class: storage.Class.Value,
+		Size:  int(storage.Size.Value),
+	}, plan.Version.Value, int(plan.Replicas.Value), plan.BackupSchedule.Value, plan.Labels, plan.Options, instances.ACL{Items: acl})
 	if err != nil {
 		resp.Diagnostics.AddError("failed MongoDB instance update", err.Error())
 		return

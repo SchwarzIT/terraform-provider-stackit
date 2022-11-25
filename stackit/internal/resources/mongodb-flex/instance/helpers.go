@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	default_version               = "5"
+	default_version               = "6.0"
 	default_replicas        int64 = 1
 	default_username              = "stackit"
 	default_backup_schedule       = "0 2 * * *"

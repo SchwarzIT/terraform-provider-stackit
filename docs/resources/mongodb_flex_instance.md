@@ -29,7 +29,7 @@ resource "stackit_mongodb_flex_instance" "example" {
 ### Required
 
 - `machine_type` (String) The Machine Type. Available options: `T1.2`, `C1.1`, `G1.1`, `M1.1`, `C1.2`, `G1.2`, `M1.2`, `C1.3`, `G1.3`, `M1.3`, `C1.4`, `G1.4`, `M1.4`, `C1.5`, `G1.5`
-- `name` (String) Specifies the instance name. Changing this value requires the resource to be recreated.
+- `name` (String) Specifies the instance name.
 - `project_id` (String) The project ID the instance runs in. Changing this value requires the resource to be recreated.
 
 ### Optional
@@ -38,9 +38,9 @@ resource "stackit_mongodb_flex_instance" "example" {
 - `backup_schedule` (String) Specifies the backup schedule (cron style)
 - `labels` (Map of String) Instance Labels
 - `options` (Map of String) Specifies mongodb instance options
-- `replicas` (Number) Number of replicas (Default is `1`). Changing this value requires the resource to be recreated.
-- `storage` (Attributes) A signle `storage` block as defined below. Changing this value requires the resource to be recreated. (see [below for nested schema](#nestedatt--storage))
-- `version` (String) MongoDB version. Only version `5` is supported
+- `replicas` (Number) Number of replicas (Default is `1`)
+- `storage` (Attributes) A signle `storage` block as defined below. (see [below for nested schema](#nestedatt--storage))
+- `version` (String) MongoDB version. Version `5.0` and `6.0` are supported
 
 ### Read-Only
 
