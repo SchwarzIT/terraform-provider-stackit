@@ -39,7 +39,7 @@ type User struct {
 	Password types.String `tfsdk:"password"`
 	Username types.String `tfsdk:"username"`
 	Database types.String `tfsdk:"database"`
-	Hostname types.String `tfsdk:"hostname"`
+	Host     types.String `tfsdk:"host"`
 	Port     types.Int64  `tfsdk:"port"`
 	URI      types.String `tfsdk:"uri"`
 	Roles    types.List   `tfsdk:"roles"`
@@ -86,23 +86,24 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Required:    true,
 			},
 			"version": {
-				Description: "MongoDB version. Only version `5` is supported",
+				Description: "MongoDB version. Version `5.0` and `6.0` are supported. Changing this value requires the resource to be recreated.",
 				Type:        types.StringType,
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					resource.RequiresReplace(),
 					modifiers.StringDefault(default_version),
+					resource.UseStateForUnknown(),
 				},
 			},
 			"replicas": {
-				Description: "Number of replicas (Default is `1`). Changing this value requires the resource to be recreated.",
+				Description: "Number of replicas (Default is `1`)",
 				Type:        types.Int64Type,
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
 					modifiers.Int64Default(default_replicas),
+					resource.UseStateForUnknown(),
 				},
 			},
 			"backup_schedule": {
@@ -112,10 +113,11 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Computed:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					modifiers.StringDefault(default_backup_schedule),
+					resource.UseStateForUnknown(),
 				},
 			},
 			"storage": {
-				Description: "A signle `storage` block as defined below. Changing this value requires the resource to be recreated.",
+				Description: "A signle `storage` block as defined below.",
 				Optional:    true,
 				Computed:    true,
 				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
@@ -138,7 +140,8 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 						},
 					},
 				}),
-				PlanModifiers: []tfsdk.AttributePlanModifier{
+				PlanModifiers: tfsdk.AttributePlanModifiers{
+					resource.UseStateForUnknown(),
 					resource.RequiresReplace(),
 				},
 			},
@@ -167,7 +170,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 						Type:        types.StringType,
 						Computed:    true,
 					},
-					"hostname": {
+					"host": {
 						Description: "Specifies the allowed user hostname",
 						Type:        types.StringType,
 						Computed:    true,
@@ -189,6 +192,9 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 						Computed:    true,
 					},
 				}),
+				PlanModifiers: tfsdk.AttributePlanModifiers{
+					resource.UseStateForUnknown(),
+				},
 			},
 			"options": {
 				Description: "Specifies mongodb instance options",

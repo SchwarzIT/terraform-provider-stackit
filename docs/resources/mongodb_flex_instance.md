@@ -38,9 +38,9 @@ resource "stackit_mongodb_flex_instance" "example" {
 - `backup_schedule` (String) Specifies the backup schedule (cron style)
 - `labels` (Map of String) Instance Labels
 - `options` (Map of String) Specifies mongodb instance options
-- `replicas` (Number) Number of replicas (Default is `1`). Changing this value requires the resource to be recreated.
-- `storage` (Attributes) A signle `storage` block as defined below. Changing this value requires the resource to be recreated. (see [below for nested schema](#nestedatt--storage))
-- `version` (String) MongoDB version. Only version `5` is supported
+- `replicas` (Number) Number of replicas (Default is `1`)
+- `storage` (Attributes) A signle `storage` block as defined below. (see [below for nested schema](#nestedatt--storage))
+- `version` (String) MongoDB version. Version `5.0` and `6.0` are supported. Changing this value requires the resource to be recreated.
 
 ### Read-Only
 
@@ -62,7 +62,7 @@ Optional:
 Read-Only:
 
 - `database` (String) Specifies the database the user can access
-- `hostname` (String) Specifies the allowed user hostname
+- `host` (String) Specifies the allowed user hostname
 - `id` (String) Specifies the user id
 - `password` (String, Sensitive) Specifies the user's password
 - `port` (Number) Specifies the port

@@ -75,6 +75,10 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
+	// The API currently has a bug that causes the instance to initially get a FAILED status
+	// To overcome the bug, we'll wait an initial 30 sec
+	time.Sleep(30 * time.Second)
+
 	instance, err := wait.Wait()
 	if err != nil {
 		resp.Diagnostics.AddError("failed MongoDB instance creation validation", err.Error())
@@ -139,7 +143,7 @@ func (r Resource) createUser(ctx context.Context, plan *Instance, d *diag.Diagno
 				"username": types.StringType,
 				"database": types.StringType,
 				"password": types.StringType,
-				"hostname": types.StringType,
+				"host":     types.StringType,
 				"port":     types.Int64Type,
 				"uri":      types.StringType,
 				"roles":    types.ListType{ElemType: types.StringType},
@@ -149,7 +153,7 @@ func (r Resource) createUser(ctx context.Context, plan *Instance, d *diag.Diagno
 				"username": types.String{Value: res.Item.Username},
 				"database": types.String{Value: res.Item.Database},
 				"password": types.String{Value: res.Item.Password},
-				"hostname": types.String{Value: res.Item.Hostname},
+				"host":     types.String{Value: res.Item.Host},
 				"port":     types.Int64{Value: int64(res.Item.Port)},
 				"uri":      types.String{Value: res.Item.URI},
 				"roles":    types.List{ElemType: types.StringType, Elems: elems},
@@ -187,13 +191,6 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	if state.User.IsNull() || state.User.IsUnknown() {
-		r.createUser(ctx, &state, &resp.Diagnostics)
-		if resp.Diagnostics.HasError() {
-			return
-		}
-	}
-
 	// update state
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -211,8 +208,6 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		return
 	}
 
-	plan.ID = state.ID
-
 	// validate
 	if err := r.validate(ctx, plan); err != nil {
 		resp.Diagnostics.AddError("failed mongodb validation", err.Error())
@@ -228,8 +223,24 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		acl = append(acl, nv)
 	}
 
+	storage := Storage{}
+	if plan.Storage.IsUnknown() {
+		storage = Storage{
+			Class: types.String{Value: default_storage_class},
+			Size:  types.Int64{Value: default_storage_size},
+		}
+	} else {
+		resp.Diagnostics.Append(plan.Storage.As(ctx, &storage, types.ObjectAsOptions{})...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+	}
+
 	// handle update
-	_, wait, err := r.client.MongoDBFlex.Instances.Update(ctx, plan.ProjectID.Value, plan.ID.Value, plan.MachineType.Value, plan.BackupSchedule.Value, plan.Labels, plan.Options, instances.ACL{Items: acl})
+	_, wait, err := r.client.MongoDBFlex.Instances.Update(ctx, plan.ProjectID.Value, plan.ID.Value, plan.Name.Value, plan.MachineType.Value, instances.Storage{
+		Class: storage.Class.Value,
+		Size:  int(storage.Size.Value),
+	}, plan.Version.Value, int(plan.Replicas.Value), plan.BackupSchedule.Value, plan.Labels, plan.Options, instances.ACL{Items: acl})
 	if err != nil {
 		resp.Diagnostics.AddError("failed MongoDB instance update", err.Error())
 		return
@@ -274,7 +285,16 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	if _, err := process.Wait(); err != nil {
+	// allow long wait
+	httpClient := r.client.GetHTTPClient()
+	t := httpClient.Timeout
+	httpClient.Timeout = time.Minute
+	_, err = process.Wait()
+
+	// revert
+	httpClient.Timeout = t
+
+	if err != nil {
 		resp.Diagnostics.AddError("failed to verify mongodb instance deletion", err.Error())
 		return
 	}

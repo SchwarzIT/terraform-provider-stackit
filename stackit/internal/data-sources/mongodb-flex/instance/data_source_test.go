@@ -21,7 +21,7 @@ func TestAcc_MongoDBInstance(t *testing.T) {
 	}
 
 	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
-	version := "5"
+	version := "5.0"
 
 	resource.ParallelTest(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){
@@ -35,7 +35,7 @@ func TestAcc_MongoDBInstance(t *testing.T) {
 					resource.TestCheckResourceAttr("data.stackit_mongodb_flex_instance.example", "name", name),
 					resource.TestCheckResourceAttr("data.stackit_mongodb_flex_instance.example", "project_id", common.ACC_TEST_PROJECT_ID),
 					resource.TestCheckResourceAttr("data.stackit_mongodb_flex_instance.example", "version", version),
-					resource.TestCheckResourceAttr("data.stackit_mongodb_flex_instance.example", "machine_type", "c1.1"),
+					resource.TestCheckResourceAttr("data.stackit_mongodb_flex_instance.example", "machine_type", "C1.1"),
 					resource.TestCheckResourceAttr("data.stackit_mongodb_flex_instance.example", "replicas", "1"),
 					resource.TestCheckResourceAttr("data.stackit_mongodb_flex_instance.example", "storage.class", "premium-perf2-mongodb"),
 					resource.TestCheckResourceAttr("data.stackit_mongodb_flex_instance.example", "storage.size", "10"),
