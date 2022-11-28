@@ -39,7 +39,7 @@ type User struct {
 	Password types.String `tfsdk:"password"`
 	Username types.String `tfsdk:"username"`
 	Database types.String `tfsdk:"database"`
-	Hostname types.String `tfsdk:"hostname"`
+	Host     types.String `tfsdk:"host"`
 	Port     types.Int64  `tfsdk:"port"`
 	URI      types.String `tfsdk:"uri"`
 	Roles    types.List   `tfsdk:"roles"`
@@ -62,9 +62,12 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				},
 			},
 			"name": {
-				Description: "Specifies the instance name.",
+				Description: "Specifies the instance name. Changing this value requires the resource to be recreated.",
 				Type:        types.StringType,
 				Required:    true,
+				PlanModifiers: []tfsdk.AttributePlanModifier{
+					resource.RequiresReplace(),
+				},
 			},
 			"project_id": {
 				Description: "The project ID the instance runs in. Changing this value requires the resource to be recreated.",
@@ -83,13 +86,14 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Required:    true,
 			},
 			"version": {
-				Description: "MongoDB version. Version `5.0` and `6.0` are supported",
+				Description: "MongoDB version. Version `5.0` and `6.0` are supported. Changing this value requires the resource to be recreated.",
 				Type:        types.StringType,
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					resource.RequiresReplace(),
 					modifiers.StringDefault(default_version),
+					resource.UseStateForUnknown(),
 				},
 			},
 			"replicas": {
@@ -99,6 +103,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Computed:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					modifiers.Int64Default(default_replicas),
+					resource.UseStateForUnknown(),
 				},
 			},
 			"backup_schedule": {
@@ -108,6 +113,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Computed:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					modifiers.StringDefault(default_backup_schedule),
+					resource.UseStateForUnknown(),
 				},
 			},
 			"storage": {
@@ -134,6 +140,10 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 						},
 					},
 				}),
+				PlanModifiers: tfsdk.AttributePlanModifiers{
+					resource.UseStateForUnknown(),
+					resource.RequiresReplace(),
+				},
 			},
 			"user": {
 				Description: "The databse admin user",
@@ -160,7 +170,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 						Type:        types.StringType,
 						Computed:    true,
 					},
-					"hostname": {
+					"host": {
 						Description: "Specifies the allowed user hostname",
 						Type:        types.StringType,
 						Computed:    true,
@@ -182,6 +192,9 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 						Computed:    true,
 					},
 				}),
+				PlanModifiers: tfsdk.AttributePlanModifiers{
+					resource.UseStateForUnknown(),
+				},
 			},
 			"options": {
 				Description: "Specifies mongodb instance options",

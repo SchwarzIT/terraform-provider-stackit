@@ -118,6 +118,7 @@ func applyClientResponse(pi *Instance, i instances.Instance) error {
 	}
 	pi.BackupSchedule = types.String{Value: i.BackupSchedule}
 	pi.MachineType = types.String{Value: i.Flavor.ID}
+
 	pi.Name = types.String{Value: i.Name}
 	pi.Replicas = types.Int64{Value: int64(i.Replicas)}
 
@@ -134,6 +135,9 @@ func applyClientResponse(pi *Instance, i instances.Instance) error {
 		return errors.New("failed setting storage object")
 	}
 	pi.Storage = storage
+	if len(i.Version) > 3 {
+		i.Version = i.Version[0:3]
+	}
 	pi.Version = types.String{Value: i.Version}
 	return nil
 }

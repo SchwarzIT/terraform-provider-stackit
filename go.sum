@@ -46,6 +46,12 @@ github.com/SchwarzIT/community-stackit-go-client v1.2.3 h1:67h8BPcMxfQDtYPvIOVUK
 github.com/SchwarzIT/community-stackit-go-client v1.2.3/go.mod h1:f78uJlfuNQmS5qZrYtJknfqAp2MWuqXJZNWP3fentyE=
 github.com/SchwarzIT/community-stackit-go-client v1.2.4-0.20221125113525-8c9e47f803d6 h1:SOISeqDe0nYYTyLaBkc64Vp/YBcewVvF4FdKAsnO3lk=
 github.com/SchwarzIT/community-stackit-go-client v1.2.4-0.20221125113525-8c9e47f803d6/go.mod h1:f78uJlfuNQmS5qZrYtJknfqAp2MWuqXJZNWP3fentyE=
+github.com/SchwarzIT/community-stackit-go-client v1.2.4-0.20221128125337-c279dd8919f0 h1:w0Px0F9fu41nJn9pQ5DkbOhzhVLsqe5MZySyjqa7qZ4=
+github.com/SchwarzIT/community-stackit-go-client v1.2.4-0.20221128125337-c279dd8919f0/go.mod h1:f78uJlfuNQmS5qZrYtJknfqAp2MWuqXJZNWP3fentyE=
+github.com/SchwarzIT/community-stackit-go-client v1.2.4-0.20221128125824-a6052874c9c6 h1:2QhIhG79GJti++cpzOmSxAwTyLlHFKutFj2nT4wxV3E=
+github.com/SchwarzIT/community-stackit-go-client v1.2.4-0.20221128125824-a6052874c9c6/go.mod h1:f78uJlfuNQmS5qZrYtJknfqAp2MWuqXJZNWP3fentyE=
+github.com/SchwarzIT/community-stackit-go-client v1.2.4 h1:onRJ+LtRfuxvTZJ3Girtw/i85kM08Vb1qyC7HGEaEgc=
+github.com/SchwarzIT/community-stackit-go-client v1.2.4/go.mod h1:f78uJlfuNQmS5qZrYtJknfqAp2MWuqXJZNWP3fentyE=
 github.com/acomagu/bufpipe v1.0.3 h1:fxAGrHZTgQ9w5QqVItgzwj235/uYZYgbXitB+dLupOk=
 github.com/acomagu/bufpipe v1.0.3/go.mod h1:mxdxdup/WdsKVreO5GpW4+M/1CE2sMG4jeGJ2sYmHc4=
 github.com/agext/levenshtein v1.2.2 h1:0S/Yg6LYmFJ5stwQeRp6EeOcCbj7xiqQSdNelsXvaqE=

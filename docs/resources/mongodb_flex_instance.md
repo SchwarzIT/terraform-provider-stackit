@@ -29,7 +29,7 @@ resource "stackit_mongodb_flex_instance" "example" {
 ### Required
 
 - `machine_type` (String) The Machine Type. Available options: `T1.2`, `C1.1`, `G1.1`, `M1.1`, `C1.2`, `G1.2`, `M1.2`, `C1.3`, `G1.3`, `M1.3`, `C1.4`, `G1.4`, `M1.4`, `C1.5`, `G1.5`
-- `name` (String) Specifies the instance name.
+- `name` (String) Specifies the instance name. Changing this value requires the resource to be recreated.
 - `project_id` (String) The project ID the instance runs in. Changing this value requires the resource to be recreated.
 
 ### Optional
@@ -40,7 +40,7 @@ resource "stackit_mongodb_flex_instance" "example" {
 - `options` (Map of String) Specifies mongodb instance options
 - `replicas` (Number) Number of replicas (Default is `1`)
 - `storage` (Attributes) A signle `storage` block as defined below. (see [below for nested schema](#nestedatt--storage))
-- `version` (String) MongoDB version. Version `5.0` and `6.0` are supported
+- `version` (String) MongoDB version. Version `5.0` and `6.0` are supported. Changing this value requires the resource to be recreated.
 
 ### Read-Only
 
@@ -62,7 +62,7 @@ Optional:
 Read-Only:
 
 - `database` (String) Specifies the database the user can access
-- `hostname` (String) Specifies the allowed user hostname
+- `host` (String) Specifies the allowed user hostname
 - `id` (String) Specifies the user id
 - `password` (String, Sensitive) Specifies the user's password
 - `port` (Number) Specifies the port
