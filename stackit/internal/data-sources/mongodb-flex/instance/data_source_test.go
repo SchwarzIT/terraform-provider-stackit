@@ -21,7 +21,7 @@ func TestAcc_MongoDBInstance(t *testing.T) {
 	}
 
 	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
-	version := "5"
+	version := "5.0"
 
 	resource.ParallelTest(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){
