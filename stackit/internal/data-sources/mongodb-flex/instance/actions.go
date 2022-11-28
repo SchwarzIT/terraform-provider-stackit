@@ -80,6 +80,10 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	}
 
 	config.Storage = storage
+
+	if len(i.Version) > 3 {
+		i.Version = i.Version[0:3]
+	}
 	config.Version = types.String{Value: i.Version}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &config)...)
