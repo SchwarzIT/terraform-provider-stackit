@@ -37,7 +37,7 @@ resource "stackit_postgres_instance" "example" {
 - `acl` (List of String) Access Control rules to whitelist IP addresses
 - `plan` (String) The PostgresDB Plan. Default is `stackit-postgresql-single-small`.
 Options are: `stackit-postgresql-cluster-big`, `stackit-postgresql-cluster-extra-large`, `stackit-postgresql-cluster-medium`, `stackit-postgresql-cluster-small`, `stackit-postgresql-single-medium`, `stackit-postgresql-single-small`, `stackit-postgresql-cluster-extra-large-non-ssl`, `stackit-postgresql-cluster-medium-non-ssl`, `stackit-postgresql-single-small-non-ss`, `stackit-postgresql-cluster-big-non-ssl`, `stackit-postgresql-cluster-small-non-ssl`, `stackit-postgresql-single-medium-non-ssl`
-- `version` (String) PostgresDB version. Options: `9.4`, `10`, `11`, `13`. Changing this value requires the resource to be recreated.
+- `version` (String) PostgresDB version. Options: `10`, `11`. Changing this value requires the resource to be recreated.
 
 ### Read-Only
 
