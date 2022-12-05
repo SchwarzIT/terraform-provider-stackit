@@ -37,9 +37,9 @@ func TestAcc_PostgresDBJob(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_postgres_instance.example", "name", name),
 					resource.TestCheckResourceAttr("stackit_postgres_instance.example", "project_id", common.ACC_TEST_PROJECT_ID),
-					resource.TestCheckResourceAttr("stackit_postgres_instance.example", "version", "13"),
+					resource.TestCheckResourceAttr("stackit_postgres_instance.example", "version", "11"),
 					resource.TestCheckResourceAttr("stackit_postgres_instance.example", "plan", plan1),
-					resource.TestCheckResourceAttr("stackit_postgres_instance.example", "plan_id", "215a5d20-5913-4e0f-8e1e-316e75fa09c5"),
+					resource.TestCheckResourceAttr("stackit_postgres_instance.example", "plan_id", "d5752507-13d1-48ee-8ef1-cd6537bd00a4"),
 					resource.TestCheckResourceAttrSet("stackit_postgres_instance.example", "id"),
 					resource.TestCheckResourceAttrSet("stackit_postgres_instance.example", "plan_id"),
 					resource.TestCheckResourceAttrSet("stackit_postgres_instance.example", "dashboard_url"),
@@ -54,7 +54,7 @@ func TestAcc_PostgresDBJob(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_postgres_instance.example", "name", name),
 					resource.TestCheckResourceAttr("stackit_postgres_instance.example", "project_id", common.ACC_TEST_PROJECT_ID),
-					resource.TestCheckResourceAttr("stackit_postgres_instance.example", "version", "6.0"),
+					resource.TestCheckResourceAttr("stackit_postgres_instance.example", "version", "11"),
 					resource.TestCheckResourceAttr("stackit_postgres_instance.example", "plan", plan2),
 					resource.TestCheckResourceAttrSet("stackit_postgres_instance.example", "id"),
 					resource.TestCheckResourceAttrSet("stackit_postgres_instance.example", "plan_id"),
@@ -91,7 +91,7 @@ func config(name, plan string) string {
 	resource "stackit_postgres_instance" "example" {
 		name       = "%s"
 		project_id = "%s"
-		version    = "13"
+		version    = "11"
 		plan       = "%s"
 	  }
 	  

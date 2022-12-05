@@ -22,8 +22,8 @@ func TestAcc_PostgresDBInstance(t *testing.T) {
 
 	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
 	plan := "stackit-postgresql-single-small"
-	planID := "215a5d20-5913-4e0f-8e1e-316e75fa09c5"
-	version := "13"
+	planID := "d5752507-13d1-48ee-8ef1-cd6537bd00a4"
+	version := "11"
 
 	resource.ParallelTest(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){
