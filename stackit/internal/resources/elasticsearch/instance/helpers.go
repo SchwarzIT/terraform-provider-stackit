@@ -17,6 +17,10 @@ const (
 )
 
 func (r Resource) validate(ctx context.Context, data *Instance) error {
+	if data.Plan.Value == "" {
+		data.Plan = types.String{Value: default_plan}
+	}
+
 	if !data.ACL.IsUnknown() && len(data.ACL.Elems) == 0 {
 		return errors.New("at least 1 ip address must be specified for `acl`")
 	}
@@ -65,7 +69,7 @@ func (r Resource) validatePlan(ctx context.Context, offers []options.Offer, vers
 		}
 		opts = append(opts, fmt.Sprintf("- %s (%s)", plan.Name, plan.Description))
 	}
-	return "", fmt.Errorf("couldn't find plan name '%s'. Available options are:\n%s\n", version, strings.Join(opts, "\n"))
+	return "", fmt.Errorf("couldn't find plan name '%s'. Available options are:\n%s\n", planName, strings.Join(opts, "\n"))
 }
 
 func (r Resource) applyClientResponse(ctx context.Context, pi *Instance, i instances.Instance) error {

@@ -2,11 +2,13 @@ package stackit
 
 import (
 	"context"
+
 	dataLogMeInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/logme/instance"
 	resourceLogMeInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/logme/instance"
 
 	dataArgusInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/argus/instance"
 	dataArgusJob "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/argus/job"
+	dataElasticSearchCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/elasticsearch/credential"
 	dataElasticSearchInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/elasticsearch/instance"
 	dataKubernetes "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/kubernetes"
 	dataMariaDBInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/mariadb/instance"
@@ -23,6 +25,7 @@ import (
 	//dataRedisInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/redis/instance"
 	resourceArgusInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/instance"
 	resourceArgusJob "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/job"
+	resourceElasticSearchCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/elasticsearch/credential"
 	resourceElasticsearchInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/elasticsearch/instance"
 	resourceKubernetes "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/kubernetes"
 	resourceMariaDBInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mariadb/instance"
@@ -101,6 +104,7 @@ func (p *StackitProvider) Resources(ctx context.Context) []func() resource.Resou
 	return []func() resource.Resource{
 		resourceArgusInstance.New,
 		resourceArgusJob.New,
+		resourceElasticSearchCredential.New,
 		resourceElasticsearchInstance.New,
 		resourceKubernetes.New,
 		resourceLogMeInstance.New,
@@ -122,6 +126,7 @@ func (p *StackitProvider) DataSources(context.Context) []func() datasource.DataS
 	return []func() datasource.DataSource{
 		dataArgusInstance.New,
 		dataArgusJob.New,
+		dataElasticSearchCredential.New,
 		dataElasticSearchInstance.New,
 		dataKubernetes.New,
 		dataLogMeInstance.New,
