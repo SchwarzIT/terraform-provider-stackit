@@ -12,22 +12,19 @@ import (
 
 // Credential is the schema model
 type Credential struct {
-	ProjectID  types.String `tfsdk:"project_id"`
-	InstanceID types.String `tfsdk:"instance_id"`
-
-	ID  types.String `tfsdk:"id"`
-	URI types.String `tfsdk:"uri"`
-
+	ID              types.String `tfsdk:"id"`
+	ProjectID       types.String `tfsdk:"project_id"`
+	InstanceID      types.String `tfsdk:"instance_id"`
+	CACert          types.String `tfsdk:"ca_cert"`
+	Host            types.String `tfsdk:"host"`
+	Hosts           types.List   `tfsdk:"hosts"`
+	Username        types.String `tfsdk:"username"`
+	Password        types.String `tfsdk:"password"`
+	Port            types.Int64  `tfsdk:"port"`
 	SyslogDrainURL  types.String `tfsdk:"syslog_drain_url"`
 	RouteServiceURL types.String `tfsdk:"route_service_url"`
-	VolumeMounts    types.List   `tfsdk:"volume_mounts"`
-
-	Host      types.String `tfsdk:"host"`
-	Port      types.Int64  `tfsdk:"port"`
-	Hosts     types.List   `tfsdk:"hosts"`
-	Username  types.String `tfsdk:"username"`
-	Password  types.String `tfsdk:"password"`
-	Protocols types.Map    `tfsdk:"protocols"`
+	Schema          types.String `tfsdk:"schema"`
+	URI             types.String `tfsdk:"uri"`
 }
 
 // GetSchema returns the terraform schema structure
@@ -57,11 +54,46 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 					resource.RequiresReplace(),
 				},
 			},
-
 			"instance_id": {
 				Description: "Elasticsearch instance ID the credential belongs to",
 				Type:        types.StringType,
 				Required:    true,
+			},
+
+			"ca_cert": {
+				Description: "CA Certificate",
+				Type:        types.StringType,
+				Computed:    true,
+			},
+
+			"host": {
+				Description: "Credential host",
+				Type:        types.StringType,
+				Computed:    true,
+			},
+
+			"hosts": {
+				Description: "Credential hosts",
+				Type:        types.ListType{ElemType: types.StringType},
+				Computed:    true,
+			},
+
+			"username": {
+				Description: "Credential username",
+				Type:        types.StringType,
+				Computed:    true,
+			},
+
+			"password": {
+				Description: "Credential password",
+				Type:        types.StringType,
+				Computed:    true,
+			},
+
+			"port": {
+				Description: "Credential port",
+				Type:        types.Int64Type,
+				Computed:    true,
 			},
 
 			"syslog_drain_url": {
@@ -69,44 +101,22 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Type:        types.StringType,
 				Computed:    true,
 			},
+
 			"route_service_url": {
 				Description: "Credential route_service_url",
 				Type:        types.StringType,
 				Computed:    true,
 			},
-			"volume_mounts": {
-				Description: "Credential volume_mounts",
-				Type:        types.ListType{ElemType: types.MapType{ElemType: types.StringType}},
-				Computed:    true,
-			},
-			"host": {
-				Description: "Credential host",
+
+			"schema": {
+				Description: "The schema used",
 				Type:        types.StringType,
 				Computed:    true,
 			},
-			"port": {
-				Description: "Credential port",
-				Type:        types.Int64Type,
-				Computed:    true,
-			},
-			"hosts": {
-				Description: "Credential hosts",
-				Type:        types.ListType{ElemType: types.StringType},
-				Computed:    true,
-			},
-			"username": {
-				Description: "Credential username",
+
+			"uri": {
+				Description: "The instance URI",
 				Type:        types.StringType,
-				Computed:    true,
-			},
-			"password": {
-				Description: "Credential password",
-				Type:        types.StringType,
-				Computed:    true,
-			},
-			"protocols": {
-				Description: "Credential protocols",
-				Type:        types.MapType{ElemType: types.StringType},
 				Computed:    true,
 			},
 		},
