@@ -24,6 +24,10 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
+	if plan.Name.IsUnknown() || plan.Name.IsNull() {
+		plan.Name = types.String{Value: default_plan}
+	}
+
 	// validate
 	if err := r.validate(ctx, &plan); err != nil {
 		resp.Diagnostics.AddError("failed instance validation", err.Error())

@@ -51,9 +51,6 @@ func (r Resource) validateVersion(ctx context.Context, offers []options.Offer, v
 }
 
 func (r Resource) validatePlan(ctx context.Context, offers []options.Offer, version, planName string) (planID string, err error) {
-	if planName == "" {
-		planName = default_plan
-	}
 	opts := []string{}
 	offerIndex := 0
 	for i, offer := range offers {
