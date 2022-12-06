@@ -14,7 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-const run_this_test = true
+const run_this_test = false
 
 func TestAcc_ElasticSearchJob(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
@@ -48,7 +48,7 @@ func TestAcc_ElasticSearchJob(t *testing.T) {
 			},
 			// test import
 			{
-				ResourceName: "stackit_elasticsearch_instance.example",
+				ResourceName: "stackit_elasticsearch_credential.example",
 				ImportStateIdFunc: func(s *terraform.State) (string, error) {
 					r, ok := s.RootModule().Resources["stackit_elasticsearch_credential.example"]
 					if !ok {

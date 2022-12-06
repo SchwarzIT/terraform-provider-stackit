@@ -8,6 +8,7 @@ import (
 
 	dataArgusInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/argus/instance"
 	dataArgusJob "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/argus/job"
+	dataElasticSearchCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/elasticsearch/credential"
 	dataElasticSearchInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/elasticsearch/instance"
 	dataKubernetes "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/kubernetes"
 	dataMariaDBInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/mariadb/instance"
@@ -125,6 +126,7 @@ func (p *StackitProvider) DataSources(context.Context) []func() datasource.DataS
 	return []func() datasource.DataSource{
 		dataArgusInstance.New,
 		dataArgusJob.New,
+		dataElasticSearchCredential.New,
 		dataElasticSearchInstance.New,
 		dataKubernetes.New,
 		dataLogMeInstance.New,
