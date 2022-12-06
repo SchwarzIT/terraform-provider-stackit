@@ -14,7 +14,7 @@ import (
 
 const run_this_test = false
 
-func TestAcc_ElasticSearchInstance(t *testing.T) {
+func TestAcc_ElasticSearchCredential(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
 		t.Skip()
 		return
