@@ -61,7 +61,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 	es := r.client.DataServices.ElasticSearch
 
-	// read instance
+	// read instance credential
 	res, err := es.Credentials.Get(ctx, cred.ProjectID.Value, cred.InstanceID.Value, cred.ID.Value)
 	if err != nil {
 		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
