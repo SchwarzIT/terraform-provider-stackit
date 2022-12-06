@@ -12,22 +12,19 @@ import (
 
 // Credential is the schema model
 type Credential struct {
-	ProjectID  types.String `tfsdk:"project_id"`
-	InstanceID types.String `tfsdk:"instance_id"`
-
-	ID  types.String `tfsdk:"id"`
-	URI types.String `tfsdk:"uri"`
-
+	ID              types.String `tfsdk:"id"`
+	ProjectID       types.String `tfsdk:"project_id"`
+	InstanceID      types.String `tfsdk:"instance_id"`
+	URI             types.String `tfsdk:"uri"`
+	Host            types.String `tfsdk:"host"`
+	Port            types.Int64  `tfsdk:"port"`
+	Hosts           types.List   `tfsdk:"hosts"`
+	Username        types.String `tfsdk:"username"`
+	Password        types.String `tfsdk:"password"`
+	CACert          types.String `tfsdk:"password"`
+	Schema          types.String `tfsdk:"password"`
 	SyslogDrainURL  types.String `tfsdk:"syslog_drain_url"`
 	RouteServiceURL types.String `tfsdk:"route_service_url"`
-	VolumeMounts    types.List   `tfsdk:"volume_mounts"`
-
-	Host      types.String `tfsdk:"host"`
-	Port      types.Int64  `tfsdk:"port"`
-	Hosts     types.List   `tfsdk:"hosts"`
-	Username  types.String `tfsdk:"username"`
-	Password  types.String `tfsdk:"password"`
-	Protocols types.Map    `tfsdk:"protocols"`
 }
 
 // GetSchema returns the terraform schema structure
@@ -64,21 +61,6 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 				Required:    true,
 			},
 
-			"syslog_drain_url": {
-				Description: "Credential syslog_drain_url",
-				Type:        types.StringType,
-				Computed:    true,
-			},
-			"route_service_url": {
-				Description: "Credential route_service_url",
-				Type:        types.StringType,
-				Computed:    true,
-			},
-			"volume_mounts": {
-				Description: "Credential volume_mounts",
-				Type:        types.ListType{ElemType: types.MapType{ElemType: types.StringType}},
-				Computed:    true,
-			},
 			"host": {
 				Description: "Credential host",
 				Type:        types.StringType,
@@ -104,9 +86,24 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 				Type:        types.StringType,
 				Computed:    true,
 			},
-			"protocols": {
-				Description: "Credential protocols",
-				Type:        types.MapType{ElemType: types.StringType},
+			"cacrt": {
+				Description: "Credential CA Certificate",
+				Type:        types.StringType,
+				Computed:    true,
+			},
+			"schema": {
+				Description: "Credential schema",
+				Type:        types.StringType,
+				Computed:    true,
+			},
+			"syslog_drain_url": {
+				Description: "Credential syslog_drain_url",
+				Type:        types.StringType,
+				Computed:    true,
+			},
+			"route_service_url": {
+				Description: "Credential route_service_url",
+				Type:        types.StringType,
 				Computed:    true,
 			},
 		},

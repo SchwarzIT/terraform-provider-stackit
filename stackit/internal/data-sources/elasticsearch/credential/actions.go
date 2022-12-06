@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 // Read - lifecycle function
@@ -26,15 +27,15 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 
 	found := -1
 	existing := ""
-	for i, instance := range list.CredentialsList {
-		if instance.ID == config.ID.Value {
+	for i, cred := range list.CredentialsList {
+		if cred.ID == config.ID.Value {
 			found = i
 			break
 		}
 		if existing == "" {
 			existing = "\navailable credentials in the project are:"
 		}
-		existing = fmt.Sprintf("%s\n- %s", existing, instance.ID)
+		existing = fmt.Sprintf("%s\n- %s", existing, cred.ID)
 	}
 
 	if found == -1 {
@@ -45,40 +46,8 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	}
 
 	// set found instance
-	intance := list.CredentialsList[found]
-
-	res, err := es.Options.GetOfferings(ctx, config.ProjectID.Value)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to get offerings", err.Error())
-		return
-	}
-
-	for _, offer := range res.Offerings {
-		for _, p := range offer.Plans {
-			if p.ID != intance.ID {
-				continue
-			}
-			// config.Plan = types.String{Value: p.Name}
-			// config.Version = types.String{Value: offer.Version}
-		}
-	}
-
-	// config.ID = types.String{Value: intance.InstanceID}
-	// config.PlanID = types.String{Value: intance.PlanID}
-	// config.DashboardURL = types.String{Value: intance.DashboardURL}
-	// config.CFGUID = types.String{Value: intance.CFGUID}
-	// config.CFSpaceGUID = types.String{Value: intance.CFSpaceGUID}
-	// config.CFOrganizationGUID = types.String{Value: intance.CFOrganizationGUID}
-	//
-	// config.ACL = types.List{ElemType: types.StringType}
-	// if aclString, ok := intance.Parameters["sgw_acl"]; ok {
-	// 	items := strings.Split(aclString, ",")
-	// 	for _, v := range items {
-	// 		config.ACL.Elems = append(config.ACL.Elems, types.String{Value: v})
-	// 	}
-	// } else {
-	// 	config.ACL.Null = true
-	// }
+	cred := list.CredentialsList[found]
+	config.ID = types.String{Value: cred.ID}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &config)...)
 	if resp.Diagnostics.HasError() {
