@@ -51,6 +51,9 @@ func (r Resource) validateVersion(ctx context.Context, offers []options.Offer, v
 }
 
 func (r Resource) validatePlan(ctx context.Context, offers []options.Offer, version, planName string) (planID string, err error) {
+	if planName == "" {
+		planName = default_plan
+	}
 	opts := []string{}
 	offerIndex := 0
 	for i, offer := range offers {
@@ -65,7 +68,7 @@ func (r Resource) validatePlan(ctx context.Context, offers []options.Offer, vers
 		}
 		opts = append(opts, fmt.Sprintf("- %s (%s)", plan.Name, plan.Description))
 	}
-	return "", fmt.Errorf("couldn't find plan name '%s'. Available options are:\n%s\n", version, strings.Join(opts, "\n"))
+	return "", fmt.Errorf("couldn't find plan name '%s'. Available options are:\n%s\n", planName, strings.Join(opts, "\n"))
 }
 
 func (r Resource) applyClientResponse(ctx context.Context, pi *Instance, i instances.Instance) error {
