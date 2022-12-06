@@ -9,10 +9,10 @@ import (
 )
 
 // Read - lifecycle function
-func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var config Credential
 	diags := req.Config.Get(ctx, &config)
-	es := r.client.DataServices.ElasticSearch
+	es := d.client.DataServices.ElasticSearch
 
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
