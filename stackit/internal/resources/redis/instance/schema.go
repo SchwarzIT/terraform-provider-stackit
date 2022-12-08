@@ -66,6 +66,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Description: fmt.Sprintf("The Redis Plan. Default is `%s`.\nOptions are: `stackit-redis-single-small`, `stackit-redis-single-medium`, `stackit-redis-cluster-big`, `stackit-redis-cluster-medium`, `stackit-redis-cluster-small`, `stackit-redis-cluster-big-non-ssl`, `stackit-redis-cluster-medium-non-ssl`, `stackit-redis-cluster-small-non-ssl`, `stackit-redis-single-medium-non-ssl`, `stackit-redis-single-small-non-ss`", default_plan),
 				Type:        types.StringType,
 				Optional:    true,
+				Computed:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					modifiers.StringDefault(default_plan),
 				},
@@ -79,6 +80,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Description: "Redis version. Options: `4.0`, `5.0`, `6.0`. Changing this value requires the resource to be recreated.",
 				Type:        types.StringType,
 				Optional:    true,
+				Computed:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					resource.RequiresReplace(),
 					modifiers.StringDefault(default_version),
