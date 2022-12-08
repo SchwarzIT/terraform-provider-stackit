@@ -23,7 +23,6 @@ import (
 	dataRedisCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/redis/credential"
 	dataRedisInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/redis/instance"
 
-	// dataRedisInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/redis/instance"
 	resourceArgusInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/instance"
 	resourceArgusJob "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/job"
 	resourceElasticSearchCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/elasticsearch/credential"
@@ -119,8 +118,8 @@ func (p *StackitProvider) Resources(ctx context.Context) []func() resource.Resou
 		resourceProject.New,
 		resourcePostgresFlexInstance.New,
 		resourceRabbitMQInstance.New,
-		resourceRedisInstance.New,
 		resourceRedisCredential.New,
+		resourceRedisInstance.New,
 	}
 }
 
@@ -142,7 +141,7 @@ func (p *StackitProvider) DataSources(context.Context) []func() datasource.DataS
 		dataPostgresFlexInstance.New,
 		dataProject.New,
 		dataRabbitMQInstance.New,
-		dataRedisInstance.New,
 		dataRedisCredential.New,
+		dataRedisInstance.New,
 	}
 }
