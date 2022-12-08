@@ -2,6 +2,7 @@ package credential_test
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -21,8 +22,11 @@ func TestAcc_DataSourceRedisCredential(t *testing.T) {
 		return
 	}
 
-	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
 	projectId := common.ACC_TEST_PROJECT_ID
+	if val, exists := os.LookupEnv("STACKIT_TEST_PROJECT_ID"); exists {
+		projectId = val
+	}
+	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
 	plan := "stackit-redis-single-small"
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -60,7 +64,7 @@ func config(project_id, name, plan string) string {
 		project_id = "%s"
 		version    = "6.0"
 		plan	   = "%s"
-	  }
+	}
 	  
 	resource "stackit_redis_credential" "example" {
 		project_id = "%s"

@@ -3,6 +3,7 @@ package credential_test
 import (
 	"errors"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit"
@@ -22,9 +23,11 @@ func TestAcc_ResourceRedisCredential(t *testing.T) {
 		return
 	}
 
-	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
 	projectId := common.ACC_TEST_PROJECT_ID
-	plan := "stackit-redis-single-small"
+	if val, exists := os.LookupEnv("STACKIT_TEST_PROJECT_ID"); exists {
+		projectId = val
+	}
+	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
 
 	resource.ParallelTest(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){
@@ -33,7 +36,7 @@ func TestAcc_ResourceRedisCredential(t *testing.T) {
 		Steps: []resource.TestStep{
 			// check minimal configuration
 			{
-				Config: config(projectId, name, plan),
+				Config: config(projectId, name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_redis_credential.example", "project_id", projectId),
 					resource.TestCheckResourceAttrSet("stackit_redis_credential.example", "instance_id"),
@@ -73,13 +76,11 @@ func TestAcc_ResourceRedisCredential(t *testing.T) {
 	})
 }
 
-func config(project_id, name, plan string) string {
+func config(project_id, name string) string {
 	return fmt.Sprintf(`
 	resource "stackit_redis_instance" "example" {
 		name       = "%s"
 		project_id = "%s"
-		version    = "6.0"
-		plan       = "%s"
 	}
 	resource "stackit_redis_credential" "example" {
 		project_id = "%s"
@@ -88,7 +89,6 @@ func config(project_id, name, plan string) string {
 	`,
 		name,
 		project_id,
-		plan,
 		project_id,
 	)
 }

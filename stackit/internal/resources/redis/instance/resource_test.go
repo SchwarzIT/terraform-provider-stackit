@@ -3,6 +3,7 @@ package instance_test
 import (
 	"errors"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit"
@@ -22,8 +23,10 @@ func TestAcc_RedisJob(t *testing.T) {
 		return
 	}
 
-	projectId := "10a508e3-1bd5-45e2-9fe0-5ee43611dba5"
-	// project_id := common.ACC_TEST_PROJECT_ID
+	projectId := common.ACC_TEST_PROJECT_ID
+	if val, exists := os.LookupEnv("STACKIT_TEST_PROJECT_ID"); exists {
+		projectId = val
+	}
 	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
 	plan1 := "stackit-redis-single-small"
 	plan2 := "stackit-redis-single-medium"
