@@ -2,6 +2,7 @@ package credential
 
 import (
 	"context"
+
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/data-services/credentials"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )

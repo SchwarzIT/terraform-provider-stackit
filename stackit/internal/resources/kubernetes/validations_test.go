@@ -1,8 +1,9 @@
 package kubernetes
 
 import (
-	"github.com/Masterminds/semver"
 	"testing"
+
+	"github.com/Masterminds/semver"
 )
 
 func Test_maxVersionOption(t *testing.T) {
