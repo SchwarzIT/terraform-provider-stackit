@@ -66,6 +66,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Description: fmt.Sprintf("The MariaDB Plan. Default is `%s`.\nOptions are: `stackit-mariadb-cluster-big-non-ssl`, `stackit-mariadb-cluster-big`, `stackit-mariadb-cluster-extra-large`, `sstackit-mariadb-cluster-medium`, `stackit-mariadb-cluster-small`, `stackit-mariadb-single-medium`, `stackit-mariadb-single-small`, `stackit-mariadb-cluster-medium-non-ssl`, `stackit-mariadb-cluster-small-non-ssl`, `stackit-mariadb-single-medium-non-ssl`, `stackit-mariadb-single-small-non-ssl`, `stackit-mariadb-cluster-extra-large-non-ssl`, `stackit-mariadb-cluster-extra-large-high-perf-non-ssl`", default_plan),
 				Type:        types.StringType,
 				Optional:    true,
+				Computed:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					modifiers.StringDefault(default_plan),
 				},
@@ -79,6 +80,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Description: "MariaDB version. Options: `10.1`, `10.4`, . Changing this value requires the resource to be recreated.",
 				Type:        types.StringType,
 				Optional:    true,
+				Computed:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					resource.RequiresReplace(),
 					modifiers.StringDefault(default_version),
