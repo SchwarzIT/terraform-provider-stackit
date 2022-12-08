@@ -17,6 +17,7 @@ import (
 	dataObjectStorageCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/object-storage/credential"
 	dataObjectStorageCredentialsGroup "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/object-storage/credentials-group"
 	dataPostgresFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/postgres-flex/instance"
+	dataPostgresCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/postgres/credential"
 	dataPostgresDBInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/postgres/instance"
 	dataProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/project"
 	dataRabbitMQInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/rabbitmq/instance"
@@ -37,6 +38,7 @@ import (
 	resourceObjectStorageCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/credential"
 	resourceObjectStorageCredentialsGroup "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/credentials-group"
 	resourcePostgresFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/postgres-flex/instance"
+	resourcePostgresCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/postgres/credential"
 	resourcePostgresDBInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/postgres/instance"
 	resourceProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/project"
 	resourceRabbitMQInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/rabbitmq/instance"
@@ -98,13 +100,13 @@ This provider is built and maintained by the STACKIT community in Schwarz IT and
 	}, nil
 }
 
-func (p *StackitProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
+func (p *StackitProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
 	resp.TypeName = "stackit"
 	resp.Version = p.version
 }
 
 // GetResources - Defines provider resources
-func (p *StackitProvider) Resources(ctx context.Context) []func() resource.Resource {
+func (p *StackitProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		resourceArgusInstance.New,
 		resourceArgusJob.New,
@@ -119,6 +121,7 @@ func (p *StackitProvider) Resources(ctx context.Context) []func() resource.Resou
 		resourceObjectStorageBucket.New,
 		resourceObjectStorageCredential.New,
 		resourceObjectStorageCredentialsGroup.New,
+		resourcePostgresCredential.New,
 		resourcePostgresDBInstance.New,
 		resourceProject.New,
 		resourcePostgresFlexInstance.New,
@@ -144,6 +147,7 @@ func (p *StackitProvider) DataSources(context.Context) []func() datasource.DataS
 		dataObjectStorageBucket.New,
 		dataObjectStorageCredential.New,
 		dataObjectStorageCredentialsGroup.New,
+		dataPostgresCredential.New,
 		dataPostgresDBInstance.New,
 		dataPostgresFlexInstance.New,
 		dataProject.New,
