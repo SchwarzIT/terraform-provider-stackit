@@ -12,11 +12,17 @@ import (
 )
 
 const (
-	default_version = "13"
+	default_version = "11"
 	default_plan    = "stackit-postgresql-single-small"
 )
 
 func (r Resource) validate(ctx context.Context, data *Instance) error {
+	if data.Version.IsNull() || data.Version.IsUnknown() {
+		data.Version = types.String{Value: default_version}
+	}
+	if data.Plan.IsNull() || data.Plan.IsUnknown() {
+		data.Plan = types.String{Value: default_plan}
+	}
 	if !data.ACL.IsUnknown() && len(data.ACL.Elems) == 0 {
 		return errors.New("at least 1 ip address must be specified for `acl`")
 	}
