@@ -3,6 +3,7 @@ package instance_test
 import (
 	"errors"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit"
@@ -22,9 +23,14 @@ func TestAcc_RedisJob(t *testing.T) {
 		return
 	}
 
+	projectId := common.ACC_TEST_PROJECT_ID
+	if val, exists := os.LookupEnv("STACKIT_TEST_PROJECT_ID"); exists {
+		projectId = val
+	}
 	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
 	plan1 := "stackit-redis-single-small"
 	plan2 := "stackit-redis-single-medium"
+	planId := "09876364-e1ba-49ec-845c-e8ac45f84921"
 
 	resource.ParallelTest(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){
@@ -33,13 +39,13 @@ func TestAcc_RedisJob(t *testing.T) {
 		Steps: []resource.TestStep{
 			// check minimal configuration
 			{
-				Config: config(name, plan1),
+				Config: config(projectId, name, plan1),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_redis_instance.example", "name", name),
-					resource.TestCheckResourceAttr("stackit_redis_instance.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("stackit_redis_instance.example", "project_id", projectId),
 					resource.TestCheckResourceAttr("stackit_redis_instance.example", "version", "6.0"),
 					resource.TestCheckResourceAttr("stackit_redis_instance.example", "plan", plan1),
-					resource.TestCheckResourceAttr("stackit_redis_instance.example", "plan_id", "09876364-e1ba-49ec-845c-e8ac45f84921"),
+					resource.TestCheckResourceAttr("stackit_redis_instance.example", "plan_id", planId),
 					resource.TestCheckResourceAttrSet("stackit_redis_instance.example", "id"),
 					resource.TestCheckResourceAttrSet("stackit_redis_instance.example", "plan_id"),
 					resource.TestCheckResourceAttrSet("stackit_redis_instance.example", "dashboard_url"),
@@ -50,10 +56,10 @@ func TestAcc_RedisJob(t *testing.T) {
 			},
 			// check update plan
 			{
-				Config: config(name, plan2),
+				Config: config(projectId, name, plan2),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_redis_instance.example", "name", name),
-					resource.TestCheckResourceAttr("stackit_redis_instance.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("stackit_redis_instance.example", "project_id", projectId),
 					resource.TestCheckResourceAttr("stackit_redis_instance.example", "version", "6.0"),
 					resource.TestCheckResourceAttr("stackit_redis_instance.example", "plan", plan2),
 					resource.TestCheckResourceAttrSet("stackit_redis_instance.example", "id"),
@@ -77,7 +83,7 @@ func TestAcc_RedisJob(t *testing.T) {
 						return "", errors.New("couldn't find attribute id")
 					}
 
-					return fmt.Sprintf("%s,%s", common.ACC_TEST_PROJECT_ID, id), nil
+					return fmt.Sprintf("%s,%s", projectId, id), nil
 				},
 				ImportState:       true,
 				ImportStateVerify: true,
@@ -86,7 +92,7 @@ func TestAcc_RedisJob(t *testing.T) {
 	})
 }
 
-func config(name, plan string) string {
+func config(projectId, name, plan string) string {
 	return fmt.Sprintf(`
 	resource "stackit_redis_instance" "example" {
 		name       = "%s"
@@ -97,7 +103,7 @@ func config(name, plan string) string {
 	  
 	  `,
 		name,
-		common.ACC_TEST_PROJECT_ID,
+		projectId,
 		plan,
 	)
 }

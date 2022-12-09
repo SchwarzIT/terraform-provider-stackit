@@ -22,6 +22,7 @@ func TestAcc_ElasticSearchCredential(t *testing.T) {
 	}
 
 	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
+	projectID := common.GetAcceptanceTestsProjectID()
 
 	resource.ParallelTest(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){
@@ -30,9 +31,9 @@ func TestAcc_ElasticSearchCredential(t *testing.T) {
 		Steps: []resource.TestStep{
 			// check minimal configuration
 			{
-				Config: config(common.ACC_TEST_PROJECT_ID, name),
+				Config: config(projectID, name),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("data.stackit_elasticsearch_credential.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("data.stackit_elasticsearch_credential.example", "project_id", projectID),
 					resource.TestCheckTypeSetElemAttrPair("stackit_elasticsearch_credential.example", "project_id", "data.stackit_elasticsearch_credential.example", "project_id"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_elasticsearch_credential.example", "instance_id", "data.stackit_elasticsearch_credential.example", "instance_id"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_elasticsearch_credential.example", "id", "data.stackit_elasticsearch_credential.example", "id"),
@@ -51,7 +52,7 @@ func TestAcc_ElasticSearchCredential(t *testing.T) {
 	})
 }
 
-func config(project_id, name string) string {
+func config(projectID, name string) string {
 	return fmt.Sprintf(`
 	resource "stackit_elasticsearch_instance" "example" {
 		name       = "%s"
@@ -71,8 +72,8 @@ func config(project_id, name string) string {
 	}
 	`,
 		name,
-		project_id,
-		project_id,
-		project_id,
+		projectID,
+		projectID,
+		projectID,
 	)
 }

@@ -36,3 +36,12 @@ func ShouldAccTestRun(runFlag bool) bool {
 	}
 	return false
 }
+
+// GetAcceptanceTestsProjectID returns the project ID for acceptance test
+// can be overridden by setting ACC_TEST_PROJECT_ID
+func GetAcceptanceTestsProjectID() string {
+	if v, ok := os.LookupEnv("ACC_TEST_PROJECT_ID"); ok && v != "" {
+		return v
+	}
+	return ACC_TEST_PROJECT_ID
+}

@@ -16,14 +16,14 @@ import (
 
 const run_this_test = false
 
-func TestAcc_ElasticSearchJob(t *testing.T) {
+func TestAcc_ResourceRedisCredential(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
 		t.Skip()
 		return
 	}
 
+	projectId := common.GetAcceptanceTestsProjectID()
 	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
-	projectID := common.GetAcceptanceTestsProjectID()
 
 	resource.ParallelTest(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){
@@ -32,27 +32,27 @@ func TestAcc_ElasticSearchJob(t *testing.T) {
 		Steps: []resource.TestStep{
 			// check minimal configuration
 			{
-				Config: config(projectID, name),
+				Config: config(projectId, name),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("stackit_elasticsearch_credential.example", "project_id", projectID),
-					resource.TestCheckResourceAttrSet("stackit_elasticsearch_credential.example", "instance_id"),
-					resource.TestCheckResourceAttrSet("stackit_elasticsearch_credential.example", "id"),
-					resource.TestCheckResourceAttrSet("stackit_elasticsearch_credential.example", "ca_cert"),
-					resource.TestCheckResourceAttrSet("stackit_elasticsearch_credential.example", "host"),
-					resource.TestCheckResourceAttrSet("stackit_elasticsearch_credential.example", "username"),
-					resource.TestCheckResourceAttrSet("stackit_elasticsearch_credential.example", "password"),
-					resource.TestCheckResourceAttrSet("stackit_elasticsearch_credential.example", "port"),
-					resource.TestCheckResourceAttrSet("stackit_elasticsearch_credential.example", "schema"),
-					resource.TestCheckResourceAttrSet("stackit_elasticsearch_credential.example", "uri"),
+					resource.TestCheckResourceAttr("stackit_redis_credential.example", "project_id", projectId),
+					resource.TestCheckResourceAttrSet("stackit_redis_credential.example", "instance_id"),
+					resource.TestCheckResourceAttrSet("stackit_redis_credential.example", "id"),
+					resource.TestCheckResourceAttrSet("stackit_redis_credential.example", "ca_cert"),
+					resource.TestCheckResourceAttrSet("stackit_redis_credential.example", "host"),
+					resource.TestCheckResourceAttrSet("stackit_redis_credential.example", "username"),
+					resource.TestCheckResourceAttrSet("stackit_redis_credential.example", "password"),
+					resource.TestCheckResourceAttrSet("stackit_redis_credential.example", "port"),
+					resource.TestCheckResourceAttrSet("stackit_redis_credential.example", "schema"),
+					resource.TestCheckResourceAttrSet("stackit_redis_credential.example", "uri"),
 				),
 			},
 			// test import
 			{
-				ResourceName: "stackit_elasticsearch_credential.example",
+				ResourceName: "stackit_redis_credential.example",
 				ImportStateIdFunc: func(s *terraform.State) (string, error) {
-					r, ok := s.RootModule().Resources["stackit_elasticsearch_credential.example"]
+					r, ok := s.RootModule().Resources["stackit_redis_credential.example"]
 					if !ok {
-						return "", errors.New("couldn't find resource stackit_elasticsearch_instance.example")
+						return "", errors.New("couldn't find resource stackit_redis_instance.example")
 					}
 					id, ok := r.Primary.Attributes["id"]
 					if !ok {
@@ -63,7 +63,7 @@ func TestAcc_ElasticSearchJob(t *testing.T) {
 						return "", errors.New("couldn't find attribute id")
 					}
 
-					return fmt.Sprintf("%s,%s,%s", common.ACC_TEST_PROJECT_ID, iid, id), nil
+					return fmt.Sprintf("%s,%s,%s", projectId, iid, id), nil
 				},
 				ImportState:       true,
 				ImportStateVerify: true,
@@ -74,15 +74,13 @@ func TestAcc_ElasticSearchJob(t *testing.T) {
 
 func config(project_id, name string) string {
 	return fmt.Sprintf(`
-	resource "stackit_elasticsearch_instance" "example" {
+	resource "stackit_redis_instance" "example" {
 		name       = "%s"
 		project_id = "%s"
-		version    = "7"
-	  }
-	  
-	resource "stackit_elasticsearch_credential" "example" {
+	}
+	resource "stackit_redis_credential" "example" {
 		project_id = "%s"
-		instance_id = stackit_elasticsearch_instance.example.id
+		instance_id = stackit_redis_instance.example.id
 	}
 	`,
 		name,

@@ -20,9 +20,9 @@ import (
 	dataPostgresDBInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/postgres/instance"
 	dataProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/project"
 	dataRabbitMQInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/rabbitmq/instance"
+	dataRedisCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/redis/credential"
 	dataRedisInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/redis/instance"
 
-	//dataRedisInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/redis/instance"
 	resourceArgusInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/instance"
 	resourceArgusJob "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/job"
 	resourceElasticSearchCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/elasticsearch/credential"
@@ -37,6 +37,7 @@ import (
 	resourcePostgresDBInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/postgres/instance"
 	resourceProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/project"
 	resourceRabbitMQInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/rabbitmq/instance"
+	resourceRedisCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/redis/credential"
 	resourceRedisInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/redis/instance"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -117,6 +118,7 @@ func (p *StackitProvider) Resources(ctx context.Context) []func() resource.Resou
 		resourceProject.New,
 		resourcePostgresFlexInstance.New,
 		resourceRabbitMQInstance.New,
+		resourceRedisCredential.New,
 		resourceRedisInstance.New,
 	}
 }
@@ -139,6 +141,7 @@ func (p *StackitProvider) DataSources(context.Context) []func() datasource.DataS
 		dataPostgresFlexInstance.New,
 		dataProject.New,
 		dataRabbitMQInstance.New,
+		dataRedisCredential.New,
 		dataRedisInstance.New,
 	}
 }
