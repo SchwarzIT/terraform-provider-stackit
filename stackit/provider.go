@@ -11,6 +11,7 @@ import (
 	dataElasticSearchCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/elasticsearch/credential"
 	dataElasticSearchInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/elasticsearch/instance"
 	dataKubernetes "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/kubernetes"
+	dataMariaDBCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/mariadb/credential"
 	dataMariaDBInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/mariadb/instance"
 	dataMongoDBFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/mongodb-flex/instance"
 	dataObjectStorageBucket "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/object-storage/bucket"
@@ -22,12 +23,12 @@ import (
 	dataRabbitMQInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/rabbitmq/instance"
 	dataRedisCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/redis/credential"
 	dataRedisInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/redis/instance"
-
 	resourceArgusInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/instance"
 	resourceArgusJob "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/job"
 	resourceElasticSearchCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/elasticsearch/credential"
 	resourceElasticsearchInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/elasticsearch/instance"
 	resourceKubernetes "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/kubernetes"
+	resourceMariaDBCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mariadb/credential"
 	resourceMariaDBInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mariadb/instance"
 	resourceMongoDBFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mongodb-flex/instance"
 	resourceObjectStorageBucket "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/bucket"
@@ -109,6 +110,7 @@ func (p *StackitProvider) Resources(ctx context.Context) []func() resource.Resou
 		resourceElasticsearchInstance.New,
 		resourceKubernetes.New,
 		resourceLogMeInstance.New,
+		resourceMariaDBCredential.New,
 		resourceMariaDBInstance.New,
 		resourceMongoDBFlexInstance.New,
 		resourceObjectStorageBucket.New,
@@ -132,6 +134,7 @@ func (p *StackitProvider) DataSources(context.Context) []func() datasource.DataS
 		dataElasticSearchInstance.New,
 		dataKubernetes.New,
 		dataLogMeInstance.New,
+		dataMariaDBCredential.New,
 		dataMariaDBInstance.New,
 		dataMongoDBFlexInstance.New,
 		dataObjectStorageBucket.New,
