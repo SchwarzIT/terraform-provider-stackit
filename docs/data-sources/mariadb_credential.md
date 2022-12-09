@@ -19,13 +19,13 @@ resource "stackit_mariadb_instance" "example" {
 }
 
 resource "stackit_mariadb_credential" "example" {
-  project_id = "example"
+  project_id  = "example"
   instance_id = stackit_mariadb_instance.example.id
 }
 
 data "stackit_mariadb_credential" "example" {
-  id = stackit_mariadb_credential.example.id
-  project_id = "example"
+  id          = stackit_mariadb_credential.example.id
+  project_id  = "example"
   instance_id = stackit_mariadb_instance.example.id
 }
 ```

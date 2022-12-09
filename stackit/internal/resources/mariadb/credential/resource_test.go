@@ -3,7 +3,6 @@ package credential_test
 import (
 	"errors"
 	"fmt"
-	"os"
 	"testing"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit"
@@ -23,10 +22,7 @@ func TestAcc_MariaDbCredentialResource(t *testing.T) {
 		return
 	}
 
-	projectId := common.ACC_TEST_PROJECT_ID
-	if val, exists := os.LookupEnv("STACKIT_TEST_PROJECT_ID"); exists {
-		projectId = val
-	}
+	projectID := common.GetAcceptanceTestsProjectID()
 	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -36,9 +32,9 @@ func TestAcc_MariaDbCredentialResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// check minimal configuration
 			{
-				Config: config(projectId, name),
+				Config: config(projectID, name),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("stackit_mariadb_credential.example", "project_id", projectId),
+					resource.TestCheckResourceAttr("stackit_mariadb_credential.example", "project_id", projectID),
 					resource.TestCheckResourceAttrSet("stackit_mariadb_credential.example", "instance_id"),
 					resource.TestCheckResourceAttrSet("stackit_mariadb_credential.example", "id"),
 					resource.TestCheckResourceAttrSet("stackit_mariadb_credential.example", "host"),
@@ -65,7 +61,7 @@ func TestAcc_MariaDbCredentialResource(t *testing.T) {
 						return "", errors.New("couldn't find attribute id")
 					}
 
-					return fmt.Sprintf("%s,%s,%s", projectId, iid, id), nil
+					return fmt.Sprintf("%s,%s,%s", projectID, iid, id), nil
 				},
 				ImportState:       true,
 				ImportStateVerify: true,
@@ -74,7 +70,7 @@ func TestAcc_MariaDbCredentialResource(t *testing.T) {
 	})
 }
 
-func config(project_id, name string) string {
+func config(projectID, name string) string {
 	return fmt.Sprintf(`
 	resource "stackit_mariadb_instance" "example" {
 		name       = "%s"
@@ -87,7 +83,7 @@ func config(project_id, name string) string {
 	}
 	`,
 		name,
-		project_id,
-		project_id,
+		projectID,
+		projectID,
 	)
 }

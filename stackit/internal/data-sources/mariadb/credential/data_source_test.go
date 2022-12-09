@@ -2,7 +2,6 @@ package credential_test
 
 import (
 	"fmt"
-	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -22,10 +21,7 @@ func TestAcc_MariaDbCredentialDataSource(t *testing.T) {
 		return
 	}
 
-	projectId := common.ACC_TEST_PROJECT_ID
-	if val, exists := os.LookupEnv("STACKIT_TEST_PROJECT_ID"); exists {
-		projectId = val
-	}
+	projectID := common.GetAcceptanceTestsProjectID()
 	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -35,9 +31,9 @@ func TestAcc_MariaDbCredentialDataSource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// check minimal configuration
 			{
-				Config: config(projectId, name),
+				Config: config(projectID, name),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("data.stackit_mariadb_credential.example", "project_id", projectId),
+					resource.TestCheckResourceAttr("data.stackit_mariadb_credential.example", "project_id", projectID),
 					resource.TestCheckTypeSetElemAttrPair("stackit_mariadb_credential.example", "project_id", "data.stackit_mariadb_credential.example", "project_id"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_mariadb_credential.example", "instance_id", "data.stackit_mariadb_credential.example", "instance_id"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_mariadb_credential.example", "id", "data.stackit_mariadb_credential.example", "id"),
@@ -56,7 +52,7 @@ func TestAcc_MariaDbCredentialDataSource(t *testing.T) {
 	})
 }
 
-func config(projectId, name string) string {
+func config(projectID, name string) string {
 	return fmt.Sprintf(`
 	resource "stackit_mariadb_instance" "example" {
 		name       = "%s"
@@ -75,8 +71,8 @@ func config(projectId, name string) string {
 	}
 	`,
 		name,
-		projectId,
-		projectId,
-		projectId,
+		projectID,
+		projectID,
+		projectID,
 	)
 }
