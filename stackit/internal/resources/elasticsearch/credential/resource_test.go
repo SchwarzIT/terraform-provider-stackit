@@ -23,7 +23,7 @@ func TestAcc_ElasticSearchJob(t *testing.T) {
 	}
 
 	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
-	project_id := common.ACC_TEST_PROJECT_ID
+	projectID := common.GetAcceptanceTestsProjectID()
 
 	resource.ParallelTest(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){
@@ -32,9 +32,9 @@ func TestAcc_ElasticSearchJob(t *testing.T) {
 		Steps: []resource.TestStep{
 			// check minimal configuration
 			{
-				Config: config(project_id, name),
+				Config: config(projectID, name),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("stackit_elasticsearch_credential.example", "project_id", project_id),
+					resource.TestCheckResourceAttr("stackit_elasticsearch_credential.example", "project_id", projectID),
 					resource.TestCheckResourceAttrSet("stackit_elasticsearch_credential.example", "instance_id"),
 					resource.TestCheckResourceAttrSet("stackit_elasticsearch_credential.example", "id"),
 					resource.TestCheckResourceAttrSet("stackit_elasticsearch_credential.example", "ca_cert"),

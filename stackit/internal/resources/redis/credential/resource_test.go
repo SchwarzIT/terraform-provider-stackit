@@ -3,7 +3,6 @@ package credential_test
 import (
 	"errors"
 	"fmt"
-	"os"
 	"testing"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit"
@@ -23,10 +22,7 @@ func TestAcc_ResourceRedisCredential(t *testing.T) {
 		return
 	}
 
-	projectId := common.ACC_TEST_PROJECT_ID
-	if val, exists := os.LookupEnv("STACKIT_TEST_PROJECT_ID"); exists {
-		projectId = val
-	}
+	projectId := common.GetAcceptanceTestsProjectID()
 	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
 
 	resource.ParallelTest(t, resource.TestCase{
