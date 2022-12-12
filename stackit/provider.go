@@ -3,14 +3,12 @@ package stackit
 import (
 	"context"
 
-	dataLogMeInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/logme/instance"
-	resourceLogMeInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/logme/instance"
-
 	dataArgusInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/argus/instance"
 	dataArgusJob "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/argus/job"
 	dataElasticSearchCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/elasticsearch/credential"
 	dataElasticSearchInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/elasticsearch/instance"
 	dataKubernetes "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/kubernetes"
+	dataLogMeInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/logme/instance"
 	dataMariaDBCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/mariadb/credential"
 	dataMariaDBInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/mariadb/instance"
 	dataMongoDBFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/mongodb-flex/instance"
@@ -28,6 +26,7 @@ import (
 	resourceElasticSearchCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/elasticsearch/credential"
 	resourceElasticsearchInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/elasticsearch/instance"
 	resourceKubernetes "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/kubernetes"
+	resourceLogMeInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/logme/instance"
 	resourceMariaDBCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mariadb/credential"
 	resourceMariaDBInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mariadb/instance"
 	resourceMongoDBFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mongodb-flex/instance"
