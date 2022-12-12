@@ -32,7 +32,7 @@ func TestAcc_ObjectStorageBucket(t *testing.T) {
 				Config: config(name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.stackit_object_storage_bucket.example", "name", name),
-					resource.TestCheckResourceAttr("data.stackit_object_storage_bucket.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("data.stackit_object_storage_bucket.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttrSet("data.stackit_object_storage_bucket.example", "region"),
 					resource.TestCheckResourceAttrSet("data.stackit_object_storage_bucket.example", "host_style_url"),
 					resource.TestCheckResourceAttrSet("data.stackit_object_storage_bucket.example", "path_style_url"),
@@ -56,9 +56,9 @@ data "stackit_object_storage_bucket" "example" {
     name       = "%s"
 }
 	  `,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
 		name,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
 		name,
 	)
 }

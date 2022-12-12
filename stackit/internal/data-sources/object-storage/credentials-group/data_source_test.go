@@ -34,7 +34,7 @@ func TestAcc_ObjectStorageCredentialsGroup(t *testing.T) {
 					resource.TestCheckResourceAttrSet("stackit_object_storage_credentials_group.example", "id"),
 					resource.TestCheckResourceAttrSet("stackit_object_storage_credentials_group.example", "urn"),
 					resource.TestCheckResourceAttr("data.stackit_object_storage_credentials_group.example", "name", name),
-					resource.TestCheckResourceAttr("data.stackit_object_storage_credentials_group.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("data.stackit_object_storage_credentials_group.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckTypeSetElemAttrPair("stackit_object_storage_credentials_group.example", "id", "data.stackit_object_storage_credentials_group.example", "id"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_object_storage_credentials_group.example", "urn", "data.stackit_object_storage_credentials_group.example", "urn"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_object_storage_credentials_group.example", "name", "data.stackit_object_storage_credentials_group.example", "name"),
@@ -57,8 +57,8 @@ func config(name string) string {
 		id		   = stackit_object_storage_credentials_group.example.id
 	}
 	`,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
 		name,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
 	)
 }

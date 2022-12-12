@@ -29,7 +29,7 @@ func TestAcc_ArgusInstances(t *testing.T) {
 			{
 				Config: config(name, "Monitoring-Medium-EU01"),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("data.stackit_argus_instance.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("data.stackit_argus_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttr("data.stackit_argus_instance.example", "name", name),
 					resource.TestCheckResourceAttr("data.stackit_argus_instance.example", "grafana.enable_public_access", "true"),
 					resource.TestCheckResourceAttrSet("data.stackit_argus_instance.example", "id"),
@@ -65,9 +65,9 @@ data "stackit_argus_instance" "example" {
 }
 
 	  `,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
 		name,
 		plan,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
 	)
 }

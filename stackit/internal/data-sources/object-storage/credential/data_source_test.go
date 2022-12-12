@@ -58,8 +58,8 @@ func config() string {
 	}
 
 	`,
-		common.ACC_TEST_PROJECT_ID,
-		common.ACC_TEST_PROJECT_ID,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
+		common.GetAcceptanceTestsProjectID(),
+		common.GetAcceptanceTestsProjectID(),
 	)
 }

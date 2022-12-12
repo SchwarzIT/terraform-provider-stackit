@@ -31,7 +31,7 @@ func TestAcc_kubernetes(t *testing.T) {
 				Config: configMinimal(name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "name", name),
-					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "allow_privileged_containers", "true"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.name", "example-np"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.machine_type", "c1.2"),
@@ -54,7 +54,7 @@ func TestAcc_kubernetes(t *testing.T) {
 				Config: configExtended(name, "new-nodepl", "c1.2"),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "name", name),
-					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "allow_privileged_containers", "false"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.name", "new-nodepl"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.machine_type", "c1.2"),
@@ -88,7 +88,7 @@ func TestAcc_kubernetes(t *testing.T) {
 				Config: configExtended(name, "new-nodepl", "c1.3"),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "name", name),
-					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.name", "new-nodepl"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.machine_type", "c1.3"),
 				),
@@ -96,7 +96,7 @@ func TestAcc_kubernetes(t *testing.T) {
 			// test import
 			{
 				ResourceName:            "stackit_kubernetes_cluster.example",
-				ImportStateId:           fmt.Sprintf("%s,%s", common.ACC_TEST_PROJECT_ID, name),
+				ImportStateId:           fmt.Sprintf("%s,%s", common.GetAcceptanceTestsProjectID(), name),
 				ImportState:             true,
 				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{"status", "extensions", "kubernetes_version"},
@@ -118,7 +118,7 @@ resource "stackit_kubernetes_cluster" "example" {
 	}]
 }
 	  `,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
 		name,
 	)
 }
@@ -169,7 +169,7 @@ resource "stackit_kubernetes_cluster" "example" {
 	}
 }
 	  `,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
 		name,
 		nodepoolName,
 		machineType,

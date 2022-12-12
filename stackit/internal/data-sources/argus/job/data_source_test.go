@@ -30,7 +30,7 @@ func TestAcc_ArgusJob(t *testing.T) {
 				Config: config(name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.stackit_argus_job.example", "name", name),
-					resource.TestCheckResourceAttr("data.stackit_argus_job.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("data.stackit_argus_job.example", "project_id", common.GetAcceptanceTestsProjectID()),
 
 					resource.TestCheckResourceAttr("data.stackit_argus_job.example", "metrics_path", "/metrics"),
 					resource.TestCheckResourceAttr("data.stackit_argus_job.example", "scheme", "https"),
@@ -74,9 +74,9 @@ data "stackit_argus_job" "example" {
 }
 
 	  `,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
 		name,
-		common.ACC_TEST_PROJECT_ID,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
+		common.GetAcceptanceTestsProjectID(),
 	)
 }

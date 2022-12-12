@@ -63,7 +63,7 @@ func TestAcc_ElasticSearchJob(t *testing.T) {
 						return "", errors.New("couldn't find attribute id")
 					}
 
-					return fmt.Sprintf("%s,%s,%s", common.ACC_TEST_PROJECT_ID, iid, id), nil
+					return fmt.Sprintf("%s,%s,%s", common.GetAcceptanceTestsProjectID(), iid, id), nil
 				},
 				ImportState:       true,
 				ImportStateVerify: true,
