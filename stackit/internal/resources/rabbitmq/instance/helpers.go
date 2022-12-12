@@ -34,8 +34,7 @@ func (r Resource) validate(ctx context.Context, data *Instance) error {
 	if err != nil {
 		return err
 	}
-
-	data.PlanID = types.String{Value: planID}
+	data.PlanID = types.StringValue(planID)
 	return nil
 }
 
@@ -73,18 +72,17 @@ func (r Resource) applyClientResponse(ctx context.Context, pi *Instance, i insta
 	if aclString, ok := i.Parameters["sgw_acl"]; ok {
 		items := strings.Split(aclString, ",")
 		for _, v := range items {
-			pi.ACL.Elems = append(pi.ACL.Elems, types.String{Value: v})
+			pi.ACL.Elems = append(pi.ACL.Elems, types.StringValue(v))
 		}
 	} else {
 		pi.ACL.Null = true
 	}
-
-	pi.Name = types.String{Value: i.Name}
-	pi.PlanID = types.String{Value: i.PlanID}
-	pi.DashboardURL = types.String{Value: i.DashboardURL}
-	pi.CFGUID = types.String{Value: i.CFGUID}
-	pi.CFSpaceGUID = types.String{Value: i.CFSpaceGUID}
-	pi.CFOrganizationGUID = types.String{Value: i.CFOrganizationGUID}
+	pi.Name = types.StringValue(i.Name)
+	pi.PlanID = types.StringValue(i.PlanID)
+	pi.DashboardURL = types.StringValue(i.DashboardURL)
+	pi.CFGUID = types.StringValue(i.CFGUID)
+	pi.CFSpaceGUID = types.StringValue(i.CFSpaceGUID)
+	pi.CFOrganizationGUID = types.StringValue(i.CFOrganizationGUID)
 	return nil
 }
 

@@ -54,24 +54,23 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 	i := ires.Item
-	config.ID = types.String{Value: instance.ID}
+	config.ID = types.StringValue(instance.ID)
 	config.ACL = types.List{ElemType: types.StringType}
 	for _, v := range i.ACL.Items {
-		config.ACL.Elems = append(config.ACL.Elems, types.String{Value: v})
+		config.ACL.Elems = append(config.ACL.Elems, types.StringValue(v))
 	}
-	config.BackupSchedule = types.String{Value: i.BackupSchedule}
-	config.MachineType = types.String{Value: i.Flavor.ID}
-	config.Name = types.String{Value: i.Name}
-	config.Replicas = types.Int64{Value: int64(i.Replicas)}
-
+	config.BackupSchedule = types.StringValue(i.BackupSchedule)
+	config.MachineType = types.StringValue(i.Flavor.ID)
+	config.Name = types.StringValue(i.Name)
+	config.Replicas = types.Int64Value(int64(i.Replicas))
 	storage, d := types.ObjectValue(
 		map[string]attr.Type{
 			"class": types.StringType,
 			"size":  types.Int64Type,
 		},
 		map[string]attr.Value{
-			"class": types.String{Value: i.Storage.Class},
-			"size":  types.Int64{Value: int64(i.Storage.Size)},
+			"class": types.StringValue(i.Storage.Class),
+			"size":  types.Int64Value(int64(i.Storage.Size)),
 		})
 
 	resp.Diagnostics.Append(d...)
@@ -84,8 +83,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	if len(i.Version) > 3 {
 		i.Version = i.Version[0:3]
 	}
-	config.Version = types.String{Value: i.Version}
-
+	config.Version = types.StringValue(i.Version)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &config)...)
 	if resp.Diagnostics.HasError() {
 		return

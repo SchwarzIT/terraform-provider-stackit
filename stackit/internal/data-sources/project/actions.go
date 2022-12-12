@@ -23,14 +23,12 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		resp.Diagnostics.AddError("failed to read project", err.Error())
 		return
 	}
-
-	p.ID = types.String{Value: project.ProjectID}
-	p.Name = types.String{Value: project.Name}
-	p.ParentContainerID = types.String{Value: project.Parent.ContainerID}
-	p.ContainerID = types.String{Value: project.ContainerID}
-
+	p.ID = types.StringValue(project.ProjectID)
+	p.Name = types.StringValue(project.Name)
+	p.ParentContainerID = types.StringValue(project.Parent.ContainerID)
+	p.ContainerID = types.StringValue(project.ContainerID)
 	if billing, ok := project.Labels["billingReference"]; ok {
-		p.BillingRef = types.String{Value: billing}
+		p.BillingRef = types.StringValue(billing)
 	}
 
 	diags = resp.State.Set(ctx, &p)

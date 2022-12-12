@@ -46,8 +46,8 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	storage := Storage{}
 	if plan.Storage.IsUnknown() {
 		storage = Storage{
-			Class: types.String{Value: default_storage_class},
-			Size:  types.Int64{Value: default_storage_size},
+			Class: types.StringValue(default_storage_class),
+			Size:  types.Int64Value(default_storage_size),
 		}
 	} else {
 		resp.Diagnostics.Append(plan.Storage.As(ctx, &storage, types.ObjectAsOptions{})...)
@@ -68,7 +68,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	// set state
-	plan.ID = types.String{Value: res.ID}
+	plan.ID = types.StringValue(res.ID)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), res.ID)...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project_id"), plan.ProjectID.Value)...)
 	if resp.Diagnostics.HasError() {
@@ -135,7 +135,7 @@ func (r Resource) createUser(ctx context.Context, plan *Instance, d *diag.Diagno
 
 		elems := []attr.Value{}
 		for _, v := range res.Item.Roles {
-			elems = append(elems, types.String{Value: v})
+			elems = append(elems, types.StringValue(v))
 		}
 		u, diags := types.ObjectValue(
 			map[string]attr.Type{
@@ -149,13 +149,13 @@ func (r Resource) createUser(ctx context.Context, plan *Instance, d *diag.Diagno
 				"roles":    types.ListType{ElemType: types.StringType},
 			},
 			map[string]attr.Value{
-				"id":       types.String{Value: res.Item.ID},
-				"username": types.String{Value: res.Item.Username},
-				"database": types.String{Value: res.Item.Database},
-				"password": types.String{Value: res.Item.Password},
-				"host":     types.String{Value: res.Item.Host},
-				"port":     types.Int64{Value: int64(res.Item.Port)},
-				"uri":      types.String{Value: res.Item.URI},
+				"id":       types.StringValue(res.Item.ID),
+				"username": types.StringValue(res.Item.Username),
+				"database": types.StringValue(res.Item.Database),
+				"password": types.StringValue(res.Item.Password),
+				"host":     types.StringValue(res.Item.Host),
+				"port":     types.Int64Value(int64(res.Item.Port)),
+				"uri":      types.StringValue(res.Item.URI),
 				"roles":    types.List{ElemType: types.StringType, Elems: elems},
 			},
 		)
@@ -226,8 +226,8 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	storage := Storage{}
 	if plan.Storage.IsUnknown() {
 		storage = Storage{
-			Class: types.String{Value: default_storage_class},
-			Size:  types.Int64{Value: default_storage_size},
+			Class: types.StringValue(default_storage_class),
+			Size:  types.Int64Value(default_storage_size),
 		}
 	} else {
 		resp.Diagnostics.Append(plan.Storage.As(ctx, &storage, types.ObjectAsOptions{})...)

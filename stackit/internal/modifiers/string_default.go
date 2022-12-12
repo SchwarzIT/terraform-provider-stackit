@@ -46,8 +46,7 @@ func (m stringDefaultModifier) Modify(ctx context.Context, req tfsdk.ModifyAttri
 	if !str.Null {
 		return
 	}
-
-	resp.AttributePlan = types.String{Value: m.Default}
+	resp.AttributePlan = types.StringValue(m.Default)
 }
 
 func StringDefault(defaultValue string) stringDefaultModifier {

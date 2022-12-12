@@ -25,13 +25,13 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	// update state
 	diags = resp.State.Set(ctx, Credential{
-		ID:                 types.String{Value: k.KeyID},
-		ProjectID:          types.String{Value: k.Project},
-		CredentialsGroupID: types.String{Value: data.CredentialsGroupID.Value},
-		Expiry:             types.String{Value: k.Expires},
-		DisplayName:        types.String{Value: k.DisplayName},
-		AccessKey:          types.String{Value: k.AccessKey},
-		SecretAccessKey:    types.String{Value: k.SecretAccessKey},
+		ID:                 types.StringValue(k.KeyID),
+		ProjectID:          types.StringValue(k.Project),
+		CredentialsGroupID: types.StringValue(data.CredentialsGroupID.Value),
+		Expiry:             types.StringValue(k.Expires),
+		DisplayName:        types.StringValue(k.DisplayName),
+		AccessKey:          types.StringValue(k.AccessKey),
+		SecretAccessKey:    types.StringValue(k.SecretAccessKey),
 	})
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -72,8 +72,8 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 			continue
 		}
 		found = true
-		state.DisplayName = types.String{Value: k.DisplayName}
-		state.Expiry = types.String{Value: k.Expires}
+		state.DisplayName = types.StringValue(k.DisplayName)
+		state.Expiry = types.StringValue(k.Expires)
 		diags = resp.State.Set(ctx, &state)
 		resp.Diagnostics.Append(diags...)
 		if resp.Diagnostics.HasError() {

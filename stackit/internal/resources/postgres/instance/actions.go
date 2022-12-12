@@ -52,7 +52,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	// set state
-	plan.ID = types.String{Value: res.InstanceID}
+	plan.ID = types.StringValue(res.InstanceID)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), res.InstanceID)...)
 	if resp.Diagnostics.HasError() {
 		return

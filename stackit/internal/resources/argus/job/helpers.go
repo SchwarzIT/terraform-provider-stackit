@@ -78,12 +78,12 @@ func (j *Job) ToClientJob() jobs.Job {
 }
 
 func (j *Job) FromClientJob(cj jobs.Job) {
-	j.ID = types.String{Value: cj.JobName}
-	j.Name = types.String{Value: cj.JobName}
-	j.MetricsPath = types.String{Value: cj.MetricsPath}
-	j.Scheme = types.String{Value: cj.Scheme}
-	j.ScrapeInterval = types.String{Value: cj.ScrapeInterval}
-	j.ScrapeTimeout = types.String{Value: cj.ScrapeTimeout}
+	j.ID = types.StringValue(cj.JobName)
+	j.Name = types.StringValue(cj.JobName)
+	j.MetricsPath = types.StringValue(cj.MetricsPath)
+	j.Scheme = types.StringValue(cj.Scheme)
+	j.ScrapeInterval = types.StringValue(cj.ScrapeInterval)
+	j.ScrapeTimeout = types.StringValue(cj.ScrapeTimeout)
 	j.handleSAML2(cj)
 	j.handleBasicAuth(cj)
 	j.handleTargets(cj)
@@ -95,8 +95,8 @@ func (j *Job) handleBasicAuth(cj jobs.Job) {
 		return
 	}
 	j.BasicAuth = &BasicAuth{
-		Username: types.String{Value: cj.BasicAuth.Username},
-		Password: types.String{Value: cj.BasicAuth.Password},
+		Username: types.StringValue(cj.BasicAuth.Username),
+		Password: types.StringValue(cj.BasicAuth.Password),
 	}
 }
 
@@ -130,7 +130,7 @@ func (j *Job) handleTargets(cj jobs.Job) {
 			URLs: []types.String{},
 		}
 		for _, v := range sc.Targets {
-			nt.URLs = append(nt.URLs, types.String{Value: v})
+			nt.URLs = append(nt.URLs, types.StringValue(v))
 		}
 
 		if len(j.Targets) > i && j.Targets[i].Labels.IsNull() {
@@ -141,7 +141,7 @@ func (j *Job) handleTargets(cj jobs.Job) {
 				nt.Labels.Elems = make(map[string]attr.Value, len(sc.Labels))
 			}
 			for k, v := range sc.Labels {
-				nt.Labels.Elems[k] = types.String{Value: v}
+				nt.Labels.Elems[k] = types.StringValue(v)
 			}
 		}
 		newTargets = append(newTargets, nt)

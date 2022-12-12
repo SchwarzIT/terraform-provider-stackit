@@ -36,10 +36,9 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		}
 
 		found = true
-
-		config.ID = types.String{Value: k.KeyID}
-		config.DisplayName = types.String{Value: k.DisplayName}
-		config.Expiry = types.String{Value: k.Expires}
+		config.ID = types.StringValue(k.KeyID)
+		config.DisplayName = types.StringValue(k.DisplayName)
+		config.Expiry = types.StringValue(k.Expires)
 		diags = resp.State.Set(ctx, &config)
 		resp.Diagnostics.Append(diags...)
 

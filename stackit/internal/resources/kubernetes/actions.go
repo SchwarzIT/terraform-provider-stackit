@@ -37,7 +37,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	// update state
-	plan.Status = types.String{Value: consts.SKE_CLUSTER_STATUS_HEALTHY}
+	plan.Status = types.StringValue(consts.SKE_CLUSTER_STATUS_HEALTHY)
 	diags = resp.State.Set(ctx, plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -99,8 +99,7 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 		diags.AddError("failed to parse Wait() response", "response is not clusters.Cluster")
 		return
 	}
-
-	cl.Status = types.String{Value: result.Status.Aggregated}
+	cl.Status = types.StringValue(result.Status.Aggregated)
 	cl.Transform(result)
 }
 
@@ -111,7 +110,7 @@ func (r Resource) getCredential(ctx context.Context, diags *diag.Diagnostics, cl
 		diags.AddError("failed to get cluster credentials", err.Error())
 		return
 	}
-	cl.KubeConfig = types.String{Value: cred.Kubeconfig}
+	cl.KubeConfig = types.StringValue(cred.Kubeconfig)
 }
 
 // Read - lifecycle function
@@ -256,7 +255,7 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 		if res.Extensions.Argus != nil {
 			extensions.Argus = &ArgusExtension{
 				Enabled:         types.Bool{Value: res.Extensions.Argus.Enabled},
-				ArgusInstanceID: types.String{Value: res.Extensions.Argus.ArgusInstanceID},
+				ArgusInstanceID: types.StringValue(res.Extensions.Argus.ArgusInstanceID),
 			}
 		}
 
@@ -268,9 +267,9 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 		hibernations := []Hibernation{}
 		for _, h := range res.Hibernation.Schedules {
 			hibernations = append(hibernations, Hibernation{
-				Start:    types.String{Value: h.Start},
-				End:      types.String{Value: h.End},
-				Timezone: types.String{Value: h.Timezone},
+				Start:    types.StringValue(h.Start),
+				End:      types.StringValue(h.End),
+				Timezone: types.StringValue(h.Timezone),
 			})
 		}
 		diags := resp.State.SetAttribute(ctx, path.Root("hibernations"), hibernations)
@@ -281,8 +280,8 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 		digas := resp.State.SetAttribute(ctx, path.Root("maintenance"), &Maintenance{
 			EnableKubernetesVersionUpdates:   types.Bool{Value: res.Maintenance.AutoUpdate.KubernetesVersion},
 			EnableMachineImageVersionUpdates: types.Bool{Value: res.Maintenance.AutoUpdate.MachineImageVersion},
-			Start:                            types.String{Value: res.Maintenance.TimeWindow.Start},
-			End:                              types.String{Value: res.Maintenance.TimeWindow.End},
+			Start:                            types.StringValue(res.Maintenance.TimeWindow.Start),
+			End:                              types.StringValue(res.Maintenance.TimeWindow.End),
 		})
 		resp.Diagnostics.Append(digas...)
 	}

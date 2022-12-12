@@ -22,15 +22,15 @@ const (
 
 func (i *Instance) setDefaults() {
 	if i.Version.IsNull() || i.Version.IsUnknown() {
-		i.Version = types.String{Value: default_version}
+		i.Version = types.StringValue(default_version)
 	}
 
 	if i.Replicas.IsNull() || i.Replicas.IsUnknown() {
-		i.Replicas = types.Int64{Value: default_replicas}
+		i.Replicas = types.Int64Value(default_replicas)
 	}
 
 	if i.BackupSchedule.IsNull() || i.BackupSchedule.IsUnknown() {
-		i.BackupSchedule = types.String{Value: default_backup_schedule}
+		i.BackupSchedule = types.StringValue(default_backup_schedule)
 	}
 }
 
@@ -114,22 +114,20 @@ func (r Resource) validateStorage(ctx context.Context, projectID, machineType st
 func applyClientResponse(pi *Instance, i instances.Instance) error {
 	pi.ACL = types.List{ElemType: types.StringType}
 	for _, v := range i.ACL.Items {
-		pi.ACL.Elems = append(pi.ACL.Elems, types.String{Value: v})
+		pi.ACL.Elems = append(pi.ACL.Elems, types.StringValue(v))
 	}
-	pi.BackupSchedule = types.String{Value: i.BackupSchedule}
-	pi.MachineType = types.String{Value: i.Flavor.ID}
-
-	pi.Name = types.String{Value: i.Name}
-	pi.Replicas = types.Int64{Value: int64(i.Replicas)}
-
+	pi.BackupSchedule = types.StringValue(i.BackupSchedule)
+	pi.MachineType = types.StringValue(i.Flavor.ID)
+	pi.Name = types.StringValue(i.Name)
+	pi.Replicas = types.Int64Value(int64(i.Replicas))
 	storage, diags := types.ObjectValue(
 		map[string]attr.Type{
 			"class": types.StringType,
 			"size":  types.Int64Type,
 		},
 		map[string]attr.Value{
-			"class": types.String{Value: i.Storage.Class},
-			"size":  types.Int64{Value: int64(i.Storage.Size)},
+			"class": types.StringValue(i.Storage.Class),
+			"size":  types.Int64Value(int64(i.Storage.Size)),
 		})
 	if diags.HasError() {
 		return errors.New("failed setting storage object")
@@ -138,6 +136,6 @@ func applyClientResponse(pi *Instance, i instances.Instance) error {
 	if len(i.Version) > 3 {
 		i.Version = i.Version[0:3]
 	}
-	pi.Version = types.String{Value: i.Version}
+	pi.Version = types.StringValue(i.Version)
 	return nil
 }

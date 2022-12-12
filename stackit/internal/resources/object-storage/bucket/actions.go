@@ -31,12 +31,12 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	// update state
 	diags = resp.State.Set(ctx, Bucket{
-		ID:           types.String{Value: b.Bucket.Name},
-		Name:         types.String{Value: b.Bucket.Name},
-		ProjectID:    types.String{Value: b.Project},
-		Region:       types.String{Value: b.Bucket.Region},
-		HostStyleURL: types.String{Value: b.Bucket.URLVirtualHostedStyle},
-		PathStyleURL: types.String{Value: b.Bucket.URLPathStyle},
+		ID:           types.StringValue(b.Bucket.Name),
+		Name:         types.StringValue(b.Bucket.Name),
+		ProjectID:    types.StringValue(b.Project),
+		Region:       types.StringValue(b.Bucket.Region),
+		HostStyleURL: types.StringValue(b.Bucket.URLVirtualHostedStyle),
+		PathStyleURL: types.StringValue(b.Bucket.URLPathStyle),
 	})
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -89,11 +89,9 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		resp.Diagnostics.AddError("failed to read bucket", err.Error())
 		return
 	}
-
-	state.Region = types.String{Value: b.Bucket.Region}
-	state.HostStyleURL = types.String{Value: b.Bucket.URLVirtualHostedStyle}
-	state.PathStyleURL = types.String{Value: b.Bucket.URLPathStyle}
-
+	state.Region = types.StringValue(b.Bucket.Region)
+	state.HostStyleURL = types.StringValue(b.Bucket.URLVirtualHostedStyle)
+	state.PathStyleURL = types.StringValue(b.Bucket.URLPathStyle)
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {

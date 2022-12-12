@@ -112,9 +112,9 @@ func (r Resource) setMetricsConfig(ctx context.Context, diags *diag.Diagnostics,
 	if ref != nil && ref.Metrics != nil {
 		if s.Metrics == nil {
 			s.Metrics = &Metrics{
-				RetentionDays:               types.Int64{Value: default_metrics_retention_days},
-				RetentionDays5mDownsampling: types.Int64{Value: default_metrics_retention_days_5m_downsampling},
-				RetentionDays1hDownsampling: types.Int64{Value: default_metrics_retention_days_1h_downsampling},
+				RetentionDays:               types.Int64Value(default_metrics_retention_days),
+				RetentionDays5mDownsampling: types.Int64Value(default_metrics_retention_days_5m_downsampling),
+				RetentionDays1hDownsampling: types.Int64Value(default_metrics_retention_days_1h_downsampling),
 			}
 		} else if ref.Metrics.RetentionDays.Equal(s.Metrics.RetentionDays) &&
 			ref.Metrics.RetentionDays5mDownsampling.Equal(s.Metrics.RetentionDays5mDownsampling) &&
@@ -179,7 +179,7 @@ func (r Resource) readInstance(ctx context.Context, diags *diag.Diagnostics, s *
 	res, err := c.Argus.Instances.Get(ctx, s.ProjectID.Value, s.ID.Value)
 	if err != nil {
 		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
-			s.ID = types.String{Value: ""}
+			s.ID = types.StringValue("")
 			return
 		}
 		diags.AddError("failed to read instance", err.Error())
@@ -223,10 +223,9 @@ func (r Resource) readMetrics(ctx context.Context, diags *diag.Diagnostics, s *I
 		diags.AddError("failed to read grafana config", err.Error())
 		return
 	}
-
-	s.Metrics.RetentionDays = types.Int64{Value: transformDayMetric(res.MetricsRetentionTimeRaw)}
-	s.Metrics.RetentionDays5mDownsampling = types.Int64{Value: transformDayMetric(res.MetricsRetentionTime5m)}
-	s.Metrics.RetentionDays1hDownsampling = types.Int64{Value: transformDayMetric(res.MetricsRetentionTime1h)}
+	s.Metrics.RetentionDays = types.Int64Value(transformDayMetric(res.MetricsRetentionTimeRaw))
+	s.Metrics.RetentionDays5mDownsampling = types.Int64Value(transformDayMetric(res.MetricsRetentionTime5m))
+	s.Metrics.RetentionDays1hDownsampling = types.Int64Value(transformDayMetric(res.MetricsRetentionTime1h))
 }
 
 // Update - lifecycle function
@@ -384,8 +383,8 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 
 	// pre-read imports
 	inst := Instance{
-		ID:        types.String{Value: instanceID},
-		ProjectID: types.String{Value: projectID},
+		ID:        types.StringValue(instanceID),
+		ProjectID: types.StringValue(projectID),
 		Grafana:   &Grafana{},
 		Metrics:   &Metrics{},
 	}

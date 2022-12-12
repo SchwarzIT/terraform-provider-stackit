@@ -48,5 +48,5 @@ func (r DataSource) getCredential(ctx context.Context, diags *diag.Diagnostics, 
 		diags.AddError("failed to get cluster credentials", err.Error())
 		return
 	}
-	cl.KubeConfig = types.String{Value: cred.Kubeconfig}
+	cl.KubeConfig = types.StringValue(cred.Kubeconfig)
 }

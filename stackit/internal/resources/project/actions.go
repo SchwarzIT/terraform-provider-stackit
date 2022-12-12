@@ -31,12 +31,12 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	p := Project{
-		ID:                  types.String{Value: plan.ID.Value},
-		ContainerID:         types.String{Value: plan.ContainerID.Value},
-		ParentContainerID:   types.String{Value: plan.ParentContainerID.Value},
-		Name:                types.String{Value: plan.Name.Value},
-		BillingRef:          types.String{Value: plan.BillingRef.Value},
-		OwnerEmail:          types.String{Value: plan.OwnerEmail.Value},
+		ID:                  types.StringValue(plan.ID.Value),
+		ContainerID:         types.StringValue(plan.ContainerID.Value),
+		ParentContainerID:   types.StringValue(plan.ParentContainerID.Value),
+		Name:                types.StringValue(plan.Name.Value),
+		BillingRef:          types.StringValue(plan.BillingRef.Value),
+		OwnerEmail:          types.StringValue(plan.OwnerEmail.Value),
 		EnableKubernetes:    types.Bool{Null: true},
 		EnableObjectStorage: types.Bool{Null: true},
 	}
@@ -93,9 +93,8 @@ func (r Resource) createProject(ctx context.Context, resp *resource.CreateRespon
 		resp.Diagnostics.AddError("failed to verify project is active", err.Error())
 		return plan
 	}
-
-	plan.ID = types.String{Value: project.ProjectID}
-	plan.ContainerID = types.String{Value: project.ContainerID}
+	plan.ID = types.StringValue(project.ProjectID)
+	plan.ContainerID = types.StringValue(project.ContainerID)
 	return plan
 }
 
@@ -145,7 +144,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 			resp.Diagnostics.AddError("failed to fetch container ID", err.Error())
 			return
 		}
-		p.ContainerID = types.String{Value: res.ContainerID}
+		p.ContainerID = types.StringValue(res.ContainerID)
 	}
 
 	project, err := c.ResourceManagement.Projects.Get(ctx, p.ContainerID.Value)
@@ -169,13 +168,11 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		}
 		p.EnableObjectStorage = types.Bool{Value: obejctStorageEnabled}
 	}
-
-	p.ID = types.String{Value: project.ProjectID}
-	p.ContainerID = types.String{Value: project.ContainerID}
-	p.ParentContainerID = types.String{Value: project.Parent.ContainerID}
-	p.Name = types.String{Value: project.Name}
-	p.BillingRef = types.String{Value: project.Labels["billingReference"]}
-
+	p.ID = types.StringValue(project.ProjectID)
+	p.ContainerID = types.StringValue(project.ContainerID)
+	p.ParentContainerID = types.StringValue(project.Parent.ContainerID)
+	p.Name = types.StringValue(project.Name)
+	p.BillingRef = types.StringValue(project.Labels["billingReference"])
 	diags = resp.State.Set(ctx, &p)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {

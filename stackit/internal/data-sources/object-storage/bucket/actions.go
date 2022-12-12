@@ -26,12 +26,10 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		resp.Diagnostics.AddError("failed to read bucket", err.Error())
 		return
 	}
-
-	config.ID = types.String{Value: b.Bucket.Name}
-	config.Region = types.String{Value: b.Bucket.Region}
-	config.HostStyleURL = types.String{Value: b.Bucket.URLVirtualHostedStyle}
-	config.PathStyleURL = types.String{Value: b.Bucket.URLPathStyle}
-
+	config.ID = types.StringValue(b.Bucket.Name)
+	config.Region = types.StringValue(b.Bucket.Region)
+	config.HostStyleURL = types.StringValue(b.Bucket.URLVirtualHostedStyle)
+	config.PathStyleURL = types.StringValue(b.Bucket.URLPathStyle)
 	diags = resp.State.Set(ctx, &config)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {

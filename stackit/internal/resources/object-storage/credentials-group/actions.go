@@ -50,8 +50,8 @@ func (r Resource) createCredentialGroup(ctx context.Context, data *CredentialsGr
 
 	for _, group := range res.CredentialsGroups {
 		if group.DisplayName == data.Name.Value {
-			data.ID = types.String{Value: group.CredentialsGroupID}
-			data.URN = types.String{Value: group.URN}
+			data.ID = types.StringValue(group.CredentialsGroupID)
+			data.URN = types.StringValue(group.URN)
 			break
 		}
 	}
@@ -78,8 +78,8 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	for _, group := range res.CredentialsGroups {
 		if group.DisplayName == state.Name.Value {
 			found = true
-			state.ID = types.String{Value: group.CredentialsGroupID}
-			state.URN = types.String{Value: group.URN}
+			state.ID = types.StringValue(group.CredentialsGroupID)
+			state.URN = types.StringValue(group.URN)
 			break
 		}
 	}

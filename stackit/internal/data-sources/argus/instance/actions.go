@@ -23,34 +23,32 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		resp.Diagnostics.AddError("failed to read instance", err.Error())
 		return
 	}
-
-	config.ID = types.String{Value: b.ID}
-	config.Name = types.String{Value: b.Name}
-	config.Plan = types.String{Value: b.PlanName}
-	config.PlanID = types.String{Value: b.PlanID}
-	config.DashboardURL = types.String{Value: b.DashboardURL}
+	config.ID = types.StringValue(b.ID)
+	config.Name = types.StringValue(b.Name)
+	config.Plan = types.StringValue(b.PlanName)
+	config.PlanID = types.StringValue(b.PlanID)
+	config.DashboardURL = types.StringValue(b.DashboardURL)
 	config.IsUpdatable = types.Bool{Value: b.IsUpdatable}
-	config.GrafanaURL = types.String{Value: b.Instance.GrafanaURL}
-	config.GrafanaInitialAdminPassword = types.String{Value: b.Instance.GrafanaAdminPassword}
-	config.GrafanaInitialAdminUser = types.String{Value: b.Instance.GrafanaAdminUser}
-	config.MetricsURL = types.String{Value: b.Instance.MetricsURL}
-	config.MetricsPushURL = types.String{Value: b.Instance.PushMetricsURL}
-	config.TargetsURL = types.String{Value: b.Instance.TargetsURL}
-	config.AlertingURL = types.String{Value: b.Instance.AlertingURL}
-	config.LogsURL = types.String{Value: b.Instance.LogsURL}
-	config.LogsPushURL = types.String{Value: b.Instance.LogsPushURL}
-	config.JaegerTracesURL = types.String{Value: b.Instance.JaegerTracesURL}
-	config.JaegerUIURL = types.String{Value: b.Instance.JaegerUIURL}
-	config.OtlpTracesURL = types.String{Value: b.Instance.OtlpTracesURL}
-	config.ZipkinSpansURL = types.String{Value: b.Instance.ZipkinSpansURL}
-
+	config.GrafanaURL = types.StringValue(b.Instance.GrafanaURL)
+	config.GrafanaInitialAdminPassword = types.StringValue(b.Instance.GrafanaAdminPassword)
+	config.GrafanaInitialAdminUser = types.StringValue(b.Instance.GrafanaAdminUser)
+	config.MetricsURL = types.StringValue(b.Instance.MetricsURL)
+	config.MetricsPushURL = types.StringValue(b.Instance.PushMetricsURL)
+	config.TargetsURL = types.StringValue(b.Instance.TargetsURL)
+	config.AlertingURL = types.StringValue(b.Instance.AlertingURL)
+	config.LogsURL = types.StringValue(b.Instance.LogsURL)
+	config.LogsPushURL = types.StringValue(b.Instance.LogsPushURL)
+	config.JaegerTracesURL = types.StringValue(b.Instance.JaegerTracesURL)
+	config.JaegerUIURL = types.StringValue(b.Instance.JaegerUIURL)
+	config.OtlpTracesURL = types.StringValue(b.Instance.OtlpTracesURL)
+	config.ZipkinSpansURL = types.StringValue(b.Instance.ZipkinSpansURL)
 	config.Grafana = &instance.Grafana{
 		EnablePublicAccess: types.Bool{Value: b.Instance.GrafanaPublicReadAccess},
 	}
 	config.Metrics = &instance.Metrics{
-		RetentionDays:               types.Int64{Value: int64(b.Instance.MetricsRetentionTimeRaw)},
-		RetentionDays1hDownsampling: types.Int64{Value: int64(b.Instance.MetricsRetentionTime1h)},
-		RetentionDays5mDownsampling: types.Int64{Value: int64(b.Instance.MetricsRetentionTime5m)},
+		RetentionDays:               types.Int64Value(int64(b.Instance.MetricsRetentionTimeRaw)),
+		RetentionDays1hDownsampling: types.Int64Value(int64(b.Instance.MetricsRetentionTime1h)),
+		RetentionDays5mDownsampling: types.Int64Value(int64(b.Instance.MetricsRetentionTime5m)),
 	}
 
 	diags = resp.State.Set(ctx, &config)

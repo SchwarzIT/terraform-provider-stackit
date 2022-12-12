@@ -93,26 +93,25 @@ func (r Resource) validateStorageClass(ctx context.Context, projectID, machineTy
 func applyClientResponse(pi *PostgresInstance, i instances.Instance) error {
 	pi.ACL = types.List{ElemType: types.StringType}
 	for _, v := range i.ACL.Items {
-		pi.ACL.Elems = append(pi.ACL.Elems, types.String{Value: v})
+		pi.ACL.Elems = append(pi.ACL.Elems, types.StringValue(v))
 	}
-	pi.BackupSchedule = types.String{Value: i.BackupSchedule}
-	pi.MachineType = types.String{Value: i.Flavor.ID}
-	pi.Name = types.String{Value: i.Name}
-	pi.Replicas = types.Int64{Value: int64(i.Replicas)}
-
+	pi.BackupSchedule = types.StringValue(i.BackupSchedule)
+	pi.MachineType = types.StringValue(i.Flavor.ID)
+	pi.Name = types.StringValue(i.Name)
+	pi.Replicas = types.Int64Value(int64(i.Replicas))
 	storage, diags := types.ObjectValue(
 		map[string]attr.Type{
 			"class": types.StringType,
 			"size":  types.Int64Type,
 		},
 		map[string]attr.Value{
-			"class": types.String{Value: i.Storage.Class},
-			"size":  types.Int64{Value: int64(i.Storage.Size)},
+			"class": types.StringValue(i.Storage.Class),
+			"size":  types.Int64Value(int64(i.Storage.Size)),
 		})
 	if diags.HasError() {
 		return errors.New("failed setting storage object")
 	}
 	pi.Storage = storage
-	pi.Version = types.String{Value: i.Version}
+	pi.Version = types.StringValue(i.Version)
 	return nil
 }

@@ -22,7 +22,7 @@ func (p *StackitProvider) Configure(ctx context.Context, req provider.ConfigureR
 	var email string
 	if config.ServiceAccountEmail.IsUnknown() || config.ServiceAccountEmail.IsNull() {
 		email = os.Getenv("STACKIT_SERVICE_ACCOUNT_EMAIL")
-		config.ServiceAccountEmail = types.String{Value: email}
+		config.ServiceAccountEmail = types.StringValue(email)
 	} else {
 		email = config.ServiceAccountEmail.Value
 	}
@@ -35,7 +35,7 @@ func (p *StackitProvider) Configure(ctx context.Context, req provider.ConfigureR
 	var token string
 	if config.ServiceAccountToken.IsUnknown() || config.ServiceAccountToken.IsNull() {
 		token = os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN")
-		config.ServiceAccountToken = types.String{Value: token}
+		config.ServiceAccountToken = types.StringValue(token)
 	} else {
 		token = config.ServiceAccountToken.Value
 	}

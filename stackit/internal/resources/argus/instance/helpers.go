@@ -30,7 +30,7 @@ func (r Resource) loadPlanID(ctx context.Context, diags *diag.Diagnostics, s *In
 	avl := ""
 	for _, v := range res.Plans {
 		if v.Name == s.Plan.Value {
-			s.PlanID = types.String{Value: v.PlanID}
+			s.PlanID = types.StringValue(v.PlanID)
 			break
 		}
 		avl = fmt.Sprintf("%s\n- %s", avl, v.Name)
@@ -51,25 +51,25 @@ func (l Instance) isEqual(got instances.Instance) bool {
 }
 
 func updateByAPIResult(s *Instance, res instances.Instance) {
-	s.ID = types.String{Value: res.ID}
-	s.Plan = types.String{Value: res.PlanName}
-	s.PlanID = types.String{Value: res.PlanID}
-	s.Name = types.String{Value: res.Name}
-	s.DashboardURL = types.String{Value: res.DashboardURL}
+	s.ID = types.StringValue(res.ID)
+	s.Plan = types.StringValue(res.PlanName)
+	s.PlanID = types.StringValue(res.PlanID)
+	s.Name = types.StringValue(res.Name)
+	s.DashboardURL = types.StringValue(res.DashboardURL)
 	s.IsUpdatable = types.Bool{Value: res.IsUpdatable}
-	s.GrafanaURL = types.String{Value: res.Instance.GrafanaURL}
-	s.GrafanaInitialAdminPassword = types.String{Value: res.Instance.GrafanaAdminPassword}
-	s.GrafanaInitialAdminUser = types.String{Value: res.Instance.GrafanaAdminUser}
-	s.MetricsURL = types.String{Value: res.Instance.MetricsURL}
-	s.MetricsPushURL = types.String{Value: res.Instance.PushMetricsURL}
-	s.TargetsURL = types.String{Value: res.Instance.TargetsURL}
-	s.AlertingURL = types.String{Value: res.Instance.AlertingURL}
-	s.LogsURL = types.String{Value: res.Instance.LogsURL}
-	s.LogsPushURL = types.String{Value: res.Instance.LogsPushURL}
-	s.JaegerTracesURL = types.String{Value: res.Instance.JaegerTracesURL}
-	s.JaegerUIURL = types.String{Value: res.Instance.JaegerUIURL}
-	s.OtlpTracesURL = types.String{Value: res.Instance.OtlpTracesURL}
-	s.ZipkinSpansURL = types.String{Value: res.Instance.ZipkinSpansURL}
+	s.GrafanaURL = types.StringValue(res.Instance.GrafanaURL)
+	s.GrafanaInitialAdminPassword = types.StringValue(res.Instance.GrafanaAdminPassword)
+	s.GrafanaInitialAdminUser = types.StringValue(res.Instance.GrafanaAdminUser)
+	s.MetricsURL = types.StringValue(res.Instance.MetricsURL)
+	s.MetricsPushURL = types.StringValue(res.Instance.PushMetricsURL)
+	s.TargetsURL = types.StringValue(res.Instance.TargetsURL)
+	s.AlertingURL = types.StringValue(res.Instance.AlertingURL)
+	s.LogsURL = types.StringValue(res.Instance.LogsURL)
+	s.LogsPushURL = types.StringValue(res.Instance.LogsPushURL)
+	s.JaegerTracesURL = types.StringValue(res.Instance.JaegerTracesURL)
+	s.JaegerUIURL = types.StringValue(res.Instance.JaegerUIURL)
+	s.OtlpTracesURL = types.StringValue(res.Instance.OtlpTracesURL)
+	s.ZipkinSpansURL = types.StringValue(res.Instance.ZipkinSpansURL)
 }
 
 func transformDayMetric(days interface{}) int64 {

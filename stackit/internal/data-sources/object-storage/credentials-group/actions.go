@@ -28,8 +28,8 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	for _, group := range list.CredentialsGroups {
 		if group.CredentialsGroupID == data.ID.Value {
 			found = true
-			data.Name = types.String{Value: group.DisplayName}
-			data.URN = types.String{Value: group.URN}
+			data.Name = types.StringValue(group.DisplayName)
+			data.URN = types.StringValue(group.URN)
 			break
 		}
 	}
