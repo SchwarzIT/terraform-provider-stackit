@@ -20,7 +20,7 @@ func TestAcc_PostgresDBInstance(t *testing.T) {
 		return
 	}
 
-	name := "odjtest-randomString" // due to stackit bug,the instance name is always that of the first created instance
+	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
 	plan := "stackit-postgresql-single-small"
 	version := "11"
 
