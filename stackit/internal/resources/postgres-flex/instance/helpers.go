@@ -19,10 +19,10 @@ const (
 )
 
 func (r Resource) validate(ctx context.Context, data PostgresInstance) error {
-	if err := r.validateVersion(ctx, data.ProjectID.Value, data.Version.Value); err != nil {
+	if err := r.validateVersion(ctx, data.ProjectID.ValueString(), data.Version.ValueString()); err != nil {
 		return err
 	}
-	if err := r.validateMachineType(ctx, data.ProjectID.Value, data.MachineType.Value); err != nil {
+	if err := r.validateMachineType(ctx, data.ProjectID.ValueString(), data.MachineType.ValueString()); err != nil {
 		return err
 	}
 
@@ -36,7 +36,7 @@ func (r Resource) validate(ctx context.Context, data PostgresInstance) error {
 		return errors.New("failed setting storage from object")
 	}
 
-	if err := r.validateStorageClass(ctx, data.ProjectID.Value, data.MachineType.Value, storage.Class.Value); err != nil {
+	if err := r.validateStorageClass(ctx, data.ProjectID.ValueString(), data.MachineType.ValueString(), storage.Class.ValueString()); err != nil {
 		return err
 	}
 	return nil

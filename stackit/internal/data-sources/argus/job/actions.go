@@ -19,7 +19,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	b, err := c.Argus.Jobs.Get(ctx, config.ProjectID.Value, config.ArgusInstanceID.Value, config.Name.Value)
+	b, err := c.Argus.Jobs.Get(ctx, config.ProjectID.ValueString(), config.ArgusInstanceID.ValueString(), config.Name.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to read job", err.Error())
 		return

@@ -18,7 +18,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	list, err := c.ObjectStorage.CredentialsGroup.List(ctx, data.ProjectID.Value)
+	list, err := c.ObjectStorage.CredentialsGroup.List(ctx, data.ProjectID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to list credentials group", err.Error())
 		return
@@ -26,7 +26,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 
 	found := false
 	for _, group := range list.CredentialsGroups {
-		if group.CredentialsGroupID == data.ID.Value {
+		if group.CredentialsGroupID == data.ID.ValueString() {
 			found = true
 			data.Name = types.StringValue(group.DisplayName)
 			data.URN = types.StringValue(group.URN)

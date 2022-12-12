@@ -24,7 +24,7 @@ func (p *StackitProvider) Configure(ctx context.Context, req provider.ConfigureR
 		email = os.Getenv("STACKIT_SERVICE_ACCOUNT_EMAIL")
 		config.ServiceAccountEmail = types.StringValue(email)
 	} else {
-		email = config.ServiceAccountEmail.Value
+		email = config.ServiceAccountEmail.ValueString()
 	}
 
 	if email == "" {
@@ -37,7 +37,7 @@ func (p *StackitProvider) Configure(ctx context.Context, req provider.ConfigureR
 		token = os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN")
 		config.ServiceAccountToken = types.StringValue(token)
 	} else {
-		token = config.ServiceAccountToken.Value
+		token = config.ServiceAccountToken.ValueString()
 	}
 
 	if token == "" {

@@ -56,7 +56,7 @@ func (c *Cluster) clusterConfig(versionOptions []*semver.Version) (clusters.Kube
 		c.KubernetesVersion = types.StringValue(default_version)
 	}
 
-	clusterConfigVersion, err := semver.NewVersion(c.KubernetesVersion.Value)
+	clusterConfigVersion, err := semver.NewVersion(c.KubernetesVersion.ValueString())
 	if err != nil {
 		return clusters.Kubernetes{}, err
 	}
@@ -71,7 +71,7 @@ func (c *Cluster) clusterConfig(versionOptions []*semver.Version) (clusters.Kube
 
 	cfg := clusters.Kubernetes{
 		Version:                   clusterConfigVersion.String(),
-		AllowPrivilegedContainers: c.AllowPrivilegedContainers.Value,
+		AllowPrivilegedContainers: c.AllowPrivilegedContainers.ValueBool(),
 	}
 
 	if c.AllowPrivilegedContainers.IsNull() || c.AllowPrivilegedContainers.IsUnknown() {
@@ -111,9 +111,9 @@ func (c *Cluster) nodePools() []clusters.NodePool {
 		ts := []clusters.Taint{}
 		for _, v := range p.Taints {
 			t := clusters.Taint{
-				Effect: v.Effect.Value,
-				Key:    v.Key.Value,
-				Value:  v.Value.Value,
+				Effect: v.Effect.ValueString(),
+				Key:    v.Key.ValueString(),
+				Value:  v.Value.ValueString(),
 			}
 			ts = append(ts, t)
 		}
@@ -143,25 +143,25 @@ func (c *Cluster) nodePools() []clusters.NodePool {
 		}
 
 		cnp := clusters.NodePool{
-			Name:           p.Name.Value,
-			Minimum:        int(p.Minimum.Value),
-			Maximum:        int(p.Maximum.Value),
-			MaxSurge:       int(p.MaxSurge.Value),
-			MaxUnavailable: int(p.MaxUnavailable.Value),
+			Name:           p.Name.ValueString(),
+			Minimum:        int(p.Minimum.ValueInt64()),
+			Maximum:        int(p.Maximum.ValueInt64()),
+			MaxSurge:       int(p.MaxSurge.ValueInt64()),
+			MaxUnavailable: int(p.MaxUnavailable.ValueInt64()),
 			Machine: clusters.Machine{
-				Type: p.MachineType.Value,
+				Type: p.MachineType.ValueString(),
 				Image: clusters.MachineImage{
-					Name:    p.OSName.Value,
-					Version: p.OSVersion.Value,
+					Name:    p.OSName.ValueString(),
+					Version: p.OSVersion.ValueString(),
 				},
 			},
 			Volume: clusters.Volume{
-				Type: p.VolumeType.Value,
-				Size: int(p.VolumeSizeGB.Value),
+				Type: p.VolumeType.ValueString(),
+				Size: int(p.VolumeSizeGB.ValueInt64()),
 			},
 			Taints: ts,
 			CRI: clusters.CRI{
-				Name: p.ContainerRuntime.Value,
+				Name: p.ContainerRuntime.ValueString(),
 			},
 			Labels:            ls,
 			AvailabilityZones: zs,
@@ -208,11 +208,11 @@ func (c *Cluster) hibernations() *clusters.Hibernation {
 	scs := []clusters.HibernationScedule{}
 	for _, h := range c.Hibernations {
 		sc := clusters.HibernationScedule{
-			Start: h.Start.Value,
-			End:   h.End.Value,
+			Start: h.Start.ValueString(),
+			End:   h.End.ValueString(),
 		}
 		if !h.Timezone.IsNull() && !h.Timezone.IsUnknown() {
-			sc.Timezone = h.Timezone.Value
+			sc.Timezone = h.Timezone.ValueString()
 		}
 		scs = append(scs, sc)
 	}
@@ -233,8 +233,8 @@ func (c *Cluster) extensions() *clusters.Extensions {
 
 	return &clusters.Extensions{
 		Argus: &clusters.ArgusExtension{
-			Enabled:         c.Extensions.Argus.Enabled.Value,
-			ArgusInstanceID: c.Extensions.Argus.ArgusInstanceID.Value,
+			Enabled:         c.Extensions.Argus.Enabled.ValueBool(),
+			ArgusInstanceID: c.Extensions.Argus.ArgusInstanceID.ValueString(),
 		},
 	}
 }
@@ -246,12 +246,12 @@ func (c *Cluster) maintenance() *clusters.Maintenance {
 
 	return &clusters.Maintenance{
 		AutoUpdate: clusters.MaintenanceAutoUpdate{
-			KubernetesVersion:   c.Maintenance.EnableKubernetesVersionUpdates.Value,
-			MachineImageVersion: c.Maintenance.EnableMachineImageVersionUpdates.Value,
+			KubernetesVersion:   c.Maintenance.EnableKubernetesVersionUpdates.ValueBool(),
+			MachineImageVersion: c.Maintenance.EnableMachineImageVersionUpdates.ValueBool(),
 		},
 		TimeWindow: clusters.MaintenanceTimeWindow{
-			Start: c.Maintenance.Start.Value,
-			End:   c.Maintenance.End.Value,
+			Start: c.Maintenance.Start.ValueString(),
+			End:   c.Maintenance.End.ValueString(),
 		},
 	}
 }

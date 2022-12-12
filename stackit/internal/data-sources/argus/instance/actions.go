@@ -18,7 +18,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	b, err := c.Argus.Instances.Get(ctx, config.ProjectID.Value, config.ID.Value)
+	b, err := c.Argus.Instances.Get(ctx, config.ProjectID.ValueString(), config.ID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to read instance", err.Error())
 		return

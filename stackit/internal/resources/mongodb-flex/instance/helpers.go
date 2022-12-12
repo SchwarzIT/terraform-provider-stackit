@@ -35,10 +35,10 @@ func (i *Instance) setDefaults() {
 }
 
 func (r Resource) validate(ctx context.Context, data Instance) error {
-	if err := r.validateVersion(ctx, data.ProjectID.Value, data.Version.Value); err != nil {
+	if err := r.validateVersion(ctx, data.ProjectID.ValueString(), data.Version.ValueString()); err != nil {
 		return err
 	}
-	if err := r.validateMachineType(ctx, data.ProjectID.Value, data.MachineType.Value); err != nil {
+	if err := r.validateMachineType(ctx, data.ProjectID.ValueString(), data.MachineType.ValueString()); err != nil {
 		return err
 	}
 
@@ -52,7 +52,7 @@ func (r Resource) validate(ctx context.Context, data Instance) error {
 		return errors.New("failed setting storage from object")
 	}
 
-	if err := r.validateStorage(ctx, data.ProjectID.Value, data.MachineType.Value, storage); err != nil {
+	if err := r.validateStorage(ctx, data.ProjectID.ValueString(), data.MachineType.ValueString(), storage); err != nil {
 		return err
 	}
 	return nil
@@ -96,7 +96,7 @@ func (r Resource) validateStorage(ctx context.Context, projectID, machineType st
 		return err
 	}
 
-	size := storage.Size.Value
+	size := storage.Size.ValueInt64()
 	if int64(res.StorageRange.Max) < size || int64(res.StorageRange.Min) > size {
 		return fmt.Errorf("storage size %d is not in the allowed range: %d..%d", size, res.StorageRange.Min, res.StorageRange.Max)
 	}
@@ -104,11 +104,11 @@ func (r Resource) validateStorage(ctx context.Context, projectID, machineType st
 	opts := ""
 	for _, v := range res.StorageClasses {
 		opts = opts + "\n- " + v
-		if strings.ToLower(v) == strings.ToLower(storage.Class.Value) {
+		if strings.ToLower(v) == strings.ToLower(storage.Class.ValueString()) {
 			return nil
 		}
 	}
-	return fmt.Errorf("couldn't find version '%s'. Available options are:%s\n", storage.Class.Value, opts)
+	return fmt.Errorf("couldn't find version '%s'. Available options are:%s\n", storage.Class.ValueString(), opts)
 }
 
 func applyClientResponse(pi *Instance, i instances.Instance) error {

@@ -42,7 +42,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	pdb := r.client.DataServices.PostgresDB
 
 	// handle creation
-	res, wait, err := pdb.Instances.Create(ctx, plan.ProjectID.Value, plan.Name.Value, plan.PlanID.Value, map[string]string{
+	res, wait, err := pdb.Instances.Create(ctx, plan.ProjectID.ValueString(), plan.Name.ValueString(), plan.PlanID.ValueString(), map[string]string{
 		"sgw_acl": strings.Join(acl, ","),
 	})
 
@@ -95,7 +95,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	pdb := r.client.DataServices.PostgresDB
 
 	// read instance
-	i, err := pdb.Instances.Get(ctx, state.ProjectID.Value, state.ID.Value)
+	i, err := pdb.Instances.Get(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if err != nil {
 		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.State.RemoveResource(ctx)
@@ -149,7 +149,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	pdb := r.client.DataServices.PostgresDB
 
 	// handle update
-	_, process, err := pdb.Instances.Update(ctx, state.ProjectID.Value, state.ID.Value, plan.PlanID.Value, map[string]string{
+	_, process, err := pdb.Instances.Update(ctx, state.ProjectID.ValueString(), state.ID.ValueString(), plan.PlanID.ValueString(), map[string]string{
 		"sgw_acl": strings.Join(acl, ","),
 	})
 	if err != nil {
@@ -182,7 +182,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	if !plan.PlanID.Equal(planID) {
-		resp.Diagnostics.AddError("server returned wrong plan ID after update", fmt.Sprintf("expected plan ID %s but received %s", planID.Value, plan.PlanID.Value))
+		resp.Diagnostics.AddError("server returned wrong plan ID after update", fmt.Sprintf("expected plan ID %s but received %s", planID.ValueString(), plan.PlanID.ValueString()))
 		return
 	}
 
@@ -205,7 +205,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	pdb := r.client.DataServices.PostgresDB
 
 	// handle deletion
-	process, err := pdb.Instances.Delete(ctx, state.ProjectID.Value, state.ID.Value)
+	process, err := pdb.Instances.Delete(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete instance", err.Error())
 		return

@@ -34,16 +34,16 @@ func (j *Job) setDefaults(job *jobs.Job) {
 
 func (j *Job) ToClientJob() jobs.Job {
 	job := jobs.Job{
-		JobName:        j.Name.Value,
-		Scheme:         j.Scheme.Value,
-		MetricsPath:    j.MetricsPath.Value,
-		ScrapeInterval: j.ScrapeInterval.Value,
-		ScrapeTimeout:  j.ScrapeTimeout.Value,
+		JobName:        j.Name.ValueString(),
+		Scheme:         j.Scheme.ValueString(),
+		MetricsPath:    j.MetricsPath.ValueString(),
+		ScrapeInterval: j.ScrapeInterval.ValueString(),
+		ScrapeTimeout:  j.ScrapeTimeout.ValueString(),
 	}
 
 	j.setDefaults(&job)
 
-	if j.SAML2 != nil && !j.SAML2.EnableURLParameters.Value {
+	if j.SAML2 != nil && !j.SAML2.EnableURLParameters.ValueBool() {
 		if job.Params == nil {
 			job.Params = map[string]interface{}{}
 		}
@@ -53,8 +53,8 @@ func (j *Job) ToClientJob() jobs.Job {
 	if j.BasicAuth != nil {
 		if job.BasicAuth == nil {
 			job.BasicAuth = &jobs.BasicAuth{
-				Username: j.BasicAuth.Username.Value,
-				Password: j.BasicAuth.Password.Value,
+				Username: j.BasicAuth.Username.ValueString(),
+				Password: j.BasicAuth.Password.ValueString(),
 			}
 		}
 	}
@@ -64,7 +64,7 @@ func (j *Job) ToClientJob() jobs.Job {
 		ti := jobs.StaticConfig{}
 		ti.Targets = make([]string, len(target.URLs))
 		for k, v := range target.URLs {
-			ti.Targets[k] = v.Value
+			ti.Targets[k] = v.ValueString()
 		}
 
 		ti.Labels = make(map[string]string, len(target.Labels.Elems))

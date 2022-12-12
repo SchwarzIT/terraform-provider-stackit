@@ -21,7 +21,7 @@ const (
 func (r Resource) loadPlanID(ctx context.Context, diags *diag.Diagnostics, s *Instance) {
 	c := r.client
 
-	res, err := c.Argus.Plans.List(ctx, s.ProjectID.Value)
+	res, err := c.Argus.Plans.List(ctx, s.ProjectID.ValueString())
 	if err != nil {
 		diags.AddError("failed to list plans", err.Error())
 		return
@@ -29,22 +29,22 @@ func (r Resource) loadPlanID(ctx context.Context, diags *diag.Diagnostics, s *In
 
 	avl := ""
 	for _, v := range res.Plans {
-		if v.Name == s.Plan.Value {
+		if v.Name == s.Plan.ValueString() {
 			s.PlanID = types.StringValue(v.PlanID)
 			break
 		}
 		avl = fmt.Sprintf("%s\n- %s", avl, v.Name)
 	}
-	if s.PlanID.Value == "" {
-		diags.AddError("invalid plan", fmt.Sprintf("couldn't find plan '%s'.\navailable names are:%s", s.Plan.Value, avl))
+	if s.PlanID.ValueString() == "" {
+		diags.AddError("invalid plan", fmt.Sprintf("couldn't find plan '%s'.\navailable names are:%s", s.Plan.ValueString(), avl))
 		return
 	}
 }
 
 func (l Instance) isEqual(got instances.Instance) bool {
-	if l.Name.Value == got.Name &&
-		l.Plan.Value == got.PlanName &&
-		l.PlanID.Value == got.PlanID {
+	if l.Name.ValueString() == got.Name &&
+		l.Plan.ValueString() == got.PlanName &&
+		l.PlanID.ValueString() == got.PlanID {
 		return true
 	}
 	return false

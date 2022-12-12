@@ -31,27 +31,27 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	p := Project{
-		ID:                  types.StringValue(plan.ID.Value),
-		ContainerID:         types.StringValue(plan.ContainerID.Value),
-		ParentContainerID:   types.StringValue(plan.ParentContainerID.Value),
-		Name:                types.StringValue(plan.Name.Value),
-		BillingRef:          types.StringValue(plan.BillingRef.Value),
-		OwnerEmail:          types.StringValue(plan.OwnerEmail.Value),
+		ID:                  types.StringValue(plan.ID.ValueString()),
+		ContainerID:         types.StringValue(plan.ContainerID.ValueString()),
+		ParentContainerID:   types.StringValue(plan.ParentContainerID.ValueString()),
+		Name:                types.StringValue(plan.Name.ValueString()),
+		BillingRef:          types.StringValue(plan.BillingRef.ValueString()),
+		OwnerEmail:          types.StringValue(plan.OwnerEmail.ValueString()),
 		EnableKubernetes:    types.Bool{Null: true},
 		EnableObjectStorage: types.Bool{Null: true},
 	}
 
 	if !plan.EnableKubernetes.IsNull() {
-		p.EnableKubernetes = types.Bool{Value: plan.EnableKubernetes.Value}
-		r.createKubernetesProject(ctx, &resp.Diagnostics, plan.ID.Value)
+		p.EnableKubernetes = types.Bool{Value: plan.EnableKubernetes.ValueBool()}
+		r.createKubernetesProject(ctx, &resp.Diagnostics, plan.ID.ValueString())
 		if resp.Diagnostics.HasError() {
 			return
 		}
 	}
 
 	if !plan.EnableObjectStorage.IsNull() {
-		p.EnableObjectStorage = types.Bool{Value: plan.EnableObjectStorage.Value}
-		r.createObjectStorageProject(ctx, &resp.Diagnostics, plan.ID.Value)
+		p.EnableObjectStorage = types.Bool{Value: plan.EnableObjectStorage.ValueBool()}
+		r.createObjectStorageProject(ctx, &resp.Diagnostics, plan.ID.ValueString())
 		if resp.Diagnostics.HasError() {
 			return
 		}
@@ -67,7 +67,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 func (r Resource) createProject(ctx context.Context, resp *resource.CreateResponse, plan Project) Project {
 	labels := map[string]string{
-		"billingReference": plan.BillingRef.Value,
+		"billingReference": plan.BillingRef.ValueString(),
 		"scope":            "PUBLIC",
 	}
 
@@ -77,13 +77,13 @@ func (r Resource) createProject(ctx context.Context, resp *resource.CreateRespon
 			Role:    consts.ROLE_PROJECT_OWNER,
 		},
 		{
-			Subject: plan.OwnerEmail.Value,
+			Subject: plan.OwnerEmail.ValueString(),
 			Role:    consts.ROLE_PROJECT_OWNER,
 		},
 	}
 
 	c := r.client
-	project, process, err := c.ResourceManagement.Projects.Create(ctx, plan.ParentContainerID.Value, plan.Name.Value, labels, members...)
+	project, process, err := c.ResourceManagement.Projects.Create(ctx, plan.ParentContainerID.ValueString(), plan.Name.ValueString(), labels, members...)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to create project", err.Error())
 		return plan
@@ -138,8 +138,8 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	if p.ContainerID.Value == "" && p.ID.Value != "" {
-		res, err := c.ResourceManagement.Projects.Get(ctx, p.ID.Value)
+	if p.ContainerID.ValueString() == "" && p.ID.ValueString() != "" {
+		res, err := c.ResourceManagement.Projects.Get(ctx, p.ID.ValueString())
 		if err != nil {
 			resp.Diagnostics.AddError("failed to fetch container ID", err.Error())
 			return
@@ -147,7 +147,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		p.ContainerID = types.StringValue(res.ContainerID)
 	}
 
-	project, err := c.ResourceManagement.Projects.Get(ctx, p.ContainerID.Value)
+	project, err := c.ResourceManagement.Projects.Get(ctx, p.ContainerID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to read project", err.Error())
 		return
@@ -155,7 +155,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 	if !p.EnableKubernetes.IsNull() {
 		kubernetesEnabled := false
-		if res, err := c.Kubernetes.Projects.Get(ctx, p.ID.Value); err == nil && res.State == consts.SKE_PROJECT_STATUS_CREATED {
+		if res, err := c.Kubernetes.Projects.Get(ctx, p.ID.ValueString()); err == nil && res.State == consts.SKE_PROJECT_STATUS_CREATED {
 			kubernetesEnabled = true
 		}
 		p.EnableKubernetes = types.Bool{Value: kubernetesEnabled}
@@ -163,7 +163,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 	if !p.EnableObjectStorage.IsNull() {
 		obejctStorageEnabled := false
-		if _, err := c.ObjectStorage.Projects.Get(ctx, p.ID.Value); err == nil {
+		if _, err := c.ObjectStorage.Projects.Get(ctx, p.ID.ValueString()); err == nil {
 			obejctStorageEnabled = true
 		}
 		p.EnableObjectStorage = types.Bool{Value: obejctStorageEnabled}
@@ -227,11 +227,11 @@ func (r Resource) updateProject(ctx context.Context, plan, state Project, resp *
 	c := r.client
 
 	labels := map[string]string{
-		"billingReference": plan.BillingRef.Value,
+		"billingReference": plan.BillingRef.ValueString(),
 		"scope":            "PUBLIC",
 	}
 
-	_, err := c.ResourceManagement.Projects.Update(ctx, plan.ParentContainerID.Value, plan.ContainerID.Value, plan.Name.Value, labels)
+	_, err := c.ResourceManagement.Projects.Update(ctx, plan.ParentContainerID.ValueString(), plan.ContainerID.ValueString(), plan.Name.ValueString(), labels)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to update project", err.Error())
 		return
@@ -243,12 +243,12 @@ func (r Resource) updateKubernetesProject(ctx context.Context, plan, state Proje
 		return
 	}
 
-	if plan.EnableKubernetes.IsNull() || !plan.EnableKubernetes.Value {
-		r.deleteKubernetesProject(ctx, &resp.Diagnostics, plan.ID.Value)
+	if plan.EnableKubernetes.IsNull() || !plan.EnableKubernetes.ValueBool() {
+		r.deleteKubernetesProject(ctx, &resp.Diagnostics, plan.ID.ValueString())
 		return
 	}
 
-	r.createKubernetesProject(ctx, &resp.Diagnostics, plan.ID.Value)
+	r.createKubernetesProject(ctx, &resp.Diagnostics, plan.ID.ValueString())
 }
 
 func (r Resource) updateObjectStorageProject(ctx context.Context, plan, state Project, resp *resource.UpdateResponse) {
@@ -256,12 +256,12 @@ func (r Resource) updateObjectStorageProject(ctx context.Context, plan, state Pr
 		return
 	}
 
-	if plan.EnableObjectStorage.IsNull() || !plan.EnableObjectStorage.Value {
-		r.deleteObjectStorageProject(ctx, &resp.Diagnostics, plan.ID.Value)
+	if plan.EnableObjectStorage.IsNull() || !plan.EnableObjectStorage.ValueBool() {
+		r.deleteObjectStorageProject(ctx, &resp.Diagnostics, plan.ID.ValueString())
 		return
 	}
 
-	r.createObjectStorageProject(ctx, &resp.Diagnostics, plan.ID.Value)
+	r.createObjectStorageProject(ctx, &resp.Diagnostics, plan.ID.ValueString())
 }
 
 // Delete - lifecycle function
@@ -274,15 +274,15 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 
 	c := r.client
 
-	if state.EnableKubernetes.Value {
-		_, _ = c.Kubernetes.Projects.Delete(ctx, state.ID.Value)
+	if state.EnableKubernetes.ValueBool() {
+		_, _ = c.Kubernetes.Projects.Delete(ctx, state.ID.ValueString())
 	}
 
-	if state.EnableObjectStorage.Value {
-		_ = c.ObjectStorage.Projects.Delete(ctx, state.ID.Value)
+	if state.EnableObjectStorage.ValueBool() {
+		_ = c.ObjectStorage.Projects.Delete(ctx, state.ID.ValueString())
 	}
 
-	process, err := c.ResourceManagement.Projects.Delete(ctx, state.ContainerID.Value)
+	process, err := c.ResourceManagement.Projects.Delete(ctx, state.ContainerID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete project", err.Error())
 		return

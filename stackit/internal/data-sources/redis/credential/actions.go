@@ -19,7 +19,7 @@ func (d DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	i, err := redis.Credentials.Get(ctx, config.ProjectID.Value, config.InstanceID.Value, config.ID.Value)
+	i, err := redis.Credentials.Get(ctx, config.ProjectID.ValueString(), config.InstanceID.ValueString(), config.ID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get credential", err.Error())
 		return

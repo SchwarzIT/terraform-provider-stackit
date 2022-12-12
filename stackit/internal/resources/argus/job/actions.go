@@ -23,7 +23,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	c := r.client
 	job := plan.ToClientJob()
 
-	_, process, err := c.Argus.Jobs.Create(ctx, plan.ProjectID.Value, plan.ArgusInstanceID.Value, job)
+	_, process, err := c.Argus.Jobs.Create(ctx, plan.ProjectID.ValueString(), plan.ArgusInstanceID.ValueString(), job)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to create job", err.Error())
 		return
@@ -61,7 +61,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 	c := r.client
 
-	res, err := c.Argus.Jobs.Get(ctx, state.ProjectID.Value, state.ArgusInstanceID.Value, state.Name.Value)
+	res, err := c.Argus.Jobs.Get(ctx, state.ProjectID.ValueString(), state.ArgusInstanceID.ValueString(), state.Name.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to read job", err.Error())
 		return
@@ -87,13 +87,13 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	c := r.client
 	job := plan.ToClientJob()
 
-	if _, err := c.Argus.Jobs.Update(ctx, plan.ProjectID.Value, plan.ArgusInstanceID.Value, job); err != nil {
+	if _, err := c.Argus.Jobs.Update(ctx, plan.ProjectID.ValueString(), plan.ArgusInstanceID.ValueString(), job); err != nil {
 		resp.Diagnostics.AddError("failed to update job", err.Error())
 		return
 	}
 
 	// read job to verify update
-	res, err := c.Argus.Jobs.Get(ctx, plan.ProjectID.Value, plan.ArgusInstanceID.Value, plan.Name.Value)
+	res, err := c.Argus.Jobs.Get(ctx, plan.ProjectID.ValueString(), plan.ArgusInstanceID.ValueString(), plan.Name.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to verify job update", err.Error())
 		return
@@ -119,7 +119,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	c := r.client
 	job := state.ToClientJob()
 
-	_, process, err := c.Argus.Jobs.Delete(ctx, state.ProjectID.Value, state.ArgusInstanceID.Value, job.JobName)
+	_, process, err := c.Argus.Jobs.Delete(ctx, state.ProjectID.ValueString(), state.ArgusInstanceID.ValueString(), job.JobName)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete job", err.Error())
 		return

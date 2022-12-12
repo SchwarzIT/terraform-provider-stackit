@@ -18,7 +18,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	project, err := c.ResourceManagement.Projects.Get(ctx, p.ContainerID.Value)
+	project, err := c.ResourceManagement.Projects.Get(ctx, p.ContainerID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to read project", err.Error())
 		return

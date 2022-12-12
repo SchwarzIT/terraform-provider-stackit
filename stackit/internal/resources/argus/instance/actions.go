@@ -57,7 +57,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 func (r Resource) createInstance(ctx context.Context, diags *diag.Diagnostics, plan *Instance) {
 	c := r.client
 
-	_, process, err := c.Argus.Instances.Create(ctx, plan.ProjectID.Value, plan.Name.Value, plan.PlanID.Value, map[string]string{})
+	_, process, err := c.Argus.Instances.Create(ctx, plan.ProjectID.ValueString(), plan.Name.ValueString(), plan.PlanID.ValueString(), map[string]string{})
 	if err != nil {
 		diags.AddError("failed during instance creation", err.Error())
 		return
@@ -93,10 +93,10 @@ func (r Resource) setGrafanaConfig(ctx context.Context, diags *diag.Diagnostics,
 
 	c := r.client
 	cfg := grafana.Config{
-		PublicReadAccess: s.Grafana.EnablePublicAccess.Value,
+		PublicReadAccess: s.Grafana.EnablePublicAccess.ValueBool(),
 	}
 
-	_, err := c.Argus.Grafana.UpdateConfig(ctx, s.ProjectID.Value, s.ID.Value, cfg)
+	_, err := c.Argus.Grafana.UpdateConfig(ctx, s.ProjectID.ValueString(), s.ID.ValueString(), cfg)
 	if err != nil {
 		diags.AddError("failed to set grafana config", err.Error())
 		return
@@ -125,12 +125,12 @@ func (r Resource) setMetricsConfig(ctx context.Context, diags *diag.Diagnostics,
 
 	c := r.client
 	cfg := metrics.Config{
-		MetricsRetentionTimeRaw: fmt.Sprintf("%dd", s.Metrics.RetentionDays.Value),
-		MetricsRetentionTime5m:  fmt.Sprintf("%dd", s.Metrics.RetentionDays5mDownsampling.Value),
-		MetricsRetentionTime1h:  fmt.Sprintf("%dd", s.Metrics.RetentionDays1hDownsampling.Value),
+		MetricsRetentionTimeRaw: fmt.Sprintf("%dd", s.Metrics.RetentionDays.ValueInt64()),
+		MetricsRetentionTime5m:  fmt.Sprintf("%dd", s.Metrics.RetentionDays5mDownsampling.ValueInt64()),
+		MetricsRetentionTime1h:  fmt.Sprintf("%dd", s.Metrics.RetentionDays1hDownsampling.ValueInt64()),
 	}
 
-	_, err := c.Argus.Metrics.UpdateConfig(ctx, s.ProjectID.Value, s.ID.Value, cfg)
+	_, err := c.Argus.Metrics.UpdateConfig(ctx, s.ProjectID.ValueString(), s.ID.ValueString(), cfg)
 	if err != nil {
 		diags.AddError("failed to set metrics config", err.Error())
 		return
@@ -152,7 +152,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	if state.ID.Value == "" {
+	if state.ID.ValueString() == "" {
 		resp.State.RemoveResource(ctx)
 		return
 	}
@@ -176,7 +176,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 func (r Resource) readInstance(ctx context.Context, diags *diag.Diagnostics, s *Instance) {
 	c := r.client
-	res, err := c.Argus.Instances.Get(ctx, s.ProjectID.Value, s.ID.Value)
+	res, err := c.Argus.Instances.Get(ctx, s.ProjectID.ValueString(), s.ID.ValueString())
 	if err != nil {
 		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			s.ID = types.StringValue("")
@@ -193,13 +193,13 @@ func (r Resource) readGrafana(ctx context.Context, diags *diag.Diagnostics, s *I
 	if s.Grafana == nil {
 		return
 	}
-	if s.ID.Value == "" {
+	if s.ID.ValueString() == "" {
 		diags.AddError("missing instance ID", "not instance ID specified when reading grafana config")
 		return
 	}
 
 	c := r.client
-	res, err := c.Argus.Grafana.GetConfig(ctx, s.ProjectID.Value, s.ID.Value)
+	res, err := c.Argus.Grafana.GetConfig(ctx, s.ProjectID.ValueString(), s.ID.ValueString())
 	if err != nil {
 		diags.AddError("failed to read grafana config", err.Error())
 		return
@@ -212,13 +212,13 @@ func (r Resource) readMetrics(ctx context.Context, diags *diag.Diagnostics, s *I
 	if s.Metrics == nil {
 		return
 	}
-	if s.ID.Value == "" {
+	if s.ID.ValueString() == "" {
 		diags.AddError("missing instance ID", "not instance ID specified when reading metrics config")
 		return
 	}
 
 	c := r.client
-	res, err := c.Argus.Metrics.GetConfig(ctx, s.ProjectID.Value, s.ID.Value)
+	res, err := c.Argus.Metrics.GetConfig(ctx, s.ProjectID.ValueString(), s.ID.ValueString())
 	if err != nil {
 		diags.AddError("failed to read grafana config", err.Error())
 		return
@@ -245,11 +245,11 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	// check if computed attributes are in the plan
-	if plan.ID.Value == "" {
+	if plan.ID.ValueString() == "" {
 		plan.ID = state.ID
 	}
 
-	if plan.PlanID.Value == "" {
+	if plan.PlanID.ValueString() == "" {
 		if plan.Plan.Equal(state.Plan) {
 			plan.PlanID = state.PlanID
 		} else {
@@ -300,7 +300,7 @@ func (r Resource) updateInstance(ctx context.Context, diags *diag.Diagnostics, p
 	}
 
 	c := r.client
-	_, process, err := c.Argus.Instances.Update(ctx, plan.ProjectID.Value, plan.ID.Value, plan.Name.Value, plan.PlanID.Value, map[string]string{})
+	_, process, err := c.Argus.Instances.Update(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), plan.Name.ValueString(), plan.PlanID.ValueString(), map[string]string{})
 	if err != nil {
 		diags.AddError("failed during instance update", err.Error())
 		return
@@ -337,7 +337,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	c := r.client
-	_, process, err := c.Argus.Instances.Delete(ctx, state.ProjectID.Value, state.ID.Value)
+	_, process, err := c.Argus.Instances.Delete(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete instance", err.Error())
 	}
@@ -390,7 +390,7 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 	}
 
 	r.readGrafana(ctx, &resp.Diagnostics, &inst)
-	if inst.Grafana.EnablePublicAccess.Value {
+	if inst.Grafana.EnablePublicAccess.ValueBool() {
 		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("grafana"), &Grafana{
 			EnablePublicAccess: types.Bool{Value: true},
 		})...)

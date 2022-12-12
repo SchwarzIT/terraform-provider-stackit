@@ -54,8 +54,8 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 	}
 
 	// cluster vars
-	projectID := cl.ProjectID.Value
-	clusterName := cl.Name.Value
+	projectID := cl.ProjectID.ValueString()
+	clusterName := cl.Name.ValueString()
 	clusterConfig, err := cl.clusterConfig(versions)
 	if err != nil {
 		diags.AddError("Failed to create cluster config", err.Error())
@@ -105,7 +105,7 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 
 func (r Resource) getCredential(ctx context.Context, diags *diag.Diagnostics, cl *Cluster) {
 	c := r.client
-	cred, err := c.Kubernetes.Clusters.GetCredential(ctx, cl.ProjectID.Value, cl.Name.Value)
+	cred, err := c.Kubernetes.Clusters.GetCredential(ctx, cl.ProjectID.ValueString(), cl.Name.ValueString())
 	if err != nil {
 		diags.AddError("failed to get cluster credentials", err.Error())
 		return
@@ -125,7 +125,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	// read cluster
-	cl, err := c.Kubernetes.Clusters.Get(ctx, state.ProjectID.Value, state.Name.Value)
+	cl, err := c.Kubernetes.Clusters.Get(ctx, state.ProjectID.ValueString(), state.Name.ValueString())
 	if err != nil {
 		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.State.RemoveResource(ctx)
@@ -188,7 +188,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	c := r.client
-	process, err := c.Kubernetes.Clusters.Delete(ctx, state.ProjectID.Value, state.Name.Value)
+	process, err := c.Kubernetes.Clusters.Delete(ctx, state.ProjectID.ValueString(), state.Name.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete cluster", err.Error())
 		return

@@ -49,7 +49,7 @@ func (r Resource) createBucket(ctx context.Context, resp *resource.CreateRespons
 	var b buckets.BucketResponse
 
 	// Create bucket
-	process, err := c.ObjectStorage.Buckets.Create(ctx, plan.ProjectID.Value, plan.Name.Value)
+	process, err := c.ObjectStorage.Buckets.Create(ctx, plan.ProjectID.ValueString(), plan.Name.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to verify bucket creation", err.Error())
 		return b
@@ -80,7 +80,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	b, err := c.ObjectStorage.Buckets.Get(ctx, state.ProjectID.Value, state.Name.Value)
+	b, err := c.ObjectStorage.Buckets.Get(ctx, state.ProjectID.ValueString(), state.Name.ValueString())
 	if err != nil {
 		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.State.RemoveResource(ctx)
@@ -116,7 +116,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	t := httpClient.Timeout
 
 	httpClient.Timeout = time.Minute
-	process, err := c.ObjectStorage.Buckets.Delete(ctx, state.ProjectID.Value, state.Name.Value)
+	process, err := c.ObjectStorage.Buckets.Delete(ctx, state.ProjectID.ValueString(), state.Name.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to verify bucket deletion", err.Error())
 		return

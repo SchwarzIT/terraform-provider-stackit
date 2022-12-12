@@ -37,19 +37,19 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 func (r Resource) createCredentialGroup(ctx context.Context, data *CredentialsGroup) diag.Diagnostic {
 	c := r.client
-	err := c.ObjectStorage.CredentialsGroup.Create(ctx, data.ProjectID.Value, data.Name.Value)
+	err := c.ObjectStorage.CredentialsGroup.Create(ctx, data.ProjectID.ValueString(), data.Name.ValueString())
 	if err != nil {
 		return diag.NewErrorDiagnostic("failed to create credential group", err.Error())
 
 	}
 
-	res, err := c.ObjectStorage.CredentialsGroup.List(ctx, data.ProjectID.Value)
+	res, err := c.ObjectStorage.CredentialsGroup.List(ctx, data.ProjectID.ValueString())
 	if err != nil {
 		return diag.NewErrorDiagnostic("failed to list credential groups", err.Error())
 	}
 
 	for _, group := range res.CredentialsGroups {
-		if group.DisplayName == data.Name.Value {
+		if group.DisplayName == data.Name.ValueString() {
 			data.ID = types.StringValue(group.CredentialsGroupID)
 			data.URN = types.StringValue(group.URN)
 			break
@@ -68,7 +68,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	res, err := c.ObjectStorage.CredentialsGroup.List(ctx, state.ProjectID.Value)
+	res, err := c.ObjectStorage.CredentialsGroup.List(ctx, state.ProjectID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to read credential group", err.Error())
 		return
@@ -76,7 +76,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 	found := false
 	for _, group := range res.CredentialsGroups {
-		if group.DisplayName == state.Name.Value {
+		if group.DisplayName == state.Name.ValueString() {
 			found = true
 			state.ID = types.StringValue(group.CredentialsGroupID)
 			state.URN = types.StringValue(group.URN)
@@ -108,7 +108,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	c := r.client
-	if err := c.ObjectStorage.CredentialsGroup.Delete(ctx, state.ProjectID.Value, state.ID.Value); err != nil {
+	if err := c.ObjectStorage.CredentialsGroup.Delete(ctx, state.ProjectID.ValueString(), state.ID.ValueString()); err != nil {
 		resp.Diagnostics.AddError("failed to delete credential group", err.Error())
 		return
 	}

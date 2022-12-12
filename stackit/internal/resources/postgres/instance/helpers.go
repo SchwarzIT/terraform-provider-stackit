@@ -27,16 +27,16 @@ func (r Resource) validate(ctx context.Context, data *Instance) error {
 		return errors.New("at least 1 ip address must be specified for `acl`")
 	}
 
-	res, err := r.client.DataServices.PostgresDB.Options.GetOfferings(ctx, data.ProjectID.Value)
+	res, err := r.client.DataServices.PostgresDB.Options.GetOfferings(ctx, data.ProjectID.ValueString())
 	if err != nil {
 		return errors.Wrap(err, "failed to fetch offerings")
 	}
 
-	if err := r.validateVersion(ctx, res.Offerings, data.Version.Value); err != nil {
+	if err := r.validateVersion(ctx, res.Offerings, data.Version.ValueString()); err != nil {
 		return err
 	}
 
-	planID, err := r.validatePlan(ctx, res.Offerings, data.Version.Value, data.Plan.Value)
+	planID, err := r.validatePlan(ctx, res.Offerings, data.Version.ValueString(), data.Plan.ValueString())
 	if err != nil {
 		return err
 	}

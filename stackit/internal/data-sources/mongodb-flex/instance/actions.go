@@ -20,7 +20,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	list, err := c.Instances.List(ctx, config.ProjectID.Value)
+	list, err := c.Instances.List(ctx, config.ProjectID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to list instances", err.Error())
 		return
@@ -29,7 +29,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	found := -1
 	existing := ""
 	for i, instance := range list.Items {
-		if instance.Name == config.Name.Value {
+		if instance.Name == config.Name.ValueString() {
 			found = i
 			break
 		}
@@ -48,7 +48,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 
 	// set found instance
 	instance := list.Items[found]
-	ires, err := c.Instances.Get(ctx, config.ProjectID.Value, instance.ID)
+	ires, err := c.Instances.Get(ctx, config.ProjectID.ValueString(), instance.ID)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get instances", err.Error())
 		return
