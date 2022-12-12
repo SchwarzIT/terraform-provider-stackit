@@ -13,7 +13,7 @@ import (
 func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var config Credential
 	diags := req.Config.Get(ctx, &config)
-	es := d.client.DataServices.ElasticSearch
+	es := d.client.DataServices.PostgresDB
 
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {

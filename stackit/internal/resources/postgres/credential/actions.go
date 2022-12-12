@@ -22,7 +22,7 @@ func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, resp 
 		return
 	}
 
-	es := r.client.DataServices.ElasticSearch
+	es := r.client.DataServices.PostgresDB
 
 	// handle creation
 	res, err := es.Credentials.Create(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString())
@@ -59,7 +59,7 @@ func (r *Resource) Read(ctx context.Context, req resource.ReadRequest, resp *res
 		return
 	}
 
-	es := r.client.DataServices.ElasticSearch
+	es := r.client.DataServices.PostgresDB
 
 	// read instance credential
 	res, err := es.Credentials.Get(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString(), cred.ID.ValueString())
@@ -96,7 +96,7 @@ func (r *Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp 
 		return
 	}
 
-	es := r.client.DataServices.ElasticSearch
+	es := r.client.DataServices.PostgresDB
 
 	res, err := es.Credentials.Delete(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString(), cred.ID.ValueString())
 	if err != nil {

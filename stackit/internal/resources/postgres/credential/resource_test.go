@@ -16,7 +16,7 @@ import (
 
 const run_this_test = false
 
-func TestAcc_ElasticSearchJob(t *testing.T) {
+func TestAcc_PostgresJob(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
 		t.Skip()
 		return
@@ -77,7 +77,7 @@ func config(project_id, name string) string {
 	resource "stackit_postgres_instance" "example" {
 		name       = "%s"
 		project_id = "%s"
-		version    = "7"
+		version    = "11"
 	  }
 	  
 	resource "stackit_postgres_credential" "example" {
