@@ -23,7 +23,7 @@ func TestAcc_ElasticSearchJob(t *testing.T) {
 	}
 
 	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
-	project_id := common.ACC_TEST_PROJECT_ID
+	project_id := common.GetAcceptanceTestsProjectID()
 
 	resource.ParallelTest(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){
@@ -63,7 +63,7 @@ func TestAcc_ElasticSearchJob(t *testing.T) {
 						return "", errors.New("couldn't find attribute id")
 					}
 
-					return fmt.Sprintf("%s,%s,%s", common.ACC_TEST_PROJECT_ID, iid, id), nil
+					return fmt.Sprintf("%s,%s,%s", common.GetAcceptanceTestsProjectID(), iid, id), nil
 				},
 				ImportState:       true,
 				ImportStateVerify: true,

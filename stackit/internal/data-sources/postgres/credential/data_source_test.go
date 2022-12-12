@@ -30,9 +30,9 @@ func TestAcc_PostgresCredential(t *testing.T) {
 		Steps: []resource.TestStep{
 			// check minimal configuration
 			{
-				Config: config(common.ACC_TEST_PROJECT_ID, name),
+				Config: config(common.GetAcceptanceTestsProjectID(), name),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("data.stackit_postgres_credential.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("data.stackit_postgres_credential.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckTypeSetElemAttrPair("stackit_postgres_credential.example", "project_id", "data.stackit_postgres_credential.example", "project_id"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_postgres_credential.example", "instance_id", "data.stackit_postgres_credential.example", "instance_id"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_postgres_credential.example", "id", "data.stackit_postgres_credential.example", "id"),
