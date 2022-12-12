@@ -3,19 +3,15 @@ package credential
 import (
 	"context"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/data-services/credentials"
-	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-func (r *Resource) applyClientResponse(_ context.Context, c *Credential, cgr credentials.GetResponse) error {
+func (r *Resource) applyClientResponse(ctx context.Context, c *Credential, cgr credentials.GetResponse) error {
 	c.ID = types.StringValue(cgr.ID)
 	c.CACert = types.StringValue(cgr.Raw.Credential.Cacrt)
 	c.Host = types.StringValue(cgr.Raw.Credential.Host)
 	if len(cgr.Raw.Credential.Hosts) > 0 {
-		c.Hosts, _ = types.ListValue(types.StringType, make([]attr.Value, len(cgr.Raw.Credential.Hosts)))
-		for k, v := range cgr.Raw.Credential.Hosts {
-			c.Hosts.Elements()[k] = types.StringValue(v)
-		}
+		c.Hosts, _ = types.ListValueFrom(ctx, types.StringType, cgr.Raw.Credential.Hosts)
 	}
 	c.Username = types.StringValue(cgr.Raw.Credential.Username)
 	c.Password = types.StringValue(cgr.Raw.Credential.Password)
