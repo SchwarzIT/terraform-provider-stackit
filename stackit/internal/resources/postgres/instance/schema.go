@@ -66,6 +66,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Description: fmt.Sprintf("The PostgresDB Plan. Default is `%s`.\nOptions are: `stackit-postgresql-cluster-big`, `stackit-postgresql-cluster-extra-large`, `stackit-postgresql-cluster-medium`, `stackit-postgresql-cluster-small`, `stackit-postgresql-single-medium`, `stackit-postgresql-single-small`, `stackit-postgresql-cluster-extra-large-non-ssl`, `stackit-postgresql-cluster-medium-non-ssl`, `stackit-postgresql-single-small-non-ss`, `stackit-postgresql-cluster-big-non-ssl`, `stackit-postgresql-cluster-small-non-ssl`, `stackit-postgresql-single-medium-non-ssl`", default_plan),
 				Type:        types.StringType,
 				Optional:    true,
+				Computed:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					modifiers.StringDefault(default_plan),
 				},
@@ -79,6 +80,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Description: "PostgresDB version. Options: `10`, `11`. Changing this value requires the resource to be recreated.",
 				Type:        types.StringType,
 				Optional:    true,
+				Computed:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					resource.RequiresReplace(),
 					modifiers.StringDefault(default_version),
