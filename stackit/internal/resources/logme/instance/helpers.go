@@ -17,10 +17,10 @@ const (
 )
 
 func (r Resource) validate(ctx context.Context, data *Instance) error {
-	if data.Plan.Value == "" {
+	if data.Plan.ValueString() == "" {
 		data.Plan = types.StringValue(default_plan)
 	}
-	if data.Version.Value == "" {
+	if data.Version.ValueString() == "" {
 		data.Version = types.StringValue(default_version)
 	}
 
