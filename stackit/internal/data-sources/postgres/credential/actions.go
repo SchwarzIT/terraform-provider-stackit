@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 
-	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -31,10 +30,9 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 	config.Host = types.StringValue(i.Raw.Credential.Host)
 	if len(i.Raw.Credential.Hosts) > 0 {
 		var d diag.Diagnostics
-		config.Hosts, d = types.ListValue(types.StringType, make([]attr.Value, len(i.Raw.Credential.Hosts)))
-		resp.Diagnostics.Append(d...)
-		for k, v := range i.Raw.Credential.Hosts {
-			config.Hosts.Elements()[k] = types.StringValue(v)
+		if len(i.Raw.Credential.Hosts) > 0 {
+			config.Hosts, d = types.ListValueFrom(ctx, types.StringType, i.Raw.Credential.Hosts)
+			resp.Diagnostics.Append(d...)
 		}
 	}
 	config.Username = types.StringValue(i.Raw.Credential.Username)
