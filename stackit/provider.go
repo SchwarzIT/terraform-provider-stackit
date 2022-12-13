@@ -8,6 +8,7 @@ import (
 	dataElasticSearchCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/elasticsearch/credential"
 	dataElasticSearchInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/elasticsearch/instance"
 	dataKubernetes "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/kubernetes"
+	dataLogMeCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/logme/credential"
 	dataLogMeInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/logme/instance"
 	dataMariaDBCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/mariadb/credential"
 	dataMariaDBInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/mariadb/instance"
@@ -21,11 +22,13 @@ import (
 	dataRabbitMQInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/rabbitmq/instance"
 	dataRedisCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/redis/credential"
 	dataRedisInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/redis/instance"
+
 	resourceArgusInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/instance"
 	resourceArgusJob "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/job"
 	resourceElasticSearchCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/elasticsearch/credential"
 	resourceElasticsearchInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/elasticsearch/instance"
 	resourceKubernetes "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/kubernetes"
+	resourceLogMeCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/logme/credential"
 	resourceLogMeInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/logme/instance"
 	resourceMariaDBCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mariadb/credential"
 	resourceMariaDBInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mariadb/instance"
@@ -108,6 +111,7 @@ func (p *StackitProvider) Resources(ctx context.Context) []func() resource.Resou
 		resourceElasticSearchCredential.New,
 		resourceElasticsearchInstance.New,
 		resourceKubernetes.New,
+		resourceLogMeCredential.New,
 		resourceLogMeInstance.New,
 		resourceMariaDBCredential.New,
 		resourceMariaDBInstance.New,
@@ -132,6 +136,7 @@ func (p *StackitProvider) DataSources(context.Context) []func() datasource.DataS
 		dataElasticSearchCredential.New,
 		dataElasticSearchInstance.New,
 		dataKubernetes.New,
+		dataLogMeCredential.New,
 		dataLogMeInstance.New,
 		dataMariaDBCredential.New,
 		dataMariaDBInstance.New,

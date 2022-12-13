@@ -66,6 +66,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Description: fmt.Sprintf("The LogMe Plan. Default is `%s`.\nOptions are: `stackit-logme-platform-logging-non-ssl`, `stackit-logme-single-small-non-ssl`, `stackit-logme-single-medium-non-ssl`, `stackit-logme-cluster-big-non-ssl`, `stackit-logme-cluster-medium-non-ssl`, `stackit-logme-cluster-small-non-ssl`", default_plan),
 				Type:        types.StringType,
 				Optional:    true,
+				Computed:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					modifiers.StringDefault(default_plan),
 				},
@@ -79,6 +80,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Description: "LogMe version. Only Option: `LogMe`. Changing this value requires the resource to be recreated.",
 				Type:        types.StringType,
 				Optional:    true,
+				Computed:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					resource.RequiresReplace(),
 					modifiers.StringDefault(default_version),
