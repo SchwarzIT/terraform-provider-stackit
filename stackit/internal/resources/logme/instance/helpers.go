@@ -18,10 +18,10 @@ const (
 
 func (r Resource) validate(ctx context.Context, data *Instance) error {
 	if data.Plan.Value == "" {
-		data.Plan = types.String{Value: default_plan}
+		data.Plan = types.StringValue(default_plan)
 	}
 	if data.Version.Value == "" {
-		data.Version = types.String{Value: default_version}
+		data.Version = types.StringValue(default_version)
 	}
 
 	if !data.ACL.IsUnknown() && len(data.ACL.Elems) == 0 {

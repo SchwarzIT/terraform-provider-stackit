@@ -18,10 +18,10 @@ const (
 
 func (r Resource) validate(ctx context.Context, data *Instance) error {
 	if data.Version.IsNull() || data.Version.IsUnknown() {
-		data.Version = types.String{Value: default_version}
+		data.Version = types.StringValue(default_version)
 	}
 	if data.Plan.IsNull() || data.Plan.IsUnknown() {
-		data.Plan = types.String{Value: default_plan}
+		data.Plan = types.StringValue(default_plan)
 	}
 	if !data.ACL.IsUnknown() && len(data.ACL.Elems) == 0 {
 		return errors.New("at least 1 ip address must be specified for `acl`")
