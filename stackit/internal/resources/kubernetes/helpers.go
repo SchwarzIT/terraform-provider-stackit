@@ -26,7 +26,7 @@ const (
 	default_volume_size_gb           int64 = 20
 	default_cri                            = "containerd"
 	default_zone                           = "eu01-m"
-	default_version                        = "1.23"
+	default_version                        = "1.24.6"
 )
 
 func (r Resource) loadAvaiableVersions(ctx context.Context) ([]*semver.Version, error) {
