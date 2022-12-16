@@ -31,7 +31,7 @@ func TestAcc_PostgresDBInstance(t *testing.T) {
 		Steps: []resource.TestStep{
 			// check minimal configuration
 			{
-				Config: config(name, version, plan),
+				Config: config(name, version),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.stackit_postgres_instance.example", "name", name),
 					resource.TestCheckResourceAttr("data.stackit_postgres_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
@@ -52,13 +52,12 @@ func TestAcc_PostgresDBInstance(t *testing.T) {
 	})
 }
 
-func config(name, version, plan string) string {
+func config(name, version string) string {
 	return fmt.Sprintf(`
 	resource "stackit_postgres_instance" "example" {
 		name       = "%s"
 		project_id = "%s"
 		version    = "%s"
-		plan       = "%s"
 	  }
 
 
@@ -73,7 +72,6 @@ func config(name, version, plan string) string {
 		name,
 		common.GetAcceptanceTestsProjectID(),
 		version,
-		plan,
 		name,
 		common.GetAcceptanceTestsProjectID(),
 	)

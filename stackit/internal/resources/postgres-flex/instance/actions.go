@@ -44,8 +44,8 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	storage := Storage{}
 	if plan.Storage.IsUnknown() {
 		storage = Storage{
-			Class: types.String{Value: default_storage_class},
-			Size:  types.Int64{Value: default_storage_size},
+			Class: types.StringValue(default_storage_class),
+			Size:  types.Int64Value(default_storage_size),
 		}
 	} else {
 		resp.Diagnostics.Append(plan.Storage.As(ctx, &storage, types.ObjectAsOptions{})...)
@@ -55,10 +55,10 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	// handle creation
-	res, wait, err := r.client.PostgresFlex.Instances.Create(ctx, plan.ProjectID.Value, plan.Name.Value, plan.MachineType.Value, instances.Storage{
-		Class: storage.Class.Value,
-		Size:  int(storage.Size.Value),
-	}, plan.Version.Value, int(plan.Replicas.Value), plan.BackupSchedule.Value, plan.Labels, plan.Options, instances.ACL{Items: acl})
+	res, wait, err := r.client.PostgresFlex.Instances.Create(ctx, plan.ProjectID.ValueString(), plan.Name.ValueString(), plan.MachineType.ValueString(), instances.Storage{
+		Class: storage.Class.ValueString(),
+		Size:  int(storage.Size.ValueInt64()),
+	}, plan.Version.ValueString(), int(plan.Replicas.ValueInt64()), plan.BackupSchedule.ValueString(), plan.Labels, plan.Options, instances.ACL{Items: acl})
 
 	if err != nil {
 		resp.Diagnostics.AddError("failed Postgres instance creation", err.Error())
@@ -66,9 +66,9 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	// set state
-	plan.ID = types.String{Value: res.ID}
+	plan.ID = types.StringValue(res.ID)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), res.ID)...)
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project_id"), plan.ProjectID.Value)...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project_id"), plan.ProjectID.ValueString())...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -113,7 +113,7 @@ func (r Resource) createUser(ctx context.Context, plan *PostgresInstance, d *dia
 	roles := []string{}
 
 	for maxTries := 10; maxTries > -1; maxTries-- {
-		res, err := r.client.PostgresFlex.Users.Create(ctx, plan.ProjectID.Value, plan.ID.Value, username, database, roles)
+		res, err := r.client.PostgresFlex.Users.Create(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), username, database, roles)
 		if err != nil {
 			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) && maxTries > 0 {
 				time.Sleep(time.Second * 5)
@@ -129,7 +129,7 @@ func (r Resource) createUser(ctx context.Context, plan *PostgresInstance, d *dia
 
 		elems := []attr.Value{}
 		for _, v := range res.Item.Roles {
-			elems = append(elems, types.String{Value: v})
+			elems = append(elems, types.StringValue(v))
 		}
 		u, diags := types.ObjectValue(
 			map[string]attr.Type{
@@ -143,13 +143,13 @@ func (r Resource) createUser(ctx context.Context, plan *PostgresInstance, d *dia
 				"roles":    types.ListType{ElemType: types.StringType},
 			},
 			map[string]attr.Value{
-				"id":       types.String{Value: res.Item.ID},
-				"username": types.String{Value: res.Item.Username},
-				"database": types.String{Value: res.Item.Database},
-				"password": types.String{Value: res.Item.Password},
-				"hostname": types.String{Value: res.Item.Hostname},
-				"port":     types.Int64{Value: int64(res.Item.Port)},
-				"uri":      types.String{Value: res.Item.URI},
+				"id":       types.StringValue(res.Item.ID),
+				"username": types.StringValue(res.Item.Username),
+				"database": types.StringValue(res.Item.Database),
+				"password": types.StringValue(res.Item.Password),
+				"hostname": types.StringValue(res.Item.Hostname),
+				"port":     types.Int64Value(int64(res.Item.Port)),
+				"uri":      types.StringValue(res.Item.URI),
 				"roles":    types.List{ElemType: types.StringType, Elems: elems},
 			},
 		)
@@ -170,7 +170,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	// read cluster
-	instance, err := r.client.PostgresFlex.Instances.Get(ctx, state.ProjectID.Value, state.ID.Value)
+	instance, err := r.client.PostgresFlex.Instances.Get(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if err != nil {
 		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.State.RemoveResource(ctx)
@@ -227,7 +227,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	// handle update
-	_, wait, err := r.client.PostgresFlex.Instances.Update(ctx, plan.ProjectID.Value, plan.ID.Value, plan.MachineType.Value, plan.BackupSchedule.Value, plan.Labels, plan.Options, instances.ACL{Items: acl})
+	_, wait, err := r.client.PostgresFlex.Instances.Update(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), plan.MachineType.ValueString(), plan.BackupSchedule.ValueString(), plan.Labels, plan.Options, instances.ACL{Items: acl})
 	if err != nil {
 		resp.Diagnostics.AddError("failed Postgres instance update", err.Error())
 		return
@@ -266,7 +266,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	process, err := r.client.PostgresFlex.Instances.Delete(ctx, state.ProjectID.Value, state.ID.Value)
+	process, err := r.client.PostgresFlex.Instances.Delete(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete postgres instance", err.Error())
 		return

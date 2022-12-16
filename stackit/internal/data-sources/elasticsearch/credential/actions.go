@@ -19,32 +19,29 @@ func (d DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	i, err := es.Credentials.Get(ctx, config.ProjectID.Value, config.InstanceID.Value, config.ID.Value)
+	i, err := es.Credentials.Get(ctx, config.ProjectID.ValueString(), config.InstanceID.ValueString(), config.ID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get credential", err.Error())
 		return
 	}
 
 	// set computed fields
-	config.CACert = types.String{Value: i.Raw.Credential.Cacrt}
-	config.Host = types.String{Value: i.Raw.Credential.Host}
-
+	config.CACert = types.StringValue(i.Raw.Credential.Cacrt)
+	config.Host = types.StringValue(i.Raw.Credential.Host)
 	config.Hosts = types.List{ElemType: types.StringType}
 	if len(i.Raw.Credential.Hosts) > 0 {
 		config.Hosts.Elems = make([]attr.Value, len(i.Raw.Credential.Hosts))
 		for k, v := range i.Raw.Credential.Hosts {
-			config.Hosts.Elems[k] = types.String{Value: v}
+			config.Hosts.Elems[k] = types.StringValue(v)
 		}
 	}
-
-	config.Username = types.String{Value: i.Raw.Credential.Username}
-	config.Password = types.String{Value: i.Raw.Credential.Password}
-	config.Port = types.Int64{Value: int64(i.Raw.Credential.Port)}
-	config.SyslogDrainURL = types.String{Value: i.Raw.SyslogDrainURL}
-	config.RouteServiceURL = types.String{Value: i.Raw.RouteServiceURL}
-	config.Schema = types.String{Value: i.Raw.Credential.Scheme}
-	config.URI = types.String{Value: i.URI}
-
+	config.Username = types.StringValue(i.Raw.Credential.Username)
+	config.Password = types.StringValue(i.Raw.Credential.Password)
+	config.Port = types.Int64Value(int64(i.Raw.Credential.Port))
+	config.SyslogDrainURL = types.StringValue(i.Raw.SyslogDrainURL)
+	config.RouteServiceURL = types.StringValue(i.Raw.RouteServiceURL)
+	config.Schema = types.StringValue(i.Raw.Credential.Scheme)
+	config.URI = types.StringValue(i.URI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &config)...)
 	if resp.Diagnostics.HasError() {
 		return

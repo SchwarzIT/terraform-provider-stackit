@@ -17,32 +17,31 @@ const (
 )
 
 func (r Resource) validate(ctx context.Context, data *Instance) error {
-	if data.Plan.Value == "" {
-		data.Plan = types.String{Value: default_plan}
+	if data.Plan.ValueString() == "" {
+		data.Plan = types.StringValue(default_plan)
 	}
-	if data.Version.Value == "" {
-		data.Version = types.String{Value: default_version}
+	if data.Version.ValueString() == "" {
+		data.Version = types.StringValue(default_version)
 	}
 
 	if !data.ACL.IsUnknown() && len(data.ACL.Elems) == 0 {
 		return errors.New("at least 1 ip address must be specified for `acl`")
 	}
 
-	res, err := r.client.DataServices.LogMe.Options.GetOfferings(ctx, data.ProjectID.Value)
+	res, err := r.client.DataServices.LogMe.Options.GetOfferings(ctx, data.ProjectID.ValueString())
 	if err != nil {
 		return errors.Wrap(err, "failed to fetch offerings")
 	}
 
-	if err := r.validateVersion(ctx, res.Offerings, data.Version.Value); err != nil {
+	if err := r.validateVersion(ctx, res.Offerings, data.Version.ValueString()); err != nil {
 		return err
 	}
 
-	planID, err := r.validatePlan(ctx, res.Offerings, data.Version.Value, data.Plan.Value)
+	planID, err := r.validatePlan(ctx, res.Offerings, data.Version.ValueString(), data.Plan.ValueString())
 	if err != nil {
 		return err
 	}
-
-	data.PlanID = types.String{Value: planID}
+	data.PlanID = types.StringValue(planID)
 	return nil
 }
 
@@ -80,18 +79,17 @@ func (r Resource) applyClientResponse(ctx context.Context, pi *Instance, i insta
 	if aclString, ok := i.Parameters["sgw_acl"]; ok {
 		items := strings.Split(aclString, ",")
 		for _, v := range items {
-			pi.ACL.Elems = append(pi.ACL.Elems, types.String{Value: v})
+			pi.ACL.Elems = append(pi.ACL.Elems, types.StringValue(v))
 		}
 	} else {
 		pi.ACL.Null = true
 	}
-
-	pi.Name = types.String{Value: i.Name}
-	pi.PlanID = types.String{Value: i.PlanID}
-	pi.DashboardURL = types.String{Value: i.DashboardURL}
-	pi.CFGUID = types.String{Value: i.CFGUID}
-	pi.CFSpaceGUID = types.String{Value: i.CFSpaceGUID}
-	pi.CFOrganizationGUID = types.String{Value: i.CFOrganizationGUID}
+	pi.Name = types.StringValue(i.Name)
+	pi.PlanID = types.StringValue(i.PlanID)
+	pi.DashboardURL = types.StringValue(i.DashboardURL)
+	pi.CFGUID = types.StringValue(i.CFGUID)
+	pi.CFSpaceGUID = types.StringValue(i.CFSpaceGUID)
+	pi.CFOrganizationGUID = types.StringValue(i.CFOrganizationGUID)
 	return nil
 }
 

@@ -20,7 +20,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	list, err := c.Instances.List(ctx, config.ProjectID.Value)
+	list, err := c.Instances.List(ctx, config.ProjectID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to list instances", err.Error())
 		return
@@ -29,7 +29,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	found := -1
 	existing := ""
 	for i, instance := range list.Items {
-		if instance.Name == config.Name.Value {
+		if instance.Name == config.Name.ValueString() {
 			found = i
 			break
 		}
@@ -48,30 +48,29 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 
 	// set found instance
 	instance := list.Items[found]
-	ires, err := c.Instances.Get(ctx, config.ProjectID.Value, instance.ID)
+	ires, err := c.Instances.Get(ctx, config.ProjectID.ValueString(), instance.ID)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get instances", err.Error())
 		return
 	}
 	i := ires.Item
-	config.ID = types.String{Value: instance.ID}
+	config.ID = types.StringValue(instance.ID)
 	config.ACL = types.List{ElemType: types.StringType}
 	for _, v := range i.ACL.Items {
-		config.ACL.Elems = append(config.ACL.Elems, types.String{Value: v})
+		config.ACL.Elems = append(config.ACL.Elems, types.StringValue(v))
 	}
-	config.BackupSchedule = types.String{Value: i.BackupSchedule}
-	config.MachineType = types.String{Value: i.Flavor.ID}
-	config.Name = types.String{Value: i.Name}
-	config.Replicas = types.Int64{Value: int64(i.Replicas)}
-
+	config.BackupSchedule = types.StringValue(i.BackupSchedule)
+	config.MachineType = types.StringValue(i.Flavor.ID)
+	config.Name = types.StringValue(i.Name)
+	config.Replicas = types.Int64Value(int64(i.Replicas))
 	storage, d := types.ObjectValue(
 		map[string]attr.Type{
 			"class": types.StringType,
 			"size":  types.Int64Type,
 		},
 		map[string]attr.Value{
-			"class": types.String{Value: i.Storage.Class},
-			"size":  types.Int64{Value: int64(i.Storage.Size)},
+			"class": types.StringValue(i.Storage.Class),
+			"size":  types.Int64Value(int64(i.Storage.Size)),
 		})
 
 	resp.Diagnostics.Append(d...)
@@ -84,8 +83,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	if len(i.Version) > 3 {
 		i.Version = i.Version[0:3]
 	}
-	config.Version = types.String{Value: i.Version}
-
+	config.Version = types.StringValue(i.Version)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &config)...)
 	if resp.Diagnostics.HasError() {
 		return

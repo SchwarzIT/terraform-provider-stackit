@@ -46,8 +46,7 @@ func (m int64DefaultModifier) Modify(ctx context.Context, req tfsdk.ModifyAttrib
 	if !i.Null {
 		return
 	}
-
-	resp.AttributePlan = types.Int64{Value: m.Default}
+	resp.AttributePlan = types.Int64Value(m.Default)
 }
 
 func Int64Default(defaultValue int64) int64DefaultModifier {

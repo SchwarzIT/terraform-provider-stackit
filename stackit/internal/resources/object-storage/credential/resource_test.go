@@ -56,7 +56,7 @@ func config() string {
 		project_id = "%s"
 	}
 	`,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
 	)
 }
 
@@ -72,8 +72,8 @@ func configWithGroup(groupName string) string {
 		credentials_group_id = stackit_object_storage_credentials_group.example.id
 	}
 	  `,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
 		groupName,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
 	)
 }

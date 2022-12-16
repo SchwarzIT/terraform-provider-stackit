@@ -53,10 +53,10 @@ func (r Resource) loadAvaiableVersions(ctx context.Context) ([]*semver.Version, 
 
 func (c *Cluster) clusterConfig(versionOptions []*semver.Version) (clusters.Kubernetes, error) {
 	if c.KubernetesVersion.IsNull() || c.KubernetesVersion.IsUnknown() {
-		c.KubernetesVersion = types.String{Value: default_version}
+		c.KubernetesVersion = types.StringValue(default_version)
 	}
 
-	clusterConfigVersion, err := semver.NewVersion(c.KubernetesVersion.Value)
+	clusterConfigVersion, err := semver.NewVersion(c.KubernetesVersion.ValueString())
 	if err != nil {
 		return clusters.Kubernetes{}, err
 	}
@@ -71,7 +71,7 @@ func (c *Cluster) clusterConfig(versionOptions []*semver.Version) (clusters.Kube
 
 	cfg := clusters.Kubernetes{
 		Version:                   clusterConfigVersion.String(),
-		AllowPrivilegedContainers: c.AllowPrivilegedContainers.Value,
+		AllowPrivilegedContainers: c.AllowPrivilegedContainers.ValueBool(),
 	}
 
 	if c.AllowPrivilegedContainers.IsNull() || c.AllowPrivilegedContainers.IsUnknown() {
@@ -111,9 +111,9 @@ func (c *Cluster) nodePools() []clusters.NodePool {
 		ts := []clusters.Taint{}
 		for _, v := range p.Taints {
 			t := clusters.Taint{
-				Effect: v.Effect.Value,
-				Key:    v.Key.Value,
-				Value:  v.Value.Value,
+				Effect: v.Effect.ValueString(),
+				Key:    v.Key.ValueString(),
+				Value:  v.Value.ValueString(),
 			}
 			ts = append(ts, t)
 		}
@@ -143,25 +143,25 @@ func (c *Cluster) nodePools() []clusters.NodePool {
 		}
 
 		cnp := clusters.NodePool{
-			Name:           p.Name.Value,
-			Minimum:        int(p.Minimum.Value),
-			Maximum:        int(p.Maximum.Value),
-			MaxSurge:       int(p.MaxSurge.Value),
-			MaxUnavailable: int(p.MaxUnavailable.Value),
+			Name:           p.Name.ValueString(),
+			Minimum:        int(p.Minimum.ValueInt64()),
+			Maximum:        int(p.Maximum.ValueInt64()),
+			MaxSurge:       int(p.MaxSurge.ValueInt64()),
+			MaxUnavailable: int(p.MaxUnavailable.ValueInt64()),
 			Machine: clusters.Machine{
-				Type: p.MachineType.Value,
+				Type: p.MachineType.ValueString(),
 				Image: clusters.MachineImage{
-					Name:    p.OSName.Value,
-					Version: p.OSVersion.Value,
+					Name:    p.OSName.ValueString(),
+					Version: p.OSVersion.ValueString(),
 				},
 			},
 			Volume: clusters.Volume{
-				Type: p.VolumeType.Value,
-				Size: int(p.VolumeSizeGB.Value),
+				Type: p.VolumeType.ValueString(),
+				Size: int(p.VolumeSizeGB.ValueInt64()),
 			},
 			Taints: ts,
 			CRI: clusters.CRI{
-				Name: p.ContainerRuntime.Value,
+				Name: p.ContainerRuntime.ValueString(),
 			},
 			Labels:            ls,
 			AvailabilityZones: zs,
@@ -208,11 +208,11 @@ func (c *Cluster) hibernations() *clusters.Hibernation {
 	scs := []clusters.HibernationScedule{}
 	for _, h := range c.Hibernations {
 		sc := clusters.HibernationScedule{
-			Start: h.Start.Value,
-			End:   h.End.Value,
+			Start: h.Start.ValueString(),
+			End:   h.End.ValueString(),
 		}
 		if !h.Timezone.IsNull() && !h.Timezone.IsUnknown() {
-			sc.Timezone = h.Timezone.Value
+			sc.Timezone = h.Timezone.ValueString()
 		}
 		scs = append(scs, sc)
 	}
@@ -233,8 +233,8 @@ func (c *Cluster) extensions() *clusters.Extensions {
 
 	return &clusters.Extensions{
 		Argus: &clusters.ArgusExtension{
-			Enabled:         c.Extensions.Argus.Enabled.Value,
-			ArgusInstanceID: c.Extensions.Argus.ArgusInstanceID.Value,
+			Enabled:         c.Extensions.Argus.Enabled.ValueBool(),
+			ArgusInstanceID: c.Extensions.Argus.ArgusInstanceID.ValueString(),
 		},
 	}
 }
@@ -246,42 +246,41 @@ func (c *Cluster) maintenance() *clusters.Maintenance {
 
 	return &clusters.Maintenance{
 		AutoUpdate: clusters.MaintenanceAutoUpdate{
-			KubernetesVersion:   c.Maintenance.EnableKubernetesVersionUpdates.Value,
-			MachineImageVersion: c.Maintenance.EnableMachineImageVersionUpdates.Value,
+			KubernetesVersion:   c.Maintenance.EnableKubernetesVersionUpdates.ValueBool(),
+			MachineImageVersion: c.Maintenance.EnableMachineImageVersionUpdates.ValueBool(),
 		},
 		TimeWindow: clusters.MaintenanceTimeWindow{
-			Start: c.Maintenance.Start.Value,
-			End:   c.Maintenance.End.Value,
+			Start: c.Maintenance.Start.ValueString(),
+			End:   c.Maintenance.End.ValueString(),
 		},
 	}
 }
 
 // Transform transforms clusters.Cluster structure to Cluster
 func (c *Cluster) Transform(cl clusters.Cluster) {
-	c.ID = types.String{Value: cl.Name}
+	c.ID = types.StringValue(cl.Name)
 	if c.KubernetesVersion.IsNull() || c.KubernetesVersion.IsUnknown() {
-		c.KubernetesVersion = types.String{Value: cl.Kubernetes.Version}
+		c.KubernetesVersion = types.StringValue(cl.Kubernetes.Version)
 	}
-	c.KubernetesVersionUsed = types.String{Value: cl.Kubernetes.Version}
+	c.KubernetesVersionUsed = types.StringValue(cl.Kubernetes.Version)
 	c.AllowPrivilegedContainers = types.Bool{Value: cl.Kubernetes.AllowPrivilegedContainers}
-	c.Status = types.String{Value: cl.Status.Aggregated}
-
+	c.Status = types.StringValue(cl.Status.Aggregated)
 	c.NodePools = []NodePool{}
 	for _, np := range cl.Nodepools {
 		n := NodePool{
-			Name:             types.String{Value: np.Name},
-			MachineType:      types.String{Value: np.Machine.Type},
-			OSName:           types.String{Value: np.Machine.Image.Name},
-			OSVersion:        types.String{Value: np.Machine.Image.Version},
-			Minimum:          types.Int64{Value: int64(np.Minimum)},
-			Maximum:          types.Int64{Value: int64(np.Maximum)},
-			MaxSurge:         types.Int64{Value: int64(np.MaxSurge)},
-			MaxUnavailable:   types.Int64{Value: int64(np.MaxUnavailable)},
-			VolumeType:       types.String{Value: np.Volume.Type},
-			VolumeSizeGB:     types.Int64{Value: int64(np.Volume.Size)},
+			Name:             types.StringValue(np.Name),
+			MachineType:      types.StringValue(np.Machine.Type),
+			OSName:           types.StringValue(np.Machine.Image.Name),
+			OSVersion:        types.StringValue(np.Machine.Image.Version),
+			Minimum:          types.Int64Value(int64(np.Minimum)),
+			Maximum:          types.Int64Value(int64(np.Maximum)),
+			MaxSurge:         types.Int64Value(int64(np.MaxSurge)),
+			MaxUnavailable:   types.Int64Value(int64(np.MaxUnavailable)),
+			VolumeType:       types.StringValue(np.Volume.Type),
+			VolumeSizeGB:     types.Int64Value(int64(np.Volume.Size)),
 			Labels:           types.Map{ElemType: types.StringType, Null: true},
 			Taints:           nil,
-			ContainerRuntime: types.String{Value: np.CRI.Name},
+			ContainerRuntime: types.StringValue(np.CRI.Name),
 			Zones:            types.List{ElemType: types.StringType, Null: true},
 		}
 		for k, v := range np.Labels {
@@ -289,23 +288,23 @@ func (c *Cluster) Transform(cl clusters.Cluster) {
 				n.Labels.Null = false
 				n.Labels.Elems = make(map[string]attr.Value, len(np.Labels))
 			}
-			n.Labels.Elems[k] = types.String{Value: v}
+			n.Labels.Elems[k] = types.StringValue(v)
 		}
 		for _, v := range np.Taints {
 			if n.Taints == nil {
 				n.Taints = []Taint{}
 			}
 			n.Taints = append(n.Taints, Taint{
-				Effect: types.String{Value: v.Effect},
-				Key:    types.String{Value: v.Key},
-				Value:  types.String{Value: v.Value},
+				Effect: types.StringValue(v.Effect),
+				Key:    types.StringValue(v.Key),
+				Value:  types.StringValue(v.Value),
 			})
 		}
 		for _, v := range np.AvailabilityZones {
 			if n.Zones.Null {
 				n.Zones.Null = false
 			}
-			n.Zones.Elems = append(n.Zones.Elems, types.String{Value: v})
+			n.Zones.Elems = append(n.Zones.Elems, types.StringValue(v))
 		}
 		c.NodePools = append(c.NodePools, n)
 	}
@@ -323,9 +322,9 @@ func (c *Cluster) transformHibernations(cl clusters.Cluster) {
 	c.Hibernations = []Hibernation{}
 	for _, h := range cl.Hibernation.Schedules {
 		c.Hibernations = append(c.Hibernations, Hibernation{
-			Start:    types.String{Value: h.Start},
-			End:      types.String{Value: h.End},
-			Timezone: types.String{Value: h.Timezone},
+			Start:    types.StringValue(h.Start),
+			End:      types.StringValue(h.End),
+			Timezone: types.StringValue(h.Timezone),
 		})
 	}
 }
@@ -338,8 +337,8 @@ func (c *Cluster) transformMaintenance(cl clusters.Cluster) {
 	c.Maintenance = &Maintenance{
 		EnableKubernetesVersionUpdates:   types.Bool{Value: cl.Maintenance.AutoUpdate.KubernetesVersion},
 		EnableMachineImageVersionUpdates: types.Bool{Value: cl.Maintenance.AutoUpdate.MachineImageVersion},
-		Start:                            types.String{Value: cl.Maintenance.TimeWindow.Start},
-		End:                              types.String{Value: cl.Maintenance.TimeWindow.End},
+		Start:                            types.StringValue(cl.Maintenance.TimeWindow.Start),
+		End:                              types.StringValue(cl.Maintenance.TimeWindow.End),
 	}
 }
 
@@ -351,7 +350,7 @@ func (c *Cluster) transformExtensions(cl clusters.Cluster) {
 	if cl.Extensions.Argus != nil && c.Extensions.Argus != nil {
 		c.Extensions.Argus = &ArgusExtension{
 			Enabled:         types.Bool{Value: cl.Extensions.Argus.Enabled},
-			ArgusInstanceID: types.String{Value: cl.Extensions.Argus.ArgusInstanceID},
+			ArgusInstanceID: types.StringValue(cl.Extensions.Argus.ArgusInstanceID),
 		}
 	}
 }

@@ -21,7 +21,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	list, err := es.Instances.List(ctx, config.ProjectID.Value)
+	list, err := es.Instances.List(ctx, config.ProjectID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to list instances", err.Error())
 		return
@@ -30,7 +30,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	found := -1
 	existing := ""
 	for i, instance := range list.Instances {
-		if instance.Name == config.Name.Value {
+		if instance.Name == config.Name.ValueString() {
 			found = i
 			break
 		}
@@ -50,7 +50,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	// set found instance
 	intance := list.Instances[found]
 
-	res, err := es.Options.GetOfferings(ctx, config.ProjectID.Value)
+	res, err := es.Options.GetOfferings(ctx, config.ProjectID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to get offerings", err.Error())
 		return
@@ -61,23 +61,21 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 			if p.ID != intance.PlanID {
 				continue
 			}
-			config.Plan = types.String{Value: p.Name}
-			config.Version = types.String{Value: offer.Version}
+			config.Plan = types.StringValue(p.Name)
+			config.Version = types.StringValue(offer.Version)
 		}
 	}
-
-	config.ID = types.String{Value: intance.InstanceID}
-	config.PlanID = types.String{Value: intance.PlanID}
-	config.DashboardURL = types.String{Value: intance.DashboardURL}
-	config.CFGUID = types.String{Value: intance.CFGUID}
-	config.CFSpaceGUID = types.String{Value: intance.CFSpaceGUID}
-	config.CFOrganizationGUID = types.String{Value: intance.CFOrganizationGUID}
-
+	config.ID = types.StringValue(intance.InstanceID)
+	config.PlanID = types.StringValue(intance.PlanID)
+	config.DashboardURL = types.StringValue(intance.DashboardURL)
+	config.CFGUID = types.StringValue(intance.CFGUID)
+	config.CFSpaceGUID = types.StringValue(intance.CFSpaceGUID)
+	config.CFOrganizationGUID = types.StringValue(intance.CFOrganizationGUID)
 	config.ACL = types.List{ElemType: types.StringType}
 	if aclString, ok := intance.Parameters["sgw_acl"]; ok {
 		items := strings.Split(aclString, ",")
 		for _, v := range items {
-			config.ACL.Elems = append(config.ACL.Elems, types.String{Value: v})
+			config.ACL.Elems = append(config.ACL.Elems, types.StringValue(v))
 		}
 	} else {
 		config.ACL.Null = true

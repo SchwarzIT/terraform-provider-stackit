@@ -25,11 +25,11 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	service := r.client.DataServices.LogMe
 
 	// handle creation
-	res, err := service.Credentials.Create(ctx, cred.ProjectID.Value, cred.InstanceID.Value)
+	res, err := service.Credentials.Create(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString())
 	if err != nil {
 		if strings.Contains(err.Error(), "service bind failed") {
 			time.Sleep(30 * time.Second)
-			res, err = service.Credentials.Create(ctx, cred.ProjectID.Value, cred.InstanceID.Value)
+			res, err = service.Credentials.Create(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString())
 		}
 		if err != nil {
 			resp.Diagnostics.AddError("failed credential creation", err.Error())
@@ -62,7 +62,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	service := r.client.DataServices.LogMe
 
 	// read instance credential
-	res, err := service.Credentials.Get(ctx, cred.ProjectID.Value, cred.InstanceID.Value, cred.ID.Value)
+	res, err := service.Credentials.Get(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString(), cred.ID.ValueString())
 	if err != nil {
 		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.State.RemoveResource(ctx)
@@ -98,7 +98,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 
 	service := r.client.DataServices.LogMe
 
-	res, err := service.Credentials.Delete(ctx, cred.ProjectID.Value, cred.InstanceID.Value, cred.ID.Value)
+	res, err := service.Credentials.Delete(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString(), cred.ID.ValueString())
 	if err != nil {
 		if !strings.Contains(err.Error(), "EOF") {
 			resp.Diagnostics.AddError("failed to delete credential", err.Error())

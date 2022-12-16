@@ -35,7 +35,7 @@ func TestAcc_ElasticSearchInstance(t *testing.T) {
 				Config: config(name, version, plan),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.stackit_elasticsearch_instance.example", "name", name),
-					resource.TestCheckResourceAttr("data.stackit_elasticsearch_instance.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("data.stackit_elasticsearch_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttr("data.stackit_elasticsearch_instance.example", "version", version),
 					resource.TestCheckResourceAttr("data.stackit_elasticsearch_instance.example", "plan", plan),
 					resource.TestCheckResourceAttr("data.stackit_elasticsearch_instance.example", "plan_id", planID),
@@ -70,10 +70,10 @@ func config(name, version, plan string) string {
 
 	`,
 		name,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
 		version,
 		plan,
 		name,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
 	)
 }

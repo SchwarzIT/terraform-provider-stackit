@@ -42,7 +42,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	lm := r.client.DataServices.LogMe
 
 	// handle creation
-	res, wait, err := lm.Instances.Create(ctx, plan.ProjectID.Value, plan.Name.Value, plan.PlanID.Value, map[string]string{
+	res, wait, err := lm.Instances.Create(ctx, plan.ProjectID.ValueString(), plan.Name.ValueString(), plan.PlanID.ValueString(), map[string]string{
 		"sgw_acl": strings.Join(acl, ","),
 	})
 
@@ -52,7 +52,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	// set state
-	plan.ID = types.String{Value: res.InstanceID}
+	plan.ID = types.StringValue(res.InstanceID)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), res.InstanceID)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -95,7 +95,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	lm := r.client.DataServices.LogMe
 
 	// read instance
-	i, err := lm.Instances.Get(ctx, state.ProjectID.Value, state.ID.Value)
+	i, err := lm.Instances.Get(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if err != nil {
 		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.State.RemoveResource(ctx)
@@ -149,7 +149,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	lm := r.client.DataServices.LogMe
 
 	// handle update
-	_, process, err := lm.Instances.Update(ctx, state.ProjectID.Value, state.ID.Value, plan.PlanID.Value, map[string]string{
+	_, process, err := lm.Instances.Update(ctx, state.ProjectID.ValueString(), state.ID.ValueString(), plan.PlanID.ValueString(), map[string]string{
 		"sgw_acl": strings.Join(acl, ","),
 	})
 	if err != nil {
@@ -182,7 +182,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	if !plan.PlanID.Equal(planID) {
-		resp.Diagnostics.AddError("server returned wrong plan ID after update", fmt.Sprintf("expected plan ID %s but received %s", planID.Value, plan.PlanID.Value))
+		resp.Diagnostics.AddError("server returned wrong plan ID after update", fmt.Sprintf("expected plan ID %s but received %s", planID.ValueString(), plan.PlanID.ValueString()))
 		return
 	}
 
@@ -205,7 +205,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	lm := r.client.DataServices.LogMe
 
 	// handle deletion
-	process, err := lm.Instances.Delete(ctx, state.ProjectID.Value, state.ID.Value)
+	process, err := lm.Instances.Delete(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete instance", err.Error())
 		return

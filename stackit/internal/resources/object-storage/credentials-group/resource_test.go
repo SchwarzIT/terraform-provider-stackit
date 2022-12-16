@@ -35,7 +35,7 @@ func TestAcc_ObjectStorageCredentialsGroup(t *testing.T) {
 					resource.TestCheckResourceAttrSet("stackit_object_storage_credentials_group.example", "id"),
 					resource.TestCheckResourceAttrSet("stackit_object_storage_credentials_group.example", "urn"),
 					resource.TestCheckResourceAttr("stackit_object_storage_credentials_group.example", "name", name),
-					resource.TestCheckResourceAttr("stackit_object_storage_credentials_group.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("stackit_object_storage_credentials_group.example", "project_id", common.GetAcceptanceTestsProjectID()),
 				),
 			},
 			// new name
@@ -45,13 +45,13 @@ func TestAcc_ObjectStorageCredentialsGroup(t *testing.T) {
 					resource.TestCheckResourceAttrSet("stackit_object_storage_credentials_group.example", "id"),
 					resource.TestCheckResourceAttrSet("stackit_object_storage_credentials_group.example", "urn"),
 					resource.TestCheckResourceAttr("stackit_object_storage_credentials_group.example", "name", newName),
-					resource.TestCheckResourceAttr("stackit_object_storage_credentials_group.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("stackit_object_storage_credentials_group.example", "project_id", common.GetAcceptanceTestsProjectID()),
 				),
 			},
 			// test import
 			{
 				ResourceName:      "stackit_object_storage_credentials_group.example",
-				ImportStateId:     fmt.Sprintf("%s,%s", common.ACC_TEST_PROJECT_ID, newName),
+				ImportStateId:     fmt.Sprintf("%s,%s", common.GetAcceptanceTestsProjectID(), newName),
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
@@ -66,7 +66,7 @@ func config(name string) string {
 		name	   = "%s"
 	  }
 	`,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
 		name,
 	)
 }

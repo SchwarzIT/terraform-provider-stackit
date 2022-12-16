@@ -9,24 +9,22 @@ import (
 )
 
 func (r Resource) applyClientResponse(ctx context.Context, c *Credential, cgr credentials.GetResponse) error {
-	c.ID = types.String{Value: cgr.ID}
-	c.CACert = types.String{Value: cgr.Raw.Credential.Cacrt}
-	c.Host = types.String{Value: cgr.Raw.Credential.Host}
-
+	c.ID = types.StringValue(cgr.ID)
+	c.CACert = types.StringValue(cgr.Raw.Credential.Cacrt)
+	c.Host = types.StringValue(cgr.Raw.Credential.Host)
 	c.Hosts = types.List{ElemType: types.StringType}
 	if len(cgr.Raw.Credential.Hosts) > 0 {
 		c.Hosts.Elems = make([]attr.Value, len(cgr.Raw.Credential.Hosts))
 		for k, v := range cgr.Raw.Credential.Hosts {
-			c.Hosts.Elems[k] = types.String{Value: v}
+			c.Hosts.Elems[k] = types.StringValue(v)
 		}
 	}
-
-	c.Username = types.String{Value: cgr.Raw.Credential.Username}
-	c.Password = types.String{Value: cgr.Raw.Credential.Password}
-	c.Port = types.Int64{Value: int64(cgr.Raw.Credential.Port)}
-	c.SyslogDrainURL = types.String{Value: cgr.Raw.SyslogDrainURL}
-	c.RouteServiceURL = types.String{Value: cgr.Raw.RouteServiceURL}
-	c.Schema = types.String{Value: cgr.Raw.Credential.Scheme}
-	c.URI = types.String{Value: cgr.URI}
+	c.Username = types.StringValue(cgr.Raw.Credential.Username)
+	c.Password = types.StringValue(cgr.Raw.Credential.Password)
+	c.Port = types.Int64Value(int64(cgr.Raw.Credential.Port))
+	c.SyslogDrainURL = types.StringValue(cgr.Raw.SyslogDrainURL)
+	c.RouteServiceURL = types.StringValue(cgr.Raw.RouteServiceURL)
+	c.Schema = types.StringValue(cgr.Raw.Credential.Scheme)
+	c.URI = types.StringValue(cgr.URI)
 	return nil
 }

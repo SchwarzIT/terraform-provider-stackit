@@ -35,7 +35,7 @@ func TestAcc_PostgresFlexInstance(t *testing.T) {
 				Config: config(name1),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "name", name1),
-					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "version", "14"),
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "machine_type", "c1.2"),
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "replicas", "1"),
@@ -56,7 +56,7 @@ func TestAcc_PostgresFlexInstance(t *testing.T) {
 				Config: config(name2),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "name", name2),
-					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "version", "14"),
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "machine_type", "c1.2"),
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "replicas", "1"),
@@ -84,7 +84,7 @@ func TestAcc_PostgresFlexInstance(t *testing.T) {
 						return "", errors.New("couldn't find attribute id")
 					}
 
-					return fmt.Sprintf("%s,%s", common.ACC_TEST_PROJECT_ID, id), nil
+					return fmt.Sprintf("%s,%s", common.GetAcceptanceTestsProjectID(), id), nil
 				},
 				ImportState:       true,
 				ImportStateVerify: true,
@@ -108,6 +108,6 @@ func config(name string) string {
 	}  
 	  `,
 		name,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
 	)
 }

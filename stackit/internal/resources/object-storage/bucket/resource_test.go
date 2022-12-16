@@ -33,7 +33,7 @@ func TestAcc_ObjectStorageBucket(t *testing.T) {
 				Config: config(name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_object_storage_bucket.example", "name", name),
-					resource.TestCheckResourceAttr("stackit_object_storage_bucket.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("stackit_object_storage_bucket.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttrSet("stackit_object_storage_bucket.example", "region"),
 					resource.TestCheckResourceAttrSet("stackit_object_storage_bucket.example", "host_style_url"),
 					resource.TestCheckResourceAttrSet("stackit_object_storage_bucket.example", "path_style_url"),
@@ -44,13 +44,13 @@ func TestAcc_ObjectStorageBucket(t *testing.T) {
 				Config: config(newName),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_object_storage_bucket.example", "name", newName),
-					resource.TestCheckResourceAttr("stackit_object_storage_bucket.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("stackit_object_storage_bucket.example", "project_id", common.GetAcceptanceTestsProjectID()),
 				),
 			},
 			// test import
 			{
 				ResourceName:      "stackit_object_storage_bucket.example",
-				ImportStateId:     fmt.Sprintf("%s,%s", common.ACC_TEST_PROJECT_ID, newName),
+				ImportStateId:     fmt.Sprintf("%s,%s", common.GetAcceptanceTestsProjectID(), newName),
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
@@ -65,7 +65,7 @@ resource "stackit_object_storage_bucket" "example" {
     name       = "%s"
 }
 	  `,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
 		name,
 	)
 }

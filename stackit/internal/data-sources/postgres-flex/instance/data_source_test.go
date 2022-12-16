@@ -33,7 +33,7 @@ func TestAcc_PostgresInstance(t *testing.T) {
 				Config: config(name, version),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.stackit_postgres_flex_instance.example", "name", name),
-					resource.TestCheckResourceAttr("data.stackit_postgres_flex_instance.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("data.stackit_postgres_flex_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttr("data.stackit_postgres_flex_instance.example", "version", version),
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "machine_type", "c1.2"),
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "replicas", "1"),
@@ -70,9 +70,9 @@ func config(name, version string) string {
 
 	`,
 		name,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
 		version,
 		name,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
 	)
 }

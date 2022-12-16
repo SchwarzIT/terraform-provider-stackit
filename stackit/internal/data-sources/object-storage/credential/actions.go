@@ -14,7 +14,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 
 	diags := req.Config.Get(ctx, &config)
 
-	if config.DisplayName.Value == "" && config.ID.Value == "" {
+	if config.DisplayName.ValueString() == "" && config.ID.ValueString() == "" {
 		diags.AddError("missing configuration", "either display_name or id must be provided")
 	}
 
@@ -23,7 +23,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	list, err := c.ObjectStorage.AccessKeys.List(ctx, config.ProjectID.Value, "")
+	list, err := c.ObjectStorage.AccessKeys.List(ctx, config.ProjectID.ValueString(), "")
 	if err != nil {
 		resp.Diagnostics.AddError("failed to read credential", err.Error())
 		return
@@ -31,15 +31,14 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 
 	found := false
 	for _, k := range list.AccessKeys {
-		if k.KeyID != config.ID.Value && k.DisplayName != config.DisplayName.Value {
+		if k.KeyID != config.ID.ValueString() && k.DisplayName != config.DisplayName.ValueString() {
 			continue
 		}
 
 		found = true
-
-		config.ID = types.String{Value: k.KeyID}
-		config.DisplayName = types.String{Value: k.DisplayName}
-		config.Expiry = types.String{Value: k.Expires}
+		config.ID = types.StringValue(k.KeyID)
+		config.DisplayName = types.StringValue(k.DisplayName)
+		config.Expiry = types.StringValue(k.Expires)
 		diags = resp.State.Set(ctx, &config)
 		resp.Diagnostics.Append(diags...)
 

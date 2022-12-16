@@ -23,7 +23,7 @@ func TestAcc_RedisJob(t *testing.T) {
 		return
 	}
 
-	projectId := common.ACC_TEST_PROJECT_ID
+	projectId := common.GetAcceptanceTestsProjectID()
 	if val, exists := os.LookupEnv("STACKIT_TEST_PROJECT_ID"); exists {
 		projectId = val
 	}

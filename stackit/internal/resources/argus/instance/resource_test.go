@@ -35,7 +35,7 @@ func TestAcc_ArgusInstances(t *testing.T) {
 				Config: config(name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_argus_instance.example", "name", name),
-					resource.TestCheckResourceAttr("stackit_argus_instance.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("stackit_argus_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttrSet("stackit_argus_instance.example", "plan_id"),
 					resource.TestCheckResourceAttrSet("stackit_argus_instance.example", "dashboard_url"),
 					resource.TestCheckResourceAttrSet("stackit_argus_instance.example", "is_updatable"),
@@ -59,7 +59,7 @@ func TestAcc_ArgusInstances(t *testing.T) {
 				Config: configExtended(name, "Monitoring-Medium-EU01"),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_argus_instance.example", "name", name),
-					resource.TestCheckResourceAttr("stackit_argus_instance.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("stackit_argus_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttr("stackit_argus_instance.example", "plan", "Monitoring-Medium-EU01"),
 					resource.TestCheckResourceAttr("stackit_argus_instance.example", "grafana.enable_public_access", "true"),
 					resource.TestCheckResourceAttr("stackit_argus_instance.example", "metrics.retention_days", "60"),
@@ -72,7 +72,7 @@ func TestAcc_ArgusInstances(t *testing.T) {
 				Config: configExtended(newName, "Monitoring-Medium-EU01"),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_argus_instance.example", "name", newName),
-					resource.TestCheckResourceAttr("stackit_argus_instance.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("stackit_argus_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttr("stackit_argus_instance.example", "plan", "Monitoring-Medium-EU01"),
 				),
 			},
@@ -81,7 +81,7 @@ func TestAcc_ArgusInstances(t *testing.T) {
 				Config: configExtended(newName, "Monitoring-Basic-EU01"),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_argus_instance.example", "name", newName),
-					resource.TestCheckResourceAttr("stackit_argus_instance.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("stackit_argus_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttr("stackit_argus_instance.example", "plan", "Monitoring-Basic-EU01"),
 				),
 			},
@@ -98,7 +98,7 @@ func TestAcc_ArgusInstances(t *testing.T) {
 						return "", errors.New("couldn't find attribute id")
 					}
 
-					return fmt.Sprintf("%s,%s", common.ACC_TEST_PROJECT_ID, id), nil
+					return fmt.Sprintf("%s,%s", common.GetAcceptanceTestsProjectID(), id), nil
 				},
 				ImportState:       true,
 				ImportStateVerify: true,
@@ -115,7 +115,7 @@ resource "stackit_argus_instance" "example" {
 	plan       = "Monitoring-Medium-EU01"
 }
 	  `,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
 		name,
 	)
 }
@@ -136,7 +136,7 @@ resource "stackit_argus_instance" "example" {
 	}
 }
 	  `,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
 		name,
 		plan,
 	)

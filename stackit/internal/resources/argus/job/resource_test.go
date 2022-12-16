@@ -34,7 +34,7 @@ func TestAcc_ArgusJob(t *testing.T) {
 				Config: config(name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_argus_job.example", "name", "example"),
-					resource.TestCheckResourceAttr("stackit_argus_job.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("stackit_argus_job.example", "project_id", common.GetAcceptanceTestsProjectID()),
 				),
 			},
 			// check update
@@ -42,7 +42,7 @@ func TestAcc_ArgusJob(t *testing.T) {
 				Config: config2(name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_argus_job.example", "name", "example"),
-					resource.TestCheckResourceAttr("stackit_argus_job.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("stackit_argus_job.example", "project_id", common.GetAcceptanceTestsProjectID()),
 				),
 			},
 			// test import
@@ -58,7 +58,7 @@ func TestAcc_ArgusJob(t *testing.T) {
 						return "", errors.New("couldn't find attribute id")
 					}
 
-					return fmt.Sprintf("%s,%s,%s", common.ACC_TEST_PROJECT_ID, id, "example"), nil
+					return fmt.Sprintf("%s,%s,%s", common.GetAcceptanceTestsProjectID(), id, "example"), nil
 				},
 				ImportState:       true,
 				ImportStateVerify: true,
@@ -90,9 +90,9 @@ resource "stackit_argus_job" "example" {
 	}
 }
 	  `,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
 		name,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
 	)
 }
 
@@ -116,8 +116,8 @@ resource "stackit_argus_job" "example" {
 }
 	
 	  `,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
 		name,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
 	)
 }

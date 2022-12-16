@@ -36,7 +36,7 @@ func TestAcc_RabbitMQJob(t *testing.T) {
 				Config: config(name, plan1),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "name", name),
-					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "version", "3.7"),
 					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "plan", plan1),
 					resource.TestCheckResourceAttrSet("stackit_rabbitmq_instance.example", "id"),
@@ -52,7 +52,7 @@ func TestAcc_RabbitMQJob(t *testing.T) {
 				Config: config(name, plan2),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "name", name),
-					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "project_id", common.ACC_TEST_PROJECT_ID),
+					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "version", "7"),
 					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "plan", plan2),
 					resource.TestCheckResourceAttrSet("stackit_rabbitmq_instance.example", "id"),
@@ -76,7 +76,7 @@ func TestAcc_RabbitMQJob(t *testing.T) {
 						return "", errors.New("couldn't find attribute id")
 					}
 
-					return fmt.Sprintf("%s,%s", common.ACC_TEST_PROJECT_ID, id), nil
+					return fmt.Sprintf("%s,%s", common.GetAcceptanceTestsProjectID(), id), nil
 				},
 				ImportState:       true,
 				ImportStateVerify: true,
@@ -96,7 +96,7 @@ func config(name, plan string) string {
 	  
 	  `,
 		name,
-		common.ACC_TEST_PROJECT_ID,
+		common.GetAcceptanceTestsProjectID(),
 		plan,
 	)
 }
