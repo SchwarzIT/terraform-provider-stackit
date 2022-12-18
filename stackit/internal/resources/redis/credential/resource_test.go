@@ -37,7 +37,6 @@ func TestAcc_ResourceRedisCredential(t *testing.T) {
 					resource.TestCheckResourceAttr("stackit_redis_credential.example", "project_id", projectId),
 					resource.TestCheckResourceAttrSet("stackit_redis_credential.example", "instance_id"),
 					resource.TestCheckResourceAttrSet("stackit_redis_credential.example", "id"),
-					resource.TestCheckResourceAttrSet("stackit_redis_credential.example", "ca_cert"),
 					resource.TestCheckResourceAttrSet("stackit_redis_credential.example", "host"),
 					resource.TestCheckResourceAttrSet("stackit_redis_credential.example", "username"),
 					resource.TestCheckResourceAttrSet("stackit_redis_credential.example", "password"),
