@@ -40,7 +40,6 @@ jobs:
 
       - name: Wait project created
         id: wait-project-active
-        needs: [ create-project ]
         uses: mydea/action-wait-for-api@v1
         with:
           url: 'https://api.stackit.cloud/resource-management/v2/projects/${{ env.ACC_TEST_PROJECT_ID }}'
