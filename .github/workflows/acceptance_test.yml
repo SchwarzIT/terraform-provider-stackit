@@ -33,6 +33,7 @@ jobs:
                 "scope": "PUBLIC" \
               } \
             }' > $HOME/pr.json
+          cat $HOME/pr.json
           echo "ACC_TEST_PROJECT_ID=$(jq -r '.projectId' $HOME/pr.json)" >> $GITHUB_ENV
 
       - name: Wait project created
