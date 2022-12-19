@@ -21,7 +21,7 @@ jobs:
             --header 'Authorization: Bearer ${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}' \
             --data-raw '{
               "name": "${{ github.event.repository.name }}.${{ github.ref_name }}.${{ github.run_id }}", \
-              "containerParentId": "${{ secrets.STACKIT_TEST_PROJECT_PARENT_ID }}", \
+              "containerParentId": "${{ secrets.STACKIT_ACC_TEST_PARENT_CONTAINER_ID }}", \
               "members": [ \
                 { \
                   "role": "project.owner", \
