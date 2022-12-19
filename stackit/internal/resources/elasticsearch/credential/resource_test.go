@@ -41,7 +41,6 @@ func TestAcc_ElasticSearchJob(t *testing.T) {
 					resource.TestCheckResourceAttrSet("stackit_elasticsearch_credential.example", "username"),
 					resource.TestCheckResourceAttrSet("stackit_elasticsearch_credential.example", "password"),
 					resource.TestCheckResourceAttrSet("stackit_elasticsearch_credential.example", "port"),
-					resource.TestCheckResourceAttrSet("stackit_elasticsearch_credential.example", "schema"),
 					resource.TestCheckResourceAttrSet("stackit_elasticsearch_credential.example", "uri"),
 				),
 			},

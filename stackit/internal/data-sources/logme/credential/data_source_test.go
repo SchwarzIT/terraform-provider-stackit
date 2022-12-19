@@ -42,7 +42,6 @@ func TestAcc_LogMeCredentialDataSource(t *testing.T) {
 					resource.TestCheckTypeSetElemAttrPair("stackit_logme_credential.example", "port", "data.stackit_logme_credential.example", "port"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_logme_credential.example", "syslog_drain_url", "data.stackit_logme_credential.example", "syslog_drain_url"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_logme_credential.example", "route_service_url", "data.stackit_logme_credential.example", "route_service_url"),
-					resource.TestCheckTypeSetElemAttrPair("stackit_logme_credential.example", "schema", "data.stackit_logme_credential.example", "schema"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_logme_credential.example", "uri", "data.stackit_logme_credential.example", "uri"),
 				),
 			},
