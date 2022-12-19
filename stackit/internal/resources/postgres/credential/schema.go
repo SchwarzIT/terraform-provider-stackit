@@ -58,12 +58,6 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Required:    true,
 			},
 
-			"ca_cert": {
-				Description: "CA Certificate",
-				Type:        types.StringType,
-				Computed:    true,
-			},
-
 			"host": {
 				Description: "Credential host",
 				Type:        types.StringType,
