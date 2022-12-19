@@ -40,7 +40,6 @@ func (d DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	config.Port = types.Int64Value(int64(i.Raw.Credential.Port))
 	config.SyslogDrainURL = types.StringValue(i.Raw.SyslogDrainURL)
 	config.RouteServiceURL = types.StringValue(i.Raw.RouteServiceURL)
-	config.Schema = types.StringValue(i.Raw.Credential.Scheme)
 	config.URI = types.StringValue(i.URI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &config)...)
 	if resp.Diagnostics.HasError() {

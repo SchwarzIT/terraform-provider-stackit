@@ -24,7 +24,6 @@ func (r Resource) applyClientResponse(ctx context.Context, c *Credential, cgr cr
 	c.Port = types.Int64Value(int64(cgr.Raw.Credential.Port))
 	c.SyslogDrainURL = types.StringValue(cgr.Raw.SyslogDrainURL)
 	c.RouteServiceURL = types.StringValue(cgr.Raw.RouteServiceURL)
-	c.Schema = types.StringValue(cgr.Raw.Credential.Scheme)
 	c.URI = types.StringValue(cgr.URI)
 	return nil
 }

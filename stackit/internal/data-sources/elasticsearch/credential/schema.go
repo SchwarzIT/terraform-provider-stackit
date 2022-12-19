@@ -23,7 +23,6 @@ type Credential struct {
 	Port            types.Int64  `tfsdk:"port"`
 	SyslogDrainURL  types.String `tfsdk:"syslog_drain_url"`
 	RouteServiceURL types.String `tfsdk:"route_service_url"`
-	Schema          types.String `tfsdk:"schema"`
 	URI             types.String `tfsdk:"uri"`
 }
 
