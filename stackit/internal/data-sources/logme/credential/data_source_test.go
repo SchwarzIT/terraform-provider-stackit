@@ -36,7 +36,6 @@ func TestAcc_LogMeCredentialDataSource(t *testing.T) {
 					resource.TestCheckTypeSetElemAttrPair("stackit_logme_credential.example", "project_id", "data.stackit_logme_credential.example", "project_id"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_logme_credential.example", "instance_id", "data.stackit_logme_credential.example", "instance_id"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_logme_credential.example", "id", "data.stackit_logme_credential.example", "id"),
-					resource.TestCheckTypeSetElemAttrPair("stackit_logme_credential.example", "ca_cert", "data.stackit_logme_credential.example", "ca_cert"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_logme_credential.example", "host", "data.stackit_logme_credential.example", "host"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_logme_credential.example", "username", "data.stackit_logme_credential.example", "username"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_logme_credential.example", "password", "data.stackit_logme_credential.example", "password"),

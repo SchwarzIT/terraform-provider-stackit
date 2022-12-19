@@ -38,7 +38,6 @@ func TestAcc_DataSourceRedisCredential(t *testing.T) {
 					resource.TestCheckTypeSetElemAttrPair("stackit_redis_credential.example", "project_id", "data.stackit_redis_credential.example", "project_id"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_redis_credential.example", "instance_id", "data.stackit_redis_credential.example", "instance_id"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_redis_credential.example", "id", "data.stackit_redis_credential.example", "id"),
-					resource.TestCheckTypeSetElemAttrPair("stackit_redis_credential.example", "ca_cert", "data.stackit_redis_credential.example", "ca_cert"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_redis_credential.example", "host", "data.stackit_redis_credential.example", "host"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_redis_credential.example", "username", "data.stackit_redis_credential.example", "username"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_redis_credential.example", "password", "data.stackit_redis_credential.example", "password"),
