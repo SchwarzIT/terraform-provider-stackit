@@ -15,7 +15,6 @@ type Credential struct {
 	ID              types.String `tfsdk:"id"`
 	ProjectID       types.String `tfsdk:"project_id"`
 	InstanceID      types.String `tfsdk:"instance_id"`
-	CACert          types.String `tfsdk:"ca_cert"`
 	Host            types.String `tfsdk:"host"`
 	Hosts           types.List   `tfsdk:"hosts"`
 	Username        types.String `tfsdk:"username"`

@@ -10,7 +10,6 @@ import (
 
 func (r Resource) applyClientResponse(ctx context.Context, c *Credential, cgr credentials.GetResponse) error {
 	c.ID = types.StringValue(cgr.ID)
-	c.CACert = types.StringValue(cgr.Raw.Credential.Cacrt)
 	c.Host = types.StringValue(cgr.Raw.Credential.Host)
 	c.Hosts = types.List{ElemType: types.StringType}
 	if len(cgr.Raw.Credential.Hosts) > 0 {

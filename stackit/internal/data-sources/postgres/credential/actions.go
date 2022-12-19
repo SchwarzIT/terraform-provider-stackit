@@ -26,7 +26,6 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 	}
 
 	// set computed fields
-	config.CACert = types.StringValue(i.Raw.Credential.Cacrt)
 	config.Host = types.StringValue(i.Raw.Credential.Host)
 	if len(i.Raw.Credential.Hosts) > 0 {
 		var d diag.Diagnostics
