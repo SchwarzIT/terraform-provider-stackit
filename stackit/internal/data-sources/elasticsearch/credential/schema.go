@@ -59,11 +59,6 @@ func (d DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 			},
 
 			// Computed:
-			"ca_cert": {
-				Description: "Credential CA Certificate",
-				Type:        types.StringType,
-				Computed:    true,
-			},
 			"host": {
 				Description: "Credential host",
 				Type:        types.StringType,
