@@ -100,12 +100,6 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Computed:    true,
 			},
 
-			"schema": {
-				Description: "The schema used",
-				Type:        types.StringType,
-				Computed:    true,
-			},
-
 			"uri": {
 				Description: "The instance URI",
 				Type:        types.StringType,
