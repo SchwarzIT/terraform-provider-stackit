@@ -46,7 +46,6 @@ func config() string {
 		project_id = "%s"
 	}
 
-
 	data "stackit_object_storage_credential" "ex1" {
 		project_id = "%s"
 		id		   = stackit_object_storage_credential.example.id

@@ -62,7 +62,6 @@ func config(name, owner, billing string) string {
 		parent_container_id = "%s"
 	}
 
-
 	data "stackit_project" "ex1" {
 		container_id = stackit_project.example.container_id
 	}

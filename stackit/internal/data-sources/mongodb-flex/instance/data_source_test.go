@@ -60,8 +60,6 @@ func config(name, version string) string {
 		version 	 = "%s"
 	}
 
-
-
 	  data "stackit_mongodb_flex_instance" "example" {
 		depends_on = [stackit_mongodb_flex_instance.example]
 		name       = "%s"

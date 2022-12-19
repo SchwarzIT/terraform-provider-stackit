@@ -63,7 +63,6 @@ func config(name, version, plan string) string {
 		plan       = "%s"
 	  }
 
-
 	
 	  data "stackit_redis_instance" "example" {
 		depends_on = [stackit_redis_instance.example]
