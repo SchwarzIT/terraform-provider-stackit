@@ -94,11 +94,6 @@ func (d DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 				Type:        types.StringType,
 				Computed:    true,
 			},
-			"schema": {
-				Description: "Credential schema",
-				Type:        types.StringType,
-				Computed:    true,
-			},
 			"uri": {
 				Description: "The instance URI",
 				Type:        types.StringType,
