@@ -21,11 +21,8 @@ jobs:
             --header 'Authorization: Bearer ${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}' \
             --data-raw '{ "name": "${{ github.event.repository.name }}_${{ github.run_id }}", "containerParentId": "${{ secrets.ACC_TEST_PARENT_CONTAINER_ID }}", "members": [{ "role": "project.owner", "subject": "${{ secrets.ACC_TEST_USER_EMAIL }}" }], "labels": { "billingReference": "${{ secrets.ACC_TEST_BILLING_REF }}", "scope": "PUBLIC" }}' > $HOME/pr.json
           
-          cat $HOME/pr.json
-          
           ACC_TEST_PROJECT_ID="$(jq -r '.projectId' $HOME/pr.json)"
-          
-          echo "ACC_TEST_PROJECT_ID=$(jq -r '.projectId' $HOME/pr.json)" >> $GITHUB_ENV
+          echo "ACC_TEST_PROJECT_ID=${ACC_TEST_PROJECT_ID}" >> $GITHUB_ENV
           [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]] && exit 1 || exit 0
 
       - name: Wait project created
