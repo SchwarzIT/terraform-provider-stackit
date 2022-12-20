@@ -11,6 +11,48 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - name: Create test project
+        id: create-project
+        shell: bash
+        run: |
+          JSON_DATA=$(cat << EOF
+          { 
+          "name": "${{ github.event.repository.name }}_${{ github.run_id }}", 
+          "containerParentId": "${{ secrets.ACC_TEST_PARENT_CONTAINER_ID }}", 
+          "members": [{ 
+          "role": "project.owner", 
+          "subject": "${{ secrets.ACC_TEST_USER_EMAIL }}" 
+          }], 
+          "labels": { 
+          "billingReference": "${{ secrets.ACC_TEST_BILLING_REF }}", 
+          "scope": "PUBLIC" 
+          }
+          }
+          EOF
+          )
+          
+          curl --location --request POST 'https://api.stackit.cloud/resource-management/v2/projects' \
+            --header 'Content-Type: application/json' \
+            --header 'Accept: application/json' \
+            --header 'Authorization: Bearer ${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}' \
+            --data-raw "${JSON_DATA}" > $HOME/pr.json
+          
+          ACC_TEST_PROJECT_ID="$(jq -r '.projectId' $HOME/pr.json)"
+          echo "ACC_TEST_PROJECT_ID=${ACC_TEST_PROJECT_ID}" >> $GITHUB_ENV
+          [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]] && exit 1 || exit 0
+
+      - name: Wait project created
+        id: wait-project-active
+        uses: mydea/action-wait-for-api@v1
+        with:
+          url: 'https://api.stackit.cloud/resource-management/v2/projects/${{ env.ACC_TEST_PROJECT_ID }}'
+          headers: '{
+              "Accept": "application/json",
+              "Authorization": "Bearer ${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}"
+            }'
+          expected-response-field: 'lifecycleState'
+          expected-response-field-value: 'ACTIVE'
+
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -20,4 +62,16 @@ jobs:
           go-version: 1.18
 
       - name: Test
+        id: acceptance-test
         run: make testacc ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+
+      - name: Delete test project
+        id: delete-project
+        if: always()
+        shell: bash
+        run:   |
+          [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]] && exit 0
+          
+          curl --location --request DELETE 'https://api.stackit.cloud/resource-management/v2/projects/${{ env.ACC_TEST_PROJECT_ID }}' \
+            --header 'Accept: application/json' \
+            --header 'Authorization: Bearer ${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}'
