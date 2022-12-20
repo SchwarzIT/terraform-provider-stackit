@@ -56,8 +56,6 @@ func (p *StackitProvider) Configure(ctx context.Context, req provider.ConfigureR
 		return
 	}
 
-	c.SetRetry(nil)
-
 	resp.DataSourceData = c
 	resp.ResourceData = c
 }

@@ -67,9 +67,9 @@ func (r Resource) validate(
 	}
 
 	// General cluster validations
-	// if err := clusters.ValidateCluster(clusterName, clusterConfig, *nodePools, maintenance, hibernation, extensions); err != nil {
-	// 	return err
-	// }
+	if err := cluster.Validate(clusterName, clusterConfig, *nodePools, maintenance, hibernation, extensions); err != nil {
+		return err
+	}
 
 	return nil
 }
