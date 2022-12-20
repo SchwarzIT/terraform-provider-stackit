@@ -142,7 +142,9 @@ func transformExtensions(c *kubernetes.Cluster, cl *cluster.Cluster) {
 		return
 	}
 
-	if cl.Extensions.Argus != nil && c.Extensions.Argus != nil {
+	c.Extensions = &kubernetes.Extensions{}
+
+	if cl.Extensions.Argus != nil {
 		c.Extensions.Argus = &kubernetes.ArgusExtension{
 			Enabled:         types.BoolValue(cl.Extensions.Argus.Enabled),
 			ArgusInstanceID: types.StringValue(cl.Extensions.Argus.ArgusInstanceID),
