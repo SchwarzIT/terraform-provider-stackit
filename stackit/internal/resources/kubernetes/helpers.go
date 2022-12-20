@@ -291,20 +291,40 @@ func (c *Cluster) Transform(cl cluster.Cluster) {
 	c.Status = types.StringValue(string(*cl.Status.Aggregated))
 	c.NodePools = []NodePool{}
 	for _, np := range cl.Nodepools {
+		maimna := types.StringNull()
+		if np.Machine.Image.Name != nil {
+			maimna = types.StringValue(*np.Machine.Image.Name)
+		}
+		ms := types.Int64Null()
+		if np.MaxSurge != nil {
+			ms = types.Int64Value(int64(*np.MaxSurge))
+		}
+		mu := types.Int64Null()
+		if np.MaxUnavailable != nil {
+			mu = types.Int64Value(int64(*np.MaxUnavailable))
+		}
+		vt := types.StringNull()
+		if np.Volume.Type != nil {
+			vt = types.StringValue(*np.Volume.Type)
+		}
+		crin := types.StringNull()
+		if np.CRI.Name != nil {
+			crin = types.StringValue(string(*np.CRI.Name))
+		}
 		n := NodePool{
 			Name:             types.StringValue(np.Name),
 			MachineType:      types.StringValue(np.Machine.Type),
-			OSName:           types.StringValue(*np.Machine.Image.Name),
+			OSName:           maimna,
 			OSVersion:        types.StringValue(np.Machine.Image.Version),
 			Minimum:          types.Int64Value(int64(np.Minimum)),
 			Maximum:          types.Int64Value(int64(np.Maximum)),
-			MaxSurge:         types.Int64Value(int64(*np.MaxSurge)),
-			MaxUnavailable:   types.Int64Value(int64(*np.MaxUnavailable)),
-			VolumeType:       types.StringValue(*np.Volume.Type),
+			MaxSurge:         ms,
+			MaxUnavailable:   mu,
+			VolumeType:       vt,
 			VolumeSizeGB:     types.Int64Value(int64(np.Volume.Size)),
 			Labels:           types.Map{ElemType: types.StringType, Null: true},
 			Taints:           nil,
-			ContainerRuntime: types.StringValue(string(*np.CRI.Name)),
+			ContainerRuntime: crin,
 			Zones:            types.List{ElemType: types.StringType, Null: true},
 		}
 		if np.Labels != nil {
@@ -321,10 +341,14 @@ func (c *Cluster) Transform(cl cluster.Cluster) {
 				if n.Taints == nil {
 					n.Taints = []Taint{}
 				}
+				taintval := types.StringNull()
+				if v.Value != nil {
+					taintval = types.StringValue(*v.Value)
+				}
 				n.Taints = append(n.Taints, Taint{
 					Effect: types.StringValue(string(v.Effect)),
 					Key:    types.StringValue(v.Key),
-					Value:  types.StringValue(*v.Value),
+					Value:  taintval,
 				})
 			}
 		}
