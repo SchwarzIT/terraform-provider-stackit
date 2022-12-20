@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes/clusters"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes/options"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated/cluster"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
 
@@ -15,11 +15,11 @@ func (r Resource) validate(
 	ctx context.Context,
 	projectID string,
 	clusterName string,
-	clusterConfig clusters.Kubernetes,
-	nodePools *[]clusters.NodePool,
-	maintenance *clusters.Maintenance,
-	hibernation *clusters.Hibernation,
-	extensions *clusters.Extensions,
+	clusterConfig cluster.Kubernetes,
+	nodePools *[]cluster.Nodepool,
+	maintenance *cluster.Maintenance,
+	hibernation *cluster.Hibernation,
+	extensions *cluster.Extension,
 ) error {
 
 	// General validation
@@ -40,7 +40,11 @@ func (r Resource) validate(
 	}
 
 	for i, np := range *nodePools {
-		versionOption, err := validateMachineImage(np.Machine.Image.Name, np.Machine.Image.Version, opts.MachineImages)
+		imageName := ""
+		if np.Machine.Image.Name != nil {
+			imageName = *np.Machine.Image.Name
+		}
+		versionOption, err := validateMachineImage(imageName, np.Machine.Image.Version, opts.MachineImages)
 		if err != nil {
 			return err
 		}
@@ -50,7 +54,11 @@ func (r Resource) validate(
 		if err := validateMachineType(np.Machine.Type, opts.MachineTypes); err != nil {
 			return err
 		}
-		if err := validateVolumeType(np.Volume.Type, opts.VolumeTypes); err != nil {
+		volType := ""
+		if np.Volume.Type != nil {
+			volType = *np.Volume.Type
+		}
+		if err := validateVolumeType(volType, opts.VolumeTypes); err != nil {
 			return err
 		}
 		if err := validateZones(np.AvailabilityZones, opts.AvailabilityZones); err != nil {
@@ -59,7 +67,7 @@ func (r Resource) validate(
 	}
 
 	// General cluster validations
-	if err := clusters.ValidateCluster(clusterName, clusterConfig, *nodePools, maintenance, hibernation, extensions); err != nil {
+	if err := cluster.Validate(clusterName, clusterConfig, *nodePools, maintenance, hibernation, extensions); err != nil {
 		return err
 	}
 

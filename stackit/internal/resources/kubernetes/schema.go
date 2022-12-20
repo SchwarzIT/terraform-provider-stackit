@@ -110,6 +110,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Description: "Kubernetes version. Allowed Options are: `1.22`, `1.23`, `1.24`, or a full version including patch (not recommended).",
 				Type:        types.StringType,
 				Optional:    true,
+				Computed:    true,
 				Validators: []tfsdk.AttributeValidator{
 					validate.StringWith(clientValidate.SemVer, "validate container runtime"),
 				},
