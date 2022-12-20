@@ -8,6 +8,7 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes/clusters"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.4/generated/cluster"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -74,43 +75,58 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 		return
 	}
 
-	_, process, err := c.Kubernetes.Clusters.CreateOrUpdate(ctx,
+	resp, err := c.Services.Kubernetes.Cluster.CreateOrUpdateClusterWithResponse(ctx,
 		projectID,
-		clusterName,
-		clusterConfig,
-		nodePools,
-		maintenance,
-		hibernations,
-		extensions,
+		clusterName, cluster.SkeServiceCreateOrUpdateClusterRequest{
+			Extensions:  extensions,
+			Hibernation: hibernations,
+			Kubernetes:  clusterConfig,
+			Maintenance: maintenance,
+			Nodepools:   nodePools,
+		},
 	)
 	if err != nil {
-		diags.AddError("failed during SKE Create/Update", err.Error())
+		diags.AddError("failed initiating Create/Update call", err.Error())
+		return
+	}
+	if resp.HasError != nil {
+		diags.AddError("failed during Create/Update", resp.HasError.Error())
 		return
 	}
 
+	process := resp.WaitHandler(ctx, c.Services.Kubernetes.Cluster, projectID, clusterName)
 	res, err := process.Wait()
 	if err != nil {
 		diags.AddError("failed to validate SKE Create/Update", err.Error())
 		return
 	}
 
-	result, ok := res.(clusters.Cluster)
+	result, ok := res.(*cluster.GetClusterResponse)
 	if !ok {
-		diags.AddError("failed to parse Wait() response", "response is not clusters.Cluster")
+		diags.AddError("failed to parse Wait() response", "response is not *cluster.GetClusterResponse")
 		return
 	}
-	cl.Status = types.StringValue(result.Status.Aggregated)
-	cl.Transform(result)
+	if result.HasError != nil {
+		diags.AddError("response has an error", result.HasError.Error())
+		return
+	}
+	cl.Status = types.StringValue(string(*result.JSON200.Status.Aggregated))
+	cl.Transform(*result.JSON200)
 }
 
 func (r Resource) getCredential(ctx context.Context, diags *diag.Diagnostics, cl *Cluster) {
 	c := r.client
-	cred, err := c.Kubernetes.Clusters.GetCredential(ctx, cl.ProjectID.ValueString(), cl.Name.ValueString())
+	res, err := c.Services.Kubernetes.Credentials.GetClusterCredentialsWithResponse(ctx, cl.ProjectID.ValueString(), cl.Name.ValueString())
 	if err != nil {
-		diags.AddError("failed to get cluster credentials", err.Error())
+		diags.AddError("failed to initiate request for cluster credentials", err.Error())
 		return
 	}
-	cl.KubeConfig = types.StringValue(cred.Kubeconfig)
+	if res.HasError != nil {
+		diags.AddError("failed fetching cluster credentials", res.HasError.Error())
+		return
+	}
+
+	cl.KubeConfig = types.StringValue(*res.JSON200.Kubeconfig)
 }
 
 // Read - lifecycle function
@@ -125,16 +141,17 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	// read cluster
-	cl, err := c.Kubernetes.Clusters.Get(ctx, state.ProjectID.ValueString(), state.Name.ValueString())
+	res, err := c.Services.Kubernetes.Cluster.GetClusterWithResponse(ctx, state.ProjectID.ValueString(), state.Name.ValueString())
 	if err != nil {
-		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
-			resp.State.RemoveResource(ctx)
-			return
-		}
-		resp.Diagnostics.AddError("failed to read cluster", err.Error())
+		diags.AddError("failed to initiate request for fetching cluster", err.Error())
 		return
 	}
-	state.Transform(cl)
+	if res.HasError != nil {
+		diags.AddError("failed fetching cluster", res.HasError.Error())
+		return
+	}
+
+	state.Transform(*res.JSON200)
 
 	// read credential
 	r.getCredential(ctx, &resp.Diagnostics, &state)
@@ -188,15 +205,21 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	c := r.client
-	process, err := c.Kubernetes.Clusters.Delete(ctx, state.ProjectID.ValueString(), state.Name.ValueString())
+	res, err := c.Services.Kubernetes.Cluster.DeleteClusterWithResponse(ctx, state.ProjectID.ValueString(), state.Name.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("failed to delete cluster", err.Error())
+		resp.Diagnostics.AddError("failed to initiate cluster deletion", err.Error())
+		return
+	}
+	if res.HasError != nil {
+		resp.Diagnostics.AddError("failed cluster deletion request", res.HasError.Error())
 		return
 	}
 
-	if _, err := process.Wait(); err != nil {
-		resp.Diagnostics.AddError("failed to verify cluster deletion", err.Error())
-		return
+	if _, err := res.WaitHandler(ctx, c.Services.Kubernetes.Cluster, state.ProjectID.ValueString(), state.Name.ValueString()).Wait(); err != nil {
+		if !strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+			resp.Diagnostics.AddError("failed to verify cluster deletion", err.Error())
+			return
+		}
 	}
 
 	resp.State.RemoveResource(ctx)
@@ -243,19 +266,23 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 
 	// pre-read imports
 	c := r.client
-	res, err := c.Kubernetes.Clusters.Get(ctx, idParts[0], idParts[1])
+	res, err := c.Services.Kubernetes.Cluster.GetClusterWithResponse(ctx, idParts[0], idParts[1])
 	if err != nil {
-		resp.Diagnostics.AddError("Error during import", err.Error())
+		resp.Diagnostics.AddError("error during import pre-read", err.Error())
+		return
+	}
+	if res.HasError != nil {
+		resp.Diagnostics.AddError("import pre-read request failure", res.HasError.Error())
 		return
 	}
 
-	if res.Extensions != nil {
+	if res.JSON200.Extensions != nil {
 		extensions := &Extensions{}
 
-		if res.Extensions.Argus != nil {
+		if res.JSON200.Extensions.Argus != nil {
 			extensions.Argus = &ArgusExtension{
-				Enabled:         types.Bool{Value: res.Extensions.Argus.Enabled},
-				ArgusInstanceID: types.StringValue(res.Extensions.Argus.ArgusInstanceID),
+				Enabled:         types.Bool{Value: res.JSON200.Extensions.Argus.Enabled},
+				ArgusInstanceID: types.StringValue(res.JSON200.Extensions.Argus.ArgusInstanceID),
 			}
 		}
 
@@ -263,25 +290,25 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 		resp.Diagnostics.Append(diags...)
 	}
 
-	if res.Hibernation != nil {
+	if res.JSON200.Hibernation != nil {
 		hibernations := []Hibernation{}
-		for _, h := range res.Hibernation.Schedules {
+		for _, h := range res.JSON200.Hibernation.Schedules {
 			hibernations = append(hibernations, Hibernation{
 				Start:    types.StringValue(h.Start),
 				End:      types.StringValue(h.End),
-				Timezone: types.StringValue(h.Timezone),
+				Timezone: types.StringValue(*h.Timezone),
 			})
 		}
 		diags := resp.State.SetAttribute(ctx, path.Root("hibernations"), hibernations)
 		resp.Diagnostics.Append(diags...)
 	}
 
-	if res.Maintenance != nil {
+	if res.JSON200.Maintenance != nil {
 		digas := resp.State.SetAttribute(ctx, path.Root("maintenance"), &Maintenance{
-			EnableKubernetesVersionUpdates:   types.Bool{Value: res.Maintenance.AutoUpdate.KubernetesVersion},
-			EnableMachineImageVersionUpdates: types.Bool{Value: res.Maintenance.AutoUpdate.MachineImageVersion},
-			Start:                            types.StringValue(res.Maintenance.TimeWindow.Start),
-			End:                              types.StringValue(res.Maintenance.TimeWindow.End),
+			EnableKubernetesVersionUpdates:   types.Bool{Value: *res.JSON200.Maintenance.AutoUpdate.KubernetesVersion},
+			EnableMachineImageVersionUpdates: types.Bool{Value: *res.JSON200.Maintenance.AutoUpdate.MachineImageVersion},
+			Start:                            types.StringValue(res.JSON200.Maintenance.TimeWindow.Start),
+			End:                              types.StringValue(res.JSON200.Maintenance.TimeWindow.End),
 		})
 		resp.Diagnostics.Append(digas...)
 	}
