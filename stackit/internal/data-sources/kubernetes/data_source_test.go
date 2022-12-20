@@ -12,7 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-const run_this_test = false
+const run_this_test = true
 
 func TestAcc_kubernetes(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
@@ -68,7 +68,7 @@ func config(name, nodepoolName, machineType string) string {
 resource "stackit_kubernetes_cluster" "example" {
 	project_id         = "%s"
 	name               = "%s"
-	kubernetes_version = "1.23"
+	kubernetes_version = "1.24"
 	allow_privileged_containers = false
 	
 	node_pools = [{

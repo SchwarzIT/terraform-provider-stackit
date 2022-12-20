@@ -20,12 +20,16 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	cl, err := c.Kubernetes.Clusters.Get(ctx, config.ProjectID.ValueString(), config.Name.ValueString())
+	cl, err := c.Services.Kubernetes.Cluster.GetClusterWithResponse(ctx, config.ProjectID.ValueString(), config.Name.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("failed to read cluster", err.Error())
+		resp.Diagnostics.AddError("failed to prepare read request for cluster", err.Error())
 		return
 	}
-	transform(&config, cl)
+	if cl.HasError != nil {
+		resp.Diagnostics.AddError("failed to read cluster", cl.HasError.Error())
+		return
+	}
+	transform(&config, cl.JSON200)
 
 	// read credential
 	r.getCredential(ctx, &resp.Diagnostics, &config)
@@ -43,10 +47,18 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 
 func (r DataSource) getCredential(ctx context.Context, diags *diag.Diagnostics, cl *kubernetes.Cluster) {
 	c := r.client
-	cred, err := c.Kubernetes.Clusters.GetCredential(ctx, cl.ProjectID.ValueString(), cl.Name.ValueString())
+	res, err := c.Services.Kubernetes.Credentials.GetClusterCredentialsWithResponse(ctx, cl.ProjectID.ValueString(), cl.Name.ValueString())
 	if err != nil {
-		diags.AddError("failed to get cluster credentials", err.Error())
+		diags.AddError("failed to prepare get request for cluster credentials", err.Error())
 		return
 	}
-	cl.KubeConfig = types.StringValue(cred.Kubeconfig)
+	if res.HasError != nil {
+		diags.AddError("failed to get cluster credentials", res.HasError.Error())
+		return
+	}
+	if res.JSON200.Kubeconfig != nil {
+		cl.KubeConfig = types.StringValue(*res.JSON200.Kubeconfig)
+	} else {
+		cl.KubeConfig = types.StringNull()
+	}
 }
