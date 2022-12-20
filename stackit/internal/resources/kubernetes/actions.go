@@ -8,7 +8,7 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes/clusters"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.4/generated/cluster"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated/cluster"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"

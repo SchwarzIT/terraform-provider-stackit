@@ -7,7 +7,7 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes/options"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.4/generated/cluster"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated/cluster"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
 

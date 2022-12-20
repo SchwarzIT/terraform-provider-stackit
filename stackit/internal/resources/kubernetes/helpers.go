@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/Masterminds/semver"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.4/generated/cluster"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated/cluster"
 	"github.com/pkg/errors"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
