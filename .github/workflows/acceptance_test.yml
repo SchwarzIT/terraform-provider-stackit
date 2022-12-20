@@ -35,7 +35,7 @@ jobs:
             --header 'Content-Type: application/json' \
             --header 'Accept: application/json' \
             --header 'Authorization: Bearer ${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}' \
-            --data-raw '$JSON_DATA' > $HOME/pr.json
+            --data-raw '${JSON_DATA}' > $HOME/pr.json
           
           ACC_TEST_PROJECT_ID="$(jq -r '.projectId' $HOME/pr.json)"
           echo "ACC_TEST_PROJECT_ID=${ACC_TEST_PROJECT_ID}" >> $GITHUB_ENV
