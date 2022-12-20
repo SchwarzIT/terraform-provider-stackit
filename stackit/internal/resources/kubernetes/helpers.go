@@ -399,6 +399,7 @@ func (c *Cluster) transformExtensions(cl cluster.Cluster) {
 		return
 	}
 
+	c.Extensions = &Extensions{}
 	if cl.Extensions.Argus != nil && c.Extensions.Argus != nil {
 		c.Extensions.Argus = &ArgusExtension{
 			Enabled:         types.Bool{Value: cl.Extensions.Argus.Enabled},
