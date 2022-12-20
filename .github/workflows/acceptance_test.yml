@@ -15,11 +15,27 @@ jobs:
         id: create-project
         shell: bash
         run: |
+          JSON_DATA=$(cat << EOF
+          { 
+          "name": "${{ github.event.repository.name }}_${{ github.run_id }}", 
+          "containerParentId": "${{ secrets.ACC_TEST_PARENT_CONTAINER_ID }}", 
+          "members": [{ 
+          "role": "project.owner", 
+          "subject": "${{ secrets.ACC_TEST_USER_EMAIL }}" 
+          }], 
+          "labels": { 
+          "billingReference": "${{ secrets.ACC_TEST_BILLING_REF }}", 
+          "scope": "PUBLIC" 
+          }
+          }
+          EOF
+          )
+          
           curl --location --request POST 'https://api.stackit.cloud/resource-management/v2/projects' \
             --header 'Content-Type: application/json' \
             --header 'Accept: application/json' \
             --header 'Authorization: Bearer ${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}' \
-            --data-raw '{ "name": "${{ github.event.repository.name }}_${{ github.run_id }}", "containerParentId": "${{ secrets.ACC_TEST_PARENT_CONTAINER_ID }}", "members": [{ "role": "project.owner", "subject": "${{ secrets.ACC_TEST_USER_EMAIL }}" }], "labels": { "billingReference": "${{ secrets.ACC_TEST_BILLING_REF }}", "scope": "PUBLIC" }}' > $HOME/pr.json
+            --data-raw '$JSON_DATA' > $HOME/pr.json
           
           ACC_TEST_PROJECT_ID="$(jq -r '.projectId' $HOME/pr.json)"
           echo "ACC_TEST_PROJECT_ID=${ACC_TEST_PROJECT_ID}" >> $GITHUB_ENV
