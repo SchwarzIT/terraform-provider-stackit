@@ -63,7 +63,6 @@ func config(name, version, plan string) string {
 		plan       = "%s"
 	  }
 
-
 	
 	  data "stackit_mariadb_instance" "example" {
 		depends_on = [stackit_mariadb_instance.example]

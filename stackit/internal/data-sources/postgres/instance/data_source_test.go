@@ -2,8 +2,9 @@ package instance_test
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
@@ -59,7 +60,6 @@ func config(name, version string) string {
 		project_id = "%s"
 		version    = "%s"
 	  }
-
 
 	
 	  data "stackit_postgres_instance" "example" {

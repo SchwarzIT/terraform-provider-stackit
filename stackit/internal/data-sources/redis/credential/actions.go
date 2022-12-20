@@ -26,7 +26,6 @@ func (d DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	}
 
 	// set computed fields
-	config.CACert = types.StringValue(i.Raw.Credential.Cacrt)
 	config.Host = types.StringValue(i.Raw.Credential.Host)
 	config.Hosts = types.List{ElemType: types.StringType}
 	if len(i.Raw.Credential.Hosts) > 0 {
@@ -40,7 +39,6 @@ func (d DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	config.Port = types.Int64Value(int64(i.Raw.Credential.Port))
 	config.SyslogDrainURL = types.StringValue(i.Raw.SyslogDrainURL)
 	config.RouteServiceURL = types.StringValue(i.Raw.RouteServiceURL)
-	config.Schema = types.StringValue(i.Raw.Credential.Scheme)
 	config.URI = types.StringValue(i.URI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &config)...)
 	if resp.Diagnostics.HasError() {
