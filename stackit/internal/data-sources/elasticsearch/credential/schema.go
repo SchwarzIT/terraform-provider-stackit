@@ -15,7 +15,6 @@ type Credential struct {
 	ID              types.String `tfsdk:"id"`
 	ProjectID       types.String `tfsdk:"project_id"`
 	InstanceID      types.String `tfsdk:"instance_id"`
-	CACert          types.String `tfsdk:"ca_cert"`
 	Host            types.String `tfsdk:"host"`
 	Hosts           types.List   `tfsdk:"hosts"`
 	Username        types.String `tfsdk:"username"`
@@ -23,7 +22,6 @@ type Credential struct {
 	Port            types.Int64  `tfsdk:"port"`
 	SyslogDrainURL  types.String `tfsdk:"syslog_drain_url"`
 	RouteServiceURL types.String `tfsdk:"route_service_url"`
-	Schema          types.String `tfsdk:"schema"`
 	URI             types.String `tfsdk:"uri"`
 }
 
@@ -61,11 +59,6 @@ func (d DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 			},
 
 			// Computed:
-			"ca_cert": {
-				Description: "Credential CA Certificate",
-				Type:        types.StringType,
-				Computed:    true,
-			},
 			"host": {
 				Description: "Credential host",
 				Type:        types.StringType,
@@ -98,11 +91,6 @@ func (d DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 			},
 			"route_service_url": {
 				Description: "Credential route_service_url",
-				Type:        types.StringType,
-				Computed:    true,
-			},
-			"schema": {
-				Description: "Credential schema",
 				Type:        types.StringType,
 				Computed:    true,
 			},

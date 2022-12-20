@@ -60,7 +60,6 @@ func config(name, version string) string {
 		}
 	}  
 
-
 	
 	  data "stackit_postgres_flex_instance" "example" {
 		depends_on = [stackit_postgres_flex_instance.example]

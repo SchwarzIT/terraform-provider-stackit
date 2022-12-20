@@ -60,7 +60,6 @@ func config(name, version, plan string) string {
 		plan       = "%s"
 	  }
 
-
 	
 	  data "stackit_elasticsearch_instance" "example" {
 		depends_on = [stackit_elasticsearch_instance.example]
