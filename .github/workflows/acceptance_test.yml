@@ -31,8 +31,6 @@ jobs:
           EOF
           )
           
-          echo "${JSON_DATA}"
-          
           curl --location --request POST 'https://api.stackit.cloud/resource-management/v2/projects' \
             --header 'Content-Type: application/json' \
             --header 'Accept: application/json' \
