@@ -18,7 +18,6 @@ type Project struct {
 	Name                types.String `tfsdk:"name"`
 	BillingRef          types.String `tfsdk:"billing_ref"`
 	OwnerEmail          types.String `tfsdk:"owner_email"`
-	EnableKubernetes    types.Bool   `tfsdk:"enable_kubernetes"`
 	EnableObjectStorage types.Bool   `tfsdk:"enable_object_storage"`
 }
 
@@ -80,12 +79,6 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Description: "Email address of owner of the project. This value is only considered during creation. changing it afterwards will have no effect.",
 				Type:        types.StringType,
 				Required:    true,
-			},
-
-			"enable_kubernetes": {
-				Description: "should kubernetes be enabled for this project? `false` by default.",
-				Type:        types.BoolType,
-				Optional:    true,
 			},
 
 			"enable_object_storage": {

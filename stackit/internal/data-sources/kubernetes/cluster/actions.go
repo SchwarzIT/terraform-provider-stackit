@@ -1,9 +1,9 @@
-package kubernetes
+package cluster
 
 import (
 	"context"
 
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/kubernetes"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/kubernetes/cluster"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -12,7 +12,7 @@ import (
 // Read - lifecycle function
 func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	c := r.client
-	var config kubernetes.Cluster
+	var config cluster.Cluster
 
 	diags := req.Config.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
@@ -20,7 +20,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	cl, err := c.Services.Kubernetes.Cluster.GetClusterWithResponse(ctx, config.ProjectID.ValueString(), config.Name.ValueString())
+	cl, err := c.Services.Kubernetes.Cluster.GetClusterWithResponse(ctx, config.KubernetesProjectID.ValueString(), config.Name.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to prepare read request for cluster", err.Error())
 		return
@@ -45,9 +45,9 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	}
 }
 
-func (r DataSource) getCredential(ctx context.Context, diags *diag.Diagnostics, cl *kubernetes.Cluster) {
+func (r DataSource) getCredential(ctx context.Context, diags *diag.Diagnostics, cl *cluster.Cluster) {
 	c := r.client
-	res, err := c.Services.Kubernetes.Credentials.GetClusterCredentialsWithResponse(ctx, cl.ProjectID.ValueString(), cl.Name.ValueString())
+	res, err := c.Services.Kubernetes.Credentials.GetClusterCredentialsWithResponse(ctx, cl.KubernetesProjectID.ValueString(), cl.Name.ValueString())
 	if err != nil {
 		diags.AddError("failed to prepare get request for cluster credentials", err.Error())
 		return

@@ -1,4 +1,4 @@
-package kubernetes
+package cluster
 
 import (
 	"context"
@@ -17,7 +17,7 @@ import (
 type Cluster struct {
 	ID                        types.String  `tfsdk:"id"`
 	Name                      types.String  `tfsdk:"name"`
-	ProjectID                 types.String  `tfsdk:"project_id"`
+	KubernetesProjectID       types.String  `tfsdk:"kubernetes_project_id"`
 	KubernetesVersion         types.String  `tfsdk:"kubernetes_version"`
 	KubernetesVersionUsed     types.String  `tfsdk:"kubernetes_version_used"`
 	AllowPrivilegedContainers types.Bool    `tfsdk:"allow_privileged_containers"`
@@ -95,8 +95,8 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 					resource.RequiresReplace(),
 				},
 			},
-			"project_id": {
-				Description: "The project ID the cluster runs in",
+			"kubernetes_project_id": {
+				Description: "The ID of a `stackit_kubernetes_project` resource",
 				Type:        types.StringType,
 				Required:    true,
 				Validators: []tfsdk.AttributeValidator{

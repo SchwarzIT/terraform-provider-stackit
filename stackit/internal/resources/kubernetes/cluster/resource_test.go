@@ -1,4 +1,4 @@
-package kubernetes_test
+package cluster_test
 
 import (
 	"fmt"
@@ -107,9 +107,14 @@ func TestAcc_kubernetes(t *testing.T) {
 
 func configMinimal(name string) string {
 	return fmt.Sprintf(`
+
+resource "stackit_kubernetes_project" "example" {
+	project_id = "%s"
+}
+
 resource "stackit_kubernetes_cluster" "example" {
-	project_id         = "%s"
-	name               = "%s"
+	kubernetes_project_id         = stackit_kubernetes_project.example.id
+	name               			  = "%s"
 	
 	node_pools = [{
 		name         = "example-np"
@@ -124,10 +129,14 @@ resource "stackit_kubernetes_cluster" "example" {
 
 func configExtended(name, nodepoolName, machineType string) string {
 	return fmt.Sprintf(`
+resource "stackit_kubernetes_project" "example" {
+	project_id = "%s"
+}
+
 resource "stackit_kubernetes_cluster" "example" {
-	project_id         = "%s"
-	name               = "%s"
-	allow_privileged_containers = false
+	kubernetes_project_id         = stackit_kubernetes_project.example.id
+	name               			  = "%s"
+	allow_privileged_containers   = false
 	
 	node_pools = [{
 		name         = "%s"
