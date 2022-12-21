@@ -232,7 +232,7 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 	if len(idParts) != 2 || idParts[0] == "" || idParts[1] == "" {
 		resp.Diagnostics.AddError(
 			"Unexpected Import Identifier",
-			fmt.Sprintf("Expected import identifier with format: `project_id,name` where `name` is the cluster name.\nInstead got: %q", req.ID),
+			fmt.Sprintf("Expected import identifier with format: `kubernetes_project_id,name` where `name` is the cluster name.\nInstead got: %q", req.ID),
 		)
 		return
 	}
@@ -250,13 +250,13 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 	if err := clientValidate.ProjectID(idParts[0]); err != nil {
 		resp.Diagnostics.AddError(
 			"Unexpected Import Identifier",
-			fmt.Sprintf("Couldn't validate project_id.\n%s", err.Error()),
+			fmt.Sprintf("Couldn't validate kubernetes_project_id.\n%s", err.Error()),
 		)
 		return
 	}
 
 	// set main attributes
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project_id"), idParts[0])...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("kubernetes_project_id"), idParts[0])...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("name"), idParts[1])...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), idParts[1])...)
 

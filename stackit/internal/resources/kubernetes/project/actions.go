@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -13,39 +14,37 @@ import (
 // Create - lifecycle function
 func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var plan KubernetesProject
-	diags := req.Plan.Get(ctx, &plan)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// handle creation
+	eof := false
 	c := r.client.Services.Kubernetes.Project
 	res, err := c.CreateProjectWithResponse(ctx, plan.ProjectID.Value)
 	if err != nil {
-		diags.AddError("failed initiating SKE project creation", err.Error())
-		return
+		if !strings.Contains(err.Error(), common.ERR_UNEXPECTED_EOF) {
+			resp.Diagnostics.AddError("failed initiating SKE project creation", err.Error())
+			return
+		}
+		eof = true
 	}
-	if res.HasError != nil {
-		diags.AddError("failed during SKE project creation", res.HasError.Error())
+	if res.HasError != nil && !eof {
+		resp.Diagnostics.AddError("failed during SKE project creation", res.HasError.Error())
 		return
 	}
 
-	plan.ID = types.StringNull()
-	if res.JSON200.ProjectID != nil {
-		plan.ID = types.StringValue(*res.JSON200.ProjectID)
+	plan.ID = types.StringValue(plan.ProjectID.Value)
+	process := res.WaitHandler(ctx, c, plan.ID.ValueString())
+	if _, err := process.Wait(); err != nil {
+		resp.Diagnostics.AddError("failed verifying SKE project creation", err.Error())
+		return
 	}
 
 	// update state
-	diags = resp.State.Set(ctx, plan)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, plan)...)
 	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	process := res.WaitHandler(ctx, c, plan.ProjectID.Value)
-	if _, err := process.Wait(); err != nil {
-		diags.AddError("failed verifying SKE project creation", err.Error())
 		return
 	}
 }

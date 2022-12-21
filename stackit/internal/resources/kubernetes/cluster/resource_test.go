@@ -31,7 +31,6 @@ func TestAcc_kubernetes(t *testing.T) {
 				Config: configMinimal(name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "name", name),
-					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "allow_privileged_containers", "true"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.name", "example-np"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.machine_type", "c1.2"),
@@ -54,7 +53,6 @@ func TestAcc_kubernetes(t *testing.T) {
 				Config: configExtended(name, "new-nodepl", "c1.2"),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "name", name),
-					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "allow_privileged_containers", "false"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.name", "new-nodepl"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.machine_type", "c1.2"),
@@ -88,7 +86,6 @@ func TestAcc_kubernetes(t *testing.T) {
 				Config: configExtended(name, "new-nodepl", "c1.3"),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "name", name),
-					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.name", "new-nodepl"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.machine_type", "c1.3"),
 				),
