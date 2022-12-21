@@ -31,8 +31,10 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		eof = true
 	}
 	if res.HasError != nil && !eof {
-		resp.Diagnostics.AddError("failed during SKE project creation", res.HasError.Error())
-		return
+		if !strings.Contains(res.HasError.Error(), common.ERR_UNEXPECTED_EOF) {
+			resp.Diagnostics.AddError("failed during SKE project creation", res.HasError.Error())
+			return
+		}
 	}
 
 	plan.ID = types.StringValue(plan.ProjectID.Value)
