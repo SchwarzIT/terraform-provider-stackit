@@ -19,9 +19,13 @@ resource "stackit_project" "example" {
   owner       = var.project_owner
 }
 
-data "stackit_kubernetes_cluster" "example" {
-  name       = "example"
+data "stackit_kubernetes_project" "example" {
   project_id = stackit_project.example.id
+}
+
+data "stackit_kubernetes_cluster" "example" {
+  name                  = "example"
+  kubernetes_project_id = data.stackit_kubernetes_project.example.id
 }
 ```
 
@@ -30,8 +34,8 @@ data "stackit_kubernetes_cluster" "example" {
 
 ### Required
 
+- `kubernetes_project_id` (String) The project ID the cluster runs in
 - `name` (String) Specifies the cluster name
-- `project_id` (String) The project ID the cluster runs in
 
 ### Read-Only
 

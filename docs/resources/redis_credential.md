@@ -33,14 +33,12 @@ resource "stackit_redis_credential" "example" {
 
 ### Read-Only
 
-- `ca_cert` (String) CA Certificate
 - `host` (String) Credential host
 - `hosts` (List of String) Credential hosts
 - `id` (String) Specifies the resource ID
 - `password` (String) Credential password
 - `port` (Number) Credential port
 - `route_service_url` (String) Credential route service url
-- `schema` (String) The schema used
 - `syslog_drain_url` (String) Credential syslog drain url
 - `uri` (String) The instance URI
 - `username` (String) Credential username

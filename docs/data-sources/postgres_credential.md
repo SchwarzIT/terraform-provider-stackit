@@ -41,13 +41,11 @@ data "stackit_postgres_credential" "example" {
 
 ### Read-Only
 
-- `ca_cert` (String) Credential CA Certificate
 - `host` (String) Credential host
 - `hosts` (List of String) Credential hosts
 - `password` (String) Credential password
 - `port` (Number) Credential port
 - `route_service_url` (String) Credential route_service_url
-- `schema` (String) Credential schema
 - `syslog_drain_url` (String) Credential syslog_drain_url
 - `uri` (String) The instance URI
 - `username` (String) Credential username

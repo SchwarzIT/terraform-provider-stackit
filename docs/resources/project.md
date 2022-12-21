@@ -33,7 +33,6 @@ resource "stackit_project" "example" {
 
 ### Optional
 
-- `enable_kubernetes` (Boolean) should kubernetes be enabled for this project? `false` by default.
 - `enable_object_storage` (Boolean) should object storage be enabled for this project? `false` by default.
 
 ### Read-Only
