@@ -1,14 +1,14 @@
-package kubernetes
+package cluster
 
 import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated/cluster"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/kubernetes"
+	kubernetesCluster "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/kubernetes/cluster"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 // Transform transforms cluster.Cluster structure to Cluster
-func transform(c *kubernetes.Cluster, cl *cluster.Cluster) {
+func transform(c *kubernetesCluster.Cluster, cl *cluster.Cluster) {
 	if cl.Name != nil {
 		c.ID = types.StringValue(*cl.Name)
 	}
@@ -26,8 +26,8 @@ func transform(c *kubernetes.Cluster, cl *cluster.Cluster) {
 	transformExtensions(c, cl)
 }
 
-func transformNodepools(c *kubernetes.Cluster, cl *cluster.Cluster) {
-	c.NodePools = []kubernetes.NodePool{}
+func transformNodepools(c *kubernetesCluster.Cluster, cl *cluster.Cluster) {
+	c.NodePools = []kubernetesCluster.NodePool{}
 	for _, np := range cl.Nodepools {
 		maimna := types.StringNull()
 		if np.Machine.Image.Name != nil {
@@ -49,7 +49,7 @@ func transformNodepools(c *kubernetes.Cluster, cl *cluster.Cluster) {
 		if np.CRI.Name != nil {
 			crin = types.StringValue(string(*np.CRI.Name))
 		}
-		n := kubernetes.NodePool{
+		n := kubernetesCluster.NodePool{
 			Name:             types.StringValue(np.Name),
 			MachineType:      types.StringValue(np.Machine.Type),
 			OSName:           maimna,
@@ -77,13 +77,13 @@ func transformNodepools(c *kubernetes.Cluster, cl *cluster.Cluster) {
 		if np.Taints != nil {
 			for _, v := range *np.Taints {
 				if n.Taints == nil {
-					n.Taints = []kubernetes.Taint{}
+					n.Taints = []kubernetesCluster.Taint{}
 				}
 				taintval := types.StringNull()
 				if v.Value != nil {
 					taintval = types.StringValue(*v.Value)
 				}
-				n.Taints = append(n.Taints, kubernetes.Taint{
+				n.Taints = append(n.Taints, kubernetesCluster.Taint{
 					Effect: types.StringValue(string(v.Effect)),
 					Key:    types.StringValue(v.Key),
 					Value:  taintval,
@@ -100,14 +100,14 @@ func transformNodepools(c *kubernetes.Cluster, cl *cluster.Cluster) {
 	}
 }
 
-func transformHibernations(c *kubernetes.Cluster, cl *cluster.Cluster) {
+func transformHibernations(c *kubernetesCluster.Cluster, cl *cluster.Cluster) {
 	if cl.Hibernation == nil {
 		return
 	}
 
-	c.Hibernations = []kubernetes.Hibernation{}
+	c.Hibernations = []kubernetesCluster.Hibernation{}
 	for _, h := range cl.Hibernation.Schedules {
-		c.Hibernations = append(c.Hibernations, kubernetes.Hibernation{
+		c.Hibernations = append(c.Hibernations, kubernetesCluster.Hibernation{
 			Start:    types.StringValue(h.Start),
 			End:      types.StringValue(h.End),
 			Timezone: types.StringValue(*h.Timezone),
@@ -115,7 +115,7 @@ func transformHibernations(c *kubernetes.Cluster, cl *cluster.Cluster) {
 	}
 }
 
-func transformMaintenance(c *kubernetes.Cluster, cl *cluster.Cluster) {
+func transformMaintenance(c *kubernetesCluster.Cluster, cl *cluster.Cluster) {
 	if cl.Maintenance == nil {
 		return
 	}
@@ -129,7 +129,7 @@ func transformMaintenance(c *kubernetes.Cluster, cl *cluster.Cluster) {
 	if cl.Maintenance.AutoUpdate.MachineImageVersion != nil {
 		eMiv = types.BoolValue(*cl.Maintenance.AutoUpdate.MachineImageVersion)
 	}
-	c.Maintenance = &kubernetes.Maintenance{
+	c.Maintenance = &kubernetesCluster.Maintenance{
 		EnableKubernetesVersionUpdates:   eKvu,
 		EnableMachineImageVersionUpdates: eMiv,
 		Start:                            types.StringValue(cl.Maintenance.TimeWindow.Start),
@@ -137,18 +137,18 @@ func transformMaintenance(c *kubernetes.Cluster, cl *cluster.Cluster) {
 	}
 }
 
-func transformExtensions(c *kubernetes.Cluster, cl *cluster.Cluster) {
+func transformExtensions(c *kubernetesCluster.Cluster, cl *cluster.Cluster) {
 	if cl.Extensions == nil {
 		return
 	}
-	c.Extensions = &kubernetes.Extensions{
-		Argus: &kubernetes.ArgusExtension{
+	c.Extensions = &kubernetesCluster.Extensions{
+		Argus: &kubernetesCluster.ArgusExtension{
 			Enabled:         types.BoolValue(false),
 			ArgusInstanceID: types.StringNull(),
 		},
 	}
 	if cl.Extensions.Argus != nil {
-		c.Extensions.Argus = &kubernetes.ArgusExtension{
+		c.Extensions.Argus = &kubernetesCluster.ArgusExtension{
 			Enabled:         types.BoolValue(cl.Extensions.Argus.Enabled),
 			ArgusInstanceID: types.StringValue(cl.Extensions.Argus.ArgusInstanceID),
 		}

@@ -2,5 +2,8 @@ package common
 
 const (
 	// Acceptance tests constants
-	ACC_TEST_PROJECT_ID = "2d07c991-6cd4-475e-b00b-8acc2494f73f"
+	ACC_TEST_PROJECT_ID = "a4d42390-a3fb-40a5-bbab-ecc3988f8091"
+
+	// errors
+	ERR_UNEXPECTED_EOF = "unexpected EOF"
 )

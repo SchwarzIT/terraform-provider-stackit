@@ -4,7 +4,11 @@ resource "stackit_project" "example" {
   owner       = var.project_owner
 }
 
-data "stackit_kubernetes_cluster" "example" {
-  name       = "example"
+data "stackit_kubernetes_project" "example" {
   project_id = stackit_project.example.id
+}
+
+data "stackit_kubernetes_cluster" "example" {
+  name                  = "example"
+  kubernetes_project_id = data.stackit_kubernetes_project.example.id
 }

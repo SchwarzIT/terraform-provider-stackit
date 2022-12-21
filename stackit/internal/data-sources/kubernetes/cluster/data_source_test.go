@@ -1,4 +1,4 @@
-package kubernetes_test
+package cluster_test
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-const run_this_test = true
+const run_this_test = false
 
 func TestAcc_kubernetes(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
@@ -30,7 +30,6 @@ func TestAcc_kubernetes(t *testing.T) {
 				Config: config(name, "nodepl", "c1.2"),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.stackit_kubernetes_cluster.example", "name", name),
-					resource.TestCheckResourceAttr("data.stackit_kubernetes_cluster.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttr("data.stackit_kubernetes_cluster.example", "allow_privileged_containers", "false"),
 					resource.TestCheckResourceAttr("data.stackit_kubernetes_cluster.example", "node_pools.0.name", "nodepl"),
 					resource.TestCheckResourceAttr("data.stackit_kubernetes_cluster.example", "node_pools.0.machine_type", "c1.2"),
@@ -65,8 +64,13 @@ func TestAcc_kubernetes(t *testing.T) {
 
 func config(name, nodepoolName, machineType string) string {
 	return fmt.Sprintf(`
+	resource "stackit_kubernetes_project" "example" {
+		project_id = "%s"
+	}
+
 resource "stackit_kubernetes_cluster" "example" {
-	project_id         = "%s"
+	depends_on 					  = [stackit_kubernetes_project.example]
+	kubernetes_project_id         = stackit_kubernetes_project.example.id
 	name               = "%s"
 	kubernetes_version = "1.24"
 	allow_privileged_containers = false
@@ -110,9 +114,9 @@ resource "stackit_kubernetes_cluster" "example" {
 }
 
 data "stackit_kubernetes_cluster" "example" {
-	depends_on = [stackit_kubernetes_cluster.example]
-	name       = "%s"
-	project_id = "%s"
+	depends_on 				= [stackit_kubernetes_project.example,stackit_kubernetes_cluster.example]
+	name       				= "%s"
+	kubernetes_project_id 	= stackit_kubernetes_project.example.id
 }
   
 	  `,
@@ -121,6 +125,5 @@ data "stackit_kubernetes_cluster" "example" {
 		nodepoolName,
 		machineType,
 		name,
-		common.GetAcceptanceTestsProjectID(),
 	)
 }

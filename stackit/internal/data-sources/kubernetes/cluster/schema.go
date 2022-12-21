@@ -1,4 +1,4 @@
-package kubernetes
+package cluster
 
 import (
 	"context"
@@ -32,7 +32,7 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 					resource.RequiresReplace(),
 				},
 			},
-			"project_id": {
+			"kubernetes_project_id": {
 				Description: "The project ID the cluster runs in",
 				Type:        types.StringType,
 				Required:    true,

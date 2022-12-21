@@ -1,4 +1,4 @@
-package kubernetes
+package project
 
 import (
 	"context"
@@ -22,7 +22,7 @@ var _ = datasource.DataSource(&DataSource{})
 
 // Metadata returns data resource metadata
 func (r *DataSource) Metadata(_ context.Context, req datasource.MetadataRequest, res *datasource.MetadataResponse) {
-	res.TypeName = "stackit_kubernetes_cluster"
+	res.TypeName = "stackit_kubernetes_project"
 }
 
 // Configure configures the data source client

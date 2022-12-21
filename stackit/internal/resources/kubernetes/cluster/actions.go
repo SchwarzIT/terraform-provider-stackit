@@ -1,4 +1,4 @@
-package kubernetes
+package cluster
 
 import (
 	"context"
@@ -55,7 +55,7 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 	}
 
 	// cluster vars
-	projectID := cl.ProjectID.ValueString()
+	projectID := cl.KubernetesProjectID.ValueString()
 	clusterName := cl.Name.ValueString()
 	clusterConfig, err := cl.clusterConfig(versions)
 	if err != nil {
@@ -116,7 +116,7 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 
 func (r Resource) getCredential(ctx context.Context, diags *diag.Diagnostics, cl *Cluster) {
 	c := r.client
-	res, err := c.Services.Kubernetes.Credentials.GetClusterCredentialsWithResponse(ctx, cl.ProjectID.ValueString(), cl.Name.ValueString())
+	res, err := c.Services.Kubernetes.Credentials.GetClusterCredentialsWithResponse(ctx, cl.KubernetesProjectID.ValueString(), cl.Name.ValueString())
 	if err != nil {
 		diags.AddError("failed to initiate request for cluster credentials", err.Error())
 		return
@@ -141,7 +141,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	// read cluster
-	res, err := c.Services.Kubernetes.Cluster.GetClusterWithResponse(ctx, state.ProjectID.ValueString(), state.Name.ValueString())
+	res, err := c.Services.Kubernetes.Cluster.GetClusterWithResponse(ctx, state.KubernetesProjectID.ValueString(), state.Name.ValueString())
 	if err != nil {
 		diags.AddError("failed to initiate request for fetching cluster", err.Error())
 		return
@@ -205,7 +205,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	c := r.client
-	res, err := c.Services.Kubernetes.Cluster.DeleteClusterWithResponse(ctx, state.ProjectID.ValueString(), state.Name.ValueString())
+	res, err := c.Services.Kubernetes.Cluster.DeleteClusterWithResponse(ctx, state.KubernetesProjectID.ValueString(), state.Name.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to initiate cluster deletion", err.Error())
 		return
@@ -215,7 +215,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	if _, err := res.WaitHandler(ctx, c.Services.Kubernetes.Cluster, state.ProjectID.ValueString(), state.Name.ValueString()).Wait(); err != nil {
+	if _, err := res.WaitHandler(ctx, c.Services.Kubernetes.Cluster, state.KubernetesProjectID.ValueString(), state.Name.ValueString()).Wait(); err != nil {
 		if !strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.Diagnostics.AddError("failed to verify cluster deletion", err.Error())
 			return
@@ -232,7 +232,7 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 	if len(idParts) != 2 || idParts[0] == "" || idParts[1] == "" {
 		resp.Diagnostics.AddError(
 			"Unexpected Import Identifier",
-			fmt.Sprintf("Expected import identifier with format: `project_id,name` where `name` is the cluster name.\nInstead got: %q", req.ID),
+			fmt.Sprintf("Expected import identifier with format: `kubernetes_project_id,name` where `name` is the cluster name.\nInstead got: %q", req.ID),
 		)
 		return
 	}
@@ -250,13 +250,13 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 	if err := clientValidate.ProjectID(idParts[0]); err != nil {
 		resp.Diagnostics.AddError(
 			"Unexpected Import Identifier",
-			fmt.Sprintf("Couldn't validate project_id.\n%s", err.Error()),
+			fmt.Sprintf("Couldn't validate kubernetes_project_id.\n%s", err.Error()),
 		)
 		return
 	}
 
 	// set main attributes
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project_id"), idParts[0])...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("kubernetes_project_id"), idParts[0])...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("name"), idParts[1])...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), idParts[1])...)
 

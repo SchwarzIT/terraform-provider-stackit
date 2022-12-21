@@ -37,16 +37,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		Name:                types.StringValue(plan.Name.ValueString()),
 		BillingRef:          types.StringValue(plan.BillingRef.ValueString()),
 		OwnerEmail:          types.StringValue(plan.OwnerEmail.ValueString()),
-		EnableKubernetes:    types.Bool{Null: true},
 		EnableObjectStorage: types.Bool{Null: true},
-	}
-
-	if !plan.EnableKubernetes.IsNull() {
-		p.EnableKubernetes = types.Bool{Value: plan.EnableKubernetes.ValueBool()}
-		r.createKubernetesProject(ctx, &resp.Diagnostics, plan.ID.ValueString())
-		if resp.Diagnostics.HasError() {
-			return
-		}
 	}
 
 	if !plan.EnableObjectStorage.IsNull() {
@@ -98,20 +89,6 @@ func (r Resource) createProject(ctx context.Context, resp *resource.CreateRespon
 	return plan
 }
 
-func (r Resource) createKubernetesProject(ctx context.Context, d *diag.Diagnostics, projectID string) {
-	c := r.client
-	_, process, err := c.Kubernetes.Projects.Create(ctx, projectID)
-	if err != nil {
-		d.AddError("failed to verify kubernetes is enabled for project", err.Error())
-		return
-	}
-
-	if _, err := process.Wait(); err != nil {
-		d.AddError("failed to validate kubernetes is enabled for project", err.Error())
-		return
-	}
-}
-
 func (r Resource) createObjectStorageProject(ctx context.Context, d *diag.Diagnostics, projectID string) {
 	c := r.client
 	if _, err := c.ObjectStorage.Projects.Create(ctx, projectID); err != nil {
@@ -151,14 +128,6 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	if err != nil {
 		resp.Diagnostics.AddError("failed to read project", err.Error())
 		return
-	}
-
-	if !p.EnableKubernetes.IsNull() {
-		kubernetesEnabled := false
-		if res, err := c.Kubernetes.Projects.Get(ctx, p.ID.ValueString()); err == nil && res.State == consts.SKE_PROJECT_STATUS_CREATED {
-			kubernetesEnabled = true
-		}
-		p.EnableKubernetes = types.Bool{Value: kubernetesEnabled}
 	}
 
 	if !p.EnableObjectStorage.IsNull() {
@@ -205,7 +174,6 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	r.updateProject(ctx, plan, state, resp)
-	r.updateKubernetesProject(ctx, plan, state, resp)
 	r.updateObjectStorageProject(ctx, plan, state, resp)
 
 	if resp.Diagnostics.HasError() {
@@ -238,19 +206,6 @@ func (r Resource) updateProject(ctx context.Context, plan, state Project, resp *
 	}
 }
 
-func (r Resource) updateKubernetesProject(ctx context.Context, plan, state Project, resp *resource.UpdateResponse) {
-	if plan.EnableKubernetes.Equal(state.EnableKubernetes) {
-		return
-	}
-
-	if plan.EnableKubernetes.IsNull() || !plan.EnableKubernetes.ValueBool() {
-		r.deleteKubernetesProject(ctx, &resp.Diagnostics, plan.ID.ValueString())
-		return
-	}
-
-	r.createKubernetesProject(ctx, &resp.Diagnostics, plan.ID.ValueString())
-}
-
 func (r Resource) updateObjectStorageProject(ctx context.Context, plan, state Project, resp *resource.UpdateResponse) {
 	if plan.EnableObjectStorage.Equal(state.EnableObjectStorage) {
 		return
@@ -274,10 +229,6 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 
 	c := r.client
 
-	if state.EnableKubernetes.ValueBool() {
-		_, _ = c.Kubernetes.Projects.Delete(ctx, state.ID.ValueString())
-	}
-
 	if state.EnableObjectStorage.ValueBool() {
 		_ = c.ObjectStorage.Projects.Delete(ctx, state.ID.ValueString())
 	}
@@ -293,28 +244,6 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	resp.State.RemoveResource(ctx)
-}
-
-func (r Resource) deleteKubernetesProject(ctx context.Context, d *diag.Diagnostics, projectID string) {
-	c := r.client
-	res, err := c.Kubernetes.Clusters.List(ctx, projectID)
-	if err == nil && len(res.Items) > 0 {
-		d.AddWarning("Kubernetes disabling considerations", `We detected active Kubernetes clusters in your project
-Therefore, in order to prevent them from automatically being deleted, we ignored your setting "enable_kubernetes=false".
-If you wish for the change to be applied, please delete all existing clusters first & re-run the plan.`)
-		return
-	}
-
-	process, err := c.Kubernetes.Projects.Delete(ctx, projectID)
-	if err != nil {
-		d.AddError("error disabling kubernetes", err.Error())
-		return
-	}
-
-	if _, err := process.Wait(); err != nil {
-		d.AddError("kubernetes disabling validation failed", err.Error())
-		return
-	}
 }
 
 func (r Resource) deleteObjectStorageProject(ctx context.Context, d *diag.Diagnostics, projectID string) {
