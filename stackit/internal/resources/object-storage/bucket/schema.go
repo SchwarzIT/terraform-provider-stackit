@@ -15,7 +15,7 @@ import (
 type Bucket struct {
 	ID                     types.String `tfsdk:"id"`
 	Name                   types.String `tfsdk:"name"`
-	ObjectStorageProjectID types.String `tfsdk:"stackit_object_storage_project"`
+	ObjectStorageProjectID types.String `tfsdk:"object_storage_project_id"`
 	Region                 types.String `tfsdk:"region"`
 	HostStyleURL           types.String `tfsdk:"host_style_url"`
 	PathStyleURL           types.String `tfsdk:"path_style_url"`

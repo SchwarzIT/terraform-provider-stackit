@@ -38,7 +38,7 @@ func TestAcc_ObjectStorageCredentialsGroup(t *testing.T) {
 					resource.TestCheckTypeSetElemAttrPair("stackit_object_storage_credentials_group.example", "id", "data.stackit_object_storage_credentials_group.example", "id"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_object_storage_credentials_group.example", "urn", "data.stackit_object_storage_credentials_group.example", "urn"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_object_storage_credentials_group.example", "name", "data.stackit_object_storage_credentials_group.example", "name"),
-					resource.TestCheckTypeSetElemAttrPair("stackit_object_storage_credentials_group.example", "object_storage_project_id", "data.stackit_object_storage_credentials_group.example", "project_id"),
+					resource.TestCheckTypeSetElemAttrPair("stackit_object_storage_credentials_group.example", "object_storage_project_id", "data.stackit_object_storage_credentials_group.example", "object_storage_project_id"),
 				),
 			},
 		},

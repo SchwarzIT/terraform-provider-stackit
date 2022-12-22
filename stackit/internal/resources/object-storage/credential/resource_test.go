@@ -52,8 +52,13 @@ func TestAcc_ObjectStorageCredential(t *testing.T) {
 
 func config() string {
 	return fmt.Sprintf(`
+
+	resource "stackit_object_storage_project" "example" {
+		project_id         = "%s"
+	}
+
 	resource "stackit_object_storage_credential" "example" {
-		project_id = "%s"
+		object_storage_project_id = stackit_object_storage_project.example.id
 	}
 	`,
 		common.GetAcceptanceTestsProjectID(),
