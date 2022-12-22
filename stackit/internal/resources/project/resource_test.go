@@ -58,22 +58,20 @@ func TestAcc_Project(t *testing.T) {
 			},
 			// enabled services
 			{
-				Config: config2(newName, billingRef, user, true, false),
+				Config: config2(newName, billingRef, user, false),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("stackit_project.example", "id"),
 					resource.TestCheckResourceAttr("stackit_project.example", "name", newName),
 					resource.TestCheckResourceAttr("stackit_project.example", "billing_ref", billingRef),
-					resource.TestCheckResourceAttr("stackit_project.example", "enable_kubernetes", "true"),
 					resource.TestCheckResourceAttr("stackit_project.example", "enable_object_storage", "false"),
 				),
 			},
 			{
-				Config: config2(newName, billingRef, user, false, true),
+				Config: config2(newName, billingRef, user, true),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("stackit_project.example", "id"),
 					resource.TestCheckResourceAttr("stackit_project.example", "name", newName),
 					resource.TestCheckResourceAttr("stackit_project.example", "billing_ref", billingRef),
-					resource.TestCheckResourceAttr("stackit_project.example", "enable_kubernetes", "false"),
 					resource.TestCheckResourceAttr("stackit_project.example", "enable_object_storage", "true"),
 				),
 			},
@@ -113,13 +111,12 @@ func config(name, billingRef, user string) string {
 	)
 }
 
-func config2(name, billingRef, user string, enableKubernetes, enableObjectStorage bool) string {
+func config2(name, billingRef, user string, enableObjectStorage bool) string {
 	return fmt.Sprintf(`
 	resource "stackit_project" "example" {
 		name        = "%s"
 		billing_ref = "%s"
 		owner_email = "%s"
-		enable_kubernetes = %v
 		enable_object_storage = %v
 		parent_container_id = "%s"
 	}
@@ -127,7 +124,6 @@ func config2(name, billingRef, user string, enableKubernetes, enableObjectStorag
 		name,
 		billingRef,
 		user,
-		enableKubernetes,
 		enableObjectStorage,
 		consts.SCHWARZ_CONTAINER_ID,
 	)
