@@ -3,13 +3,10 @@ package project
 import (
 	"context"
 	"fmt"
-	"net/http"
-	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/resource-management/projects"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -31,21 +28,12 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	p := Project{
-		ID:                  types.StringValue(plan.ID.ValueString()),
-		ContainerID:         types.StringValue(plan.ContainerID.ValueString()),
-		ParentContainerID:   types.StringValue(plan.ParentContainerID.ValueString()),
-		Name:                types.StringValue(plan.Name.ValueString()),
-		BillingRef:          types.StringValue(plan.BillingRef.ValueString()),
-		OwnerEmail:          types.StringValue(plan.OwnerEmail.ValueString()),
-		EnableObjectStorage: types.Bool{Null: true},
-	}
-
-	if !plan.EnableObjectStorage.IsNull() {
-		p.EnableObjectStorage = types.Bool{Value: plan.EnableObjectStorage.ValueBool()}
-		r.createObjectStorageProject(ctx, &resp.Diagnostics, plan.ID.ValueString())
-		if resp.Diagnostics.HasError() {
-			return
-		}
+		ID:                types.StringValue(plan.ID.ValueString()),
+		ContainerID:       types.StringValue(plan.ContainerID.ValueString()),
+		ParentContainerID: types.StringValue(plan.ParentContainerID.ValueString()),
+		Name:              types.StringValue(plan.Name.ValueString()),
+		BillingRef:        types.StringValue(plan.BillingRef.ValueString()),
+		OwnerEmail:        types.StringValue(plan.OwnerEmail.ValueString()),
 	}
 
 	// update state
@@ -89,21 +77,6 @@ func (r Resource) createProject(ctx context.Context, resp *resource.CreateRespon
 	return plan
 }
 
-func (r Resource) createObjectStorageProject(ctx context.Context, d *diag.Diagnostics, projectID string) {
-	c := r.client
-	if _, err := c.ObjectStorage.Projects.Create(ctx, projectID); err != nil {
-		d.AddError("failed to enable object storage in project", err.Error())
-		return
-	}
-
-	// verify
-	_, err := c.ObjectStorage.Projects.Get(ctx, projectID)
-	if err != nil {
-		d.AddError("failed to verify object storage is enabled", err.Error())
-		return
-	}
-}
-
 // Read - lifecycle function
 func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	c := r.client
@@ -130,13 +103,6 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	if !p.EnableObjectStorage.IsNull() {
-		obejctStorageEnabled := false
-		if _, err := c.ObjectStorage.Projects.Get(ctx, p.ID.ValueString()); err == nil {
-			obejctStorageEnabled = true
-		}
-		p.EnableObjectStorage = types.Bool{Value: obejctStorageEnabled}
-	}
 	p.ID = types.StringValue(project.ProjectID)
 	p.ContainerID = types.StringValue(project.ContainerID)
 	p.ParentContainerID = types.StringValue(project.Parent.ContainerID)
@@ -174,8 +140,6 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	r.updateProject(ctx, plan, state, resp)
-	r.updateObjectStorageProject(ctx, plan, state, resp)
-
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -206,19 +170,6 @@ func (r Resource) updateProject(ctx context.Context, plan, state Project, resp *
 	}
 }
 
-func (r Resource) updateObjectStorageProject(ctx context.Context, plan, state Project, resp *resource.UpdateResponse) {
-	if plan.EnableObjectStorage.Equal(state.EnableObjectStorage) {
-		return
-	}
-
-	if plan.EnableObjectStorage.IsNull() || !plan.EnableObjectStorage.ValueBool() {
-		r.deleteObjectStorageProject(ctx, &resp.Diagnostics, plan.ID.ValueString())
-		return
-	}
-
-	r.createObjectStorageProject(ctx, &resp.Diagnostics, plan.ID.ValueString())
-}
-
 // Delete - lifecycle function
 func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var state Project
@@ -228,11 +179,6 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	c := r.client
-
-	if state.EnableObjectStorage.ValueBool() {
-		_ = c.ObjectStorage.Projects.Delete(ctx, state.ID.ValueString())
-	}
-
 	process, err := c.ResourceManagement.Projects.Delete(ctx, state.ContainerID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete project", err.Error())
@@ -244,24 +190,6 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	resp.State.RemoveResource(ctx)
-}
-
-func (r Resource) deleteObjectStorageProject(ctx context.Context, d *diag.Diagnostics, projectID string) {
-	c := r.client
-	res, err := c.ObjectStorage.Buckets.List(ctx, projectID)
-	if err == nil && len(res.Buckets) > 0 {
-		d.AddWarning("Object Storage disabling considerations", `We detected active buckets in your project
-Therefor, in order to prevent them from automatically being deleted, we ignored your setting "enable_object_storage=false".
-If you wish for the change to be applied, please delete all existing buckets first & re-run the plan.`)
-		return
-	}
-	if err := c.ObjectStorage.Projects.Delete(ctx, projectID); err != nil {
-		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
-			return
-		}
-		d.AddError("failed to disable object storage", err.Error())
-		return
-	}
 }
 
 // ImportState handles terraform import
@@ -277,5 +205,4 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 
 	// set main attributes
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
-
 }

@@ -39,6 +39,7 @@ import (
 	resourceObjectStorageBucket "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/bucket"
 	resourceObjectStorageCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/credential"
 	resourceObjectStorageCredentialsGroup "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/credentials-group"
+	resourceObjectStorageProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/project"
 	resourcePostgresFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/postgres-flex/instance"
 	resourcePostgresCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/postgres/credential"
 	resourcePostgresDBInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/postgres/instance"
@@ -124,6 +125,7 @@ func (p *StackitProvider) Resources(_ context.Context) []func() resource.Resourc
 		resourceObjectStorageBucket.New,
 		resourceObjectStorageCredential.New,
 		resourceObjectStorageCredentialsGroup.New,
+		resourceObjectStorageProject.New,
 		resourcePostgresCredential.New,
 		resourcePostgresDBInstance.New,
 		resourceProject.New,
