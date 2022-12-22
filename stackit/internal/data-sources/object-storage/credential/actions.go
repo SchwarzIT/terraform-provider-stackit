@@ -23,7 +23,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	list, err := c.ObjectStorage.AccessKeys.List(ctx, config.ProjectID.ValueString(), "")
+	list, err := c.ObjectStorage.AccessKeys.List(ctx, config.ObjectStorageProjectID.ValueString(), "")
 	if err != nil {
 		resp.Diagnostics.AddError("failed to read credential", err.Error())
 		return

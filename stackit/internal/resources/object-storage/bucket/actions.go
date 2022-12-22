@@ -31,12 +31,12 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	// update state
 	diags = resp.State.Set(ctx, Bucket{
-		ID:           types.StringValue(b.Bucket.Name),
-		Name:         types.StringValue(b.Bucket.Name),
-		ProjectID:    types.StringValue(b.Project),
-		Region:       types.StringValue(b.Bucket.Region),
-		HostStyleURL: types.StringValue(b.Bucket.URLVirtualHostedStyle),
-		PathStyleURL: types.StringValue(b.Bucket.URLPathStyle),
+		ID:                     types.StringValue(b.Bucket.Name),
+		Name:                   types.StringValue(b.Bucket.Name),
+		ObjectStorageProjectID: types.StringValue(b.Project),
+		Region:                 types.StringValue(b.Bucket.Region),
+		HostStyleURL:           types.StringValue(b.Bucket.URLVirtualHostedStyle),
+		PathStyleURL:           types.StringValue(b.Bucket.URLPathStyle),
 	})
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -49,7 +49,7 @@ func (r Resource) createBucket(ctx context.Context, resp *resource.CreateRespons
 	var b buckets.BucketResponse
 
 	// Create bucket
-	process, err := c.ObjectStorage.Buckets.Create(ctx, plan.ProjectID.ValueString(), plan.Name.ValueString())
+	process, err := c.ObjectStorage.Buckets.Create(ctx, plan.ObjectStorageProjectID.ValueString(), plan.Name.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to verify bucket creation", err.Error())
 		return b
@@ -80,7 +80,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	b, err := c.ObjectStorage.Buckets.Get(ctx, state.ProjectID.ValueString(), state.Name.ValueString())
+	b, err := c.ObjectStorage.Buckets.Get(ctx, state.ObjectStorageProjectID.ValueString(), state.Name.ValueString())
 	if err != nil {
 		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.State.RemoveResource(ctx)
@@ -116,7 +116,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	t := httpClient.Timeout
 
 	httpClient.Timeout = time.Minute
-	process, err := c.ObjectStorage.Buckets.Delete(ctx, state.ProjectID.ValueString(), state.Name.ValueString())
+	process, err := c.ObjectStorage.Buckets.Delete(ctx, state.ObjectStorageProjectID.ValueString(), state.Name.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to verify bucket deletion", err.Error())
 		return
@@ -139,7 +139,7 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 	if len(idParts) != 2 || idParts[0] == "" || idParts[1] == "" {
 		resp.Diagnostics.AddError(
 			"Unexpected Import Identifier",
-			fmt.Sprintf("Expected import identifier with format: `project_id,name` where `name` is the cluster name.\nInstead got: %q", req.ID),
+			fmt.Sprintf("Expected import identifier with format: `object_storage_project_id,name` where `name` is the cluster name.\nInstead got: %q", req.ID),
 		)
 		return
 	}
@@ -163,7 +163,7 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 	}
 
 	// set main attributes
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project_id"), idParts[0])...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("object_storage_project_id"), idParts[0])...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("name"), idParts[1])...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), idParts[1])...)
 

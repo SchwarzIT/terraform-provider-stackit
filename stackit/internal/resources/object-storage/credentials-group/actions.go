@@ -37,13 +37,13 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 func (r Resource) createCredentialGroup(ctx context.Context, data *CredentialsGroup) diag.Diagnostic {
 	c := r.client
-	err := c.ObjectStorage.CredentialsGroup.Create(ctx, data.ProjectID.ValueString(), data.Name.ValueString())
+	err := c.ObjectStorage.CredentialsGroup.Create(ctx, data.ObjectStorageProjectID.ValueString(), data.Name.ValueString())
 	if err != nil {
 		return diag.NewErrorDiagnostic("failed to create credential group", err.Error())
 
 	}
 
-	res, err := c.ObjectStorage.CredentialsGroup.List(ctx, data.ProjectID.ValueString())
+	res, err := c.ObjectStorage.CredentialsGroup.List(ctx, data.ObjectStorageProjectID.ValueString())
 	if err != nil {
 		return diag.NewErrorDiagnostic("failed to list credential groups", err.Error())
 	}
@@ -68,7 +68,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	res, err := c.ObjectStorage.CredentialsGroup.List(ctx, state.ProjectID.ValueString())
+	res, err := c.ObjectStorage.CredentialsGroup.List(ctx, state.ObjectStorageProjectID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to read credential group", err.Error())
 		return
@@ -108,7 +108,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	c := r.client
-	if err := c.ObjectStorage.CredentialsGroup.Delete(ctx, state.ProjectID.ValueString(), state.ID.ValueString()); err != nil {
+	if err := c.ObjectStorage.CredentialsGroup.Delete(ctx, state.ObjectStorageProjectID.ValueString(), state.ID.ValueString()); err != nil {
 		resp.Diagnostics.AddError("failed to delete credential group", err.Error())
 		return
 	}
@@ -123,7 +123,7 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 	if len(idParts) != 2 || idParts[0] == "" || idParts[1] == "" {
 		resp.Diagnostics.AddError(
 			"Unexpected Import Identifier",
-			fmt.Sprintf("Expected import identifier with format: `project_id,id` where `name` is the credentials group name.\nInstead got: %q", req.ID),
+			fmt.Sprintf("Expected import identifier with format: `object_storage_project_id,id` where `name` is the credentials group name.\nInstead got: %q", req.ID),
 		)
 		return
 	}
@@ -132,12 +132,12 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 	if err := clientValidate.ProjectID(idParts[0]); err != nil {
 		resp.Diagnostics.AddError(
 			"Unexpected Import Identifier",
-			fmt.Sprintf("Couldn't validate project_id.\n%s", err.Error()),
+			fmt.Sprintf("Couldn't validate object_storage_project_id.\n%s", err.Error()),
 		)
 		return
 	}
 
 	// set main attributes
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project_id"), idParts[0])...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("object_storage_project_id"), idParts[0])...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("name"), idParts[1])...)
 }

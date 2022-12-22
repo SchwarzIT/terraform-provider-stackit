@@ -12,10 +12,10 @@ import (
 
 // CredentialsGroup is the schema model
 type CredentialsGroup struct {
-	ID        types.String `tfsdk:"id"`
-	Name      types.String `tfsdk:"name"`
-	ProjectID types.String `tfsdk:"project_id"`
-	URN       types.String `tfsdk:"urn"`
+	ID                     types.String `tfsdk:"id"`
+	Name                   types.String `tfsdk:"name"`
+	ObjectStorageProjectID types.String `tfsdk:"object_storage_project_id"`
+	URN                    types.String `tfsdk:"urn"`
 }
 
 // GetSchema returns the terraform schema structure
@@ -31,8 +31,8 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Computed:    true,
 			},
 
-			"project_id": {
-				Description: "project ID the credential group belongs to",
+			"object_storage_project_id": {
+				Description: "The ID returned from `stackit_object_storage_project`",
 				Type:        types.StringType,
 				Required:    true,
 				Validators: []tfsdk.AttributeValidator{

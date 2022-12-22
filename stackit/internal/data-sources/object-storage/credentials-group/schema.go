@@ -24,8 +24,8 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 				},
 			},
 
-			"project_id": {
-				Description: "project ID the credential group belongs to",
+			"object_storage_project_id": {
+				Description: "The ID returned from `stackit_object_storage_project`",
 				Type:        types.StringType,
 				Required:    true,
 				Validators: []tfsdk.AttributeValidator{

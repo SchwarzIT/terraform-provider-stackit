@@ -62,18 +62,22 @@ func config() string {
 
 func configWithGroup(groupName string) string {
 	return fmt.Sprintf(`
+
+	resource "stackit_object_storage_project" "example" {
+		project_id         = "%s"
+	}
+
 	resource "stackit_object_storage_credentials_group" "example" {
-		project_id = "%s"
-		name	   = "%s"
+		object_storage_project_id = stackit_object_storage_project.example.id
+		name	   				  = "%s"
 	}
 
 	resource "stackit_object_storage_credential" "example" {
-		project_id 			 = "%s"
-		credentials_group_id = stackit_object_storage_credentials_group.example.id
+		object_storage_project_id 	= stackit_object_storage_project.example.id
+		credentials_group_id 		= stackit_object_storage_credentials_group.example.id
 	}
 	  `,
 		common.GetAcceptanceTestsProjectID(),
 		groupName,
-		common.GetAcceptanceTestsProjectID(),
 	)
 }
