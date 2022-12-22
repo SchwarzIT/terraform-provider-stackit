@@ -24,7 +24,7 @@ func TestAcc_LogMeJob(t *testing.T) {
 
 	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
 	plan1 := "stackit-logme-single-small-non-ssl"
-	plan2 := "stackit-logme-platform-logging-non-ssl"
+	plan2 := "stackit-logme-single-medium-non-ssl"
 
 	resource.ParallelTest(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){

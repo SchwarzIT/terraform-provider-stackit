@@ -36,7 +36,7 @@ resource "stackit_logme_instance" "example" {
 
 - `acl` (List of String) Access Control rules to whitelist IP addresses
 - `plan` (String) The LogMe Plan. Default is `stackit-logme-single-small-non-ssl`.
-Options are: `stackit-logme-platform-logging-non-ssl`, `stackit-logme-single-small-non-ssl`, `stackit-logme-single-medium-non-ssl`, `stackit-logme-cluster-big-non-ssl`, `stackit-logme-cluster-medium-non-ssl`, `stackit-logme-cluster-small-non-ssl`
+Options are: `stackit-logme-single-medium-non-ssl`, `stackit-logme-single-small-non-ssl`, `stackit-logme-cluster-small-non-ssl`, `stackit-logme-cluster-medium-non-ssl`, `stackit-logme-cluster-big-non-ssl`
 - `version` (String) LogMe version. Only Option: `LogMe`. Changing this value requires the resource to be recreated.
 
 ### Read-Only
