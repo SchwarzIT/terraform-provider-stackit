@@ -1,4 +1,4 @@
-package credentialsgroup
+package project
 
 import (
 	"context"
@@ -13,19 +13,15 @@ import (
 // GetSchema returns the terraform schema structure
 func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		Description: "Data source for Object Storage credential groups",
+		Description: "Data source for Object Storage project",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
-				Description: "the credential group ID",
+				Description: "Specifies the resource ID",
 				Type:        types.StringType,
-				Required:    true,
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
-				},
+				Computed:    true,
 			},
-
-			"object_storage_project_id": {
-				Description: "The ID returned from `stackit_object_storage_project`",
+			"project_id": {
+				Description: "The project ID in which Object Storage is enabled",
 				Type:        types.StringType,
 				Required:    true,
 				Validators: []tfsdk.AttributeValidator{
@@ -34,18 +30,6 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					resource.RequiresReplace(),
 				},
-			},
-
-			"name": {
-				Description: "the credential group's display name",
-				Type:        types.StringType,
-				Computed:    true,
-			},
-
-			"urn": {
-				Description: "credential group URN",
-				Type:        types.StringType,
-				Computed:    true,
 			},
 		},
 	}, nil

@@ -21,7 +21,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	b, err := c.ObjectStorage.Buckets.Get(ctx, config.ProjectID.ValueString(), config.Name.ValueString())
+	b, err := c.ObjectStorage.Buckets.Get(ctx, config.ObjectStorageProjectID.ValueString(), config.Name.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to read bucket", err.Error())
 		return

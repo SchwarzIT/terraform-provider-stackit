@@ -25,13 +25,13 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	// update state
 	diags = resp.State.Set(ctx, Credential{
-		ID:                 types.StringValue(k.KeyID),
-		ProjectID:          types.StringValue(k.Project),
-		CredentialsGroupID: types.StringValue(data.CredentialsGroupID.ValueString()),
-		Expiry:             types.StringValue(k.Expires),
-		DisplayName:        types.StringValue(k.DisplayName),
-		AccessKey:          types.StringValue(k.AccessKey),
-		SecretAccessKey:    types.StringValue(k.SecretAccessKey),
+		ID:                     types.StringValue(k.KeyID),
+		ObjectStorageProjectID: types.StringValue(k.Project),
+		CredentialsGroupID:     types.StringValue(data.CredentialsGroupID.ValueString()),
+		Expiry:                 types.StringValue(k.Expires),
+		DisplayName:            types.StringValue(k.DisplayName),
+		AccessKey:              types.StringValue(k.AccessKey),
+		SecretAccessKey:        types.StringValue(k.SecretAccessKey),
 	})
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -41,7 +41,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 func (r Resource) createAccessKey(ctx context.Context, resp *resource.CreateResponse, key Credential) keys.AccessKeyCreateResponse {
 	c := r.client
-	res, err := c.ObjectStorage.AccessKeys.Create(ctx, key.ProjectID.ValueString(), key.Expiry.ValueString(), key.CredentialsGroupID.ValueString())
+	res, err := c.ObjectStorage.AccessKeys.Create(ctx, key.ObjectStorageProjectID.ValueString(), key.Expiry.ValueString(), key.CredentialsGroupID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to create credential", err.Error())
 		return res
@@ -60,7 +60,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	list, err := c.ObjectStorage.AccessKeys.List(ctx, state.ProjectID.ValueString(), state.CredentialsGroupID.ValueString())
+	list, err := c.ObjectStorage.AccessKeys.List(ctx, state.ObjectStorageProjectID.ValueString(), state.CredentialsGroupID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to read credential list", err.Error())
 		return
@@ -100,7 +100,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	c := r.client
-	err := c.ObjectStorage.AccessKeys.Delete(ctx, state.ProjectID.ValueString(), state.ID.ValueString(), state.CredentialsGroupID.ValueString())
+	err := c.ObjectStorage.AccessKeys.Delete(ctx, state.ObjectStorageProjectID.ValueString(), state.ID.ValueString(), state.CredentialsGroupID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to delete credential", err.Error())
 		return

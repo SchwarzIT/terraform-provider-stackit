@@ -31,10 +31,6 @@ resource "stackit_project" "example" {
 - `owner_email` (String) Email address of owner of the project. This value is only considered during creation. changing it afterwards will have no effect.
 - `parent_container_id` (String) the container ID in which the project will be created
 
-### Optional
-
-- `enable_object_storage` (Boolean) should object storage be enabled for this project? `false` by default.
-
 ### Read-Only
 
 - `container_id` (String) the project container ID

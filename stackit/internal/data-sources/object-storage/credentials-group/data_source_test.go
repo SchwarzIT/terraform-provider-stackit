@@ -34,11 +34,11 @@ func TestAcc_ObjectStorageCredentialsGroup(t *testing.T) {
 					resource.TestCheckResourceAttrSet("stackit_object_storage_credentials_group.example", "id"),
 					resource.TestCheckResourceAttrSet("stackit_object_storage_credentials_group.example", "urn"),
 					resource.TestCheckResourceAttr("data.stackit_object_storage_credentials_group.example", "name", name),
-					resource.TestCheckResourceAttr("data.stackit_object_storage_credentials_group.example", "project_id", common.GetAcceptanceTestsProjectID()),
+					resource.TestCheckResourceAttr("data.stackit_object_storage_credentials_group.example", "object_storage_project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckTypeSetElemAttrPair("stackit_object_storage_credentials_group.example", "id", "data.stackit_object_storage_credentials_group.example", "id"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_object_storage_credentials_group.example", "urn", "data.stackit_object_storage_credentials_group.example", "urn"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_object_storage_credentials_group.example", "name", "data.stackit_object_storage_credentials_group.example", "name"),
-					resource.TestCheckTypeSetElemAttrPair("stackit_object_storage_credentials_group.example", "project_id", "data.stackit_object_storage_credentials_group.example", "project_id"),
+					resource.TestCheckTypeSetElemAttrPair("stackit_object_storage_credentials_group.example", "object_storage_project_id", "data.stackit_object_storage_credentials_group.example", "object_storage_project_id"),
 				),
 			},
 		},
@@ -47,18 +47,21 @@ func TestAcc_ObjectStorageCredentialsGroup(t *testing.T) {
 
 func config(name string) string {
 	return fmt.Sprintf(`
+	resource "stackit_object_storage_project" "example" {
+		project_id         = "%s"
+	}
+
 	resource "stackit_object_storage_credentials_group" "example" {
-		project_id = "%s"
-		name	   = "%s"
+		object_storage_project_id 	= stackit_object_storage_project.example.id
+		name	   					= "%s"
 	}
 
 	data "stackit_object_storage_credentials_group" "example" {
-		project_id = "%s"
-		id		   = stackit_object_storage_credentials_group.example.id
+		object_storage_project_id 	= stackit_object_storage_project.example.id
+		id		  					= stackit_object_storage_credentials_group.example.id
 	}
 	`,
 		common.GetAcceptanceTestsProjectID(),
 		name,
-		common.GetAcceptanceTestsProjectID(),
 	)
 }

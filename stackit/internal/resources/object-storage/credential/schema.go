@@ -14,13 +14,13 @@ import (
 
 // Credential is the schema model
 type Credential struct {
-	ID                 types.String `tfsdk:"id"`
-	ProjectID          types.String `tfsdk:"project_id"`
-	CredentialsGroupID types.String `tfsdk:"credentials_group_id"`
-	Expiry             types.String `tfsdk:"expiry"`
-	DisplayName        types.String `tfsdk:"display_name"`
-	AccessKey          types.String `tfsdk:"access_key"`
-	SecretAccessKey    types.String `tfsdk:"secret_access_key"`
+	ID                     types.String `tfsdk:"id"`
+	ObjectStorageProjectID types.String `tfsdk:"object_storage_project_id"`
+	CredentialsGroupID     types.String `tfsdk:"credentials_group_id"`
+	Expiry                 types.String `tfsdk:"expiry"`
+	DisplayName            types.String `tfsdk:"display_name"`
+	AccessKey              types.String `tfsdk:"access_key"`
+	SecretAccessKey        types.String `tfsdk:"secret_access_key"`
 }
 
 // GetSchema returns the terraform schema structure
@@ -39,8 +39,8 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				},
 			},
 
-			"project_id": {
-				Description: "project ID the credential belongs to. changing this field will recreate the credential.",
+			"object_storage_project_id": {
+				Description: "The ID returned from `stackit_object_storage_project`",
 				Type:        types.StringType,
 				Required:    true,
 				Validators: []tfsdk.AttributeValidator{

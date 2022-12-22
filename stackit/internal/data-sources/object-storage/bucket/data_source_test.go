@@ -32,7 +32,7 @@ func TestAcc_ObjectStorageBucket(t *testing.T) {
 				Config: config(name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.stackit_object_storage_bucket.example", "name", name),
-					resource.TestCheckResourceAttr("data.stackit_object_storage_bucket.example", "project_id", common.GetAcceptanceTestsProjectID()),
+					resource.TestCheckResourceAttr("data.stackit_object_storage_bucket.example", "object_storage_project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttrSet("data.stackit_object_storage_bucket.example", "region"),
 					resource.TestCheckResourceAttrSet("data.stackit_object_storage_bucket.example", "host_style_url"),
 					resource.TestCheckResourceAttrSet("data.stackit_object_storage_bucket.example", "path_style_url"),
@@ -45,20 +45,24 @@ func TestAcc_ObjectStorageBucket(t *testing.T) {
 
 func config(name string) string {
 	return fmt.Sprintf(`
-resource "stackit_object_storage_bucket" "example" {
+
+resource "stackit_object_storage_project" "example" {
 	project_id = "%s"
-    name       = "%s"
+}
+
+resource "stackit_object_storage_bucket" "example" {
+	object_storage_project_id 	= stackit_object_storage_project.example.id
+    name       					= "%s"
 }
 
 data "stackit_object_storage_bucket" "example" {
-	depends_on = [stackit_object_storage_bucket.example]
-	project_id = "%s"
-    name       = "%s"
+	depends_on 					= [stackit_object_storage_bucket.example]
+	object_storage_project_id 	= stackit_object_storage_project.example.id
+    name      					= "%s"
 }
 	  `,
 		common.GetAcceptanceTestsProjectID(),
 		name,
-		common.GetAcceptanceTestsProjectID(),
 		name,
 	)
 }

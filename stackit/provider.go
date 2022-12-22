@@ -17,6 +17,7 @@ import (
 	dataObjectStorageBucket "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/object-storage/bucket"
 	dataObjectStorageCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/object-storage/credential"
 	dataObjectStorageCredentialsGroup "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/object-storage/credentials-group"
+	dataObjectStorageProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/object-storage/project"
 	dataPostgresFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/postgres-flex/instance"
 	dataPostgresCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/postgres/credential"
 	dataPostgresDBInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/postgres/instance"
@@ -39,6 +40,7 @@ import (
 	resourceObjectStorageBucket "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/bucket"
 	resourceObjectStorageCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/credential"
 	resourceObjectStorageCredentialsGroup "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/credentials-group"
+	resourceObjectStorageProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/project"
 	resourcePostgresFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/postgres-flex/instance"
 	resourcePostgresCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/postgres/credential"
 	resourcePostgresDBInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/postgres/instance"
@@ -124,6 +126,7 @@ func (p *StackitProvider) Resources(_ context.Context) []func() resource.Resourc
 		resourceObjectStorageBucket.New,
 		resourceObjectStorageCredential.New,
 		resourceObjectStorageCredentialsGroup.New,
+		resourceObjectStorageProject.New,
 		resourcePostgresCredential.New,
 		resourcePostgresDBInstance.New,
 		resourceProject.New,
@@ -151,6 +154,7 @@ func (p *StackitProvider) DataSources(context.Context) []func() datasource.DataS
 		dataObjectStorageBucket.New,
 		dataObjectStorageCredential.New,
 		dataObjectStorageCredentialsGroup.New,
+		dataObjectStorageProject.New,
 		dataPostgresCredential.New,
 		dataPostgresDBInstance.New,
 		dataPostgresFlexInstance.New,

@@ -18,7 +18,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	list, err := c.ObjectStorage.CredentialsGroup.List(ctx, data.ProjectID.ValueString())
+	list, err := c.ObjectStorage.CredentialsGroup.List(ctx, data.ObjectStorageProjectID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to list credentials group", err.Error())
 		return
