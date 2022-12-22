@@ -13,9 +13,18 @@ Data source for Object Storage credential groups
 ## Example Usage
 
 ```terraform
+resource "stackit_object_storage_project" "example" {
+  project_id = "example"
+}
+
+resource "stackit_object_storage_credentials_group" "example" {
+  object_storage_project_id = stackit_object_storage_project.example.id
+  name                      = "example"
+}
+
 data "stackit_object_storage_credentials_group" "example" {
-  id         = "..."
-  project_id = stackit_project.example.id
+  object_storage_project_id = stackit_object_storage_project.example.id
+  id                        = stackit_object_storage_credentials_group.example.id
 }
 ```
 
@@ -25,7 +34,7 @@ data "stackit_object_storage_credentials_group" "example" {
 ### Required
 
 - `id` (String) the credential group ID
-- `project_id` (String) project ID the credential group belongs to
+- `object_storage_project_id` (String) The ID returned from `stackit_object_storage_project`
 
 ### Read-Only
 

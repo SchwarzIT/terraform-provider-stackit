@@ -13,14 +13,18 @@ Manages Object Storage credentials
 ## Example Usage
 
 ```terraform
-resource "stackit_project" "example" {
-  name        = "example"
-  billing_ref = var.project_billing_ref
-  owner       = var.project_owner
+resource "stackit_object_storage_project" "example" {
+  project_id = "example"
+}
+
+resource "stackit_object_storage_credentials_group" "example" {
+  object_storage_project_id = stackit_object_storage_project.example.id
+  name                      = "example"
 }
 
 resource "stackit_object_storage_credential" "example" {
-  project_id = stackit_project.example.id
+  object_storage_project_id = stackit_object_storage_project.example.id
+  credentials_group_id      = stackit_object_storage_credentials_group.example.id
 }
 ```
 
@@ -29,7 +33,7 @@ resource "stackit_object_storage_credential" "example" {
 
 ### Required
 
-- `project_id` (String) project ID the credential belongs to. changing this field will recreate the credential.
+- `object_storage_project_id` (String) The ID returned from `stackit_object_storage_project`
 
 ### Optional
 
