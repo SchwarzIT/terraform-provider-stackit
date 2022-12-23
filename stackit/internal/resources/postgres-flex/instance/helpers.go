@@ -49,7 +49,7 @@ func (r Resource) validateVersion(ctx context.Context, projectID, version string
 	}
 
 	opts := ""
-	for _, v := range res {
+	for _, v := range res.Versions {
 		opts = opts + "\n- " + v
 		if strings.ToLower(v) == strings.ToLower(version) {
 			return nil
