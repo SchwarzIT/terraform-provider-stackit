@@ -20,8 +20,6 @@ resource "stackit_postgres_flex_instance" "example" {
   name         = "example"
   project_id   = "example"
   machine_type = "c1.2"
-  version      = "14"
-  replicas     = 1
 }
 ```
 
@@ -33,7 +31,6 @@ resource "stackit_postgres_flex_instance" "example" {
 - `machine_type` (String) The Machine Type. Available options: `c1.2` `m1.2`, `c1.3`, `m1.3`, `c1.4`, `c1.5`, `m1.5`
 - `name` (String) Specifies the instance name. Changing this value requires the resource to be recreated.
 - `project_id` (String) The project ID the instance runs in. Changing this value requires the resource to be recreated.
-- `version` (String) Postgres version. Options: `13`, `14`. Changing this value requires the resource to be recreated.
 
 ### Optional
 
@@ -43,6 +40,7 @@ resource "stackit_postgres_flex_instance" "example" {
 - `options` (Map of String) Specifies postgres instance options
 - `replicas` (Number) Number of replicas (Default is `1`). Changing this value requires the resource to be recreated.
 - `storage` (Attributes) A signle `storage` block as defined below. Changing this value requires the resource to be recreated. (see [below for nested schema](#nestedatt--storage))
+- `version` (String) Postgres version. Options: `13`, `14`. Changing this value requires the resource to be recreated.
 
 ### Read-Only
 
