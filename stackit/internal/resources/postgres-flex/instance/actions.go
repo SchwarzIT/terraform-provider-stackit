@@ -19,12 +19,14 @@ import (
 
 // Create - lifecycle function
 func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	var plan PostgresInstance
+	var plan Instance
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	plan.setDefaults()
 
 	// validate
 	if err := r.validate(ctx, plan); err != nil {
@@ -103,7 +105,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 }
 
-func (r Resource) createUser(ctx context.Context, plan *PostgresInstance, d *diag.Diagnostics) {
+func (r Resource) createUser(ctx context.Context, plan *Instance, d *diag.Diagnostics) {
 	// these are the default user values
 	// the current API doesn't read them yet, but in later releases
 	// this will be the way to get the default user and database credentials
@@ -161,7 +163,7 @@ func (r Resource) createUser(ctx context.Context, plan *PostgresInstance, d *dia
 
 // Read - lifecycle function
 func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	var state PostgresInstance
+	var state Instance
 
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -202,7 +204,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 // Update - lifecycle function
 func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	var plan, state PostgresInstance
+	var plan, state Instance
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 	if resp.Diagnostics.HasError() {
@@ -224,6 +226,19 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 			continue
 		}
 		acl = append(acl, nv)
+	}
+
+	storage := Storage{}
+	if plan.Storage.IsUnknown() {
+		storage = Storage{
+			Class: types.StringValue(default_storage_class),
+			Size:  types.Int64Value(default_storage_size),
+		}
+	} else {
+		resp.Diagnostics.Append(plan.Storage.As(ctx, &storage, types.ObjectAsOptions{})...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
 	}
 
 	// handle update
@@ -260,7 +275,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 
 // Delete - lifecycle function
 func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var state PostgresInstance
+	var state Instance
 	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 	if resp.Diagnostics.HasError() {
 		return

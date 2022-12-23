@@ -11,8 +11,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-// PostgresInstance is the schema model
-type PostgresInstance struct {
+// Instance is the schema model
+type Instance struct {
 	ID             types.String      `tfsdk:"id"`
 	Name           types.String      `tfsdk:"name"`
 	ProjectID      types.String      `tfsdk:"project_id"`
@@ -88,9 +88,12 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 			"version": {
 				Description: "Postgres version. Options: `13`, `14`. Changing this value requires the resource to be recreated.",
 				Type:        types.StringType,
-				Required:    true,
+				Optional:    true,
+				Computed:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					resource.RequiresReplace(),
+					modifiers.StringDefault(default_version),
+					resource.UseStateForUnknown(),
 				},
 			},
 			"replicas": {
@@ -98,8 +101,8 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Type:        types.Int64Type,
 				Optional:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
-					modifiers.Int64Default(1),
-					resource.RequiresReplace(),
+					modifiers.Int64Default(default_replicas),
+					resource.UseStateForUnknown(),
 				},
 			},
 			"backup_schedule": {
@@ -109,6 +112,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Computed:    true,
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					modifiers.StringDefault(default_backup_schedule),
+					resource.UseStateForUnknown(),
 				},
 			},
 			"storage": {
@@ -135,7 +139,8 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 						},
 					},
 				}),
-				PlanModifiers: []tfsdk.AttributePlanModifier{
+				PlanModifiers: tfsdk.AttributePlanModifiers{
+					resource.UseStateForUnknown(),
 					resource.RequiresReplace(),
 				},
 			},
@@ -186,6 +191,9 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 						Computed:    true,
 					},
 				}),
+				PlanModifiers: tfsdk.AttributePlanModifiers{
+					resource.UseStateForUnknown(),
+				},
 			},
 			"options": {
 				Description: "Specifies postgres instance options",

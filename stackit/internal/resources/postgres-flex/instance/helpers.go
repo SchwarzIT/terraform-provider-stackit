@@ -12,13 +12,29 @@ import (
 )
 
 const (
+	default_version               = "14"
+	default_replicas        int64 = 1
 	default_username              = "stackit"
 	default_backup_schedule       = "0 2 * * *"
 	default_storage_class         = "premium-perf6-stackit"
 	default_storage_size    int64 = 20
 )
 
-func (r Resource) validate(ctx context.Context, data PostgresInstance) error {
+func (i *Instance) setDefaults() {
+	if i.Version.IsNull() || i.Version.IsUnknown() {
+		i.Version = types.StringValue(default_version)
+	}
+
+	if i.Replicas.IsNull() || i.Replicas.IsUnknown() {
+		i.Replicas = types.Int64Value(default_replicas)
+	}
+
+	if i.BackupSchedule.IsNull() || i.BackupSchedule.IsUnknown() {
+		i.BackupSchedule = types.StringValue(default_backup_schedule)
+	}
+}
+
+func (r Resource) validate(ctx context.Context, data Instance) error {
 	if err := r.validateVersion(ctx, data.ProjectID.ValueString(), data.Version.ValueString()); err != nil {
 		return err
 	}
@@ -36,7 +52,7 @@ func (r Resource) validate(ctx context.Context, data PostgresInstance) error {
 		return errors.New("failed setting storage from object")
 	}
 
-	if err := r.validateStorageClass(ctx, data.ProjectID.ValueString(), data.MachineType.ValueString(), storage.Class.ValueString()); err != nil {
+	if err := r.validateStorage(ctx, data.ProjectID.ValueString(), data.MachineType.ValueString(), storage); err != nil {
 		return err
 	}
 	return nil
@@ -74,23 +90,28 @@ func (r Resource) validateMachineType(ctx context.Context, projectID, flavorID s
 	return fmt.Errorf("couldn't find machine type '%s'. Available options are:%s\n", flavorID, opts)
 }
 
-func (r Resource) validateStorageClass(ctx context.Context, projectID, machineType, storageClass string) error {
+func (r Resource) validateStorage(ctx context.Context, projectID, machineType string, storage Storage) error {
 	res, err := r.client.PostgresFlex.Options.GetStorageClasses(ctx, projectID, machineType)
 	if err != nil {
 		return err
 	}
 
+	size := storage.Size.ValueInt64()
+	if int64(res.StorageRange.Max) < size || int64(res.StorageRange.Min) > size {
+		return fmt.Errorf("storage size %d is not in the allowed range: %d..%d", size, res.StorageRange.Min, res.StorageRange.Max)
+	}
+
 	opts := ""
 	for _, v := range res.StorageClasses {
 		opts = opts + "\n- " + v
-		if strings.ToLower(v) == strings.ToLower(storageClass) {
+		if strings.ToLower(v) == strings.ToLower(storage.Class.ValueString()) {
 			return nil
 		}
 	}
-	return fmt.Errorf("couldn't find version '%s'. Available options are:%s\n", storageClass, opts)
+	return fmt.Errorf("couldn't find version '%s'. Available options are:%s\n", storage.Class.ValueString(), opts)
 }
 
-func applyClientResponse(pi *PostgresInstance, i instances.Instance) error {
+func applyClientResponse(pi *Instance, i instances.Instance) error {
 	pi.ACL = types.List{ElemType: types.StringType}
 	for _, v := range i.ACL.Items {
 		pi.ACL.Elems = append(pi.ACL.Elems, types.StringValue(v))
