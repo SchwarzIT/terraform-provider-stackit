@@ -9,7 +9,6 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated/cluster"
 	"github.com/pkg/errors"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -47,7 +46,7 @@ func (r Resource) loadAvaiableVersions(ctx context.Context) ([]*semver.Version, 
 		if v.State == nil || v.Version == nil {
 			continue
 		}
-		if !strings.EqualFold(*v.State, consts.SKE_VERSION_STATE_SUPPORTED) {
+		if !strings.EqualFold(*v.State, "supported") {
 			continue
 		}
 		versionOption, err := semver.NewVersion(*v.Version)

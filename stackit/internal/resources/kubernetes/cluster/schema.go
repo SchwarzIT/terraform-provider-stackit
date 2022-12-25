@@ -3,7 +3,7 @@ package cluster
 import (
 	"context"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes/clusters"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated/cluster"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
@@ -89,7 +89,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Type:        types.StringType,
 				Required:    true,
 				Validators: []tfsdk.AttributeValidator{
-					validate.StringWith(clusters.ValidateClusterName, "validate cluster name"),
+					validate.StringWith(cluster.ValidateClusterName, "validate cluster name"),
 				},
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					resource.RequiresReplace(),
@@ -251,8 +251,9 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 						Computed:    true,
 						Validators: []tfsdk.AttributeValidator{
 							validate.StringWith(func(v string) error {
-								cri := clusters.CRI{Name: v}
-								return clusters.ValidateCRI(cri)
+								n := cluster.CRIName(v)
+								cri := cluster.CRI{Name: &n}
+								return cluster.ValidateCRI(&cri)
 							}, "validate container runtime"),
 						},
 						PlanModifiers: []tfsdk.AttributePlanModifier{

@@ -16,7 +16,7 @@ import (
 
 const run_this_test = false
 
-func TestAcc_PostgresDBJob(t *testing.T) {
+func TestAcc_PostgresInstance(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
 		t.Skip()
 		return

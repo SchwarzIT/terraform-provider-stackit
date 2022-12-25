@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes/clusters"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated/cluster"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -38,7 +36,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	// update state
-	plan.Status = types.StringValue(consts.SKE_CLUSTER_STATUS_HEALTHY)
+	plan.Status = types.StringValue(string(cluster.STATE_HEALTHY))
 	diags = resp.State.Set(ctx, plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -238,7 +236,7 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 	}
 
 	// validate cluster name
-	if err := clusters.ValidateClusterName(idParts[1]); err != nil {
+	if err := cluster.ValidateClusterName(idParts[1]); err != nil {
 		resp.Diagnostics.AddError(
 			"Unexpected Import Identifier",
 			fmt.Sprintf("Couldn't validate cluster name.\n%s", err.Error()),

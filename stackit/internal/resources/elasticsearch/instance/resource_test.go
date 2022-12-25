@@ -16,7 +16,7 @@ import (
 
 const run_this_test = false
 
-func TestAcc_ElasticSearchJob(t *testing.T) {
+func TestAcc_ElasticSearchInstance(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
 		t.Skip()
 		return

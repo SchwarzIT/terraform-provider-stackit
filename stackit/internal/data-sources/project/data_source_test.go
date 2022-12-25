@@ -16,7 +16,7 @@ import (
 
 const run_this_test = false
 
-func TestAcc_ObjectStorageCredential(t *testing.T) {
+func TestAcc_ProjectDataSource(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
 		t.Skip()
 		return

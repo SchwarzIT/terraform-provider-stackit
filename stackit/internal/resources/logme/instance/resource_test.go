@@ -16,7 +16,7 @@ import (
 
 const run_this_test = false
 
-func TestAcc_LogMeJob(t *testing.T) {
+func TestAcc_LogMeInstanceResource(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
 		t.Skip()
 		return
