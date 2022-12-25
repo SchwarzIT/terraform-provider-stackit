@@ -3,7 +3,7 @@ package cluster
 import (
 	"context"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes/clusters"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/include/cluster"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -26,7 +26,7 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 				Type:        types.StringType,
 				Required:    true,
 				Validators: []tfsdk.AttributeValidator{
-					validate.StringWith(clusters.ValidateClusterName, "validate cluster name"),
+					validate.StringWith(cluster.ValidateClusterName, "validate cluster name"),
 				},
 				PlanModifiers: []tfsdk.AttributePlanModifier{
 					resource.RequiresReplace(),

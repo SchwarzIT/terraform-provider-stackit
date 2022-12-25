@@ -2,12 +2,12 @@ package cluster
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes/options"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated/cluster"
+	provideroptions "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated/provider-options"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
 
@@ -29,13 +29,13 @@ func (r Resource) validate(
 
 	// Validate against real options
 	c := r.client
-	opts, err := c.Kubernetes.Options.List(ctx)
-	if err != nil {
+	opts, err := c.Services.Kubernetes.ProviderOptions.GetProviderOptionsWithResponse(ctx)
+	if err != nil || opts.HasError != nil || opts.JSON200.KubernetesVersions == nil {
 		// if options cannot be fetched, skip validation
 		return nil
 	}
 
-	if err := validateKubernetesVersion(clusterConfig.Version, opts.KubernetesVersions); err != nil {
+	if err := validateKubernetesVersion(clusterConfig.Version, *opts.JSON200.KubernetesVersions); err != nil {
 		return err
 	}
 
@@ -44,24 +44,24 @@ func (r Resource) validate(
 		if np.Machine.Image.Name != nil {
 			imageName = *np.Machine.Image.Name
 		}
-		versionOption, err := validateMachineImage(imageName, np.Machine.Image.Version, opts.MachineImages)
+		versionOption, err := validateMachineImage(imageName, np.Machine.Image.Version, opts.JSON200.MachineImages)
 		if err != nil {
 			return err
 		}
 		if np.Machine.Image.Version == "" {
 			(*nodePools)[i].Machine.Image.Version = versionOption
 		}
-		if err := validateMachineType(np.Machine.Type, opts.MachineTypes); err != nil {
+		if err := validateMachineType(np.Machine.Type, opts.JSON200.MachineTypes); err != nil {
 			return err
 		}
 		volType := ""
 		if np.Volume.Type != nil {
 			volType = *np.Volume.Type
 		}
-		if err := validateVolumeType(volType, opts.VolumeTypes); err != nil {
+		if err := validateVolumeType(volType, opts.JSON200.VolumeTypes); err != nil {
 			return err
 		}
-		if err := validateZones(np.AvailabilityZones, opts.AvailabilityZones); err != nil {
+		if err := validateZones(np.AvailabilityZones, opts.JSON200.AvailabilityZones); err != nil {
 			return err
 		}
 	}
@@ -74,15 +74,26 @@ func (r Resource) validate(
 	return nil
 }
 
-func validateKubernetesVersion(version string, versionOptions []options.KubernetesVersion) error {
+func validateKubernetesVersion(version string, versionOptions []provideroptions.KubernetesVersion) error {
 	found := false
 	accepted := ""
 	for _, v := range versionOptions {
-		if v.Version == version {
+		if v.Version == nil {
+			continue
+		}
+		if *v.Version == version {
 			found = true
 			break
 		}
-		accepted = fmt.Sprintf("%s- %s (state: %s, expires: %s)\n", accepted, v.Version, v.State, v.ExpirationDate)
+		ed := ""
+		if v.ExpirationDate != nil {
+			ed = *v.ExpirationDate
+		}
+		s := ""
+		if v.State != nil {
+			s = *v.State
+		}
+		accepted = fmt.Sprintf("%s- %s (state: %s, expires: %s)\n", accepted, *v.Version, s, ed)
 	}
 	if !found {
 		return fmt.Errorf(
@@ -94,30 +105,43 @@ func validateKubernetesVersion(version string, versionOptions []options.Kubernet
 	return nil
 }
 
-func validateMachineImage(image, version string, imageOptions []options.MachineImage) (versionOption string, err error) {
+func validateMachineImage(image, version string, imageOptions *[]provideroptions.MachineImage) (versionOption string, err error) {
+	if imageOptions == nil {
+		return "", errors.New("received empty machine image list")
+	}
 	foundImage := false
 	foundVersion := false
 	acceptedImages := ""
 	acceptedVersions := ""
 	supportedVersion := ""
-	for _, v := range imageOptions {
-		if v.Name == image {
+	for _, v := range *imageOptions {
+		if v.Name == nil || v.Versions == nil {
+			continue
+		}
+		if *v.Name == image {
 			foundImage = true
-			for _, v2 := range v.Versions {
-				if strings.EqualFold(v2.State, consts.SKE_VERSION_STATE_SUPPORTED) {
-					if supportedVersion == "" {
-						supportedVersion = v2.Version
+			for _, v2 := range *v.Versions {
+				if v2.State != nil && strings.EqualFold(*v2.State, "supported") {
+					if v2.Version == nil {
+						continue
 					}
-					if v2.Version == version {
+					if supportedVersion == "" {
+						supportedVersion = *v2.Version
+					}
+					if *v2.Version == version {
 						foundVersion = true
 						break
 					}
-					acceptedVersions = fmt.Sprintf("%s- %s (state: %s, expires: %s)\n", acceptedVersions, v2.Version, v2.State, v2.ExpirationDate)
+					ed := ""
+					if v2.ExpirationDate != nil {
+						ed = *v2.ExpirationDate
+					}
+					acceptedVersions = fmt.Sprintf("%s- %s (state: %s, expires: %s)\n", acceptedVersions, *v2.Version, *v2.State, ed)
 				}
 			}
 
 		}
-		acceptedImages = fmt.Sprintf("%s- %s (versions: %v)\n", acceptedImages, v.Name, v.Versions)
+		acceptedImages = fmt.Sprintf("%s- %s (versions: %v)\n", acceptedImages, *v.Name, *v.Versions)
 	}
 	if !foundImage {
 		return "", fmt.Errorf(
@@ -138,15 +162,21 @@ func validateMachineImage(image, version string, imageOptions []options.MachineI
 	return supportedVersion, nil
 }
 
-func validateMachineType(machine string, machineTypes []options.MachineType) error {
+func validateMachineType(machine string, machineTypes *[]provideroptions.MachineType) error {
+	if machineTypes == nil {
+		return errors.New("received nil machine type list")
+	}
 	found := false
 	accepted := ""
-	for _, v := range machineTypes {
-		if v.Name == machine {
+	for _, v := range *machineTypes {
+		if v.Name == nil {
+			continue
+		}
+		if *v.Name == machine {
 			found = true
 			break
 		}
-		accepted = fmt.Sprintf("%s- %s (cpu: %d, mem: %d)\n", accepted, v.Name, v.CPU, v.Memory)
+		accepted = fmt.Sprintf("%s- %s (cpu: %d, mem: %d)\n", accepted, *v.Name, v.CPU, v.Memory)
 	}
 	if !found {
 		return fmt.Errorf(
@@ -158,15 +188,21 @@ func validateMachineType(machine string, machineTypes []options.MachineType) err
 	return nil
 }
 
-func validateVolumeType(volume string, volumeTypes []options.VolumeType) error {
+func validateVolumeType(volume string, volumeTypes *[]provideroptions.VolumeType) error {
+	if volumeTypes == nil {
+		return errors.New("received nil volune type list")
+	}
 	found := false
 	accepted := ""
-	for _, v := range volumeTypes {
-		if v.Name == volume {
+	for _, v := range *volumeTypes {
+		if v.Name == nil {
+			continue
+		}
+		if *v.Name == volume {
 			found = true
 			break
 		}
-		accepted = fmt.Sprintf("%s- %s\n", accepted, v.Name)
+		accepted = fmt.Sprintf("%s- %s\n", accepted, *v.Name)
 	}
 	if !found {
 		return fmt.Errorf(
@@ -178,11 +214,14 @@ func validateVolumeType(volume string, volumeTypes []options.VolumeType) error {
 	return nil
 }
 
-func validateZones(zones []string, zoneOptions []options.AvailabilityZone) error {
+func validateZones(zones []string, zoneOptions *[]provideroptions.AvailabilityZone) error {
+	if zoneOptions == nil {
+		return errors.New("received nil avaiability zones")
+	}
 	var found bool
 	accepted := ""
-	for _, v := range zoneOptions {
-		accepted = fmt.Sprintf("%s- %s\n", accepted, v.Name)
+	for _, v := range *zoneOptions {
+		accepted = fmt.Sprintf("%s- %s\n", accepted, *v.Name)
 	}
 	if len(zones) == 0 {
 		return fmt.Errorf(
@@ -193,8 +232,11 @@ func validateZones(zones []string, zoneOptions []options.AvailabilityZone) error
 
 	for _, v := range zones {
 		found = false
-		for _, v2 := range zoneOptions {
-			if v == v2.Name {
+		for _, v2 := range *zoneOptions {
+			if v2.Name == nil {
+				continue
+			}
+			if v == *v2.Name {
 				found = true
 				break
 			}
