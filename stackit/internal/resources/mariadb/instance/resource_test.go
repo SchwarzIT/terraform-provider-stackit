@@ -16,7 +16,7 @@ import (
 
 const run_this_test = false
 
-func TestAcc_MariaDBJob(t *testing.T) {
+func TestAcc_MariaDBInstanceResource(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
 		t.Skip()
 		return
