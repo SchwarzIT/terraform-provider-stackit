@@ -19,21 +19,32 @@ const (
 )
 
 func (r Resource) loadPlanID(ctx context.Context, diags *diag.Diagnostics, s *Instance) {
-	c := r.client
+	c := r.client.Services.Argus
 
-	res, err := c.Argus.Plans.List(ctx, s.ProjectID.ValueString())
+	res, err := c.Plans.ListPlansWithResponse(ctx, s.ProjectID.ValueString())
 	if err != nil {
-		diags.AddError("failed to list plans", err.Error())
+		diags.AddError("failed to prepare list plans request", err.Error())
+		return
+	}
+	if res.HasError != nil {
+		diags.AddError("failed to make list plans request", res.HasError.Error())
+		return
+	}
+	if res.JSON200 == nil {
+		diags.AddError("received an empty response", "JSON200 == nil")
 		return
 	}
 
 	avl := ""
-	for _, v := range res.Plans {
-		if v.Name == s.Plan.ValueString() {
-			s.PlanID = types.StringValue(v.PlanID)
+	for _, v := range res.JSON200.Plans {
+		if v.Name == nil {
+			continue
+		}
+		if *v.Name == s.Plan.ValueString() {
+			s.PlanID = types.StringValue(v.PlanID.String())
 			break
 		}
-		avl = fmt.Sprintf("%s\n- %s", avl, v.Name)
+		avl = fmt.Sprintf("%s\n- %s", avl, *v.Name)
 	}
 	if s.PlanID.ValueString() == "" {
 		diags.AddError("invalid plan", fmt.Sprintf("couldn't find plan '%s'.\navailable names are:%s", s.Plan.ValueString(), avl))
