@@ -7,7 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres-flex/instances"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/generated/instance"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/generated/users"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -57,33 +58,65 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	// handle creation
-	res, wait, err := r.client.PostgresFlex.Instances.Create(ctx, plan.ProjectID.ValueString(), plan.Name.ValueString(), plan.MachineType.ValueString(), instances.Storage{
-		Class: storage.Class.ValueString(),
-		Size:  int(storage.Size.ValueInt64()),
-	}, plan.Version.ValueString(), int(plan.Replicas.ValueInt64()), plan.BackupSchedule.ValueString(), plan.Labels, plan.Options, instances.ACL{Items: acl})
 
+	c := r.client.Services.PostgresFlex
+
+	// prepare values
+	name := plan.Name.ValueString()
+	bu := plan.BackupSchedule.ValueString()
+	flavorID := plan.MachineType.ValueString()
+	repl := int(plan.Replicas.ValueInt64())
+	sc := storage.Class.ValueString()
+	ss := int(storage.Size.ValueInt64())
+	v := plan.Version.ValueString()
+
+	body := instance.InstanceCreateInstanceRequest{
+		Name: &name,
+		ACL: &instance.InstanceACL{
+			Items: &acl,
+		},
+		BackupSchedule: &bu,
+		FlavorID:       &flavorID,
+		Labels:         &plan.Labels,
+		Options:        &plan.Options,
+		Replicas:       &repl,
+		Storage: &instance.InstanceStorage{
+			Class: &sc,
+			Size:  &ss,
+		},
+		Version: &v,
+	}
+	res, err := c.Instance.CreateWithResponse(ctx, plan.ProjectID.ValueString(), body)
 	if err != nil {
-		resp.Diagnostics.AddError("failed Postgres instance creation", err.Error())
+		resp.Diagnostics.AddError("failed preparing Postgres instance creation request", err.Error())
 		return
+	}
+	if res.HasError != nil {
+		resp.Diagnostics.AddError("failed Postgres instance creation", res.HasError.Error())
+		return
+	}
+	if res.JSON200.ID == nil {
+		resp.Diagnostics.AddError("received nil ID", "postgres flex API returned a nil ID")
 	}
 
 	// set state
-	plan.ID = types.StringValue(res.ID)
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), res.ID)...)
+	plan.ID = types.StringValue(*res.JSON200.ID)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), *res.JSON200.ID)...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project_id"), plan.ProjectID.ValueString())...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	instance, err := wait.Wait()
+	process := res.WaitHandler(ctx, c.Instance, plan.ProjectID.ValueString(), *res.JSON200.ID)
+	ins, err := process.Wait()
 	if err != nil {
 		resp.Diagnostics.AddError("failed Postgres instance creation validation", err.Error())
 		return
 	}
 
-	i, ok := instance.(instances.Instance)
+	i, ok := ins.(*instance.InstanceSingleInstance)
 	if !ok {
-		resp.Diagnostics.AddError("failed to parse client response", "response is not of instances.Instance")
+		resp.Diagnostics.AddError("failed to parse client response", "response is not of *instance.InstanceSingleInstance")
 		return
 	}
 
@@ -115,23 +148,72 @@ func (r Resource) createUser(ctx context.Context, plan *Instance, d *diag.Diagno
 	roles := []string{}
 
 	for maxTries := 10; maxTries > -1; maxTries-- {
-		res, err := r.client.PostgresFlex.Users.Create(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), username, database, roles)
+		c := r.client.Services.PostgresFlex
+		body := users.CreateUserJSONRequestBody{
+			Database: &database,
+			Roles:    &roles,
+			Username: &username,
+		}
+		res, err := c.Users.CreateUserWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
 		if err != nil {
-			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) && maxTries > 0 {
-				time.Sleep(time.Second * 5)
-				continue
-			}
-			if strings.Contains(err.Error(), http.StatusText(http.StatusBadRequest)) && maxTries > 0 {
-				time.Sleep(time.Second * 30)
-				continue
-			}
-			d.AddError("failed to create user", err.Error())
+			d.AddError("failed prepare create user request", err.Error())
+			return
+		}
+		if (res.StatusCode() == http.StatusNotFound ||
+			res.StatusCode() == http.StatusBadRequest) &&
+			maxTries > 0 {
+			time.Sleep(time.Second * 5)
+			continue
+		}
+		if res.HasError != nil {
+			d.AddError("failed create user request", res.HasError.Error())
+		}
+
+		if res.JSON200 == nil {
+			d.AddError("response is nil", "api returned nil response")
 			return
 		}
 
+		item := users.InstanceUser{}
+		if res.JSON200.Item != nil {
+			item = *res.JSON200.Item
+		}
+		roles := []string{}
+		if item.Roles != nil {
+			roles = *item.Roles
+		}
 		elems := []attr.Value{}
-		for _, v := range res.Item.Roles {
+		for _, v := range roles {
 			elems = append(elems, types.StringValue(v))
+		}
+
+		id := ""
+		if item.ID != nil {
+			id = *item.ID
+		}
+		un := ""
+		if item.Username != nil {
+			un = *item.Username
+		}
+		db := ""
+		if item.Database != nil {
+			db = *item.Database
+		}
+		pw := ""
+		if item.Password != nil {
+			pw = *item.Password
+		}
+		ho := ""
+		if item.Host != nil {
+			ho = *item.Host
+		}
+		var po int
+		if item.Port != nil {
+			po = *item.Port
+		}
+		uri := ""
+		if item.Uri != nil {
+			uri = *item.Uri
 		}
 		u, diags := types.ObjectValue(
 			map[string]attr.Type{
@@ -145,13 +227,13 @@ func (r Resource) createUser(ctx context.Context, plan *Instance, d *diag.Diagno
 				"roles":    types.ListType{ElemType: types.StringType},
 			},
 			map[string]attr.Value{
-				"id":       types.StringValue(res.Item.ID),
-				"username": types.StringValue(res.Item.Username),
-				"database": types.StringValue(res.Item.Database),
-				"password": types.StringValue(res.Item.Password),
-				"hostname": types.StringValue(res.Item.Hostname),
-				"port":     types.Int64Value(int64(res.Item.Port)),
-				"uri":      types.StringValue(res.Item.URI),
+				"id":       types.StringValue(id),
+				"username": types.StringValue(un),
+				"database": types.StringValue(db),
+				"password": types.StringValue(pw),
+				"hostname": types.StringValue(ho),
+				"port":     types.Int64Value(int64(po)),
+				"uri":      types.StringValue(uri),
 				"roles":    types.List{ElemType: types.StringType, Elems: elems},
 			},
 		)
@@ -172,9 +254,15 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	// read cluster
-	instance, err := r.client.PostgresFlex.Instances.Get(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
+
+	c := r.client.Services.PostgresFlex
+	res, err := c.Instance.GetWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if err != nil {
-		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+		resp.Diagnostics.AddError("failed to prepare read postgres instance request", err.Error())
+		return
+	}
+	if res.HasError != nil {
+		if res.StatusCode() == http.StatusNotFound {
 			resp.State.RemoveResource(ctx)
 			return
 		}
@@ -182,7 +270,12 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	if err := applyClientResponse(&state, instance.Item); err != nil {
+	if res.JSON200 == nil {
+		resp.Diagnostics.AddError("instance response is nil", "JSON200 is nil")
+		return
+	}
+
+	if err := applyClientResponse(&state, res.JSON200.Item); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
 	}
@@ -241,22 +334,58 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		}
 	}
 
+	// prepare values
+	name := plan.Name.ValueString()
+	bu := plan.BackupSchedule.ValueString()
+	flavorID := plan.MachineType.ValueString()
+	repl := int(plan.Replicas.ValueInt64())
+	sc := storage.Class.ValueString()
+	ss := int(storage.Size.ValueInt64())
+	v := plan.Version.ValueString()
+
+	body := instance.InstanceUpdateInstanceRequest{
+		Name: &name,
+		ACL: &instance.InstanceACL{
+			Items: &acl,
+		},
+		BackupSchedule: &bu,
+		FlavorID:       &flavorID,
+		Labels:         &plan.Labels,
+		Options:        &plan.Options,
+		Replicas:       &repl,
+		Storage: &instance.InstanceStorage{
+			Class: &sc,
+			Size:  &ss,
+		},
+		Version: &v,
+	}
+
 	// handle update
-	_, wait, err := r.client.PostgresFlex.Instances.Update(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), plan.MachineType.ValueString(), plan.BackupSchedule.ValueString(), plan.Labels, plan.Options, instances.ACL{Items: acl})
+	c := r.client.Services.PostgresFlex.Instance
+	res, err := c.UpdateWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
 	if err != nil {
-		resp.Diagnostics.AddError("failed Postgres instance update", err.Error())
+		resp.Diagnostics.AddError("failed prepare Postgres instance update request", err.Error())
+		return
+	}
+	if res.HasError != nil {
+		if res.StatusCode() == http.StatusNotFound {
+			resp.State.RemoveResource(ctx)
+			return
+		}
+		resp.Diagnostics.AddError("failed to update postgres instance", err.Error())
 		return
 	}
 
-	instance, err := wait.Wait()
+	process := res.WaitHandler(ctx, c, plan.ProjectID.ValueString(), plan.ID.ValueString())
+	isi, err := process.Wait()
 	if err != nil {
 		resp.Diagnostics.AddError("failed Postgres instance update validation", err.Error())
 		return
 	}
 
-	i, ok := instance.(instances.Instance)
+	i, ok := isi.(*instance.InstanceSingleInstance)
 	if !ok {
-		resp.Diagnostics.AddError("failed to parse client response", "response is not of instances.Instance")
+		resp.Diagnostics.AddError("failed to parse client response", "response is not of *instance.InstanceSingleInstance")
 		return
 	}
 
@@ -281,13 +410,27 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	process, err := r.client.PostgresFlex.Instances.Delete(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
+	c := r.client.Services.PostgresFlex.Instance
+	res, err := c.DeleteWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("failed to delete postgres instance", err.Error())
+		resp.Diagnostics.AddError("failed to prepare delete postgres instance request", err.Error())
+		return
+	}
+	if res.HasError != nil {
+		if res.StatusCode() == http.StatusNotFound {
+			resp.State.RemoveResource(ctx)
+			return
+		}
+		resp.Diagnostics.AddError("failed to make delete postgres instance request", res.HasError.Error())
 		return
 	}
 
+	process := res.WaitHandler(ctx, c, state.ProjectID.ValueString(), state.ID.ValueString())
 	if _, err := process.Wait(); err != nil {
+		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+			resp.State.RemoveResource(ctx)
+			return
+		}
 		resp.Diagnostics.AddError("failed to verify postgres instance deletion", err.Error())
 		return
 	}
