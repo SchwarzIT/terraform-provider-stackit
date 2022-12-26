@@ -121,15 +121,19 @@ func applyClientResponse(pi *Instance, i *instance.InstanceSingleInstance) error
 			pi.ACL.Elems = append(pi.ACL.Elems, types.StringValue(v))
 		}
 	}
+	pi.BackupSchedule = types.StringNull()
 	if i.BackupSchedule != nil {
 		pi.BackupSchedule = types.StringValue(*i.BackupSchedule)
 	}
+	pi.MachineType = types.StringNull()
 	if i.Flavor != nil && i.Flavor.ID != nil {
 		pi.MachineType = types.StringValue(*i.Flavor.ID)
 	}
+	pi.Name = types.StringNull()
 	if i.Name != nil {
 		pi.Name = types.StringValue(*i.Name)
 	}
+	pi.Replicas = types.Int64Null()
 	if i.Replicas != nil {
 		pi.Replicas = types.Int64Value(int64(*i.Replicas))
 	}
@@ -156,6 +160,7 @@ func applyClientResponse(pi *Instance, i *instance.InstanceSingleInstance) error
 		}
 		pi.Storage = storage
 	}
+	pi.Version = types.StringNull()
 	if i.Version != nil {
 		pi.Version = types.StringValue(*i.Version)
 	}
