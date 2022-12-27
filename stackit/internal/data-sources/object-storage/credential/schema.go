@@ -5,7 +5,10 @@ import (
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -22,7 +25,7 @@ type Credential struct {
 func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		Description: "Data source for Object Storage credentials",
-		Attributes: map[string]tfsdk.Attribute{
+		Attributes: map[string]schema.Attribute{
 			"id": {
 				Description: "the credential ID",
 				Type:        types.StringType,
@@ -34,11 +37,11 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 				Description: "The ID returned from `stackit_object_storage_project`",
 				Type:        types.StringType,
 				Required:    true,
-				Validators: []tfsdk.AttributeValidator{
+				Validators: []validator.String{
 					validate.ProjectID(),
 				},
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
 				},
 			},
 
@@ -54,5 +57,5 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 				Optional:    true,
 			},
 		},
-	}, nil
+	}
 }

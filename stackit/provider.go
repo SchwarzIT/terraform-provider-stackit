@@ -50,10 +50,9 @@ import (
 	resourceRedisInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/redis/instance"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
+	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -79,29 +78,25 @@ type providerSchema struct {
 }
 
 // GetSchema returns the provider's schema
-func (p *StackitProvider) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (p *StackitProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		MarkdownDescription: `
 This provider is built and maintained by the STACKIT community in Schwarz IT and is not an official STACKIT provider
 
 ~> **Note:** The provider is built using Terraform's plugin framework, therefore we recommend using Terraform CLI v1.x which supports Protocol v6
 		`,
-		Attributes: map[string]tfsdk.Attribute{
-			"service_account_email": {
-				Type:                types.StringType,
+		Attributes: map[string]schema.Attribute{
+			"service_account_email": schema.StringAttribute{
 				Optional:            true,
-				Computed:            true,
 				MarkdownDescription: "Service Account Email.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_EMAIL` environment variable instead.",
 			},
-			"service_account_token": {
-				Type:                types.StringType,
+			"service_account_token": schema.StringAttribute{
 				Optional:            true,
-				Computed:            true,
 				Sensitive:           true,
 				MarkdownDescription: "Service Account Token.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_TOKEN` environment variable instead.",
 			},
 		},
-	}, nil
+	}
 }
 
 func (p *StackitProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {

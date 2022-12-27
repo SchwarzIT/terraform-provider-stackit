@@ -75,7 +75,7 @@ func (r Resource) applyClientResponse(ctx context.Context, pi *Instance, i insta
 			pi.ACL.Elems = append(pi.ACL.Elems, types.StringValue(v))
 		}
 	} else {
-		pi.ACL.Null = true
+		pi.ACL.IsNull() = true
 	}
 	pi.Name = types.StringValue(i.Name)
 	pi.PlanID = types.StringValue(i.PlanID)

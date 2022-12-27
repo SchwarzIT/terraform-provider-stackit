@@ -70,7 +70,7 @@ func updateByAPIResult(s *Instance, res *instances.ProjectInstanceUI) {
 	}
 	s.DashboardURL = types.StringValue(res.DashboardURL)
 	if res.IsUpdatable != nil {
-		s.IsUpdatable = types.Bool{Value: *res.IsUpdatable}
+		s.IsUpdatable = types.BoolValue(*res.IsUpdatable)
 	}
 	s.GrafanaURL = types.StringValue(res.Instance.GrafanaURL)
 	s.GrafanaInitialAdminPassword = types.StringValue(res.Instance.GrafanaAdminPassword)

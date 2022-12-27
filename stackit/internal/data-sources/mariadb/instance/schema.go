@@ -5,7 +5,9 @@ import (
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -32,28 +34,28 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 
 ~> **Note:** MariaDB API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this data source is not ready for production usage.		
 		`,
-		Attributes: map[string]tfsdk.Attribute{
+		Attributes: map[string]schema.Attribute{
 			"id": {
 				Description: "The instance ID",
 				Type:        types.StringType,
 				Computed:    true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: planmodifier.Strings{
+					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"name": {
 				Description: "Specifies the instance name.",
 				Type:        types.StringType,
 				Required:    true,
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"project_id": {
 				Description: "The project ID.",
 				Type:        types.StringType,
 				Required:    true,
-				Validators: []tfsdk.AttributeValidator{
+				Validators: []validator.String{
 					validate.ProjectID(),
 				},
 			},
@@ -98,5 +100,5 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 				Computed:    true,
 			},
 		},
-	}, nil
+	}
 }

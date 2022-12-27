@@ -6,7 +6,9 @@ import (
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -31,13 +33,13 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 		
 ~> **Note:** MongoDB Flex is in 'beta' stage in STACKIT
 `,
-		Attributes: map[string]tfsdk.Attribute{
+		Attributes: map[string]schema.Attribute{
 			"id": {
 				Description: "Specifies the resource ID",
 				Type:        types.StringType,
 				Computed:    true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: planmodifier.Strings{
+					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"name": {
@@ -49,7 +51,7 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 				Description: "The project ID",
 				Type:        types.StringType,
 				Required:    true,
-				Validators: []tfsdk.AttributeValidator{
+				Validators: []validator.String{
 					validate.ProjectID(),
 				},
 			},
@@ -62,17 +64,17 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 				Description: "MongoDB version",
 				Type:        types.StringType,
 				Computed:    true,
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"replicas": {
 				Description: "Number of replicas",
 				Type:        types.Int64Type,
 				Computed:    true,
-				PlanModifiers: []tfsdk.AttributePlanModifier{
+				PlanModifiers: []planmodifier.String{
 					modifiers.Int64Default(1),
-					resource.RequiresReplace(),
+					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"backup_schedule": {
@@ -102,5 +104,5 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 				Computed:    true,
 			},
 		},
-	}, nil
+	}
 }

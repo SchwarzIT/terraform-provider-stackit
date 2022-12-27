@@ -6,9 +6,12 @@ import (
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -28,92 +31,82 @@ type Instance struct {
 }
 
 // GetSchema returns the terraform schema structure
-func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		MarkdownDescription: `Manages Elasticsearch instances
 
 ~> **Note:** Elasticsearch API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
 		`,
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
 				Description: "Specifies the resource ID",
-				Type:        types.StringType,
 				Computed:    true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				Description: "Specifies the instance name. Changing this value requires the resource to be recreated. Changing this value requires the resource to be recreated.",
-				Type:        types.StringType,
 				Required:    true,
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
 				},
 			},
-			"project_id": {
+			"project_id": schema.StringAttribute{
 				Description: "The project ID.",
-				Type:        types.StringType,
 				Required:    true,
-				Validators: []tfsdk.AttributeValidator{
+				Validators: []validator.String{
 					validate.ProjectID(),
 				},
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
 				},
 			},
-			"plan": {
+			"plan": schema.StringAttribute{
 				Description: fmt.Sprintf("The Elasticsearch Plan. Default is `%s`.\nOptions are: `stackit-elasticsearch-single-small`, `stackit-elasticsearch-cluster-small`, `stackit-elasticsearch-single-medium`, `stackit-elasticsearch-cluster-medium`, `stackit-elasticsearch-cluster-big`", default_plan),
-				Type:        types.StringType,
 				Optional:    true,
 				Computed:    true,
-				PlanModifiers: []tfsdk.AttributePlanModifier{
+				PlanModifiers: []planmodifier.String{
 					modifiers.StringDefault(default_plan),
 				},
 			},
-			"plan_id": {
+			"plan_id": schema.StringAttribute{
 				Description: "The selected plan ID",
-				Type:        types.StringType,
 				Computed:    true,
 			},
-			"version": {
+			"version": schema.StringAttribute{
 				Description: "Elasticsearch version. Options: `5`, `6`, `7`. Changing this value requires the resource to be recreated.",
-				Type:        types.StringType,
 				Required:    true,
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
 					modifiers.StringDefault(default_version),
 				},
 			},
-			"acl": {
+			"acl": schema.ListAttribute{
 				Description: "Access Control rules to whitelist IP addresses",
-				Type:        types.ListType{ElemType: types.StringType},
+				ElementType: types.StringType,
 				Optional:    true,
 				Computed:    true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.UseStateForUnknown(),
 				},
 			},
-			"dashboard_url": {
+			"dashboard_url": schema.StringAttribute{
 				Description: "Dashboard URL",
-				Type:        types.StringType,
 				Computed:    true,
 			},
-			"cf_guid": {
+			"cf_guid": schema.StringAttribute{
 				Description: "Cloud Foundry GUID",
-				Type:        types.StringType,
 				Computed:    true,
 			},
-			"cf_space_guid": {
+			"cf_space_guid": schema.StringAttribute{
 				Description: "Cloud Foundry Space GUID",
-				Type:        types.StringType,
 				Computed:    true,
 			},
-			"cf_organization_guid": {
+			"cf_organization_guid": schema.StringAttribute{
 				Description: "Cloud Foundry Organization GUID",
-				Type:        types.StringType,
 				Computed:    true,
 			},
 		},
-	}, nil
+	}
 }

@@ -31,7 +31,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	acl := []string{}
-	for _, v := range plan.ACL.Elems {
+	for _, v := range plan.ACL.Elements() {
 		nv, err := common.ToString(ctx, v)
 		if err != nil {
 			continue
@@ -139,7 +139,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	acl := []string{}
-	for _, v := range plan.ACL.Elems {
+	for _, v := range plan.ACL.Elements() {
 		nv, err := common.ToString(ctx, v)
 		if err != nil {
 			continue

@@ -9,6 +9,7 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb-flex/instances"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
 
 const (
@@ -47,7 +48,7 @@ func (r Resource) validate(ctx context.Context, data Instance) error {
 	}
 
 	storage := Storage{}
-	diag := data.Storage.As(ctx, &storage, types.ObjectAsOptions{})
+	diag := data.Storage.As(ctx, &storage, basetypes.ObjectAsOptions{})
 	if diag.HasError() {
 		return errors.New("failed setting storage from object")
 	}
@@ -112,10 +113,11 @@ func (r Resource) validateStorage(ctx context.Context, projectID, machineType st
 }
 
 func applyClientResponse(pi *Instance, i instances.Instance) error {
-	pi.ACL = types.List{ElemType: types.StringType}
+	elems := []attr.Value{}
 	for _, v := range i.ACL.Items {
-		pi.ACL.Elems = append(pi.ACL.Elems, types.StringValue(v))
+		elems = append(elems, types.StringValue(v))
 	}
+	pi.ACL = types.ListValueMust(types.StringType, elems)
 	pi.BackupSchedule = types.StringValue(i.BackupSchedule)
 	pi.MachineType = types.StringValue(i.Flavor.ID)
 	pi.Name = types.StringValue(i.Name)

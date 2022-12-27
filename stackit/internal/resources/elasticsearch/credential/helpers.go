@@ -11,12 +11,14 @@ import (
 func (r Resource) applyClientResponse(ctx context.Context, c *Credential, cgr credentials.GetResponse) error {
 	c.ID = types.StringValue(cgr.ID)
 	c.Host = types.StringValue(cgr.Raw.Credential.Host)
-	c.Hosts = types.List{ElemType: types.StringType}
+
+	c.Hosts = types.ListNull(types.StringType)
 	if len(cgr.Raw.Credential.Hosts) > 0 {
-		c.Hosts.Elems = make([]attr.Value, len(cgr.Raw.Credential.Hosts))
-		for k, v := range cgr.Raw.Credential.Hosts {
-			c.Hosts.Elems[k] = types.StringValue(v)
+		h := []attr.Value{}
+		for _, v := range cgr.Raw.Credential.Hosts {
+			h = append(h, types.StringValue(v))
 		}
+		c.Hosts = types.ListValueMust(types.StringType, h)
 	}
 	c.Username = types.StringValue(cgr.Raw.Credential.Username)
 	c.Password = types.StringValue(cgr.Raw.Credential.Password)

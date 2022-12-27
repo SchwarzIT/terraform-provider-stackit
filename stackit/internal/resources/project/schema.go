@@ -4,10 +4,11 @@ import (
 	"context"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"gorm.io/gorm/schema"
 )
 
 // Project is the schema model
@@ -21,18 +22,18 @@ type Project struct {
 }
 
 // GetSchema returns the terraform schema structure
-func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		Description: "Manages projects",
-		Attributes: map[string]tfsdk.Attribute{
+		Attributes: map[string]schema.Attribute{
 			"id": {
 				Description: "the project ID",
 				Type:        types.StringType,
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: planmodifier.Strings{
+					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 
@@ -42,8 +43,8 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: planmodifier.Strings{
+					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 
@@ -51,8 +52,8 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Description: "the container ID in which the project will be created",
 				Type:        types.StringType,
 				Required:    true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: planmodifier.Strings{
+					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 
@@ -60,7 +61,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Description: "the project name",
 				Type:        types.StringType,
 				Required:    true,
-				Validators: []tfsdk.AttributeValidator{
+				Validators: []validator.String{
 					validate.ProjectName(),
 				},
 			},
@@ -69,7 +70,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Description: "billing reference for cost transparency",
 				Type:        types.StringType,
 				Required:    true,
-				Validators: []tfsdk.AttributeValidator{
+				Validators: []validator.String{
 					validate.BillingRef(),
 				},
 			},
@@ -80,5 +81,5 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Required:    true,
 			},
 		},
-	}, nil
+	}
 }

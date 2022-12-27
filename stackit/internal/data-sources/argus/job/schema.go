@@ -6,6 +6,8 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus/instances"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -14,7 +16,7 @@ import (
 func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		Description: "Data source for Argus Jobs",
-		Attributes: map[string]tfsdk.Attribute{
+		Attributes: map[string]schema.Attribute{
 			"id": {
 				Description: "Specifies the Argus Job ID",
 				Type:        types.StringType,
@@ -25,7 +27,7 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 				Description: "Specifies the name of the scraping job",
 				Type:        types.StringType,
 				Required:    true,
-				Validators: []tfsdk.AttributeValidator{
+				Validators: []validator.String{
 					validate.StringWith(
 						instances.ValidateInstanceName,
 						"validate argus instance name",
@@ -37,7 +39,7 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 				Description: "Specifies the Project ID the Argus instance belongs to",
 				Type:        types.StringType,
 				Required:    true,
-				Validators: []tfsdk.AttributeValidator{
+				Validators: []validator.String{
 					validate.ProjectID(),
 				},
 			},
@@ -118,5 +120,5 @@ func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics
 				}),
 			},
 		},
-	}, nil
+	}
 }

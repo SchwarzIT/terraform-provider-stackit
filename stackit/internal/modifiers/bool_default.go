@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -17,6 +17,8 @@ type boolDefaultModifier struct {
 	Default bool
 }
 
+var _ planmodifier.Bool = (*boolDefaultModifier)(nil)
+
 // Description returns a plain text description of the validator's behavior, suitable for a practitioner to understand its impact.
 func (m boolDefaultModifier) Description(ctx context.Context) string {
 	return fmt.Sprintf("If value is not configured, defaults to %v", m.Default)
@@ -27,27 +29,19 @@ func (m boolDefaultModifier) MarkdownDescription(ctx context.Context) string {
 	return fmt.Sprintf("If value is not configured, defaults to `%v`", m.Default)
 }
 
-// Modify runs the logic of the plan modifier.
-// Access to the configuration, plan, and state is available in `req`, while
-// `resp` contains fields for updating the planned value, triggering resource
-// replacement, and returning diagnostics.
-func (m boolDefaultModifier) Modify(ctx context.Context, req tfsdk.ModifyAttributePlanRequest, resp *tfsdk.ModifyAttributePlanResponse) {
-	// types.Bool must be the attr.Value produced by the attr.Type in the schema for this attribute
-	// for generic plan modifiers, use
-	// https://pkg.go.dev/github.com/hashicorp/terraform-plugin-framework/tfsdk#ConvertValue
-	// to convert into a known type.
-	var i types.Bool
-	diags := tfsdk.ValueAs(ctx, req.AttributePlan, &i)
-	resp.Diagnostics.Append(diags...)
-	if diags.HasError() {
+// PlanModifyBool runs the logic of the plan modifier.
+func (m boolDefaultModifier) PlanModifyBool(ctx context.Context, req planmodifier.BoolRequest, resp *planmodifier.BoolResponse) {
+	if !req.ConfigValue.IsNull() {
 		return
 	}
 
-	if !i.Null {
+	// If the attribute plan is "known" and "not null", then a previous plan modifier in the sequence
+	// has already been applied, and we don't want to interfere.
+	if !req.PlanValue.IsUnknown() && !req.PlanValue.IsNull() {
 		return
 	}
 
-	resp.AttributePlan = types.Bool{Value: m.Default}
+	resp.PlanValue = types.BoolValue(m.Default)
 }
 
 func BoolDefault(defaultValue bool) boolDefaultModifier {

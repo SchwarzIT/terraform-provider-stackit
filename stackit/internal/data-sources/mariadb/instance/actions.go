@@ -78,7 +78,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 			config.ACL.Elems = append(config.ACL.Elems, types.StringValue(v))
 		}
 	} else {
-		config.ACL.Null = true
+		config.ACL.IsNull() = true
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &config)...)

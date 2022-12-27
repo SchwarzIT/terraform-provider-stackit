@@ -3,9 +3,8 @@ package job
 import (
 	"context"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus/jobs"
+	scrapeconfig "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/generated/scrape-config"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
-	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -17,26 +16,49 @@ const (
 	default_saml2_enable_url_parameters = true
 )
 
-func (j *Job) setDefaults(job *jobs.Job) {
-	if j.MetricsPath.Null || j.MetricsPath.Unknown {
-		job.MetricsPath = default_metrics_path
+func (j *Job) setDefaults(job *scrapeconfig.CreateJSONBody) {
+	if job == nil {
+		return
 	}
-	if j.Scheme.Null || j.Scheme.Unknown {
-		job.Scheme = default_scheme
+	if j.MetricsPath.IsNull() || j.MetricsPath.IsUnknown() {
+		s := default_metrics_path
+		job.MetricsPath = &s
 	}
-	if j.ScrapeInterval.Null || j.ScrapeInterval.Unknown {
+	if j.Scheme.IsNull() || j.Scheme.IsUnknown() {
+		job.Scheme = scrapeconfig.CreateJSONBodyScheme(default_scheme)
+	}
+	if j.ScrapeInterval.IsNull() || j.ScrapeInterval.IsUnknown() {
 		job.ScrapeInterval = default_scrape_interval
 	}
-	if j.ScrapeTimeout.Null || j.ScrapeTimeout.Unknown {
+	if j.ScrapeTimeout.IsNull() || j.ScrapeTimeout.IsUnknown() {
 		job.ScrapeTimeout = default_scrape_timeout
 	}
 }
 
-func (j *Job) ToClientJob() jobs.Job {
-	job := jobs.Job{
+func (j *Job) setDefaultsUpdate(job *scrapeconfig.UpdateJSONBody) {
+	if job == nil {
+		return
+	}
+	if j.MetricsPath.IsNull() || j.MetricsPath.IsUnknown() {
+		job.MetricsPath = default_metrics_path
+	}
+	if j.Scheme.IsNull() || j.Scheme.IsUnknown() {
+		job.Scheme = scrapeconfig.UpdateJSONBodyScheme(default_scheme)
+	}
+	if j.ScrapeInterval.IsNull() || j.ScrapeInterval.IsUnknown() {
+		job.ScrapeInterval = default_scrape_interval
+	}
+	if j.ScrapeTimeout.IsNull() || j.ScrapeTimeout.IsUnknown() {
+		job.ScrapeTimeout = default_scrape_timeout
+	}
+}
+
+func (j *Job) ToClientJob() scrapeconfig.CreateJSONBody {
+	mp := j.MetricsPath.ValueString()
+	job := scrapeconfig.CreateJSONBody{
 		JobName:        j.Name.ValueString(),
-		Scheme:         j.Scheme.ValueString(),
-		MetricsPath:    j.MetricsPath.ValueString(),
+		Scheme:         scrapeconfig.CreateJSONBodyScheme(j.Scheme.ValueString()),
+		MetricsPath:    &mp,
 		ScrapeInterval: j.ScrapeInterval.ValueString(),
 		ScrapeTimeout:  j.ScrapeTimeout.ValueString(),
 	}
@@ -45,43 +67,119 @@ func (j *Job) ToClientJob() jobs.Job {
 
 	if j.SAML2 != nil && !j.SAML2.EnableURLParameters.ValueBool() {
 		if job.Params == nil {
-			job.Params = map[string]interface{}{}
+			job.Params = &map[string]interface{}{}
 		}
-		job.Params["saml2"] = []string{"disabled"}
+		p := *job.Params
+		p["saml2"] = []string{"disabled"}
+		job.Params = &p
 	}
 
 	if j.BasicAuth != nil {
 		if job.BasicAuth == nil {
-			job.BasicAuth = &jobs.BasicAuth{
-				Username: j.BasicAuth.Username.ValueString(),
-				Password: j.BasicAuth.Password.ValueString(),
+			u := j.BasicAuth.Username.ValueString()
+			p := j.BasicAuth.Password.ValueString()
+			job.BasicAuth = &struct {
+				Password *string `json:"password,omitempty"`
+				Username *string `json:"username,omitempty"`
+			}{
+				Username: &u,
+				Password: &p,
 			}
 		}
 	}
 
-	t := make([]jobs.StaticConfig, len(j.Targets))
+	t := make([]struct {
+		Labels  *map[string]interface{} `json:"labels,omitempty"`
+		Targets []string                `json:"targets"`
+	}, len(j.Targets))
 	for i, target := range j.Targets {
-		ti := jobs.StaticConfig{}
+		ti := struct {
+			Labels  *map[string]interface{} `json:"labels,omitempty"`
+			Targets []string                `json:"targets"`
+		}{}
 		ti.Targets = make([]string, len(target.URLs))
 		for k, v := range target.URLs {
 			ti.Targets[k] = v.ValueString()
 		}
 
-		ti.Labels = make(map[string]string, len(target.Labels.Elems))
-		for k, v := range target.Labels.Elems {
-			ti.Labels[k], _ = common.ToString(context.TODO(), v)
+		ls := map[string]interface{}{}
+		for k, v := range target.Labels.Elements() {
+			ls[k], _ = common.ToString(context.TODO(), v)
 		}
+		ti.Labels = &ls
 		t[i] = ti
 	}
 	job.StaticConfigs = t
 	return job
 }
 
-func (j *Job) FromClientJob(cj jobs.Job) {
+func (j *Job) ToClientUpdateJob() scrapeconfig.UpdateJSONBody {
+	job := scrapeconfig.UpdateJSONBody{
+		Scheme:         scrapeconfig.UpdateJSONBodyScheme(j.Scheme.ValueString()),
+		MetricsPath:    j.MetricsPath.ValueString(),
+		ScrapeInterval: j.ScrapeInterval.ValueString(),
+		ScrapeTimeout:  j.ScrapeTimeout.ValueString(),
+	}
+
+	j.setDefaultsUpdate(&job)
+
+	if j.SAML2 != nil && !j.SAML2.EnableURLParameters.ValueBool() {
+		if job.Params == nil {
+			job.Params = &map[string]interface{}{}
+		}
+		p := *job.Params
+		p["saml2"] = []string{"disabled"}
+		job.Params = &p
+	}
+
+	if j.BasicAuth != nil {
+		if job.BasicAuth == nil {
+			u := j.BasicAuth.Username.ValueString()
+			p := j.BasicAuth.Password.ValueString()
+			job.BasicAuth = &struct {
+				Password *string `json:"password,omitempty"`
+				Username *string `json:"username,omitempty"`
+			}{
+				Username: &u,
+				Password: &p,
+			}
+		}
+	}
+
+	t := make([]struct {
+		Labels  *map[string]interface{} `json:"labels,omitempty"`
+		Targets []string                `json:"targets"`
+	}, len(j.Targets))
+	for i, target := range j.Targets {
+		ti := struct {
+			Labels  *map[string]interface{} `json:"labels,omitempty"`
+			Targets []string                `json:"targets"`
+		}{}
+		ti.Targets = make([]string, len(target.URLs))
+		for k, v := range target.URLs {
+			ti.Targets[k] = v.ValueString()
+		}
+
+		ls := map[string]interface{}{}
+		for k, v := range target.Labels.Elements() {
+			ls[k], _ = common.ToString(context.TODO(), v)
+		}
+		ti.Labels = &ls
+		t[i] = ti
+	}
+	job.StaticConfigs = t
+	return job
+}
+
+func (j *Job) FromClientJob(cj scrapeconfig.Job) {
 	j.ID = types.StringValue(cj.JobName)
 	j.Name = types.StringValue(cj.JobName)
-	j.MetricsPath = types.StringValue(cj.MetricsPath)
-	j.Scheme = types.StringValue(cj.Scheme)
+	if cj.MetricsPath != nil {
+		j.MetricsPath = types.StringValue(*cj.MetricsPath)
+	}
+	if cj.Scheme != nil {
+		j.Scheme = types.StringValue(string(*cj.Scheme))
+	}
 	j.ScrapeInterval = types.StringValue(cj.ScrapeInterval)
 	j.ScrapeTimeout = types.StringValue(cj.ScrapeTimeout)
 	j.handleSAML2(cj)
@@ -89,7 +187,7 @@ func (j *Job) FromClientJob(cj jobs.Job) {
 	j.handleTargets(cj)
 }
 
-func (j *Job) handleBasicAuth(cj jobs.Job) {
+func (j *Job) handleBasicAuth(cj scrapeconfig.Job) {
 	if cj.BasicAuth == nil {
 		j.BasicAuth = nil
 		return
@@ -100,7 +198,7 @@ func (j *Job) handleBasicAuth(cj jobs.Job) {
 	}
 }
 
-func (j *Job) handleSAML2(cj jobs.Job) {
+func (j *Job) handleSAML2(cj scrapeconfig.Job) {
 	if cj.Params == nil && j.SAML2 == nil {
 		return
 	}
@@ -110,20 +208,19 @@ func (j *Job) handleSAML2(cj jobs.Job) {
 	}
 
 	flag := true
-	if v, ok := cj.Params["saml2"]; ok {
-		if sl, ok := v.([]string); ok {
-			if len(sl) == 1 && sl[0] == "disabled" {
-				flag = false
-			}
+	p := *cj.Params
+	if v, ok := p["saml2"]; ok {
+		if len(v) == 1 && v[0] == "disabled" {
+			flag = false
 		}
 	}
 
 	j.SAML2 = &SAML2{
-		EnableURLParameters: types.Bool{Value: flag},
+		EnableURLParameters: types.BoolValue(flag),
 	}
 }
 
-func (j *Job) handleTargets(cj jobs.Job) {
+func (j *Job) handleTargets(cj scrapeconfig.Job) {
 	newTargets := []Target{}
 	for i, sc := range cj.StaticConfigs {
 		nt := Target{
@@ -136,13 +233,7 @@ func (j *Job) handleTargets(cj jobs.Job) {
 		if len(j.Targets) > i && j.Targets[i].Labels.IsNull() {
 			nt.Labels = j.Targets[i].Labels
 		} else {
-			nt.Labels = types.Map{ElemType: types.StringType}
-			if len(sc.Labels) > 0 {
-				nt.Labels.Elems = make(map[string]attr.Value, len(sc.Labels))
-			}
-			for k, v := range sc.Labels {
-				nt.Labels.Elems[k] = types.StringValue(v)
-			}
+			nt.Labels, _ = types.MapValueFrom(context.TODO(), types.StringType, sc.Labels)
 		}
 		newTargets = append(newTargets, nt)
 	}

@@ -28,7 +28,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	config.Plan = types.StringValue(b.PlanName)
 	config.PlanID = types.StringValue(b.PlanID)
 	config.DashboardURL = types.StringValue(b.DashboardURL)
-	config.IsUpdatable = types.Bool{Value: b.IsUpdatable}
+	config.IsUpdatable = types.BoolValue(b.IsUpdatable}
 	config.GrafanaURL = types.StringValue(b.Instance.GrafanaURL)
 	config.GrafanaInitialAdminPassword = types.StringValue(b.Instance.GrafanaAdminPassword)
 	config.GrafanaInitialAdminUser = types.StringValue(b.Instance.GrafanaAdminUser)
@@ -43,7 +43,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	config.OtlpTracesURL = types.StringValue(b.Instance.OtlpTracesURL)
 	config.ZipkinSpansURL = types.StringValue(b.Instance.ZipkinSpansURL)
 	config.Grafana = &instance.Grafana{
-		EnablePublicAccess: types.Bool{Value: b.Instance.GrafanaPublicReadAccess},
+		EnablePublicAccess: types.BoolValue(b.Instance.GrafanaPublicReadAccess},
 	}
 	config.Metrics = &instance.Metrics{
 		RetentionDays:               types.Int64Value(int64(b.Instance.MetricsRetentionTimeRaw)),

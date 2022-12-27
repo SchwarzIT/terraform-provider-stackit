@@ -15,7 +15,7 @@ func transform(c *kubernetesCluster.Cluster, cl *cluster.Cluster) {
 	c.KubernetesVersion = types.StringValue(cl.Kubernetes.Version)
 	c.KubernetesVersionUsed = types.StringValue(cl.Kubernetes.Version)
 	if cl.Kubernetes.AllowPrivilegedContainers != nil {
-		c.AllowPrivilegedContainers = types.Bool{Value: *cl.Kubernetes.AllowPrivilegedContainers}
+		c.AllowPrivilegedContainers = types.BoolValue(*cl.Kubernetes.AllowPrivilegedContainers}
 	}
 	if cl.Status.Aggregated != nil {
 		c.Status = types.StringValue(string(*cl.Status.Aggregated))
@@ -67,8 +67,8 @@ func transformNodepools(c *kubernetesCluster.Cluster, cl *cluster.Cluster) {
 		}
 		if np.Labels != nil {
 			for k, v := range *np.Labels {
-				if n.Labels.Null {
-					n.Labels.Null = false
+				if n.Labels.IsNull() {
+					n.Labels.IsNull() = false
 					n.Labels.Elems = make(map[string]attr.Value, len(*np.Labels))
 				}
 				n.Labels.Elems[k] = types.StringValue(v)
@@ -91,8 +91,8 @@ func transformNodepools(c *kubernetesCluster.Cluster, cl *cluster.Cluster) {
 			}
 		}
 		for _, v := range np.AvailabilityZones {
-			if n.Zones.Null {
-				n.Zones.Null = false
+			if n.Zones.IsNull() {
+				n.Zones.IsNull() = false
 			}
 			n.Zones.Elems = append(n.Zones.Elems, types.StringValue(v))
 		}

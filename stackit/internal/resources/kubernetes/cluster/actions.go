@@ -279,7 +279,7 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 
 		if res.JSON200.Extensions.Argus != nil {
 			extensions.Argus = &ArgusExtension{
-				Enabled:         types.Bool{Value: res.JSON200.Extensions.Argus.Enabled},
+				Enabled:         types.BoolValue(res.JSON200.Extensions.Argus.Enabled),
 				ArgusInstanceID: types.StringValue(res.JSON200.Extensions.Argus.ArgusInstanceID),
 			}
 		}
@@ -303,8 +303,8 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 
 	if res.JSON200.Maintenance != nil {
 		digas := resp.State.SetAttribute(ctx, path.Root("maintenance"), &Maintenance{
-			EnableKubernetesVersionUpdates:   types.Bool{Value: *res.JSON200.Maintenance.AutoUpdate.KubernetesVersion},
-			EnableMachineImageVersionUpdates: types.Bool{Value: *res.JSON200.Maintenance.AutoUpdate.MachineImageVersion},
+			EnableKubernetesVersionUpdates:   types.BoolValue(*res.JSON200.Maintenance.AutoUpdate.KubernetesVersion),
+			EnableMachineImageVersionUpdates: types.BoolValue(*res.JSON200.Maintenance.AutoUpdate.MachineImageVersion),
 			Start:                            types.StringValue(res.JSON200.Maintenance.TimeWindow.Start),
 			End:                              types.StringValue(res.JSON200.Maintenance.TimeWindow.End),
 		})

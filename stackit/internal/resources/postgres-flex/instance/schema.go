@@ -5,10 +5,12 @@ import (
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"gorm.io/gorm/schema"
 )
 
 // Instance is the schema model
@@ -46,38 +48,38 @@ type User struct {
 }
 
 // GetSchema returns the terraform schema structure
-func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		MarkdownDescription: `Manages Postgres Flex instances
 		
 ~> **Note:** Postgres Flex is in 'alpha' stage in STACKIT
 `,
-		Attributes: map[string]tfsdk.Attribute{
+		Attributes: map[string]schema.Attribute{
 			"id": {
 				Description: "Specifies the resource ID",
 				Type:        types.StringType,
 				Computed:    true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: planmodifier.Strings{
+					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"name": {
 				Description: "Specifies the instance name. Changing this value requires the resource to be recreated.",
 				Type:        types.StringType,
 				Required:    true,
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"project_id": {
 				Description: "The project ID the instance runs in. Changing this value requires the resource to be recreated.",
 				Type:        types.StringType,
 				Required:    true,
-				Validators: []tfsdk.AttributeValidator{
+				Validators: []validator.String{
 					validate.ProjectID(),
 				},
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"machine_type": {
@@ -90,19 +92,19 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Type:        types.StringType,
 				Optional:    true,
 				Computed:    true,
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
 					modifiers.StringDefault(default_version),
-					resource.UseStateForUnknown(),
+					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"replicas": {
 				Description: "Number of replicas (Default is `1`). Changing this value requires the resource to be recreated.",
 				Type:        types.Int64Type,
 				Optional:    true,
-				PlanModifiers: []tfsdk.AttributePlanModifier{
+				PlanModifiers: []planmodifier.String{
 					modifiers.Int64Default(default_replicas),
-					resource.UseStateForUnknown(),
+					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"backup_schedule": {
@@ -110,9 +112,9 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Type:        types.StringType,
 				Optional:    true,
 				Computed:    true,
-				PlanModifiers: []tfsdk.AttributePlanModifier{
+				PlanModifiers: []planmodifier.String{
 					modifiers.StringDefault(default_backup_schedule),
-					resource.UseStateForUnknown(),
+					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"storage": {
@@ -125,7 +127,7 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 						Type:        types.StringType,
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []tfsdk.AttributePlanModifier{
+						PlanModifiers: []planmodifier.String{
 							modifiers.StringDefault(default_storage_class),
 						},
 					},
@@ -134,14 +136,14 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 						Type:        types.Int64Type,
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []tfsdk.AttributePlanModifier{
+						PlanModifiers: []planmodifier.String{
 							modifiers.Int64Default(default_storage_size),
 						},
 					},
 				}),
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
-					resource.RequiresReplace(),
+				PlanModifiers: planmodifier.Strings{
+					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"user": {
@@ -191,8 +193,8 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 						Computed:    true,
 					},
 				}),
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: planmodifier.Strings{
+					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"options": {
@@ -216,5 +218,5 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Computed:    true,
 			},
 		},
-	}, nil
+	}
 }

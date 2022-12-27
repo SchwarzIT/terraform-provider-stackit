@@ -100,7 +100,7 @@ func (r Resource) setGrafanaConfig(ctx context.Context, diags *diag.Diagnostics,
 
 	if ref != nil && ref.Grafana != nil {
 		if s.Grafana == nil {
-			s.Grafana = &Grafana{EnablePublicAccess: types.Bool{Value: default_grafana_enable_public_access}}
+			s.Grafana = &Grafana{EnablePublicAccess: types.BoolValue(default_grafana_enable_public_access)}
 		} else if ref.Grafana.EnablePublicAccess.Equal(s.Grafana.EnablePublicAccess) {
 			return
 		}
@@ -112,7 +112,7 @@ func (r Resource) setGrafanaConfig(ctx context.Context, diags *diag.Diagnostics,
 		PublicReadAccess: &epa,
 	}
 
-	res, err := c.Argus.Grafanaconfigs.UpdateWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString(), cfg)
+	res, err := c.Argus.GrafanaConfigs.UpdateWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString(), cfg)
 	if err != nil {
 		diags.AddError("failed to prepare grafana config request", err.Error())
 		return
@@ -149,7 +149,7 @@ func (r Resource) setMetricsConfig(ctx context.Context, diags *diag.Diagnostics,
 		MetricsRetentionTime1h:  fmt.Sprintf("%dd", s.Metrics.RetentionDays1hDownsampling.ValueInt64()),
 	}
 
-	res, err := c.Argus.Metricsstorageretention.UpdateWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString(), cfg)
+	res, err := c.Argus.MetricsStorageRetention.UpdateWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString(), cfg)
 	if err != nil {
 		diags.AddError("failed to prepare metrics config request", err.Error())
 		return
@@ -229,7 +229,7 @@ func (r Resource) readGrafana(ctx context.Context, diags *diag.Diagnostics, s *I
 	}
 
 	c := r.client.Services
-	res, err := c.Argus.Grafanaconfigs.ListWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString())
+	res, err := c.Argus.GrafanaConfigs.ListWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString())
 	if err != nil {
 		diags.AddError("failed to prepare read grafana configs request", err.Error())
 		return
@@ -256,7 +256,7 @@ func (r Resource) readMetrics(ctx context.Context, diags *diag.Diagnostics, s *I
 	}
 
 	c := r.client.Services
-	res, err := c.Argus.Metricsstorageretention.ListWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString())
+	res, err := c.Argus.MetricsStorageRetention.ListWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString())
 	if err != nil {
 		diags.AddError("failed to prepare read metrics storage retention request", err.Error())
 		return
@@ -458,7 +458,7 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 	r.readGrafana(ctx, &resp.Diagnostics, &inst)
 	if inst.Grafana.EnablePublicAccess.ValueBool() {
 		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("grafana"), &Grafana{
-			EnablePublicAccess: types.Bool{Value: true},
+			EnablePublicAccess: types.BoolValue(true),
 		})...)
 	}
 

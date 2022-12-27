@@ -2,13 +2,16 @@ package instance
 
 import (
 	"context"
+	"regexp"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus/instances"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -49,135 +52,122 @@ type Metrics struct {
 }
 
 // GetSchema returns the terraform schema structure
-func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		Description: "Manages Argus Instances",
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
 				Description: "Specifies the Argus instance ID",
-				Type:        types.StringType,
 				Computed:    true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 
-			"name": {
+			"name": schema.StringAttribute{
 				Description: "Specifies the name of the Argus instance",
-				Type:        types.StringType,
 				Required:    true,
-				Validators: []tfsdk.AttributeValidator{
-					validate.StringWith(
-						instances.ValidateInstanceName,
-						"validate argus instance name",
+				Validators: []validator.String{
+					stringvalidator.RegexMatches(
+						regexp.MustCompile(`^[a-z0-9]+$`),
+						"must contain only lowercase alphanumeric characters",
 					),
 				},
 			},
 
-			"project_id": {
+			"project_id": schema.StringAttribute{
 				Description: "Specifies the Project ID the Argus instance belongs to",
-				Type:        types.StringType,
 				Required:    true,
-				Validators: []tfsdk.AttributeValidator{
+				Validators: []validator.String{
 					validate.ProjectID(),
 				},
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
 				},
 			},
 
-			"plan": {
+			"plan": schema.StringAttribute{
 				Description: "Specifies the Argus plan. Available options are: `Monitoring-Medium-EU01`, `Monitoring-Large-EU01`, `Frontend-Starter-EU01`, `Monitoring-XL-EU01`, `Monitoring-XXL-EU01`, `Monitoring-Starter-EU01`, `Monitoring-Basic-EU01`, `Observability-Medium-EU01`, `Observability-Large-EU01 `, `Observability-XL-EU01`, `Observability-Starter-EU01`, `Observability-Basic-EU01`, `Observability-XXL-EU01`.",
-				Type:        types.StringType,
 				Required:    true,
 			},
 
-			"grafana": {
+			"grafana": schema.SingleNestedAttribute{
 				Description: "A Grafana configuration block",
 				Optional:    true,
-				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
-					"enable_public_access": {
+				Attributes: map[string]schema.Attribute{
+					"enable_public_access": schema.BoolAttribute{
 						Description: "If true, anyone can access Grafana dashboards without logging in. Default is set to `false`.",
-						Type:        types.BoolType,
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []tfsdk.AttributePlanModifier{
+						PlanModifiers: []planmodifier.Bool{
 							modifiers.BoolDefault(default_grafana_enable_public_access),
 						},
 					},
-				}),
+				},
 			},
 
-			"metrics": {
+			"metrics": schema.SingleNestedAttribute{
 				Description: "Metrics configuration block",
 				Optional:    true,
-				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
-					"retention_days": {
+				Attributes: map[string]schema.Attribute{
+					"retention_days": schema.Int64Attribute{
 						Description: "Specifies for how many days the raw metrics are kept. Default is set to `90`",
-						Type:        types.Int64Type,
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []tfsdk.AttributePlanModifier{
+						PlanModifiers: []planmodifier.Int64{
 							modifiers.Int64Default(default_metrics_retention_days),
 						},
 					},
-					"retention_days_5m_downsampling": {
+					"retention_days_5m_downsampling": schema.Int64Attribute{
 						Description: "Specifies for how many days the 5m downsampled metrics are kept. must be less than the value of the general retention. Default is set to `0` (disabled).",
-						Type:        types.Int64Type,
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []tfsdk.AttributePlanModifier{
+						PlanModifiers: []planmodifier.Int64{
 							modifiers.Int64Default(default_metrics_retention_days_5m_downsampling),
 						},
 					},
-					"retention_days_1h_downsampling": {
+					"retention_days_1h_downsampling": schema.Int64Attribute{
 						Description: "Specifies for how many days the 1h downsampled metrics are kept. must be less than the value of the 5m downsampling retention. Default is set to `0` (disabled).",
-						Type:        types.Int64Type,
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []tfsdk.AttributePlanModifier{
+						PlanModifiers: []planmodifier.Int64{
 							modifiers.Int64Default(default_metrics_retention_days_1h_downsampling),
 						},
 					},
-				}),
+				},
 			},
 
 			// Read only:
 
-			"plan_id": {
-				Type:        types.StringType,
+			"plan_id": schema.StringAttribute{
 				Optional:    false,
 				Required:    false,
 				Computed:    true,
 				Description: "Specifies Argus Plan ID.",
 			},
 
-			"dashboard_url": {
-				Type:        types.StringType,
+			"dashboard_url": schema.StringAttribute{
 				Optional:    false,
 				Required:    false,
 				Computed:    true,
 				Description: "Specifies Argus instance dashboard URL.",
 			},
 
-			"is_updatable": {
-				Type:        types.BoolType,
+			"is_updatable": schema.BoolAttribute{
 				Optional:    false,
 				Required:    false,
 				Computed:    true,
 				Description: "Specifies if the instance can be updated.",
 			},
 
-			"grafana_url": {
-				Type:        types.StringType,
+			"grafana_url": schema.StringAttribute{
 				Optional:    false,
 				Required:    false,
 				Computed:    true,
 				Description: "Specifies Grafana URL.",
 			},
 
-			"grafana_initial_admin_password": {
-				Type:        types.StringType,
+			"grafana_initial_admin_password": schema.StringAttribute{
 				Optional:    false,
 				Required:    false,
 				Computed:    true,
@@ -185,89 +175,78 @@ func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics)
 				Description: "Specifies an initial Grafana admin password.",
 			},
 
-			"grafana_initial_admin_user": {
-				Type:        types.StringType,
+			"grafana_initial_admin_user": schema.StringAttribute{
 				Optional:    false,
 				Required:    false,
 				Computed:    true,
 				Description: "Specifies an initial Grafana admin username.",
 			},
 
-			"metrics_url": {
-				Type:        types.StringType,
+			"metrics_url": schema.StringAttribute{
 				Optional:    false,
 				Required:    false,
 				Computed:    true,
 				Description: "Specifies metrics URL.",
 			},
 
-			"metrics_push_url": {
-				Type:        types.StringType,
+			"metrics_push_url": schema.StringAttribute{
 				Optional:    false,
 				Required:    false,
 				Computed:    true,
 				Description: "Specifies URL for pushing metrics.",
 			},
 
-			"targets_url": {
-				Type:        types.StringType,
+			"targets_url": schema.StringAttribute{
 				Optional:    false,
 				Required:    false,
 				Computed:    true,
 				Description: "Specifies Targets URL.",
 			},
 
-			"alerting_url": {
-				Type:        types.StringType,
+			"alerting_url": schema.StringAttribute{
 				Optional:    false,
 				Required:    false,
 				Computed:    true,
 				Description: "Specifies Alerting URL.",
 			},
 
-			"logs_url": {
-				Type:        types.StringType,
+			"logs_url": schema.StringAttribute{
 				Optional:    false,
 				Required:    false,
 				Computed:    true,
 				Description: "Specifies Logs URL.",
 			},
 
-			"logs_push_url": {
-				Type:        types.StringType,
+			"logs_push_url": schema.StringAttribute{
 				Optional:    false,
 				Required:    false,
 				Computed:    true,
 				Description: "Specifies URL for pushing logs.",
 			},
 
-			"jaeger_traces_url": {
-				Type:     types.StringType,
+			"jaeger_traces_url": schema.StringAttribute{
 				Computed: true,
 				Required: false,
 				Optional: false,
 			},
 
-			"jaeger_ui_url": {
-				Type:     types.StringType,
+			"jaeger_ui_url": schema.StringAttribute{
 				Computed: true,
 				Required: false,
 				Optional: false,
 			},
 
-			"otlp_traces_url": {
-				Type:     types.StringType,
+			"otlp_traces_url": schema.StringAttribute{
 				Computed: true,
 				Required: false,
 				Optional: false,
 			},
 
-			"zipkin_spans_url": {
-				Type:     types.StringType,
+			"zipkin_spans_url": schema.StringAttribute{
 				Computed: true,
 				Required: false,
 				Optional: false,
 			},
 		},
-	}, nil
+	}
 }

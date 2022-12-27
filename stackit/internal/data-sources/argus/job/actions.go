@@ -48,6 +48,6 @@ func handleSAML2(j *job.Job, cj jobs.Job) {
 	}
 
 	j.SAML2 = &job.SAML2{
-		EnableURLParameters: types.Bool{Value: flag},
+		EnableURLParameters: types.BoolValue(flag},
 	}
 }

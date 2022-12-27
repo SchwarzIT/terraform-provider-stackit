@@ -130,7 +130,7 @@ func (c *Cluster) nodePools() []cluster.Nodepool {
 
 		// labels
 		ls := map[string]string{}
-		for k, v := range p.Labels.Elems {
+		for k, v := range p.Labels.Elements() {
 			nv, err := common.ToString(context.Background(), v)
 			if err != nil {
 				ls[k] = ""
@@ -141,7 +141,7 @@ func (c *Cluster) nodePools() []cluster.Nodepool {
 
 		// zones
 		zs := []string{}
-		for _, v := range p.Zones.Elems {
+		for _, v := range p.Zones.Elements() {
 			if v.IsNull() || v.IsUnknown() {
 				continue
 			}
@@ -286,7 +286,9 @@ func (c *Cluster) Transform(cl cluster.Cluster) {
 		c.KubernetesVersion = types.StringValue(cl.Kubernetes.Version)
 	}
 	c.KubernetesVersionUsed = types.StringValue(cl.Kubernetes.Version)
-	c.AllowPrivilegedContainers = types.Bool{Value: *cl.Kubernetes.AllowPrivilegedContainers}
+	if cl.Kubernetes.AllowPrivilegedContainers != nil {
+		c.AllowPrivilegedContainers = types.BoolValue(*cl.Kubernetes.AllowPrivilegedContainers)
+	}
 	c.Status = types.StringValue(string(*cl.Status.Aggregated))
 	c.NodePools = []NodePool{}
 	for _, np := range cl.Nodepools {
@@ -321,19 +323,17 @@ func (c *Cluster) Transform(cl cluster.Cluster) {
 			MaxUnavailable:   mu,
 			VolumeType:       vt,
 			VolumeSizeGB:     types.Int64Value(int64(np.Volume.Size)),
-			Labels:           types.Map{ElemType: types.StringType, Null: true},
+			Labels:           types.MapNull(types.StringType),
 			Taints:           nil,
 			ContainerRuntime: crin,
-			Zones:            types.List{ElemType: types.StringType, Null: true},
+			Zones:            types.ListNull(types.StringType),
 		}
 		if np.Labels != nil {
+			elems := map[string]attr.Value{}
 			for k, v := range *np.Labels {
-				if n.Labels.Null {
-					n.Labels.Null = false
-					n.Labels.Elems = make(map[string]attr.Value, len(*np.Labels))
-				}
-				n.Labels.Elems[k] = types.StringValue(v)
+				elems[k] = types.StringValue(v)
 			}
+			n.Labels = types.MapValueMust(types.StringType, elems)
 		}
 		if np.Taints != nil {
 			for _, v := range *np.Taints {
@@ -351,12 +351,11 @@ func (c *Cluster) Transform(cl cluster.Cluster) {
 				})
 			}
 		}
+		elems := []attr.Value{}
 		for _, v := range np.AvailabilityZones {
-			if n.Zones.Null {
-				n.Zones.Null = false
-			}
-			n.Zones.Elems = append(n.Zones.Elems, types.StringValue(v))
+			elems = append(elems, types.StringValue(v))
 		}
+		n.Zones = types.ListValueMust(types.StringType, elems)
 		c.NodePools = append(c.NodePools, n)
 	}
 
@@ -385,9 +384,18 @@ func (c *Cluster) transformMaintenance(cl cluster.Cluster) {
 		return
 	}
 
+	ekvu := types.BoolNull()
+	if cl.Maintenance.AutoUpdate.KubernetesVersion != nil {
+		ekvu = types.BoolValue(*cl.Maintenance.AutoUpdate.KubernetesVersion)
+	}
+	emvu := types.BoolNull()
+	if cl.Maintenance.AutoUpdate.KubernetesVersion != nil {
+		emvu = types.BoolValue(*cl.Maintenance.AutoUpdate.MachineImageVersion)
+	}
+
 	c.Maintenance = &Maintenance{
-		EnableKubernetesVersionUpdates:   types.Bool{Value: *cl.Maintenance.AutoUpdate.KubernetesVersion},
-		EnableMachineImageVersionUpdates: types.Bool{Value: *cl.Maintenance.AutoUpdate.MachineImageVersion},
+		EnableKubernetesVersionUpdates:   ekvu,
+		EnableMachineImageVersionUpdates: emvu,
 		Start:                            types.StringValue(cl.Maintenance.TimeWindow.Start),
 		End:                              types.StringValue(cl.Maintenance.TimeWindow.End),
 	}
