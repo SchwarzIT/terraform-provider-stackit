@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus/instances"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/generated/instances"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -52,8 +52,8 @@ func (r Resource) loadPlanID(ctx context.Context, diags *diag.Diagnostics, s *In
 	}
 }
 
-func (l Instance) isEqual(got instances.Instance) bool {
-	if l.Name.ValueString() == got.Name &&
+func (l Instance) isEqual(got instances.ProjectInstanceUI) bool {
+	if got.Name != nil && l.Name.ValueString() == *got.Name &&
 		l.Plan.ValueString() == got.PlanName &&
 		l.PlanID.ValueString() == got.PlanID {
 		return true
@@ -61,13 +61,17 @@ func (l Instance) isEqual(got instances.Instance) bool {
 	return false
 }
 
-func updateByAPIResult(s *Instance, res instances.Instance) {
+func updateByAPIResult(s *Instance, res *instances.ProjectInstanceUI) {
 	s.ID = types.StringValue(res.ID)
 	s.Plan = types.StringValue(res.PlanName)
 	s.PlanID = types.StringValue(res.PlanID)
-	s.Name = types.StringValue(res.Name)
+	if res.Name != nil {
+		s.Name = types.StringValue(*res.Name)
+	}
 	s.DashboardURL = types.StringValue(res.DashboardURL)
-	s.IsUpdatable = types.Bool{Value: res.IsUpdatable}
+	if res.IsUpdatable != nil {
+		s.IsUpdatable = types.Bool{Value: *res.IsUpdatable}
+	}
 	s.GrafanaURL = types.StringValue(res.Instance.GrafanaURL)
 	s.GrafanaInitialAdminPassword = types.StringValue(res.Instance.GrafanaAdminPassword)
 	s.GrafanaInitialAdminUser = types.StringValue(res.Instance.GrafanaAdminUser)
@@ -78,7 +82,7 @@ func updateByAPIResult(s *Instance, res instances.Instance) {
 	s.LogsURL = types.StringValue(res.Instance.LogsURL)
 	s.LogsPushURL = types.StringValue(res.Instance.LogsPushURL)
 	s.JaegerTracesURL = types.StringValue(res.Instance.JaegerTracesURL)
-	s.JaegerUIURL = types.StringValue(res.Instance.JaegerUIURL)
+	s.JaegerUIURL = types.StringValue(res.Instance.JaegerUiURL)
 	s.OtlpTracesURL = types.StringValue(res.Instance.OtlpTracesURL)
 	s.ZipkinSpansURL = types.StringValue(res.Instance.ZipkinSpansURL)
 }
