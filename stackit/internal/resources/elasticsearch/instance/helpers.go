@@ -7,6 +7,7 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/data-services/instances"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/data-services/options"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/pkg/errors"
 )
@@ -21,7 +22,7 @@ func (r Resource) validate(ctx context.Context, data *Instance) error {
 		data.Plan = types.StringValue(default_plan)
 	}
 
-	if !data.ACL.IsUnknown() && len(data.ACL.Elems) == 0 {
+	if !data.ACL.IsUnknown() && len(data.ACL.Elements()) == 0 {
 		return errors.New("at least 1 ip address must be specified for `acl`")
 	}
 
@@ -72,14 +73,14 @@ func (r Resource) validatePlan(ctx context.Context, offers []options.Offer, vers
 }
 
 func (r Resource) applyClientResponse(ctx context.Context, pi *Instance, i instances.Instance) error {
-	pi.ACL = types.List{ElemType: types.StringType}
+	pi.ACL = types.ListNull(types.StringType)
 	if aclString, ok := i.Parameters["sgw_acl"]; ok {
+		elems := []attr.Value{}
 		items := strings.Split(aclString, ",")
 		for _, v := range items {
-			pi.ACL.Elems = append(pi.ACL.Elems, types.StringValue(v))
+			elems = append(elems, types.StringValue(v))
 		}
-	} else {
-		pi.ACL.Null = true
+		pi.ACL = types.ListValueMust(types.StringType, elems)
 	}
 	pi.Name = types.StringValue(i.Name)
 	pi.PlanID = types.StringValue(i.PlanID)
