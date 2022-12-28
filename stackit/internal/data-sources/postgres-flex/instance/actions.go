@@ -10,8 +10,8 @@ import (
 )
 
 // Read - lifecycle function
-func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	c := r.client.PostgresFlex
+func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+	c := d.client.Services.PostgresFlex.Instance
 	var config Instance
 	diags := req.Config.Get(ctx, &config)
 
@@ -20,23 +20,35 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	list, err := c.Instances.List(ctx, config.ProjectID.ValueString())
+	res, err := c.ListWithResponse(ctx, config.ProjectID.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("failed to list instances", err.Error())
+		resp.Diagnostics.AddError("failed to prepare list instances request", err.Error())
+		return
+	}
+	if res.HasError != nil {
+		resp.Diagnostics.AddError("failed to make list instances request", res.HasError.Error())
+		return
+	}
+	if res.JSON200 == nil || res.JSON200.Items == nil {
+		resp.Diagnostics.AddError("received a nil response", "JSON200 == nil or nil items list")
 		return
 	}
 
+	list := *res.JSON200.Items
 	found := -1
 	existing := ""
-	for i, instance := range list.Items {
-		if instance.Name == config.Name.ValueString() {
+	for i, instance := range list {
+		if instance.Name == nil {
+			continue
+		}
+		if *instance.Name == config.Name.ValueString() {
 			found = i
 			break
 		}
 		if existing == "" {
 			existing = "\navailable instances in the project are:"
 		}
-		existing = fmt.Sprintf("%s\n- %s", existing, instance.Name)
+		existing = fmt.Sprintf("%s\n- %s", existing, *instance.Name)
 	}
 
 	if found == -1 {
@@ -47,40 +59,78 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	}
 
 	// set found instance
-	instance := list.Items[found]
-	ires, err := c.Instances.Get(ctx, config.ProjectID.ValueString(), instance.ID)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to get instances", err.Error())
+	instance := list[found]
+	if instance.ID == nil {
+		resp.Diagnostics.AddError("received a nil instance ID", "instance.ID == nil")
 		return
 	}
-	i := ires.Item
-	config.ID = types.StringValue(instance.ID)
+	ires, err := c.GetWithResponse(ctx, config.ProjectID.ValueString(), *instance.ID)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to prepare get instances request", err.Error())
+		return
+	}
+	if ires.HasError != nil {
+		resp.Diagnostics.AddError("failed to make get instances request", res.HasError.Error())
+		return
+	}
+	if ires.JSON200 == nil || ires.JSON200.Item == nil {
+		resp.Diagnostics.AddError("received a nil response", "JSON200 == nil or nil Item")
+		return
+	}
+
+	i := *ires.JSON200.Item
+	config.ID = types.StringValue(*instance.ID)
+
 	elems := []attr.Value{}
-	for _, v := range i.ACL.Items {
-		elems = append(elems, types.StringValue(v))
+	if i.ACL != nil && i.ACL.Items != nil {
+		for _, v := range *i.ACL.Items {
+			elems = append(elems, types.StringValue(v))
+		}
 	}
 	config.ACL = types.ListValueMust(types.StringType, elems)
-	config.BackupSchedule = types.StringValue(i.BackupSchedule)
-	config.MachineType = types.StringValue(i.Flavor.ID)
-	config.Name = types.StringValue(i.Name)
-	config.Replicas = types.Int64Value(int64(i.Replicas))
-	storage, d := types.ObjectValue(
-		map[string]attr.Type{
-			"class": types.StringType,
-			"size":  types.Int64Type,
-		},
-		map[string]attr.Value{
-			"class": types.StringValue(i.Storage.Class),
-			"size":  types.Int64Value(int64(i.Storage.Size)),
-		})
-
-	resp.Diagnostics.Append(d...)
-	if resp.Diagnostics.HasError() {
-		return
+	config.BackupSchedule = types.StringNull()
+	if i.BackupSchedule != nil {
+		config.BackupSchedule = types.StringValue(*i.BackupSchedule)
 	}
-
-	config.Storage = storage
-	config.Version = types.StringValue(i.Version)
+	config.MachineType = types.StringNull()
+	if i.Flavor != nil && i.Flavor.ID != nil {
+		config.MachineType = types.StringValue(*i.Flavor.ID)
+	}
+	config.Name = types.StringNull()
+	if i.Name != nil {
+		config.Name = types.StringValue(*i.Name)
+	}
+	config.Replicas = types.Int64Null()
+	if i.Replicas != nil {
+		config.Replicas = types.Int64Value(int64(*i.Replicas))
+	}
+	if i.Storage != nil {
+		class := types.StringNull()
+		if i.Storage.Class != nil {
+			class = types.StringValue(*i.Storage.Class)
+		}
+		size := types.Int64Null()
+		if i.Storage.Class != nil {
+			size = types.Int64Value(int64(*i.Storage.Size))
+		}
+		storage, diags := types.ObjectValue(
+			map[string]attr.Type{
+				"class": types.StringType,
+				"size":  types.Int64Type,
+			},
+			map[string]attr.Value{
+				"class": class,
+				"size":  size,
+			})
+		if diags.HasError() {
+			return
+		}
+		config.Storage = storage
+	}
+	config.Version = types.StringNull()
+	if i.Version != nil {
+		config.Version = types.StringValue(*i.Version)
+	}
 	resp.Diagnostics.Append(resp.State.Set(ctx, &config)...)
 	if resp.Diagnostics.HasError() {
 		return
