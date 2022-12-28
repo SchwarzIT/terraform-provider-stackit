@@ -33,10 +33,10 @@ type Instance struct {
 // Schema returns the terraform schema structure
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: `Manages RabbitMQ instances
+		MarkdownDescription: fmt.Sprintf(`Manages %s instances
 
-~> **Note:** RabbitMQ API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
-		`,
+~> **Note:** %s API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
+		`, r.service.Display(), r.service.Display()),
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "Specifies the resource ID",

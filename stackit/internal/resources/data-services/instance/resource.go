@@ -20,6 +20,24 @@ const (
 	RabbitMQ      ResourceService = "rabbitmq"
 )
 
+func (s ResourceService) Display() string {
+	switch s {
+	case ElasticSearch:
+		return "ElasticSearch"
+	case LogMe:
+		return "LogMe"
+	case MariaDB:
+		return "MariaDB"
+	case Postgres:
+		return "Postgres"
+	case Redis:
+		return "Redis"
+	case RabbitMQ:
+		return "RabbitMQ"
+	}
+	return ""
+}
+
 // NewElasticSearch returns a new configured resource
 func NewElasticSearch() resource.Resource {
 	return &Resource{service: ElasticSearch}

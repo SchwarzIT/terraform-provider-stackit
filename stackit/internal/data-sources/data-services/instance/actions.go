@@ -92,7 +92,10 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 	config.DashboardURL = types.StringValue(instance.DashboardUrl)
 	config.CFGUID = types.StringValue(instance.CFGUID)
 	config.CFSpaceGUID = types.StringValue(instance.CFSpaceGUID)
-	config.CFOrganizationGUID = types.StringValue(instance.CFSpaceGUID)
+	config.CFOrganizationGUID = types.StringNull()
+	if instance.OrganizationGUID != nil {
+		config.CFOrganizationGUID = types.StringValue(*instance.OrganizationGUID)
+	}
 	elems := []attr.Value{}
 	if acl, ok := instance.Parameters["sgw_acl"]; ok {
 		aclString, ok := acl.(string)

@@ -9,16 +9,34 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 )
 
-type DataSourceService string
+type ResourceService string
 
 const (
-	ElasticSearch DataSourceService = "elasticsearch"
-	LogMe         DataSourceService = "logme"
-	MariaDB       DataSourceService = "mariadb"
-	Postgres      DataSourceService = "postgres"
-	Redis         DataSourceService = "redis"
-	RabbitMQ      DataSourceService = "rabbitmq"
+	ElasticSearch ResourceService = "elasticsearch"
+	LogMe         ResourceService = "logme"
+	MariaDB       ResourceService = "mariadb"
+	Postgres      ResourceService = "postgres"
+	Redis         ResourceService = "redis"
+	RabbitMQ      ResourceService = "rabbitmq"
 )
+
+func (s ResourceService) Display() string {
+	switch s {
+	case ElasticSearch:
+		return "ElasticSearch"
+	case LogMe:
+		return "LogMe"
+	case MariaDB:
+		return "MariaDB"
+	case Postgres:
+		return "Postgres"
+	case Redis:
+		return "Redis"
+	case RabbitMQ:
+		return "RabbitMQ"
+	}
+	return ""
+}
 
 // NewElasticSearch returns a new configured resource
 func NewElasticSearch() resource.Resource {
@@ -53,7 +71,7 @@ func NewRabbitMQ() resource.Resource {
 // Resource is the exported resource
 type Resource struct {
 	client  *dataservices.ClientWithResponses
-	service DataSourceService
+	service ResourceService
 }
 
 var _ = resource.Resource(&Resource{})
