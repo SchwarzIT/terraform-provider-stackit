@@ -23,7 +23,7 @@ type Bucket struct {
 	PathStyleURL           types.String `tfsdk:"path_style_url"`
 }
 
-// GetSchema returns the terraform schema structure
+// Schema returns the terraform schema structure
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Description: "Manages Object Storage buckets",

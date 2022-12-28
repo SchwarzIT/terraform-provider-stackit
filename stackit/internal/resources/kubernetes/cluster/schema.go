@@ -76,7 +76,7 @@ type ArgusExtension struct {
 	ArgusInstanceID types.String `schema:"argus_instance_id"`
 }
 
-// GetSchema returns the terraform schema structure
+// Schema returns the terraform schema structure
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Description: "Manages kubernetes clusters",

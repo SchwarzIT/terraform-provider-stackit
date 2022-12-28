@@ -27,7 +27,7 @@ type Instance struct {
 	CFOrganizationGUID types.String `tfsdk:"cf_organization_guid"`
 }
 
-// GetSchema returns the terraform schema structure
+// Schema returns the terraform schema structure
 func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		Description: `Data source for Elasticsearch instances

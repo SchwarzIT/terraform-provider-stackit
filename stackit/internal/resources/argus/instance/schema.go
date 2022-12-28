@@ -51,7 +51,7 @@ type Metrics struct {
 	RetentionDays1hDownsampling types.Int64 `tfsdk:"retention_days_1h_downsampling"`
 }
 
-// GetSchema returns the terraform schema structure
+// Schema returns the terraform schema structure
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Description: "Manages Argus Instances",

@@ -28,7 +28,7 @@ type Credential struct {
 	URI             types.String `tfsdk:"uri"`
 }
 
-// GetSchema returns the terraform schema structure
+// Schema returns the terraform schema structure
 func (d DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		Description: "Manages Elasticsearch credentials",

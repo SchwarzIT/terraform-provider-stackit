@@ -21,7 +21,7 @@ type Credential struct {
 	DisplayName            types.String `tfsdk:"display_name"`
 }
 
-// GetSchema returns the terraform schema structure
+// Schema returns the terraform schema structure
 func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		Description: "Data source for Object Storage credentials",

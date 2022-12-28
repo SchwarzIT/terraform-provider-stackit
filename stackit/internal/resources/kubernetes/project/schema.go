@@ -16,7 +16,7 @@ type KubernetesProject struct {
 	ProjectID types.String `tfsdk:"project_id"`
 }
 
-// GetSchema returns the terraform schema structure
+// Schema returns the terraform schema structure
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Description: "This resource enables STACKIT Kubernetes Engine (SKE) in a project",

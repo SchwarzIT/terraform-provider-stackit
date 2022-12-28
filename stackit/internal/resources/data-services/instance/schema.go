@@ -30,7 +30,7 @@ type Instance struct {
 	CFOrganizationGUID types.String `tfsdk:"cf_organization_guid"`
 }
 
-// GetSchema returns the terraform schema structure
+// Schema returns the terraform schema structure
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: `Manages RabbitMQ instances

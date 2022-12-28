@@ -26,7 +26,7 @@ type Instance struct {
 	Storage        types.Object `tfsdk:"storage"`
 }
 
-// GetSchema returns the terraform schema structure
+// Schema returns the terraform schema structure
 func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		MarkdownDescription: `Data source for MongoDB Flex instance

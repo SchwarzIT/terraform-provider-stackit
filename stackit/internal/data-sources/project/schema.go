@@ -18,7 +18,7 @@ type Project struct {
 	BillingRef        types.String `tfsdk:"billing_ref"`
 }
 
-// GetSchema returns the terraform schema structure
+// Schema returns the terraform schema structure
 func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		Description: "Data source for projects",

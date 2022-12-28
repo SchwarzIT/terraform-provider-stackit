@@ -18,17 +18,32 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	b, err := c.Argus.Instances.Get(ctx, config.ProjectID.ValueString(), config.ID.ValueString())
+	res, err := c.Services.Argus.Instances.InstanceReadWithResponse(ctx, config.ProjectID.ValueString(), config.ID.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("failed to read instance", err.Error())
+		resp.Diagnostics.AddError("failed to prepare read instance request", err.Error())
 		return
 	}
+	if res.HasError != nil {
+		diags.AddError("failed to read instance", res.HasError.Error())
+		return
+	}
+	if res.JSON200 == nil {
+		diags.AddError("read instance returned an empty response", "JSON200 == nil")
+		return
+	}
+	b := res.JSON200
 	config.ID = types.StringValue(b.ID)
-	config.Name = types.StringValue(b.Name)
+	config.Name = types.StringNull()
+	if b.Name != nil {
+		config.Name = types.StringValue(*b.Name)
+	}
 	config.Plan = types.StringValue(b.PlanName)
 	config.PlanID = types.StringValue(b.PlanID)
 	config.DashboardURL = types.StringValue(b.DashboardURL)
-	config.IsUpdatable = types.BoolValue(b.IsUpdatable}
+	config.IsUpdatable = types.BoolNull()
+	if b.IsUpdatable != nil {
+		config.IsUpdatable = types.BoolValue(*b.IsUpdatable)
+	}
 	config.GrafanaURL = types.StringValue(b.Instance.GrafanaURL)
 	config.GrafanaInitialAdminPassword = types.StringValue(b.Instance.GrafanaAdminPassword)
 	config.GrafanaInitialAdminUser = types.StringValue(b.Instance.GrafanaAdminUser)
@@ -39,11 +54,11 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	config.LogsURL = types.StringValue(b.Instance.LogsURL)
 	config.LogsPushURL = types.StringValue(b.Instance.LogsPushURL)
 	config.JaegerTracesURL = types.StringValue(b.Instance.JaegerTracesURL)
-	config.JaegerUIURL = types.StringValue(b.Instance.JaegerUIURL)
+	config.JaegerUIURL = types.StringValue(b.Instance.JaegerUiURL)
 	config.OtlpTracesURL = types.StringValue(b.Instance.OtlpTracesURL)
 	config.ZipkinSpansURL = types.StringValue(b.Instance.ZipkinSpansURL)
 	config.Grafana = &instance.Grafana{
-		EnablePublicAccess: types.BoolValue(b.Instance.GrafanaPublicReadAccess},
+		EnablePublicAccess: types.BoolValue(b.Instance.GrafanaPublicReadAccess),
 	}
 	config.Metrics = &instance.Metrics{
 		RetentionDays:               types.Int64Value(int64(b.Instance.MetricsRetentionTimeRaw)),

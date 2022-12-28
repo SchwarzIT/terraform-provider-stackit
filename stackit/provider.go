@@ -9,22 +9,13 @@ import (
 	dataElasticSearchInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/elasticsearch/instance"
 	dataKubernetesCluster "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/kubernetes/cluster"
 	dataKubernetesProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/kubernetes/project"
-	dataLogMeCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/logme/credential"
-	dataLogMeInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/logme/instance"
-	dataMariaDBCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/mariadb/credential"
-	dataMariaDBInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/mariadb/instance"
 	dataMongoDBFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/mongodb-flex/instance"
 	dataObjectStorageBucket "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/object-storage/bucket"
 	dataObjectStorageCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/object-storage/credential"
 	dataObjectStorageCredentialsGroup "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/object-storage/credentials-group"
 	dataObjectStorageProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/object-storage/project"
 	dataPostgresFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/postgres-flex/instance"
-	dataPostgresCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/postgres/credential"
-	dataPostgresDBInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/postgres/instance"
 	dataProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/project"
-	dataRabbitMQInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/rabbitmq/instance"
-	dataRedisCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/redis/credential"
-	dataRedisInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/redis/instance"
 
 	resourceArgusInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/instance"
 	resourceArgusJob "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/job"
@@ -68,7 +59,7 @@ type providerSchema struct {
 	ServiceAccountToken types.String `tfsdk:"service_account_token"`
 }
 
-// GetSchema returns the provider's schema
+// Schema returns the provider's schema
 func (p *StackitProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: `
@@ -133,21 +124,12 @@ func (p *StackitProvider) DataSources(context.Context) []func() datasource.DataS
 		dataElasticSearchInstance.New,
 		dataKubernetesCluster.New,
 		dataKubernetesProject.New,
-		dataLogMeCredential.New,
-		dataLogMeInstance.New,
-		dataMariaDBCredential.New,
-		dataMariaDBInstance.New,
 		dataMongoDBFlexInstance.New,
 		dataObjectStorageBucket.New,
 		dataObjectStorageCredential.New,
 		dataObjectStorageCredentialsGroup.New,
 		dataObjectStorageProject.New,
-		dataPostgresCredential.New,
-		dataPostgresDBInstance.New,
 		dataPostgresFlexInstance.New,
 		dataProject.New,
-		dataRabbitMQInstance.New,
-		dataRedisCredential.New,
-		dataRedisInstance.New,
 	}
 }
