@@ -30,14 +30,13 @@ resource "stackit_logme_instance" "example" {
 ### Required
 
 - `name` (String) Specifies the instance name. Changing this value requires the resource to be recreated. Changing this value requires the resource to be recreated.
+- `plan` (String) The RabbitMQ Plan. Default is `stackit-logme-single-small-non-ssl`
 - `project_id` (String) The project ID.
 
 ### Optional
 
 - `acl` (List of String) Access Control rules to whitelist IP addresses
-- `plan` (String) The LogMe Plan. Default is `stackit-logme-single-small-non-ssl`.
-Options are: `stackit-logme-single-medium-non-ssl`, `stackit-logme-single-small-non-ssl`, `stackit-logme-cluster-small-non-ssl`, `stackit-logme-cluster-medium-non-ssl`, `stackit-logme-cluster-big-non-ssl`
-- `version` (String) LogMe version. Only Option: `LogMe`. Changing this value requires the resource to be recreated.
+- `version` (String) RabbitMQ version. Default is LogMe
 
 ### Read-Only
 

@@ -3,15 +3,15 @@
 page_title: "stackit_elasticsearch_instance Resource - stackit"
 subcategory: ""
 description: |-
-  Manages Elasticsearch instances
-  ~> Note: Elasticsearch API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
+  Manages ElasticSearch instances
+  ~> Note: ElasticSearch API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
 ---
 
 # stackit_elasticsearch_instance (Resource)
 
-Manages Elasticsearch instances
+Manages ElasticSearch instances
 
-~> **Note:** Elasticsearch API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
+~> **Note:** ElasticSearch API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
 
 ## Example Usage
 
@@ -30,14 +30,13 @@ resource "stackit_elasticsearch_instance" "example" {
 ### Required
 
 - `name` (String) Specifies the instance name. Changing this value requires the resource to be recreated. Changing this value requires the resource to be recreated.
+- `plan` (String) The RabbitMQ Plan. Default is `stackit-elasticsearch-single-small`
 - `project_id` (String) The project ID.
-- `version` (String) Elasticsearch version. Options: `5`, `6`, `7`. Changing this value requires the resource to be recreated.
 
 ### Optional
 
 - `acl` (List of String) Access Control rules to whitelist IP addresses
-- `plan` (String) The Elasticsearch Plan. Default is `stackit-elasticsearch-single-small`.
-Options are: `stackit-elasticsearch-single-small`, `stackit-elasticsearch-cluster-small`, `stackit-elasticsearch-single-medium`, `stackit-elasticsearch-cluster-medium`, `stackit-elasticsearch-cluster-big`
+- `version` (String) RabbitMQ version. Default is 7
 
 ### Read-Only
 

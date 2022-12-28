@@ -3,12 +3,12 @@
 page_title: "stackit_kubernetes_project Data Source - stackit"
 subcategory: ""
 description: |-
-  Data source for kubernetes project
+  Data source for STACKIT Kubernetes Engine (SKE) project
 ---
 
 # stackit_kubernetes_project (Data Source)
 
-Data source for kubernetes project
+Data source for STACKIT Kubernetes Engine (SKE) project
 
 ## Example Usage
 
@@ -28,10 +28,10 @@ data "stackit_kubernetes_project" "example" {
 
 ### Required
 
-- `project_id` (String) The project ID in which SKE is enabled
+- `project_id` (String) the project ID that SKE will be enabled in
 
 ### Read-Only
 
-- `id` (String) Specifies the resource ID
+- `id` (String) kubernetes project ID
 
 

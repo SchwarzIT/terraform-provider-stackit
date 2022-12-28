@@ -30,15 +30,13 @@ resource "stackit_rabbitmq_instance" "example" {
 ### Required
 
 - `name` (String) Specifies the instance name. Changing this value requires the resource to be recreated. Changing this value requires the resource to be recreated.
-- `plan` (String) The RabbitMQ Plan. Default is `stackit-rabbitmq-single-small`.
-Options are: `stackit-messaging-cluster-big`, `stackit-messaging-cluster-medium`, `stackit-messaging-cluster-small`, `stackit-messaging-single-medium`, `stackit-messaging-single-small`, `stackit-rabbitmq-cluster-medium`, `stackit-rabbitmq-single-medium`, `stackit-rabbitmq-cluster-big`,`stackit-rabbitmq-cluster-small`, `stackit-rabbitmq-single-small`
+- `plan` (String) The RabbitMQ Plan. Default is `stackit-rabbitmq-single-small`
 - `project_id` (String) The project ID.
 
 ### Optional
 
 - `acl` (List of String) Access Control rules to whitelist IP addresses
-- `version` (String) RabbitMQ version. Default is 3.7.
-Options: `3.10`, `3.8`, `3.7`. Changing this value requires the resource to be recreated.
+- `version` (String) RabbitMQ version. Default is 3.7
 
 ### Read-Only
 

@@ -36,7 +36,7 @@ data "stackit_postgres_credential" "example" {
 ### Required
 
 - `id` (String) Specifies the resource ID
-- `instance_id` (String) Postgres instance ID the credential belongs to
+- `instance_id` (String) Instance ID the credential belongs to
 - `project_id` (String) Project ID the credential belongs to
 
 ### Read-Only

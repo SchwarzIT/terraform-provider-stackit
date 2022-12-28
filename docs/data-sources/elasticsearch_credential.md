@@ -3,12 +3,12 @@
 page_title: "stackit_elasticsearch_credential Data Source - stackit"
 subcategory: ""
 description: |-
-  Manages Elasticsearch credentials
+  Manages ElasticSearch credentials
 ---
 
 # stackit_elasticsearch_credential (Data Source)
 
-Manages Elasticsearch credentials
+Manages ElasticSearch credentials
 
 ## Example Usage
 
@@ -37,7 +37,7 @@ data "stackit_elasticsearch_credential" "example" {
 ### Required
 
 - `id` (String) Specifies the resource ID
-- `instance_id` (String) Elasticsearch instance ID the credential belongs to
+- `instance_id` (String) Instance ID the credential belongs to
 - `project_id` (String) Project ID the credential belongs to
 
 ### Read-Only

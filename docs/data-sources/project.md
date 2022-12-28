@@ -3,12 +3,12 @@
 page_title: "stackit_project Data Source - stackit"
 subcategory: ""
 description: |-
-  Data source for projects
+  Data source for STACKIT projects
 ---
 
 # stackit_project (Data Source)
 
-Data source for projects
+Data source for STACKIT projects
 
 ## Example Usage
 

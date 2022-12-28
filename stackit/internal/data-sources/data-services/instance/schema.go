@@ -53,7 +53,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 			},
 			"plan": schema.StringAttribute{
 				Description: "The RabbitMQ Plan",
-				Required:    true,
+				Computed:    true,
 			},
 			"plan_id": schema.StringAttribute{
 				Description: "The selected plan ID",

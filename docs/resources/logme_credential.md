@@ -3,12 +3,12 @@
 page_title: "stackit_logme_credential Resource - stackit"
 subcategory: ""
 description: |-
-  Manages LogMe instance credentials
+  Manages LogMe credentials
 ---
 
 # stackit_logme_credential (Resource)
 
-Manages LogMe instance credentials
+Manages LogMe credentials
 
 ## Example Usage
 
@@ -29,7 +29,7 @@ resource "stackit_logme_credential" "example" {
 
 ### Required
 
-- `instance_id` (String) LogMe instance ID the credential belongs to
+- `instance_id` (String) Elasticsearch instance ID the credential belongs to
 - `project_id` (String) Project ID the credential belongs to
 
 ### Read-Only

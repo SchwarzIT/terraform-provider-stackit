@@ -30,14 +30,13 @@ resource "stackit_mariadb_instance" "example" {
 ### Required
 
 - `name` (String) Specifies the instance name. Changing this value requires the resource to be recreated. Changing this value requires the resource to be recreated.
+- `plan` (String) The RabbitMQ Plan. Default is `stackit-mariadb-single-small`
 - `project_id` (String) The project ID.
 
 ### Optional
 
 - `acl` (List of String) Access Control rules to whitelist IP addresses
-- `plan` (String) The MariaDB Plan. Default is `stackit-mariadb-single-small`.
-Options are: `stackit-mariadb-cluster-big-non-ssl`, `stackit-mariadb-cluster-big`, `stackit-mariadb-cluster-extra-large`, `sstackit-mariadb-cluster-medium`, `stackit-mariadb-cluster-small`, `stackit-mariadb-single-medium`, `stackit-mariadb-single-small`, `stackit-mariadb-cluster-medium-non-ssl`, `stackit-mariadb-cluster-small-non-ssl`, `stackit-mariadb-single-medium-non-ssl`, `stackit-mariadb-single-small-non-ssl`, `stackit-mariadb-cluster-extra-large-non-ssl`, `stackit-mariadb-cluster-extra-large-high-perf-non-ssl`
-- `version` (String) MariaDB version. Options: `10.1`, `10.4`, . Changing this value requires the resource to be recreated.
+- `version` (String) RabbitMQ version. Default is 10.4
 
 ### Read-Only
 

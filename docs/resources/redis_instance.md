@@ -30,14 +30,13 @@ resource "stackit_redis_instance" "example" {
 ### Required
 
 - `name` (String) Specifies the instance name. Changing this value requires the resource to be recreated. Changing this value requires the resource to be recreated.
+- `plan` (String) The RabbitMQ Plan. Default is `stackit-redis-single-small`
 - `project_id` (String) The project ID.
 
 ### Optional
 
 - `acl` (List of String) Access Control rules to whitelist IP addresses
-- `plan` (String) The Redis Plan. Default is `stackit-redis-single-small`.
-Options are: `stackit-redis-single-small`, `stackit-redis-single-medium`, `stackit-redis-cluster-big`, `stackit-redis-cluster-medium`, `stackit-redis-cluster-small`, `stackit-redis-cluster-big-non-ssl`, `stackit-redis-cluster-medium-non-ssl`, `stackit-redis-cluster-small-non-ssl`, `stackit-redis-single-medium-non-ssl`, `stackit-redis-single-small-non-ss`
-- `version` (String) Redis version. Options: `4.0`, `5.0`, `6.0`. Changing this value requires the resource to be recreated.
+- `version` (String) RabbitMQ version. Default is 6.0
 
 ### Read-Only
 

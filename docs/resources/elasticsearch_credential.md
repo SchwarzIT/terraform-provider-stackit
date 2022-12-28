@@ -3,12 +3,12 @@
 page_title: "stackit_elasticsearch_credential Resource - stackit"
 subcategory: ""
 description: |-
-  Manages Elasticsearch credentials
+  Manages ElasticSearch credentials
 ---
 
 # stackit_elasticsearch_credential (Resource)
 
-Manages Elasticsearch credentials
+Manages ElasticSearch credentials
 
 ## Example Usage
 
