@@ -4,11 +4,9 @@ import (
 	"context"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -28,75 +26,61 @@ type Instance struct {
 }
 
 // Schema returns the terraform schema structure
-func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+
+// Schema returns the terraform schema structure
+func (r *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		Description: `Data source for Elasticsearch instances
 
 ~> **Note:** Elasticsearch API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this data source is not ready for production usage.		
 		`,
 		Attributes: map[string]schema.Attribute{
-			"id": {
-				Description: "The instance ID",
-				Type:        types.StringType,
+			"id": schema.StringAttribute{
+				Description: "Specifies the resource ID",
 				Computed:    true,
-				PlanModifiers: planmodifier.Strings{
-					stringplanmodifier.UseStateForUnknown(),
-				},
 			},
-			"name": {
-				Description: "Specifies the instance name.",
-				Type:        types.StringType,
+			"name": schema.StringAttribute{
+				Description: "Specifies the instance name. Changing this value requires the resource to be recreated. Changing this value requires the resource to be recreated.",
 				Required:    true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
-				},
 			},
-			"project_id": {
+			"project_id": schema.StringAttribute{
 				Description: "The project ID.",
-				Type:        types.StringType,
 				Required:    true,
 				Validators: []validator.String{
 					validate.ProjectID(),
 				},
 			},
-			"plan": {
-				Description: "The Elasticsearch plan name",
-				Type:        types.StringType,
+			"plan": schema.StringAttribute{
+				Description: "The RabbitMQ Plan",
+				Required:    true,
+			},
+			"plan_id": schema.StringAttribute{
+				Description: "The selected plan ID",
 				Computed:    true,
 			},
-			"plan_id": {
-				Description: "Elasticsearch plan ID",
-				Type:        types.StringType,
+			"version": schema.StringAttribute{
+				Description: "RabbitMQ version",
 				Computed:    true,
 			},
-			"version": {
-				Description: "Elasticsearch version",
-				Type:        types.StringType,
+			"acl": schema.ListAttribute{
+				Description: "Access Control rules to whitelist IP addresses",
+				ElementType: types.StringType,
 				Computed:    true,
 			},
-			"acl": {
-				Description: "Access control rules",
-				Type:        types.ListType{ElemType: types.StringType},
-				Computed:    true,
-			},
-			"dashboard_url": {
+			"dashboard_url": schema.StringAttribute{
 				Description: "Dashboard URL",
-				Type:        types.StringType,
 				Computed:    true,
 			},
-			"cf_guid": {
+			"cf_guid": schema.StringAttribute{
 				Description: "Cloud Foundry GUID",
-				Type:        types.StringType,
 				Computed:    true,
 			},
-			"cf_space_guid": {
+			"cf_space_guid": schema.StringAttribute{
 				Description: "Cloud Foundry Space GUID",
-				Type:        types.StringType,
 				Computed:    true,
 			},
-			"cf_organization_guid": {
+			"cf_organization_guid": schema.StringAttribute{
 				Description: "Cloud Foundry Organization GUID",
-				Type:        types.StringType,
 				Computed:    true,
 			},
 		},

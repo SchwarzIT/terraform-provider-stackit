@@ -4,12 +4,9 @@ import (
 	"context"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -29,77 +26,66 @@ type Credential struct {
 }
 
 // Schema returns the terraform schema structure
-func (d DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (r *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		Description: "Manages Elasticsearch credentials",
 		Attributes: map[string]schema.Attribute{
-			"id": {
+			"id": schema.StringAttribute{
 				Description: "Specifies the resource ID",
-				Type:        types.StringType,
 				Required:    true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
-				},
 			},
-			"project_id": {
+
+			"project_id": schema.StringAttribute{
 				Description: "Project ID the credential belongs to",
-				Type:        types.StringType,
 				Required:    true,
 				Validators: []validator.String{
 					validate.ProjectID(),
 				},
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
-				},
-			},
-			"instance_id": {
-				Description: "Elasticsearch instance ID the credential belongs to",
-				Type:        types.StringType,
-				Required:    true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
-				},
 			},
 
-			// Computed:
-			"host": {
+			"instance_id": schema.StringAttribute{
+				Description: "Elasticsearch instance ID the credential belongs to",
+				Required:    true,
+			},
+
+			"host": schema.StringAttribute{
 				Description: "Credential host",
-				Type:        types.StringType,
 				Computed:    true,
 			},
-			"hosts": {
+
+			"hosts": schema.ListAttribute{
 				Description: "Credential hosts",
-				Type:        types.ListType{ElemType: types.StringType},
+				ElementType: types.StringType,
 				Computed:    true,
 			},
-			"username": {
+
+			"username": schema.StringAttribute{
 				Description: "Credential username",
-				Type:        types.StringType,
 				Computed:    true,
 			},
-			"password": {
+
+			"password": schema.StringAttribute{
 				Description: "Credential password",
-				Type:        types.StringType,
 				Computed:    true,
 			},
-			"port": {
+
+			"port": schema.Int64Attribute{
 				Description: "Credential port",
-				Type:        types.Int64Type,
 				Computed:    true,
 			},
-			"syslog_drain_url": {
+
+			"syslog_drain_url": schema.StringAttribute{
 				Description: "Credential syslog_drain_url",
-				Type:        types.StringType,
 				Computed:    true,
 			},
-			"route_service_url": {
+
+			"route_service_url": schema.StringAttribute{
 				Description: "Credential route_service_url",
-				Type:        types.StringType,
 				Computed:    true,
 			},
-			"uri": {
+
+			"uri": schema.StringAttribute{
 				Description: "The instance URI",
-				Type:        types.StringType,
 				Computed:    true,
 			},
 		},
