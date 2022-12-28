@@ -5,8 +5,8 @@ import (
 
 	dataArgusInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/argus/instance"
 	dataArgusJob "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/argus/job"
-	dataElasticSearchCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/elasticsearch/credential"
-	dataElasticSearchInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/elasticsearch/instance"
+	dataDataServicesCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/data-services/credential"
+	dataDataServicesInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/data-services/instance"
 	dataKubernetesCluster "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/kubernetes/cluster"
 	dataKubernetesProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/kubernetes/project"
 	dataMongoDBFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/mongodb-flex/instance"
@@ -120,8 +120,18 @@ func (p *StackitProvider) DataSources(context.Context) []func() datasource.DataS
 	return []func() datasource.DataSource{
 		dataArgusInstance.New,
 		dataArgusJob.New,
-		dataElasticSearchCredential.New,
-		dataElasticSearchInstance.New,
+		dataDataServicesCredential.NewElasticSearch,
+		dataDataServicesCredential.NewLogMe,
+		dataDataServicesCredential.NewMariaDB,
+		dataDataServicesCredential.NewPostgres,
+		dataDataServicesCredential.NewRabbitMQ,
+		dataDataServicesCredential.NewRedis,
+		dataDataServicesInstance.NewElasticSearch,
+		dataDataServicesInstance.NewLogMe,
+		dataDataServicesInstance.NewMariaDB,
+		dataDataServicesInstance.NewPostgres,
+		dataDataServicesInstance.NewRabbitMQ,
+		dataDataServicesInstance.NewRedis,
 		dataKubernetesCluster.New,
 		dataKubernetesProject.New,
 		dataMongoDBFlexInstance.New,
