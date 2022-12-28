@@ -15,6 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
 
 // Create - lifecycle function
@@ -35,7 +36,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	acl := []string{}
-	for _, v := range plan.ACL.Elems {
+	for _, v := range plan.ACL.Elements() {
 		nv, err := common.ToString(context.Background(), v)
 		if err != nil {
 			continue
@@ -50,7 +51,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 			Size:  types.Int64Value(default_storage_size),
 		}
 	} else {
-		resp.Diagnostics.Append(plan.Storage.As(ctx, &storage, types.ObjectAsOptions{})...)
+		resp.Diagnostics.Append(plan.Storage.As(ctx, &storage, basetypes.ObjectAsOptions{})...)
 		if resp.Diagnostics.HasError() {
 			return
 		}
@@ -152,7 +153,7 @@ func (r Resource) createUser(ctx context.Context, plan *Instance, d *diag.Diagno
 				"hostname": types.StringValue(res.Item.Hostname),
 				"port":     types.Int64Value(int64(res.Item.Port)),
 				"uri":      types.StringValue(res.Item.URI),
-				"roles":    types.List{ElemType: types.StringType, Elems: elems},
+				"roles":    types.ListValueMust(types.StringType, elems),
 			},
 		)
 		plan.User = u
@@ -220,7 +221,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	acl := []string{}
-	for _, v := range plan.ACL.Elems {
+	for _, v := range plan.ACL.Elements() {
 		nv, err := common.ToString(context.Background(), v)
 		if err != nil {
 			continue
@@ -235,7 +236,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 			Size:  types.Int64Value(default_storage_size),
 		}
 	} else {
-		resp.Diagnostics.Append(plan.Storage.As(ctx, &storage, types.ObjectAsOptions{})...)
+		resp.Diagnostics.Append(plan.Storage.As(ctx, &storage, basetypes.ObjectAsOptions{})...)
 		if resp.Diagnostics.HasError() {
 			return
 		}

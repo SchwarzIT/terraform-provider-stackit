@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/data-services/credentials"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -22,22 +21,29 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	es := r.client.DataServices.ElasticSearch
-
 	// handle creation
-	res, err := es.Credentials.Create(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString())
+	res, err := r.client.Credentials.PostWithResponse(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString())
 	if err != nil {
-		if strings.Contains(err.Error(), "service bind failed") {
+		resp.Diagnostics.AddError("failed preparing credential creation request", err.Error())
+	}
+	if res.HasError != nil {
+		if strings.Contains(res.HasError.Error(), "service bind failed") {
 			time.Sleep(30 * time.Second)
-			res, err = es.Credentials.Create(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString())
+			res, err = r.client.Credentials.PostWithResponse(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString())
+			if err != nil {
+				resp.Diagnostics.AddError("failed preparing 2nd credential creation request", err.Error())
+			}
 		}
-		if err != nil {
+		if res.HasError != nil {
 			resp.Diagnostics.AddError("failed credential creation", err.Error())
 			return
 		}
 	}
+	if res.JSON200 == nil {
+		resp.Diagnostics.AddError("failed parsing credential creation response", "JSON200 == nil")
+	}
 
-	if err := r.applyClientResponse(ctx, &cred, credentials.GetResponse(res)); err != nil {
+	if err := r.applyClientResponse(ctx, &cred, res.JSON200); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
 	}
@@ -59,20 +65,24 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	es := r.client.DataServices.ElasticSearch
-
 	// read instance credential
-	res, err := es.Credentials.Get(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString(), cred.ID.ValueString())
+	res, err := r.client.Credentials.GetWithResponse(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString(), cred.ID.ValueString())
 	if err != nil {
-		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+		resp.Diagnostics.AddError("failed preparing get credential request", err.Error())
+	}
+	if res.HasError != nil {
+		if res.StatusCode() == http.StatusNotFound {
 			resp.State.RemoveResource(ctx)
 			return
 		}
-		resp.Diagnostics.AddError("failed to read credential", err.Error())
+		resp.Diagnostics.AddError("failed to read credential", res.HasError.Error())
 		return
 	}
+	if res.JSON200 == nil {
+		resp.Diagnostics.AddError("failed parsing get credential response", "JSON200 == nil")
+	}
 
-	if err := r.applyClientResponse(ctx, &cred, res); err != nil {
+	if err := r.applyClientResponse(ctx, &cred, res.JSON200); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
 	}
@@ -96,18 +106,15 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	es := r.client.DataServices.ElasticSearch
-
-	res, err := es.Credentials.Delete(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString(), cred.ID.ValueString())
+	res, err := r.client.Credentials.DeleteWithResponse(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString(), cred.ID.ValueString())
 	if err != nil {
+		resp.Diagnostics.AddError("failed preparing delete credential request", err.Error())
+	}
+	if res.HasError != nil {
 		if !strings.Contains(err.Error(), "EOF") {
-			resp.Diagnostics.AddError("failed to delete credential", err.Error())
+			resp.Diagnostics.AddError("failed to delete credential", res.HasError.Error())
 			return
 		}
-	}
-	if res.Error != "" {
-		resp.Diagnostics.AddError("failed to delete credential", res.Error)
-		return
 	}
 
 	resp.State.RemoveResource(ctx)

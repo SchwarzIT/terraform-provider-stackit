@@ -33,9 +33,9 @@ type Instance struct {
 // GetSchema returns the terraform schema structure
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: `Manages Elasticsearch instances
+		MarkdownDescription: `Manages RabbitMQ instances
 
-~> **Note:** Elasticsearch API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
+~> **Note:** RabbitMQ API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
 		`,
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
@@ -63,11 +63,10 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"plan": schema.StringAttribute{
-				Description: fmt.Sprintf("The Elasticsearch Plan. Default is `%s`.\nOptions are: `stackit-elasticsearch-single-small`, `stackit-elasticsearch-cluster-small`, `stackit-elasticsearch-single-medium`, `stackit-elasticsearch-cluster-medium`, `stackit-elasticsearch-cluster-big`", default_plan),
-				Optional:    true,
-				Computed:    true,
+				Description: fmt.Sprintf("The RabbitMQ Plan. Default is `%s`", r.getDefaultPlan()),
+				Required:    true,
 				PlanModifiers: []planmodifier.String{
-					modifiers.StringDefault(default_plan),
+					modifiers.StringDefault(r.getDefaultPlan()),
 				},
 			},
 			"plan_id": schema.StringAttribute{
@@ -75,11 +74,11 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Computed:    true,
 			},
 			"version": schema.StringAttribute{
-				Description: "Elasticsearch version. Options: `5`, `6`, `7`. Changing this value requires the resource to be recreated.",
-				Required:    true,
+				Description: fmt.Sprintf("RabbitMQ version. Default is %s", r.getDefaultVersion()),
+				Optional:    true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
-					modifiers.StringDefault(default_version),
+					modifiers.StringDefault(r.getDefaultVersion()),
 				},
 			},
 			"acl": schema.ListAttribute{

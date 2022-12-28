@@ -5,10 +5,11 @@ import (
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gorm.io/gorm/schema"
 )
 
 // Project is the schema model
@@ -26,58 +27,52 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 	resp.Schema = schema.Schema{
 		Description: "Manages projects",
 		Attributes: map[string]schema.Attribute{
-			"id": {
+			"id": schema.StringAttribute{
 				Description: "the project ID",
-				Type:        types.StringType,
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				PlanModifiers: planmodifier.Strings{
+				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 
-			"container_id": {
+			"container_id": schema.StringAttribute{
 				Description: "the project container ID",
-				Type:        types.StringType,
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				PlanModifiers: planmodifier.Strings{
+				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 
-			"parent_container_id": {
+			"parent_container_id": schema.StringAttribute{
 				Description: "the container ID in which the project will be created",
-				Type:        types.StringType,
 				Required:    true,
-				PlanModifiers: planmodifier.Strings{
+				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 
-			"name": {
+			"name": schema.StringAttribute{
 				Description: "the project name",
-				Type:        types.StringType,
 				Required:    true,
 				Validators: []validator.String{
 					validate.ProjectName(),
 				},
 			},
 
-			"billing_ref": {
+			"billing_ref": schema.StringAttribute{
 				Description: "billing reference for cost transparency",
-				Type:        types.StringType,
 				Required:    true,
 				Validators: []validator.String{
 					validate.BillingRef(),
 				},
 			},
 
-			"owner_email": {
+			"owner_email": schema.StringAttribute{
 				Description: "Email address of owner of the project. This value is only considered during creation. changing it afterwards will have no effect.",
-				Type:        types.StringType,
 				Required:    true,
 			},
 		},

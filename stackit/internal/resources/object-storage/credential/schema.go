@@ -7,10 +7,11 @@ import (
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gorm.io/gorm/schema"
 )
 
 // Credential is the schema model
@@ -29,20 +30,18 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 	resp.Schema = schema.Schema{
 		Description: "Manages Object Storage credentials",
 		Attributes: map[string]schema.Attribute{
-			"id": {
+			"id": schema.StringAttribute{
 				Description: "the credential ID",
-				Type:        types.StringType,
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				PlanModifiers: planmodifier.Strings{
+				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 
-			"object_storage_project_id": {
+			"object_storage_project_id": schema.StringAttribute{
 				Description: "The ID returned from `stackit_object_storage_project`",
-				Type:        types.StringType,
 				Required:    true,
 				Validators: []validator.String{
 					validate.ProjectID(),
@@ -52,9 +51,8 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 
-			"credentials_group_id": {
+			"credentials_group_id": schema.StringAttribute{
 				Description: "credential group ID. changing this field will recreate the credential.",
-				Type:        types.StringType,
 				Optional:    true,
 				Computed:    true,
 				Validators: []validator.String{
@@ -65,9 +63,8 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 
-			"expiry": {
+			"expiry": schema.StringAttribute{
 				Description: "specifies if the credential should expire. changing this field will recreate the credential.",
-				Type:        types.StringType,
 				Optional:    true,
 				Computed:    true,
 				Validators: []validator.String{
@@ -78,26 +75,23 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 
-			"display_name": {
+			"display_name": schema.StringAttribute{
 				Description: "the credential's display name in the portal",
-				Type:        types.StringType,
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
 			},
 
-			"access_key": {
+			"access_key": schema.StringAttribute{
 				Description: "access key (sensitive)",
-				Type:        types.StringType,
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
 				Sensitive:   true,
 			},
 
-			"secret_access_key": {
+			"secret_access_key": schema.StringAttribute{
 				Description: "secret access key (sensitive)",
-				Type:        types.StringType,
 				Computed:    true,
 				Required:    false,
 				Optional:    false,

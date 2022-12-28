@@ -4,9 +4,10 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gorm.io/gorm/schema"
 )
 
 // ObjectStorageProject is the schema model
@@ -20,18 +21,16 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 	resp.Schema = schema.Schema{
 		Description: "This resource enables STACKIT Object Storage in a project",
 		Attributes: map[string]schema.Attribute{
-			"id": {
+			"id": schema.StringAttribute{
 				Description: "object storage project ID",
-				Type:        types.StringType,
 				Computed:    true,
-				PlanModifiers: planmodifier.Strings{
+				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 
-			"project_id": {
+			"project_id": schema.StringAttribute{
 				Description: "the project ID that Object Storage will be enabled in",
-				Type:        types.StringType,
 				Required:    true,
 			},
 		},

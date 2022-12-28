@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/data-services/instances"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/generated/instances"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -31,7 +31,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	acl := []string{}
-	for _, v := range plan.ACL.Elems {
+	for _, v := range plan.ACL.Elements() {
 		nv, err := common.ToString(ctx, v)
 		if err != nil {
 			continue
@@ -39,34 +39,46 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		acl = append(acl, nv)
 	}
 
-	dsa := r.client.DataServices.RabbitMQ
-
 	// handle creation
-	res, wait, err := dsa.Instances.Create(ctx, plan.ProjectID.ValueString(), plan.Name.ValueString(), plan.PlanID.ValueString(), map[string]string{
+	params := map[string]interface{}{
 		"sgw_acl": strings.Join(acl, ","),
-	})
-
+	}
+	body := instances.InstanceProvisionRequest{
+		InstanceName: plan.Name.ValueString(),
+		PlanID:       plan.PlanID.ValueString(),
+		Parameters:   &params,
+	}
+	res, err := r.client.Instances.ProvisionWithResponse(ctx, plan.ProjectID.ValueString(), body)
 	if err != nil {
-		resp.Diagnostics.AddError("failed instance creation", err.Error())
+		resp.Diagnostics.AddError("failed preparing instance provisioning request", err.Error())
+		return
+	}
+	if res.HasError != nil {
+		resp.Diagnostics.AddError("failed making instance provisioning request", res.HasError.Error())
+		return
+	}
+	if res.JSON202 == nil {
+		resp.Diagnostics.AddError("received an empty response", "JSON202 == nil")
 		return
 	}
 
 	// set state
-	plan.ID = types.StringValue(res.InstanceID)
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), res.InstanceID)...)
+	plan.ID = types.StringValue(res.JSON202.InstanceID)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), res.JSON202.InstanceID)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	instance, err := wait.Wait()
+	process := res.WaitHandler(ctx, r.client.Instances, plan.ProjectID.ValueString(), plan.ID.ValueString())
+	instance, err := process.Wait()
 	if err != nil {
 		resp.Diagnostics.AddError("failed instance `create` validation", err.Error())
 		return
 	}
 
-	i, ok := instance.(instances.Instance)
+	i, ok := instance.(*instances.Instance)
 	if !ok {
-		resp.Diagnostics.AddError("failed to parse client response", "response is not of instances.Instance")
+		resp.Diagnostics.AddError("failed to parse client response", "response is not of *instances.Instance")
 		return
 	}
 
@@ -92,20 +104,26 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	dsa := r.client.DataServices.RabbitMQ
-
 	// read instance
-	i, err := dsa.Instances.Get(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
+	res, err := r.client.Instances.GetWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if err != nil {
-		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+		resp.Diagnostics.AddError("failed preparing get instance request", err.Error())
+		return
+	}
+	if res.HasError != nil {
+		if res.StatusCode() == http.StatusNotFound {
 			resp.State.RemoveResource(ctx)
 			return
 		}
-		resp.Diagnostics.AddError("failed to read instance", err.Error())
+		resp.Diagnostics.AddError("failed making get instance request", res.HasError.Error())
+		return
+	}
+	if res.JSON200 == nil {
+		resp.Diagnostics.AddError("received an empty response", "JSON200 == nil")
 		return
 	}
 
-	if err := r.applyClientResponse(ctx, &state, i); err != nil {
+	if err := r.applyClientResponse(ctx, &state, res.JSON200); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
 	}
@@ -139,44 +157,51 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	acl := []string{}
-	for _, v := range plan.ACL.Elems {
+	for _, v := range plan.ACL.Elements() {
 		nv, err := common.ToString(ctx, v)
 		if err != nil {
 			continue
 		}
 		acl = append(acl, nv)
 	}
-	dsa := r.client.DataServices.RabbitMQ
 
 	// handle update
-	_, process, err := dsa.Instances.Update(ctx, state.ProjectID.ValueString(), state.ID.ValueString(), plan.PlanID.ValueString(), map[string]string{
+	params := map[string]interface{}{
 		"sgw_acl": strings.Join(acl, ","),
-	})
+	}
+	body := instances.UpdateJSONRequestBody{
+		PlanID:     plan.PlanID.ValueString(),
+		Parameters: &params,
+	}
+	res, err := r.client.Instances.UpdateWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString(), body)
 	if err != nil {
-		resp.Diagnostics.AddError("failed instance update", err.Error())
+		resp.Diagnostics.AddError("failed preparing update instance request", err.Error())
+		return
+	}
+	if res.HasError != nil {
+		resp.Diagnostics.AddError("failed making update instance request", res.HasError.Error())
 		return
 	}
 
-	instance, err := process.Wait()
+	process := res.WaitHandler(ctx, r.client.Instances, state.ProjectID.ValueString(), state.ID.ValueString())
+	instancesGetResp, err := process.Wait()
 	if err != nil {
-		elaborate := ""
-		if i, ok := instance.(instances.Instance); ok {
-			elaborate = "\n- type: " + i.LastOperation.Type + "\n- state: " + i.LastOperation.State
-		} else {
-			elaborate = "\n- couldn't parst response as instances.Instance"
-		}
-		resp.Diagnostics.AddError("failed instance update validation"+elaborate, err.Error())
+		resp.Diagnostics.AddError("failed instance update validation", err.Error())
 		return
 	}
 
-	i, ok := instance.(instances.Instance)
+	newRes, ok := instancesGetResp.(*instances.GetResponse)
 	if !ok {
-		resp.Diagnostics.AddError("failed to parse client response", "response is not of instances.Instance")
+		resp.Diagnostics.AddError("can't parse response", "returned value is not of *instances.GetResponse")
+		return
+	}
+	if newRes.JSON200 == nil {
+		resp.Diagnostics.AddError("received an empty response", "JSON200 == nil")
 		return
 	}
 
 	planID := plan.PlanID
-	if err := r.applyClientResponse(ctx, &plan, i); err != nil {
+	if err := r.applyClientResponse(ctx, &plan, newRes.JSON200); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
 	}
@@ -202,22 +227,24 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	dsa := r.client.DataServices.RabbitMQ
-
 	// handle deletion
-	process, err := dsa.Instances.Delete(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
+	res, err := r.client.Instances.DeprovisionWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("failed to delete instance", err.Error())
+		resp.Diagnostics.AddError("failed making deprovision request", err.Error())
+		return
+	}
+	if res.HasError != nil {
+		if res.StatusCode() == http.StatusNotFound {
+			resp.State.RemoveResource(ctx)
+			return
+		}
+		resp.Diagnostics.AddError("failed making deprovision instance request", res.HasError.Error())
 		return
 	}
 
-	if instance, err := process.Wait(); err != nil {
-		resp.Diagnostics.AddError("failed to verify instance deletion", err.Error())
-		if i, ok := instance.(instances.Instance); ok {
-			resp.Diagnostics.AddError("instance delete response", "- type: "+i.LastOperation.Type+"\n- state: "+i.LastOperation.State)
-		} else {
-			resp.Diagnostics.AddError("instance delete response", "- couldn't parst response as instances.Instance")
-		}
+	process := res.WaitHandler(ctx, r.client.Instances, state.ProjectID.ValueString(), state.ID.ValueString())
+	if _, err := process.Wait(); err != nil {
+		resp.Diagnostics.AddError("failed to verify instance deprovision", err.Error())
 	}
 
 	resp.State.RemoveResource(ctx)

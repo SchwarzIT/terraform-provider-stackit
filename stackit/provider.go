@@ -28,26 +28,17 @@ import (
 
 	resourceArgusInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/instance"
 	resourceArgusJob "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/job"
-	resourceElasticSearchCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/elasticsearch/credential"
-	resourceElasticsearchInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/elasticsearch/instance"
+	resourceDataServicesCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/data-services/credential"
+	resourceDataServicesInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/data-services/instance"
 	resourceKubernetesCluster "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/kubernetes/cluster"
 	resourceKubernetesProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/kubernetes/project"
-	resourceLogMeCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/logme/credential"
-	resourceLogMeInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/logme/instance"
-	resourceMariaDBCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mariadb/credential"
-	resourceMariaDBInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mariadb/instance"
 	resourceMongoDBFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mongodb-flex/instance"
 	resourceObjectStorageBucket "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/bucket"
 	resourceObjectStorageCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/credential"
 	resourceObjectStorageCredentialsGroup "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/credentials-group"
 	resourceObjectStorageProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/project"
 	resourcePostgresFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/postgres-flex/instance"
-	resourcePostgresCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/postgres/credential"
-	resourcePostgresDBInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/postgres/instance"
 	resourceProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/project"
-	resourceRabbitMQInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/rabbitmq/instance"
-	resourceRedisCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/redis/credential"
-	resourceRedisInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/redis/instance"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -109,26 +100,27 @@ func (p *StackitProvider) Resources(_ context.Context) []func() resource.Resourc
 	return []func() resource.Resource{
 		resourceArgusInstance.New,
 		resourceArgusJob.New,
-		resourceElasticSearchCredential.New,
-		resourceElasticsearchInstance.New,
+		resourceDataServicesCredential.NewElasticSearch,
+		resourceDataServicesCredential.NewLogMe,
+		resourceDataServicesCredential.NewMariaDB,
+		resourceDataServicesCredential.NewPostgres,
+		resourceDataServicesCredential.NewRabbitMQ,
+		resourceDataServicesCredential.NewRedis,
+		resourceDataServicesInstance.NewElasticSearch,
+		resourceDataServicesInstance.NewLogMe,
+		resourceDataServicesInstance.NewMariaDB,
+		resourceDataServicesInstance.NewPostgres,
+		resourceDataServicesInstance.NewRabbitMQ,
+		resourceDataServicesInstance.NewRedis,
 		resourceKubernetesCluster.New,
 		resourceKubernetesProject.New,
-		resourceLogMeCredential.New,
-		resourceLogMeInstance.New,
-		resourceMariaDBCredential.New,
-		resourceMariaDBInstance.New,
 		resourceMongoDBFlexInstance.New,
 		resourceObjectStorageBucket.New,
 		resourceObjectStorageCredential.New,
 		resourceObjectStorageCredentialsGroup.New,
 		resourceObjectStorageProject.New,
-		resourcePostgresCredential.New,
-		resourcePostgresDBInstance.New,
 		resourceProject.New,
 		resourcePostgresFlexInstance.New,
-		resourceRabbitMQInstance.New,
-		resourceRedisCredential.New,
-		resourceRedisInstance.New,
 	}
 }
 
