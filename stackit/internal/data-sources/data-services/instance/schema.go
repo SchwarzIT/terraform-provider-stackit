@@ -41,7 +41,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Computed:    true,
 			},
 			"name": schema.StringAttribute{
-				Description: "Specifies the instance name. Changing this value requires the resource to be recreated. Changing this value requires the resource to be recreated.",
+				Description: "Specifies the instance name.",
 				Required:    true,
 			},
 			"project_id": schema.StringAttribute{

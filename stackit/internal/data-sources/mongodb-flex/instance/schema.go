@@ -36,22 +36,22 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Computed:    true,
 			},
 			"name": schema.StringAttribute{
-				Description: "Specifies the instance name. Changing this value requires the resource to be recreated.",
+				Description: "Specifies the instance name.",
 				Required:    true,
 			},
 			"project_id": schema.StringAttribute{
-				Description: "The project ID the instance runs in. Changing this value requires the resource to be recreated.",
+				Description: "The project ID the instance runs in.",
 				Required:    true,
 				Validators: []validator.String{
 					validate.ProjectID(),
 				},
 			},
 			"machine_type": schema.StringAttribute{
-				Description: "The Machine Type. Available options: `T1.2`, `C1.1`, `G1.1`, `M1.1`, `C1.2`, `G1.2`, `M1.2`, `C1.3`, `G1.3`, `M1.3`, `C1.4`, `G1.4`, `M1.4`, `C1.5`, `G1.5`",
+				Description: "The Machine Type.",
 				Computed:    true,
 			},
 			"version": schema.StringAttribute{
-				Description: "MongoDB version. Version `5.0` and `6.0` are supported. Changing this value requires the resource to be recreated.",
+				Description: "MongoDB version.",
 				Computed:    true,
 			},
 			"replicas": schema.Int64Attribute{
