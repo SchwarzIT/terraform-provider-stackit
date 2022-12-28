@@ -3,9 +3,8 @@ package project
 import (
 	"context"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -19,37 +18,32 @@ type Project struct {
 }
 
 // Schema returns the terraform schema structure
-func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		Description: "Data source for projects",
 		Attributes: map[string]schema.Attribute{
-			"id": {
+			"id": schema.StringAttribute{
 				Description: "the project UUID",
-				Type:        types.StringType,
 				Computed:    true,
 			},
 
-			"container_id": {
+			"container_id": schema.StringAttribute{
 				Description: "the project container ID",
-				Type:        types.StringType,
 				Required:    true,
 			},
 
-			"parent_container_id": {
+			"parent_container_id": schema.StringAttribute{
 				Description: "the project's parent container ID",
-				Type:        types.StringType,
 				Computed:    true,
 			},
 
-			"name": {
+			"name": schema.StringAttribute{
 				Description: "the project name",
-				Type:        types.StringType,
 				Computed:    true,
 			},
 
-			"billing_ref": {
+			"billing_ref": schema.StringAttribute{
 				Description: "billing reference for cost transparency",
-				Type:        types.StringType,
 				Computed:    true,
 			},
 		},

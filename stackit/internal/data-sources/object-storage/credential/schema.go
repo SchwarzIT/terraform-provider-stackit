@@ -4,12 +4,9 @@ import (
 	"context"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -22,37 +19,30 @@ type Credential struct {
 }
 
 // Schema returns the terraform schema structure
-func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		Description: "Data source for Object Storage credentials",
 		Attributes: map[string]schema.Attribute{
-			"id": {
+			"id": schema.StringAttribute{
 				Description: "the credential ID",
-				Type:        types.StringType,
 				Optional:    true,
 				Computed:    true,
 			},
 
-			"object_storage_project_id": {
+			"object_storage_project_id": schema.StringAttribute{
 				Description: "The ID returned from `stackit_object_storage_project`",
-				Type:        types.StringType,
 				Required:    true,
 				Validators: []validator.String{
 					validate.ProjectID(),
 				},
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
-				},
 			},
 
-			"expiry": {
-				Type:     types.StringType,
+			"expiry": schema.StringAttribute{
 				Computed: true,
 			},
 
-			"display_name": {
+			"display_name": schema.StringAttribute{
 				Description: "the credential's display name in the portal",
-				Type:        types.StringType,
 				Computed:    true,
 				Optional:    true,
 			},

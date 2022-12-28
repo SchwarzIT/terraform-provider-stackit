@@ -55,10 +55,11 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	}
 	i := ires.Item
 	config.ID = types.StringValue(instance.ID)
-	config.ACL = types.List{ElemType: types.StringType}
+	elems := []attr.Value{}
 	for _, v := range i.ACL.Items {
-		config.ACL.Elems = append(config.ACL.Elems, types.StringValue(v))
+		elems = append(elems, types.StringValue(v))
 	}
+	config.ACL = types.ListValueMust(types.StringType, elems)
 	config.BackupSchedule = types.StringValue(i.BackupSchedule)
 	config.MachineType = types.StringValue(i.Flavor.ID)
 	config.Name = types.StringValue(i.Name)
