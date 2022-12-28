@@ -43,7 +43,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Computed:    true,
 			},
 			"allow_privileged_containers": schema.BoolAttribute{
-				Description: "Should containers be allowed to run in privileged mode? Default is `true`",
+				Description: "Should containers be allowed to run in privileged mode?",
 				Optional:    true,
 				Computed:    true,
 			},
@@ -58,11 +58,11 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 							Required:    true,
 						},
 						"machine_type": schema.StringAttribute{
-							Description: "The machine type. Accepted options are: `c1.2`, `c1.3`, `c1.4`, `c1.5`, `g1.2`, `g1.3`, `g1.4`, `g1.5`, `m1.2`, `m1.3`, `m1.4`",
+							Description: "The machine type.",
 							Required:    true,
 						},
 						"os_name": schema.StringAttribute{
-							Description: "The name of the OS image. Only `flatcar` is supported",
+							Description: "The name of the OS image.",
 							Computed:    true,
 						},
 						"os_version": schema.StringAttribute{
@@ -70,29 +70,29 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 							Computed:    true,
 						},
 						"minimum": schema.Int64Attribute{
-							Description: "Minimum nodes in the pool. Defaults to 1. (Value must be between 1-100)",
+							Description: "Minimum nodes in the pool.",
 							Computed:    true,
 						},
 
 						"maximum": schema.Int64Attribute{
-							Description: "Maximum nodes in the pool. Defaults to 2. (Value must be between 1-100)",
+							Description: "Maximum nodes in the pool.",
 							Computed:    true,
 						},
 
 						"max_surge": schema.Int64Attribute{
-							Description: "The maximum number of nodes upgraded simultaneously. Defaults to 1. (Value must be between 1-10)",
+							Description: "The maximum number of nodes upgraded simultaneously.",
 							Computed:    true,
 						},
 						"max_unavailable": schema.Int64Attribute{
-							Description: "The maximum number of nodes unavailable during upgraded. Defaults to 1",
+							Description: "The maximum number of nodes unavailable during upgraded.",
 							Computed:    true,
 						},
 						"volume_type": schema.StringAttribute{
-							Description: "Specifies the volume type. Defaults to `storage_premium_perf1`. Available options are `storage_premium_perf0`, `storage_premium_perf1`, `storage_premium_perf2`, `storage_premium_perf4`, `storage_premium_perf6`",
+							Description: "Specifies the volume type.",
 							Computed:    true,
 						},
 						"volume_size_gb": schema.Int64Attribute{
-							Description: "The volume size in GB. Default is set to `20`",
+							Description: "The volume size in GB.",
 							Computed:    true,
 						},
 						"labels": schema.MapAttribute{
@@ -121,11 +121,11 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 							},
 						},
 						"container_runtime": schema.StringAttribute{
-							Description: "Specifies the container runtime. Defaults to `containerd`. Allowed options are `docker`, `containerd`",
+							Description: "Specifies the container runtime.",
 							Computed:    true,
 						},
 						"zones": schema.ListAttribute{
-							Description: "Specify a list of availability zones. Accepted options are `eu01-m` for metro, or `eu01-1`, `eu01-2`, `eu01-3`",
+							Description: "Specify a list of availability zones.",
 							ElementType: types.StringType,
 							Computed:    true,
 						},
@@ -185,11 +185,11 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 						Computed:    true,
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
-								Description: "Flag to enable/disable argus extensions. Defaults to `false`",
+								Description: "Flag to enable/disable argus extensions.",
 								Computed:    true,
 							},
 							"argus_instance_id": schema.StringAttribute{
-								Description: "Instance ID of argus, Required when enabled is set to `true`",
+								Description: "Instance ID of argus",
 								Computed:    true,
 							},
 						},

@@ -55,7 +55,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Computed:    true,
 			},
 			"replicas": schema.Int64Attribute{
-				Description: "Number of replicas (Default is `1`)",
+				Description: "Number of replicas",
 				Computed:    true,
 			},
 			"backup_schedule": schema.StringAttribute{
@@ -71,7 +71,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 						Computed:    true,
 					},
 					"size": schema.Int64Attribute{
-						Description: "The storage size in GB. Default is `10`.",
+						Description: "The storage size in GB.",
 						Computed:    true,
 					},
 				},
