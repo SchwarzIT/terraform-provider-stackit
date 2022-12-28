@@ -1,4 +1,4 @@
-package credential_test
+package test
 
 import (
 	"fmt"
@@ -13,10 +13,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-const run_this_test = false
+const es_cred_run_this_test = false
 
 func TestAcc_ElasticSearchCredential(t *testing.T) {
-	if !common.ShouldAccTestRun(run_this_test) {
+	if !common.ShouldAccTestRun(es_cred_run_this_test) {
 		t.Skip()
 		return
 	}
@@ -31,7 +31,7 @@ func TestAcc_ElasticSearchCredential(t *testing.T) {
 		Steps: []resource.TestStep{
 			// check minimal configuration
 			{
-				Config: config(projectID, name),
+				Config: configESCred(projectID, name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.stackit_elasticsearch_credential.example", "project_id", projectID),
 					resource.TestCheckTypeSetElemAttrPair("stackit_elasticsearch_credential.example", "project_id", "data.stackit_elasticsearch_credential.example", "project_id"),
@@ -50,7 +50,7 @@ func TestAcc_ElasticSearchCredential(t *testing.T) {
 	})
 }
 
-func config(projectID, name string) string {
+func configESCred(projectID, name string) string {
 	return fmt.Sprintf(`
 	resource "stackit_elasticsearch_instance" "example" {
 		name       = "%s"

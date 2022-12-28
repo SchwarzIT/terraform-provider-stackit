@@ -12,8 +12,9 @@ import (
 )
 
 // Schema returns the terraform schema structure
-func (r *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
+		Description: "Data source for Argus Instance Jobs",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "Specifies the Argus Job ID",
@@ -42,22 +43,22 @@ func (r *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 			},
 
 			"metrics_path": schema.StringAttribute{
-				Description: "Specifies the job scraping path. Defaults to `/metrics`",
+				Description: "Specifies the job scraping path.",
 				Computed:    true,
 			},
 
 			"scheme": schema.StringAttribute{
-				Description: "Specifies the scheme. Default is `https`.",
+				Description: "Specifies the scheme.",
 				Computed:    true,
 			},
 
 			"scrape_interval": schema.StringAttribute{
-				Description: "Specifies the scrape interval as duration string. Default is `5m`.",
+				Description: "Specifies the scrape interval as duration string.",
 				Computed:    true,
 			},
 
 			"scrape_timeout": schema.StringAttribute{
-				Description: "Specifies the scrape timeout as duration string. Default is `2m`.",
+				Description: "Specifies the scrape timeout as duration string.",
 				Computed:    true,
 			},
 
@@ -66,7 +67,7 @@ func (r *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Optional:    true,
 				Attributes: map[string]schema.Attribute{
 					"enable_url_parameters": schema.BoolAttribute{
-						Description: "Should URL parameters be enabled? Default is `true`",
+						Description: "Should URL parameters be enabled?",
 						Computed:    true,
 					},
 				},

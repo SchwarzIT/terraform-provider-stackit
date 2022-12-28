@@ -2,6 +2,7 @@ package credential
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -26,9 +27,9 @@ type Credential struct {
 }
 
 // Schema returns the terraform schema structure
-func (r *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "Manages Elasticsearch credentials",
+		Description: fmt.Sprintf("Manages %s credentials", d.service.Display()),
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "Specifies the resource ID",
@@ -44,7 +45,7 @@ func (r *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 			},
 
 			"instance_id": schema.StringAttribute{
-				Description: "Elasticsearch instance ID the credential belongs to",
+				Description: "Instance ID the credential belongs to",
 				Required:    true,
 			},
 

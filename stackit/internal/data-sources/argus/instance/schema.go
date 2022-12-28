@@ -10,17 +10,17 @@ import (
 )
 
 // Schema returns the terraform schema structure
-func (r *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "Manages Argus Instances",
+		Description: "Data source for Argus Instances",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				Description: "Specifies the Argus instance ID",
+				Description: "Specifies the Argus instance ID.",
 				Required:    true,
 			},
 
 			"project_id": schema.StringAttribute{
-				Description: "Specifies the Project ID the Argus instance belongs to",
+				Description: "Specifies the Project ID.",
 				Required:    true,
 				Validators: []validator.String{
 					validate.ProjectID(),
@@ -30,21 +30,21 @@ func (r *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 			// Read only:
 
 			"name": schema.StringAttribute{
-				Description: "Specifies the name of the Argus instance",
+				Description: "Specifies the name of the Argus instance.",
 				Computed:    true,
 			},
 
 			"plan": schema.StringAttribute{
-				Description: "Specifies the Argus plan. Available options are: `Monitoring-Medium-EU01`, `Monitoring-Large-EU01`, `Frontend-Starter-EU01`, `Monitoring-XL-EU01`, `Monitoring-XXL-EU01`, `Monitoring-Starter-EU01`, `Monitoring-Basic-EU01`, `Observability-Medium-EU01`, `Observability-Large-EU01 `, `Observability-XL-EU01`, `Observability-Starter-EU01`, `Observability-Basic-EU01`, `Observability-XXL-EU01`.",
+				Description: "Specifies the Argus plan.",
 				Computed:    true,
 			},
 
 			"grafana": schema.SingleNestedAttribute{
-				Description: "A Grafana configuration block",
+				Description: "A Grafana configuration block.",
 				Computed:    true,
 				Attributes: map[string]schema.Attribute{
 					"enable_public_access": schema.BoolAttribute{
-						Description: "If true, anyone can access Grafana dashboards without logging in. Default is set to `false`.",
+						Description: "If true, anyone can access Grafana dashboards without logging in.",
 						Computed:    true,
 					},
 				},
@@ -55,15 +55,15 @@ func (r *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Computed:    true,
 				Attributes: map[string]schema.Attribute{
 					"retention_days": schema.Int64Attribute{
-						Description: "Specifies for how many days the raw metrics are kept. Default is set to `90`",
+						Description: "Specifies for how many days the raw metrics are kept.",
 						Computed:    true,
 					},
 					"retention_days_5m_downsampling": schema.Int64Attribute{
-						Description: "Specifies for how many days the 5m downsampled metrics are kept. must be less than the value of the general retention. Default is set to `0` (disabled).",
+						Description: "Specifies for how many days the 5m downsampled metrics are kept.",
 						Computed:    true,
 					},
 					"retention_days_1h_downsampling": schema.Int64Attribute{
-						Description: "Specifies for how many days the 1h downsampled metrics are kept. must be less than the value of the 5m downsampling retention. Default is set to `0` (disabled).",
+						Description: "Specifies for how many days the 1h downsampled metrics are kept.",
 						Computed:    true,
 					},
 				},

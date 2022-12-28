@@ -24,7 +24,7 @@ type Instance struct {
 }
 
 // Schema returns the terraform schema structure
-func (r *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: `Data source for MongoDB Flex instance
 		

@@ -8,9 +8,9 @@ import (
 )
 
 // Schema returns the terraform schema structure
-func (r *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "This resource enables STACKIT Kubernetes Engine (SKE) in a project",
+		Description: "Data source for STACKIT Kubernetes Engine (SKE) project",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "kubernetes project ID",
