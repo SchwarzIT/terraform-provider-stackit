@@ -5,239 +5,205 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/include/cluster"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 // Schema returns the terraform schema structure
-func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
-		Description: "Data source for kubernetes clusters",
+func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
+		Description: "Manages kubernetes clusters",
 		Attributes: map[string]schema.Attribute{
-			"id": {
+			"id": schema.StringAttribute{
 				Description: "Specifies the resource ID",
-				Type:        types.StringType,
 				Computed:    true,
 			},
-			"name": {
-				Description: "Specifies the cluster name",
-				Type:        types.StringType,
+			"name": schema.StringAttribute{
+				Description: "Specifies the cluster name (lower case, alphanumeric, hypens allowed, up to 11 chars)",
 				Required:    true,
 				Validators: []validator.String{
 					validate.StringWith(cluster.ValidateClusterName, "validate cluster name"),
 				},
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
-				},
 			},
-			"kubernetes_project_id": {
-				Description: "The project ID the cluster runs in",
-				Type:        types.StringType,
+			"kubernetes_project_id": schema.StringAttribute{
+				Description: "The ID of a `stackit_kubernetes_project` resource",
 				Required:    true,
 				Validators: []validator.String{
 					validate.ProjectID(),
 				},
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
+			},
+			"kubernetes_version": schema.StringAttribute{
+				Description: "Kubernetes version. ",
+				Computed:    true,
+			},
+			"kubernetes_version_used": schema.StringAttribute{
+				Description: "Full Kubernetes version used. For example, if `1.22` was selected, this value may result to `1.22.15`",
+				Computed:    true,
+			},
+			"allow_privileged_containers": schema.BoolAttribute{
+				Description: "Should containers be allowed to run in privileged mode? Default is `true`",
+				Optional:    true,
+				Computed:    true,
+			},
+
+			"node_pools": schema.ListNestedAttribute{
+				Description: "One or more `node_pool` block as defined below",
+				Optional:    true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"name": schema.StringAttribute{
+							Description: "Specifies the name of the node pool",
+							Required:    true,
+						},
+						"machine_type": schema.StringAttribute{
+							Description: "The machine type. Accepted options are: `c1.2`, `c1.3`, `c1.4`, `c1.5`, `g1.2`, `g1.3`, `g1.4`, `g1.5`, `m1.2`, `m1.3`, `m1.4`",
+							Required:    true,
+						},
+						"os_name": schema.StringAttribute{
+							Description: "The name of the OS image. Only `flatcar` is supported",
+							Computed:    true,
+						},
+						"os_version": schema.StringAttribute{
+							Description: "The OS image version.",
+							Computed:    true,
+						},
+						"minimum": schema.Int64Attribute{
+							Description: "Minimum nodes in the pool. Defaults to 1. (Value must be between 1-100)",
+							Computed:    true,
+						},
+
+						"maximum": schema.Int64Attribute{
+							Description: "Maximum nodes in the pool. Defaults to 2. (Value must be between 1-100)",
+							Computed:    true,
+						},
+
+						"max_surge": schema.Int64Attribute{
+							Description: "The maximum number of nodes upgraded simultaneously. Defaults to 1. (Value must be between 1-10)",
+							Computed:    true,
+						},
+						"max_unavailable": schema.Int64Attribute{
+							Description: "The maximum number of nodes unavailable during upgraded. Defaults to 1",
+							Computed:    true,
+						},
+						"volume_type": schema.StringAttribute{
+							Description: "Specifies the volume type. Defaults to `storage_premium_perf1`. Available options are `storage_premium_perf0`, `storage_premium_perf1`, `storage_premium_perf2`, `storage_premium_perf4`, `storage_premium_perf6`",
+							Computed:    true,
+						},
+						"volume_size_gb": schema.Int64Attribute{
+							Description: "The volume size in GB. Default is set to `20`",
+							Computed:    true,
+						},
+						"labels": schema.MapAttribute{
+							Description: "Labels to add to each node",
+							ElementType: types.StringType,
+							Computed:    true,
+						},
+						"taints": schema.ListNestedAttribute{
+							Description: "Specifies a taint list as defined below",
+							Computed:    true,
+							NestedObject: schema.NestedAttributeObject{
+								Attributes: map[string]schema.Attribute{
+									"effect": schema.StringAttribute{
+										Description: "The taint effect. Only `PreferNoSchedule` is supported at the moment",
+										Computed:    true,
+									},
+									"key": schema.StringAttribute{
+										Description: "Taint key to be applied to a node",
+										Computed:    true,
+									},
+									"value": schema.StringAttribute{
+										Description: "Taint value corresponding to the taint key",
+										Computed:    true,
+									},
+								},
+							},
+						},
+						"container_runtime": schema.StringAttribute{
+							Description: "Specifies the container runtime. Defaults to `containerd`. Allowed options are `docker`, `containerd`",
+							Computed:    true,
+						},
+						"zones": schema.ListAttribute{
+							Description: "Specify a list of availability zones. Accepted options are `eu01-m` for metro, or `eu01-1`, `eu01-2`, `eu01-3`",
+							ElementType: types.StringType,
+							Computed:    true,
+						},
+					},
 				},
 			},
-			"kubernetes_version": {
-				Description: "Kubernetes version",
-				Type:        types.StringType,
-				Computed:    true,
-			},
-			"kubernetes_version_used": {
-				Description: "Full Kubernetes version used. For the data source, it'll always match `kubernetes_version`",
-				Type:        types.StringType,
-				Computed:    true,
-			},
-			"allow_privileged_containers": {
-				Description: "Are containers allowed to run in privileged mode?",
-				Type:        types.BoolType,
-				Computed:    true,
-			},
-
-			"node_pools": {
-				Description: "One or more `node_pool` blocks",
-				Computed:    true,
-				Attributes: tfsdk.ListNestedAttributes(map[string]tfsdk.Attribute{
-					"name": {
-						Description: "The name of the node pool",
-						Type:        types.StringType,
-						Computed:    true,
-					},
-					"machine_type": {
-						Description: "The machine type",
-						Type:        types.StringType,
-						Computed:    true,
-					},
-					"os_name": {
-						Description: "The name of the OS image",
-						Type:        types.StringType,
-						Computed:    true,
-					},
-					"os_version": {
-						Description: "The OS image version",
-						Type:        types.StringType,
-						Computed:    true,
-					},
-					"minimum": {
-						Description: "Minimum nodes in the pool",
-						Type:        types.Int64Type,
-						Computed:    true,
-					},
-					"maximum": {
-						Description: "Maximum nodes in the pool",
-						Type:        types.Int64Type,
-						Computed:    true,
-					},
-					"max_surge": {
-						Description: "The maximum number of nodes upgraded simultaneously",
-						Type:        types.Int64Type,
-						Computed:    true,
-					},
-					"max_unavailable": {
-						Description: "The maximum number of nodes unavailable during upgraded",
-						Type:        types.Int64Type,
-						Computed:    true,
-					},
-					"volume_type": {
-						Description: "Specifies the volume type",
-						Type:        types.StringType,
-						Computed:    true,
-					},
-					"volume_size_gb": {
-						Description: "The volume size in GB",
-						Type:        types.Int64Type,
-						Computed:    true,
-					},
-					"labels": {
-						Description: "Labels added to each node",
-						Type: types.MapType{
-							ElemType: types.StringType,
-						},
-						Computed: true,
-					},
-					"taints": {
-						Description: "Taint blocks",
-						Computed:    true,
-						Attributes: tfsdk.ListNestedAttributes(map[string]tfsdk.Attribute{
-							"effect": {
-								Description: "The taint effect",
-								Type:        types.StringType,
-								Computed:    true,
-							},
-							"key": {
-								Description: "Taint key applied to a node",
-								Type:        types.StringType,
-								Computed:    true,
-							},
-							"value": {
-								Description: "Taint value corresponding to the taint key",
-								Type:        types.StringType,
-								Computed:    true,
-							},
-						}),
-					},
-					"container_runtime": {
-						Description: "The container runtime",
-						Type:        types.StringType,
-						Computed:    true,
-					},
-					"zones": {
-						Description: "List of availability zones",
-						Type:        types.ListType{ElemType: types.StringType},
-						Computed:    true,
-					},
-				}),
-			},
-
-			"maintenance": {
+			"maintenance": schema.SingleNestedAttribute{
 				Description: "A single maintenance block as defined below",
 				Computed:    true,
-				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
-					"enable_kubernetes_version_updates": {
+				Attributes: map[string]schema.Attribute{
+					"enable_kubernetes_version_updates": schema.BoolAttribute{
 						Description: "Flag to enable/disable auto-updates of the Kubernetes version",
-						Type:        types.BoolType,
 						Computed:    true,
 					},
-					"enable_machine_image_version_updates": {
+					"enable_machine_image_version_updates": schema.BoolAttribute{
 						Description: "Flag to enable/disable auto-updates of the OS image version",
-						Type:        types.BoolType,
 						Computed:    true,
 					},
-					"start": {
+					"start": schema.StringAttribute{
 						Description: "RFC3339 Date time for maintenance window start. i.e. `2019-08-24T23:00:00Z`",
-						Type:        types.StringType,
 						Computed:    true,
 					},
-					"end": {
+					"end": schema.StringAttribute{
 						Description: "RFC3339 Date time for maintenance window end. i.e. `2019-08-24T23:30:00Z`",
-						Type:        types.StringType,
 						Computed:    true,
 					},
-				}),
+				},
 			},
 
-			"hibernations": {
-				Description: "One or more hibernation blocks",
+			"hibernations": schema.ListNestedAttribute{
+				Description: "One or more hibernation block as defined below",
 				Computed:    true,
-				Attributes: tfsdk.ListNestedAttributes(map[string]tfsdk.Attribute{
-					"start": {
-						Description: "Start time of cluster hibernation",
-						Type:        types.StringType,
-						Computed:    true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"start": schema.StringAttribute{
+							Description: "Start time of cluster hibernation, in crontab syntax, i.e. `0 18 * * *` for starting everyday at 6pm",
+							Computed:    true,
+						},
+						"end": schema.StringAttribute{
+							Description: "End time of hibernation, in crontab syntax, i.e. `0 8 * * *` for waking up the cluster at 8am",
+							Computed:    true,
+						},
+						"timezone": schema.StringAttribute{
+							Description: "Timezone name corresponding to a file in the IANA Time Zone database. i.e. `Europe/Berlin`",
+							Computed:    true,
+						},
 					},
-					"end": {
-						Description: "End time of hibernation",
-						Type:        types.StringType,
-						Computed:    true,
-					},
-					"timezone": {
-						Description: "Timezone",
-						Type:        types.StringType,
-						Computed:    true,
-					},
-				}),
+				},
 			},
 
-			"extensions": {
-				Description: "A single extensions block",
+			"extensions": schema.SingleNestedAttribute{
+				Description: "A single extensions block as defined below",
 				Computed:    true,
-				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
-					"argus": {
-						Description: "A single argus block",
-						Optional:    true,
-						Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
-							"enabled": {
-								Description: "Is argus extension enabled?",
-								Type:        types.BoolType,
+				Attributes: map[string]schema.Attribute{
+					"argus": schema.SingleNestedAttribute{
+						Description: "A single argus block as defined below",
+						Computed:    true,
+						Attributes: map[string]schema.Attribute{
+							"enabled": schema.BoolAttribute{
+								Description: "Flag to enable/disable argus extensions. Defaults to `false`",
 								Computed:    true,
 							},
-							"argus_instance_id": {
-								Description: "Instance ID of argus",
-								Type:        types.StringType,
+							"argus_instance_id": schema.StringAttribute{
+								Description: "Instance ID of argus, Required when enabled is set to `true`",
 								Computed:    true,
 							},
-						}),
+						},
 					},
-				}),
+				},
 			},
 
-			"status": {
-				Description: "The cluster aggregated status",
-				Type:        types.StringType,
+			"status": schema.StringAttribute{
+				Description: "The cluster's aggregated status",
 				Computed:    true,
 			},
 
-			"kube_config": {
+			"kube_config": schema.StringAttribute{
 				Description: "Kube config file used for connecting to the cluster",
-				Type:        types.StringType,
 				Sensitive:   true,
 				Computed:    true,
 			},

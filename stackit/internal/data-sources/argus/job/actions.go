@@ -9,17 +9,15 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	c := r.client
+func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var config job.Job
-
 	diags := req.Config.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	res, err := c.Services.Argus.ScrapeConfig.ReadWithResponse(ctx, config.ProjectID.ValueString(), config.ArgusInstanceID.ValueString(), config.Name.ValueString())
+	res, err := d.client.Services.Argus.ScrapeConfig.ReadWithResponse(ctx, config.ProjectID.ValueString(), config.ArgusInstanceID.ValueString(), config.Name.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed preparing read job request", err.Error())
 		return

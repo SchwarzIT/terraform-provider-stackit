@@ -8,8 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	c := r.client
+func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var config instance.Instance
 
 	diags := req.Config.Get(ctx, &config)
@@ -18,7 +17,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	res, err := c.Services.Argus.Instances.InstanceReadWithResponse(ctx, config.ProjectID.ValueString(), config.ID.ValueString())
+	res, err := d.client.Services.Argus.Instances.InstanceReadWithResponse(ctx, config.ProjectID.ValueString(), config.ID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to prepare read instance request", err.Error())
 		return

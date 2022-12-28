@@ -10,7 +10,7 @@ import (
 )
 
 // Read - lifecycle function
-func (d DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var config Credential
 	diags := req.Config.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)

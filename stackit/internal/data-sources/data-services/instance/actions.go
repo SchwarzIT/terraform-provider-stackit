@@ -11,8 +11,7 @@ import (
 )
 
 // Read - lifecycle function
-func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	c := r.client
+func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var config Instance
 	diags := req.Config.Get(ctx, &config)
 
@@ -21,7 +20,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	res, err := c.Instances.ListWithResponse(ctx, config.ProjectID.ValueString())
+	res, err := d.client.Instances.ListWithResponse(ctx, config.ProjectID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to prepare list instances request", err.Error())
 		return
@@ -59,7 +58,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	// set found instance
 	instance := list.Instances[found]
 
-	ores, err := r.client.Offerings.GetWithResponse(ctx, config.ProjectID.ValueString())
+	ores, err := d.client.Offerings.GetWithResponse(ctx, config.ProjectID.ValueString())
 	if err != nil {
 		diags.AddError(err.Error(), "failed to prepare get offerings call")
 		return
