@@ -29,7 +29,7 @@ resource "stackit_logme_credential" "example" {
 
 ### Required
 
-- `instance_id` (String) Elasticsearch instance ID the credential belongs to
+- `instance_id` (String) Instance ID the credential belongs to
 - `project_id` (String) Project ID the credential belongs to
 
 ### Read-Only
