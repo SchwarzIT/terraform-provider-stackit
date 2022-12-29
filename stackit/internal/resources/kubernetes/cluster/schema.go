@@ -17,63 +17,63 @@ import (
 
 // Cluster is the schema model
 type Cluster struct {
-	ID                        types.String  `schema:"id"`
-	Name                      types.String  `schema:"name"`
-	KubernetesProjectID       types.String  `schema:"kubernetes_project_id"`
-	KubernetesVersion         types.String  `schema:"kubernetes_version"`
-	KubernetesVersionUsed     types.String  `schema:"kubernetes_version_used"`
-	AllowPrivilegedContainers types.Bool    `schema:"allow_privileged_containers"`
-	NodePools                 []NodePool    `schema:"node_pools"`
-	Maintenance               *Maintenance  `schema:"maintenance"`
-	Hibernations              []Hibernation `schema:"hibernations"`
-	Extensions                *Extensions   `schema:"extensions"`
-	Status                    types.String  `schema:"status"`
-	KubeConfig                types.String  `schema:"kube_config"`
+	ID                        types.String  `tfsdk:"id"`
+	Name                      types.String  `tfsdk:"name"`
+	KubernetesProjectID       types.String  `tfsdk:"kubernetes_project_id"`
+	KubernetesVersion         types.String  `tfsdk:"kubernetes_version"`
+	KubernetesVersionUsed     types.String  `tfsdk:"kubernetes_version_used"`
+	AllowPrivilegedContainers types.Bool    `tfsdk:"allow_privileged_containers"`
+	NodePools                 []NodePool    `tfsdk:"node_pools"`
+	Maintenance               *Maintenance  `tfsdk:"maintenance"`
+	Hibernations              []Hibernation `tfsdk:"hibernations"`
+	Extensions                *Extensions   `tfsdk:"extensions"`
+	Status                    types.String  `tfsdk:"status"`
+	KubeConfig                types.String  `tfsdk:"kube_config"`
 }
 
 type NodePool struct {
-	Name             types.String `schema:"name"`
-	MachineType      types.String `schema:"machine_type"`
-	OSName           types.String `schema:"os_name"`
-	OSVersion        types.String `schema:"os_version"`
-	Minimum          types.Int64  `schema:"minimum"`
-	Maximum          types.Int64  `schema:"maximum"`
-	MaxSurge         types.Int64  `schema:"max_surge"`
-	MaxUnavailable   types.Int64  `schema:"max_unavailable"`
-	VolumeType       types.String `schema:"volume_type"`
-	VolumeSizeGB     types.Int64  `schema:"volume_size_gb"`
-	Labels           types.Map    `schema:"labels"`
-	Taints           []Taint      `schema:"taints"`
-	ContainerRuntime types.String `schema:"container_runtime"`
-	Zones            types.List   `schema:"zones"`
+	Name             types.String `tfsdk:"name"`
+	MachineType      types.String `tfsdk:"machine_type"`
+	OSName           types.String `tfsdk:"os_name"`
+	OSVersion        types.String `tfsdk:"os_version"`
+	Minimum          types.Int64  `tfsdk:"minimum"`
+	Maximum          types.Int64  `tfsdk:"maximum"`
+	MaxSurge         types.Int64  `tfsdk:"max_surge"`
+	MaxUnavailable   types.Int64  `tfsdk:"max_unavailable"`
+	VolumeType       types.String `tfsdk:"volume_type"`
+	VolumeSizeGB     types.Int64  `tfsdk:"volume_size_gb"`
+	Labels           types.Map    `tfsdk:"labels"`
+	Taints           []Taint      `tfsdk:"taints"`
+	ContainerRuntime types.String `tfsdk:"container_runtime"`
+	Zones            types.List   `tfsdk:"zones"`
 }
 
 type Taint struct {
-	Effect types.String `schema:"effect"`
-	Key    types.String `schema:"key"`
-	Value  types.String `schema:"value"`
+	Effect types.String `tfsdk:"effect"`
+	Key    types.String `tfsdk:"key"`
+	Value  types.String `tfsdk:"value"`
 }
 
 type Maintenance struct {
-	EnableKubernetesVersionUpdates   types.Bool   `schema:"enable_kubernetes_version_updates"`
-	EnableMachineImageVersionUpdates types.Bool   `schema:"enable_machine_image_version_updates"`
-	Start                            types.String `schema:"start"`
-	End                              types.String `schema:"end"`
+	EnableKubernetesVersionUpdates   types.Bool   `tfsdk:"enable_kubernetes_version_updates"`
+	EnableMachineImageVersionUpdates types.Bool   `tfsdk:"enable_machine_image_version_updates"`
+	Start                            types.String `tfsdk:"start"`
+	End                              types.String `tfsdk:"end"`
 }
 
 type Hibernation struct {
-	Start    types.String `schema:"start"`
-	End      types.String `schema:"end"`
-	Timezone types.String `schema:"timezone"`
+	Start    types.String `tfsdk:"start"`
+	End      types.String `tfsdk:"end"`
+	Timezone types.String `tfsdk:"timezone"`
 }
 
 type Extensions struct {
-	Argus *ArgusExtension `schema:"argus"`
+	Argus *ArgusExtension `tfsdk:"argus"`
 }
 
 type ArgusExtension struct {
-	Enabled         types.Bool   `schema:"enabled"`
-	ArgusInstanceID types.String `schema:"argus_instance_id"`
+	Enabled         types.Bool   `tfsdk:"enabled"`
+	ArgusInstanceID types.String `tfsdk:"argus_instance_id"`
 }
 
 // Schema returns the terraform schema structure

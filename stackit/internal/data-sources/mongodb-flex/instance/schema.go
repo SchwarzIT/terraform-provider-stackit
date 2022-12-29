@@ -76,57 +76,6 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 					},
 				},
 			},
-			"user": schema.SingleNestedAttribute{
-				Description: "The databse admin user",
-				Computed:    true,
-				Attributes: map[string]schema.Attribute{
-					"id": schema.StringAttribute{
-						Description: "Specifies the user id",
-						Computed:    true,
-					},
-					"username": schema.StringAttribute{
-						Description: "Specifies the user's username",
-						Computed:    true,
-					},
-					"password": schema.StringAttribute{
-						Description: "Specifies the user's password",
-						Computed:    true,
-						Sensitive:   true,
-					},
-					"database": schema.StringAttribute{
-						Description: "Specifies the database the user can access",
-						Computed:    true,
-					},
-					"host": schema.StringAttribute{
-						Description: "Specifies the allowed user hostname",
-						Computed:    true,
-					},
-					"port": schema.Int64Attribute{
-						Description: "Specifies the port",
-						Computed:    true,
-					},
-					"uri": schema.StringAttribute{
-						Description: "Specifies connection URI",
-						Computed:    true,
-						Sensitive:   true,
-					},
-					"roles": schema.ListAttribute{
-						Description: "Specifies the roles assigned to the user",
-						ElementType: types.StringType,
-						Computed:    true,
-					},
-				},
-			},
-			"options": schema.MapAttribute{
-				Description: "Specifies mongodb instance options",
-				ElementType: types.StringType,
-				Computed:    true,
-			},
-			"labels": schema.MapAttribute{
-				Description: "Instance Labels",
-				ElementType: types.StringType,
-				Computed:    true,
-			},
 			"acl": schema.ListAttribute{
 				Description: "Access Control rules to whitelist IP addresses",
 				ElementType: types.StringType,

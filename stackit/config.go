@@ -3,6 +3,7 @@ package stackit
 import (
 	"context"
 	"os"
+	"time"
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -55,6 +56,9 @@ func (p *StackitProvider) Configure(ctx context.Context, req provider.ConfigureR
 		)
 		return
 	}
+
+	httpClient := c.GetHTTPClient()
+	httpClient.Timeout = time.Minute
 
 	resp.DataSourceData = c
 	resp.ResourceData = c

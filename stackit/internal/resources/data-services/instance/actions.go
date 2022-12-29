@@ -76,13 +76,18 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	i, ok := instance.(*instances.Instance)
+	i, ok := instance.(*instances.GetResponse)
 	if !ok {
-		resp.Diagnostics.AddError("failed to parse client response", "response is not of *instances.Instance")
+		resp.Diagnostics.AddError("failed to parse client response", "response is not of *instances.GetResponse")
 		return
 	}
 
-	if err := r.applyClientResponse(ctx, &plan, i); err != nil {
+	if i.JSON200 == nil {
+		resp.Diagnostics.AddError("failed to parse client response", "JSON200 == nil")
+		return
+	}
+
+	if err := r.applyClientResponse(ctx, &plan, i.JSON200); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
 	}

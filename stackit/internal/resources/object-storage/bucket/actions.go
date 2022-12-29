@@ -111,23 +111,16 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	c := r.client
-
-	httpClient := c.GetHTTPClient()
-	t := httpClient.Timeout
-
-	httpClient.Timeout = time.Minute
 	process, err := c.ObjectStorage.Buckets.Delete(ctx, state.ObjectStorageProjectID.ValueString(), state.Name.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to verify bucket deletion", err.Error())
 		return
 	}
 	process.SetTimeout(10 * time.Minute)
-	_, err = process.Wait()
-	if err != nil {
+	if _, err = process.Wait(); err != nil {
 		resp.Diagnostics.AddError("failed to verify bucket deletion", err.Error())
 		return
 	}
-	httpClient.Timeout = t
 
 	resp.State.RemoveResource(ctx)
 }

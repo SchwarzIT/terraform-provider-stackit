@@ -37,6 +37,9 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
+	// artificial wait for instance to be ready
+	time.Sleep(1 * time.Minute)
+
 	r.setGrafanaConfig(ctx, &resp.Diagnostics, &plan, nil)
 	if resp.Diagnostics.HasError() {
 		return
@@ -78,7 +81,7 @@ func (r Resource) createInstance(ctx context.Context, diags *diag.Diagnostics, p
 	}
 
 	process := res.WaitHandler(ctx, c.Instances, plan.ProjectID.ValueString(), res.JSON202.InstanceID)
-	wr, err := process.Wait()
+	wr, err := process.WaitWithContext(ctx)
 	if err != nil {
 		diags.AddError("failed validating instance creation", err.Error())
 		return
@@ -155,7 +158,7 @@ func (r Resource) setMetricsConfig(ctx context.Context, diags *diag.Diagnostics,
 		return
 	}
 	if res.HasError != nil {
-		diags.AddError("failed to make metrics config request", res.HasError.Error())
+		diags.AddWarning("failed to make metrics config request", res.HasError.Error())
 		return
 	}
 }
@@ -201,7 +204,7 @@ func (r Resource) readInstance(ctx context.Context, diags *diag.Diagnostics, s *
 	c := r.client.Services
 	res, err := c.Argus.Instances.InstanceReadWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString())
 	if err != nil {
-		diags.AddError("failed to prepare read instance request", err.Error())
+		diags.AddError(fmt.Sprintf("failed to prepare read instance request (ctx.Err() is: %+v)", ctx.Err()), err.Error())
 		return
 	}
 	if res.HasError != nil {
@@ -368,7 +371,7 @@ func (r Resource) updateInstance(ctx context.Context, diags *diag.Diagnostics, p
 	}
 	process := res.WaitHandler(ctx, c.Argus.Instances, plan.ProjectID.ValueString(), plan.ID.ValueString())
 	process.SetTimeout(2 * time.Hour)
-	wr, err := process.Wait()
+	wr, err := process.WaitWithContext(ctx)
 	if err != nil {
 		diags.AddError("failed validating instance update", err.Error())
 		return
@@ -408,7 +411,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 	process := res.WaitHandler(ctx, r.client.Services.Argus.Instances, state.ProjectID.ValueString(), state.ID.ValueString())
-	if _, err := process.Wait(); err != nil {
+	if _, err := process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed verify instance deletion", err.Error())
 		return
 	}

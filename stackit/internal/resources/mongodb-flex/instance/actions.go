@@ -286,16 +286,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	// allow long wait
-	httpClient := r.client.GetHTTPClient()
-	t := httpClient.Timeout
-	httpClient.Timeout = time.Minute
-	_, err = process.Wait()
-
-	// revert
-	httpClient.Timeout = t
-
-	if err != nil {
+	if _, err = process.Wait(); err != nil {
 		resp.Diagnostics.AddError("failed to verify mongodb instance deletion", err.Error())
 		return
 	}
