@@ -38,7 +38,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	plan.ID = plan.ProjectID
 	process := res.WaitHandler(ctx, c, plan.ID.ValueString())
-	if _, err := process.Wait(); err != nil {
+	if _, err := process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed verifying SKE project creation", err.Error())
 		return
 	}
@@ -115,7 +115,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 
 	}
 	process := res.WaitHandler(ctx, c, state.ID.ValueString())
-	if _, err := process.Wait(); err != nil {
+	if _, err := process.WaitWithContext(ctx); err != nil {
 		if !strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.Diagnostics.AddError("failed to verify project deletion", err.Error())
 			return

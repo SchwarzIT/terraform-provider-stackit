@@ -55,7 +55,7 @@ func (r Resource) createBucket(ctx context.Context, resp *resource.CreateRespons
 		return b
 	}
 	process.SetTimeout(10 * time.Minute)
-	tmp, err := process.Wait()
+	tmp, err := process.WaitWithContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to verify bucket creation", err.Error())
 		return b
@@ -117,7 +117,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 	process.SetTimeout(10 * time.Minute)
-	if _, err = process.Wait(); err != nil {
+	if _, err = process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed to verify bucket deletion", err.Error())
 		return
 	}

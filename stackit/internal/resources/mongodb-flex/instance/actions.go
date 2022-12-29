@@ -80,7 +80,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	// To overcome the bug, we'll wait an initial 30 sec
 	time.Sleep(30 * time.Second)
 
-	instance, err := wait.Wait()
+	instance, err := wait.WaitWithContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("failed MongoDB instance creation validation", err.Error())
 		return
@@ -247,7 +247,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		return
 	}
 
-	instance, err := wait.Wait()
+	instance, err := wait.WaitWithContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("failed MongoDB instance update validation", err.Error())
 		return
@@ -286,7 +286,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	if _, err = process.Wait(); err != nil {
+	if _, err = process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed to verify mongodb instance deletion", err.Error())
 		return
 	}

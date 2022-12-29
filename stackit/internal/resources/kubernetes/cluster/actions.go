@@ -93,7 +93,7 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 	}
 
 	process := resp.WaitHandler(ctx, c.Services.Kubernetes.Cluster, projectID, clusterName)
-	res, err := process.Wait()
+	res, err := process.WaitWithContext(ctx)
 	if err != nil {
 		diags.AddError("failed to validate SKE Create/Update", err.Error())
 		return
@@ -213,7 +213,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	if _, err := res.WaitHandler(ctx, c.Services.Kubernetes.Cluster, state.KubernetesProjectID.ValueString(), state.Name.ValueString()).Wait(); err != nil {
+	if _, err := res.WaitHandler(ctx, c.Services.Kubernetes.Cluster, state.KubernetesProjectID.ValueString(), state.Name.ValueString()).WaitWithContext(ctx); err != nil {
 		if !strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.Diagnostics.AddError("failed to verify cluster deletion", err.Error())
 			return

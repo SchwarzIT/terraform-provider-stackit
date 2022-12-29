@@ -70,7 +70,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	process := res.WaitHandler(ctx, r.client.Instances, plan.ProjectID.ValueString(), plan.ID.ValueString())
-	instance, err := process.Wait()
+	instance, err := process.WaitWithContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("failed instance `create` validation", err.Error())
 		return
@@ -189,7 +189,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	process := res.WaitHandler(ctx, r.client.Instances, state.ProjectID.ValueString(), state.ID.ValueString())
-	instancesGetResp, err := process.Wait()
+	instancesGetResp, err := process.WaitWithContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("failed instance update validation", err.Error())
 		return
@@ -248,7 +248,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	process := res.WaitHandler(ctx, r.client.Instances, state.ProjectID.ValueString(), state.ID.ValueString())
-	if _, err := process.Wait(); err != nil {
+	if _, err := process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed to verify instance deprovision", err.Error())
 	}
 
