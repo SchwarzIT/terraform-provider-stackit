@@ -30,12 +30,12 @@ resource "stackit_postgres_instance" "example" {
 ### Required
 
 - `name` (String) Specifies the instance name. Changing this value requires the resource to be recreated. Changing this value requires the resource to be recreated.
-- `plan` (String) The RabbitMQ Plan. Default is `stackit-postgresql-single-small`
 - `project_id` (String) The project ID.
 
 ### Optional
 
 - `acl` (List of String) Access Control rules to whitelist IP addresses
+- `plan` (String) The RabbitMQ Plan. Default is `stackit-postgresql-single-small`
 - `version` (String) RabbitMQ version. Default is 11
 
 ### Read-Only

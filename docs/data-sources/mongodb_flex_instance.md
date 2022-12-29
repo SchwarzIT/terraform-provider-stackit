@@ -35,12 +35,9 @@ data "stackit_mongodb_flex_instance" "example" {
 - `acl` (List of String) Access Control rules to whitelist IP addresses
 - `backup_schedule` (String) Specifies the backup schedule (cron style)
 - `id` (String) Specifies the resource ID
-- `labels` (Map of String) Instance Labels
 - `machine_type` (String) The Machine Type.
-- `options` (Map of String) Specifies mongodb instance options
 - `replicas` (Number) Number of replicas
 - `storage` (Attributes) A signle `storage` block as defined below. (see [below for nested schema](#nestedatt--storage))
-- `user` (Attributes) The databse admin user (see [below for nested schema](#nestedatt--user))
 - `version` (String) MongoDB version.
 
 <a id="nestedatt--storage"></a>
@@ -50,20 +47,5 @@ Read-Only:
 
 - `class` (String) Specifies the storage class. Available option: `premium-perf2-mongodb`
 - `size` (Number) The storage size in GB.
-
-
-<a id="nestedatt--user"></a>
-### Nested Schema for `user`
-
-Read-Only:
-
-- `database` (String) Specifies the database the user can access
-- `host` (String) Specifies the allowed user hostname
-- `id` (String) Specifies the user id
-- `password` (String, Sensitive) Specifies the user's password
-- `port` (Number) Specifies the port
-- `roles` (List of String) Specifies the roles assigned to the user
-- `uri` (String, Sensitive) Specifies connection URI
-- `username` (String) Specifies the user's username
 
 
