@@ -29,7 +29,7 @@ resource "stackit_postgres_credential" "example" {
 
 ### Required
 
-- `instance_id` (String) Postgres instance ID the credential belongs to
+- `instance_id` (String) Elasticsearch instance ID the credential belongs to
 - `project_id` (String) Project ID the credential belongs to
 
 ### Read-Only

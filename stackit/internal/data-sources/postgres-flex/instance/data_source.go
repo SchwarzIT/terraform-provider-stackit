@@ -21,7 +21,7 @@ type DataSource struct {
 var _ = datasource.DataSource(&DataSource{})
 
 // Metadata returns data resource metadata
-func (r *DataSource) Metadata(_ context.Context, req datasource.MetadataRequest, res *datasource.MetadataResponse) {
+func (d *DataSource) Metadata(_ context.Context, req datasource.MetadataRequest, res *datasource.MetadataResponse) {
 	res.TypeName = "stackit_postgres_flex_instance"
 }
 

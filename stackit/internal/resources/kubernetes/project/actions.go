@@ -8,7 +8,6 @@ import (
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 // Create - lifecycle function
@@ -22,7 +21,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	// handle creation
 	eof := false
 	c := r.client.Services.Kubernetes.Project
-	res, err := c.CreateProjectWithResponse(ctx, plan.ProjectID.Value)
+	res, err := c.CreateProjectWithResponse(ctx, plan.ProjectID.ValueString())
 	if err != nil {
 		if !strings.Contains(err.Error(), common.ERR_UNEXPECTED_EOF) {
 			resp.Diagnostics.AddError("failed initiating SKE project creation", err.Error())
@@ -37,9 +36,9 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		}
 	}
 
-	plan.ID = types.StringValue(plan.ProjectID.Value)
+	plan.ID = plan.ProjectID
 	process := res.WaitHandler(ctx, c, plan.ID.ValueString())
-	if _, err := process.Wait(); err != nil {
+	if _, err := process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed verifying SKE project creation", err.Error())
 		return
 	}
@@ -62,7 +61,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 	// read
 	c := r.client.Services.Kubernetes.Project
-	res, err := c.GetProjectWithResponse(ctx, state.ID.Value)
+	res, err := c.GetProjectWithResponse(ctx, state.ID.ValueString())
 	if err != nil {
 		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.State.RemoveResource(ctx)
@@ -96,7 +95,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 
 	// handle creation
 	c := r.client.Services.Kubernetes.Project
-	res, err := c.DeleteProjectWithResponse(ctx, state.ID.Value)
+	res, err := c.DeleteProjectWithResponse(ctx, state.ID.ValueString())
 	if err != nil {
 		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.State.RemoveResource(ctx)
@@ -115,8 +114,8 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 
 	}
-	process := res.WaitHandler(ctx, c, state.ID.Value)
-	if _, err := process.Wait(); err != nil {
+	process := res.WaitHandler(ctx, c, state.ID.ValueString())
+	if _, err := process.WaitWithContext(ctx); err != nil {
 		if !strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.Diagnostics.AddError("failed to verify project deletion", err.Error())
 			return

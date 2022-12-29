@@ -28,7 +28,7 @@ resource "stackit_redis_credential" "example" {
 
 ### Required
 
-- `instance_id` (String) Redis instance ID the credential belongs to
+- `instance_id` (String) Elasticsearch instance ID the credential belongs to
 - `project_id` (String) Project ID the credential belongs to
 
 ### Read-Only
@@ -38,8 +38,8 @@ resource "stackit_redis_credential" "example" {
 - `id` (String) Specifies the resource ID
 - `password` (String) Credential password
 - `port` (Number) Credential port
-- `route_service_url` (String) Credential route service url
-- `syslog_drain_url` (String) Credential syslog drain url
+- `route_service_url` (String) Credential route_service_url
+- `syslog_drain_url` (String) Credential syslog_drain_url
 - `uri` (String) The instance URI
 - `username` (String) Credential username
 

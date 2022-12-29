@@ -27,25 +27,25 @@ data "stackit_mongodb_flex_instance" "example" {
 
 ### Required
 
-- `name` (String) Specifies the instance name
-- `project_id` (String) The project ID
+- `name` (String) Specifies the instance name.
+- `project_id` (String) The project ID the instance runs in.
 
 ### Read-Only
 
 - `acl` (List of String) Access Control rules to whitelist IP addresses
 - `backup_schedule` (String) Specifies the backup schedule (cron style)
 - `id` (String) Specifies the resource ID
-- `machine_type` (String) The Machine Type
+- `machine_type` (String) The Machine Type.
 - `replicas` (Number) Number of replicas
-- `storage` (Attributes) A signle `storage` block as defined below (see [below for nested schema](#nestedatt--storage))
-- `version` (String) MongoDB version
+- `storage` (Attributes) A signle `storage` block as defined below. (see [below for nested schema](#nestedatt--storage))
+- `version` (String) MongoDB version.
 
 <a id="nestedatt--storage"></a>
 ### Nested Schema for `storage`
 
 Read-Only:
 
-- `class` (String) Specifies the storage class. Available option: `premium-perf6-stackit`
-- `size` (Number) The storage size in GB
+- `class` (String) Specifies the storage class. Available option: `premium-perf2-mongodb`
+- `size` (Number) The storage size in GB.
 
 

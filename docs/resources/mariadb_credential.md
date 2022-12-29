@@ -3,12 +3,12 @@
 page_title: "stackit_mariadb_credential Resource - stackit"
 subcategory: ""
 description: |-
-  Manages MariaDB instance credentials
+  Manages MariaDB credentials
 ---
 
 # stackit_mariadb_credential (Resource)
 
-Manages MariaDB instance credentials
+Manages MariaDB credentials
 
 ## Example Usage
 
@@ -29,7 +29,7 @@ resource "stackit_mariadb_credential" "example" {
 
 ### Required
 
-- `instance_id` (String) MariaDB instance ID the credential belongs to
+- `instance_id` (String) Elasticsearch instance ID the credential belongs to
 - `project_id` (String) Project ID the credential belongs to
 
 ### Read-Only

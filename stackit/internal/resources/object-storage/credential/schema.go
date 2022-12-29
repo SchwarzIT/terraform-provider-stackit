@@ -6,9 +6,11 @@ import (
 	credentialsgroup "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage/credentials-group"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -23,85 +25,78 @@ type Credential struct {
 	SecretAccessKey        types.String `tfsdk:"secret_access_key"`
 }
 
-// GetSchema returns the terraform schema structure
-func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+// Schema returns the terraform schema structure
+func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		Description: "Manages Object Storage credentials",
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
 				Description: "the credential ID",
-				Type:        types.StringType,
 				Required:    false,
 				Optional:    false,
 				Computed:    true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 
-			"object_storage_project_id": {
+			"object_storage_project_id": schema.StringAttribute{
 				Description: "The ID returned from `stackit_object_storage_project`",
-				Type:        types.StringType,
 				Required:    true,
-				Validators: []tfsdk.AttributeValidator{
+				Validators: []validator.String{
 					validate.ProjectID(),
 				},
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
 				},
 			},
 
-			"credentials_group_id": {
+			"credentials_group_id": schema.StringAttribute{
 				Description: "credential group ID. changing this field will recreate the credential.",
-				Type:        types.StringType,
 				Optional:    true,
 				Computed:    true,
-				Validators: []tfsdk.AttributeValidator{
+				Validators: []validator.String{
 					validate.StringWith(credentialsgroup.ValidateCredentialsGroupID, "credentials group ID"),
 				},
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
 				},
 			},
 
-			"expiry": {
+			"expiry": schema.StringAttribute{
 				Description: "specifies if the credential should expire. changing this field will recreate the credential.",
-				Type:        types.StringType,
 				Optional:    true,
 				Computed:    true,
-				Validators: []tfsdk.AttributeValidator{
+				Validators: []validator.String{
 					validate.StringWith(clientValidate.ISO8601, "validate expiry is ISO-8601 compatible"),
 				},
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
 				},
 			},
 
-			"display_name": {
+			"display_name": schema.StringAttribute{
 				Description: "the credential's display name in the portal",
-				Type:        types.StringType,
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
 			},
 
-			"access_key": {
+			"access_key": schema.StringAttribute{
 				Description: "access key (sensitive)",
-				Type:        types.StringType,
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
 				Sensitive:   true,
 			},
 
-			"secret_access_key": {
+			"secret_access_key": schema.StringAttribute{
 				Description: "secret access key (sensitive)",
-				Type:        types.StringType,
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
 				Sensitive:   true,
 			},
 		},
-	}, nil
+	}
 }

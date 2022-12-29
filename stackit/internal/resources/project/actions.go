@@ -68,7 +68,7 @@ func (r Resource) createProject(ctx context.Context, resp *resource.CreateRespon
 		return plan
 	}
 
-	if _, err := process.Wait(); err != nil {
+	if _, err := process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed to verify project is active", err.Error())
 		return plan
 	}
@@ -185,7 +185,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	if _, err := process.Wait(); err != nil {
+	if _, err := process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed to verify project deletion", err.Error())
 	}
 

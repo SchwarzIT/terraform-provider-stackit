@@ -5,9 +5,12 @@ import (
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -45,176 +48,149 @@ type User struct {
 	Roles    types.List   `tfsdk:"roles"`
 }
 
-// GetSchema returns the terraform schema structure
-func (r *Resource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+// Schema returns the terraform schema structure
+func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		MarkdownDescription: `Manages Postgres Flex instances
 		
 ~> **Note:** Postgres Flex is in 'alpha' stage in STACKIT
 `,
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
 				Description: "Specifies the resource ID",
-				Type:        types.StringType,
 				Computed:    true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				Description: "Specifies the instance name. Changing this value requires the resource to be recreated.",
-				Type:        types.StringType,
 				Required:    true,
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
 				},
 			},
-			"project_id": {
+			"project_id": schema.StringAttribute{
 				Description: "The project ID the instance runs in. Changing this value requires the resource to be recreated.",
-				Type:        types.StringType,
 				Required:    true,
-				Validators: []tfsdk.AttributeValidator{
+				Validators: []validator.String{
 					validate.ProjectID(),
 				},
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
 				},
 			},
-			"machine_type": {
+			"machine_type": schema.StringAttribute{
 				Description: "The Machine Type. Available options: `c1.2` `m1.2`, `c1.3`, `m1.3`, `c1.4`, `c1.5`, `m1.5`",
-				Type:        types.StringType,
 				Required:    true,
 			},
-			"version": {
+			"version": schema.StringAttribute{
 				Description: "Postgres version. Options: `13`, `14`. Changing this value requires the resource to be recreated.",
-				Type:        types.StringType,
 				Optional:    true,
 				Computed:    true,
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
 					modifiers.StringDefault(default_version),
-					resource.UseStateForUnknown(),
+					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
-			"replicas": {
+			"replicas": schema.Int64Attribute{
 				Description: "Number of replicas (Default is `1`). Changing this value requires the resource to be recreated.",
-				Type:        types.Int64Type,
 				Optional:    true,
-				PlanModifiers: []tfsdk.AttributePlanModifier{
+				PlanModifiers: []planmodifier.Int64{
 					modifiers.Int64Default(default_replicas),
-					resource.UseStateForUnknown(),
+					int64planmodifier.UseStateForUnknown(),
 				},
 			},
-			"backup_schedule": {
+			"backup_schedule": schema.StringAttribute{
 				Description: "Specifies the backup schedule (cron style)",
-				Type:        types.StringType,
 				Optional:    true,
 				Computed:    true,
-				PlanModifiers: []tfsdk.AttributePlanModifier{
+				PlanModifiers: []planmodifier.String{
 					modifiers.StringDefault(default_backup_schedule),
-					resource.UseStateForUnknown(),
+					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
-			"storage": {
-				Description: "A signle `storage` block as defined below. Changing this value requires the resource to be recreated.",
+			"storage": schema.SingleNestedAttribute{
+				Description: "A signle `storage` block as defined below.",
 				Optional:    true,
 				Computed:    true,
-				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
-					"class": {
+				Attributes: map[string]schema.Attribute{
+					"class": schema.StringAttribute{
 						Description: "Specifies the storage class. Available option: `premium-perf6-stackit`",
-						Type:        types.StringType,
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []tfsdk.AttributePlanModifier{
+						PlanModifiers: []planmodifier.String{
 							modifiers.StringDefault(default_storage_class),
 						},
 					},
-					"size": {
+					"size": schema.Int64Attribute{
 						Description: "The storage size in GB",
-						Type:        types.Int64Type,
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []tfsdk.AttributePlanModifier{
+						PlanModifiers: []planmodifier.Int64{
 							modifiers.Int64Default(default_storage_size),
 						},
 					},
-				}),
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
-					resource.RequiresReplace(),
 				},
 			},
-			"user": {
+			"user": schema.SingleNestedAttribute{
 				Description: "The databse admin user",
 				Computed:    true,
-				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
-					"id": {
+				Attributes: map[string]schema.Attribute{
+					"id": schema.StringAttribute{
 						Description: "Specifies the user id",
-						Type:        types.StringType,
 						Computed:    true,
 					},
-					"username": {
+					"username": schema.StringAttribute{
 						Description: "Specifies the user's username",
-						Type:        types.StringType,
 						Computed:    true,
 					},
-					"password": {
+					"password": schema.StringAttribute{
 						Description: "Specifies the user's password",
-						Type:        types.StringType,
 						Computed:    true,
 						Sensitive:   true,
 					},
-					"database": {
+					"database": schema.StringAttribute{
 						Description: "Specifies the database the user can access",
-						Type:        types.StringType,
 						Computed:    true,
 					},
-					"hostname": {
+					"hostname": schema.StringAttribute{
 						Description: "Specifies the allowed user hostname",
-						Type:        types.StringType,
 						Computed:    true,
 					},
-					"port": {
+					"port": schema.Int64Attribute{
 						Description: "Specifies the port",
-						Type:        types.Int64Type,
 						Computed:    true,
 					},
-					"uri": {
+					"uri": schema.StringAttribute{
 						Description: "Specifies connection URI",
-						Type:        types.StringType,
 						Computed:    true,
 						Sensitive:   true,
 					},
-					"roles": {
+					"roles": schema.ListAttribute{
 						Description: "Specifies the roles assigned to the user",
-						Type:        types.ListType{ElemType: types.StringType},
+						ElementType: types.StringType,
 						Computed:    true,
 					},
-				}),
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
 				},
 			},
-			"options": {
+			"options": schema.MapAttribute{
 				Description: "Specifies postgres instance options",
-				Type: types.MapType{
-					ElemType: types.StringType,
-				},
-				Optional: true,
+				ElementType: types.StringType,
+				Optional:    true,
 			},
-			"labels": {
+			"labels": schema.MapAttribute{
 				Description: "Instance Labels",
-				Type: types.MapType{
-					ElemType: types.StringType,
-				},
-				Optional: true,
+				ElementType: types.StringType,
+				Optional:    true,
 			},
-			"acl": {
+			"acl": schema.ListAttribute{
 				Description: "Access Control rules to whitelist IP addresses",
-				Type:        types.ListType{ElemType: types.StringType},
+				ElementType: types.StringType,
 				Optional:    true,
 				Computed:    true,
 			},
 		},
-	}, nil
+	}
 }

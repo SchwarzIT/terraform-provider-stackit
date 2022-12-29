@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus/jobs"
+	scrapeconfig "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/generated/scrape-config"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -20,28 +20,36 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	c := r.client
-	job := plan.ToClientJob()
-
-	_, process, err := c.Argus.Jobs.Create(ctx, plan.ProjectID.ValueString(), plan.ArgusInstanceID.ValueString(), job)
+	c := r.client.Services
+	job := scrapeconfig.CreateJSONRequestBody(plan.ToClientJob())
+	res, err := c.Argus.ScrapeConfig.CreateWithResponse(ctx, plan.ProjectID.ValueString(), plan.ArgusInstanceID.ValueString(), job)
 	if err != nil {
-		resp.Diagnostics.AddError("failed to create job", err.Error())
+		resp.Diagnostics.AddError("failed preparing create job request", err.Error())
+		return
+	}
+	if res.HasError != nil {
+		resp.Diagnostics.AddError("failed making create job request", res.HasError.Error())
+		return
+	}
+	if res.JSON202 == nil {
+		resp.Diagnostics.AddError("create job request returned an empty response", "JSON202 == nil")
 		return
 	}
 
-	res, err := process.Wait()
-	if err != nil {
-		resp.Diagnostics.AddError("failed to validate job creation", err.Error())
+	data := scrapeconfig.Job{}
+	found := false
+	for _, v := range res.JSON202.Data {
+		if v.JobName == job.JobName {
+			data = v
+			found = true
+			break
+		}
+	}
+	if !found {
+		resp.Diagnostics.AddError("failed to find job name", "no job by that name was found in create response")
 		return
 	}
-
-	jobRes, ok := res.(jobs.GetJobResponse)
-	if !ok {
-		resp.Diagnostics.AddError("conversion failure", "failed to convert wait process response")
-		return
-	}
-
-	plan.FromClientJob(jobRes.Data)
+	plan.FromClientJob(data)
 	diags = resp.State.Set(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -59,15 +67,23 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	c := r.client
+	c := r.client.Services
 
-	res, err := c.Argus.Jobs.Get(ctx, state.ProjectID.ValueString(), state.ArgusInstanceID.ValueString(), state.Name.ValueString())
+	res, err := c.Argus.ScrapeConfig.ReadWithResponse(ctx, state.ProjectID.ValueString(), state.ArgusInstanceID.ValueString(), state.Name.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("failed to read job", err.Error())
+		resp.Diagnostics.AddError("failed preparing read job request", err.Error())
 		return
 	}
-	state.FromClientJob(res.Data)
+	if res.HasError != nil {
+		resp.Diagnostics.AddError("failed making read job request", res.HasError.Error())
+		return
+	}
+	if res.JSON200 == nil {
+		resp.Diagnostics.AddError("failed parsing read job request", "JSON200 == nil")
+		return
+	}
 
+	state.FromClientJob(res.JSON200.Data)
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -84,21 +100,33 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		return
 	}
 
-	c := r.client
-	job := plan.ToClientJob()
-
-	if _, err := c.Argus.Jobs.Update(ctx, plan.ProjectID.ValueString(), plan.ArgusInstanceID.ValueString(), job); err != nil {
-		resp.Diagnostics.AddError("failed to update job", err.Error())
+	c := r.client.Services
+	job := scrapeconfig.UpdateJSONRequestBody(plan.ToClientUpdateJob())
+	ures, err := c.Argus.ScrapeConfig.UpdateWithResponse(ctx, plan.ProjectID.ValueString(), plan.ArgusInstanceID.ValueString(), plan.Name.ValueString(), job)
+	if err != nil {
+		resp.Diagnostics.AddError("failed preparing update job request", err.Error())
+		return
+	}
+	if ures.HasError != nil {
+		resp.Diagnostics.AddError("failed making update job request", ures.HasError.Error())
 		return
 	}
 
 	// read job to verify update
-	res, err := c.Argus.Jobs.Get(ctx, plan.ProjectID.ValueString(), plan.ArgusInstanceID.ValueString(), plan.Name.ValueString())
+	res, err := c.Argus.ScrapeConfig.ReadWithResponse(ctx, plan.ProjectID.ValueString(), plan.ArgusInstanceID.ValueString(), plan.Name.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("failed to verify job update", err.Error())
+		resp.Diagnostics.AddError("failed preparing read job request", err.Error())
 		return
 	}
-	plan.FromClientJob(res.Data)
+	if res.HasError != nil {
+		resp.Diagnostics.AddError("failed making read job request", res.HasError.Error())
+		return
+	}
+	if res.JSON200 == nil {
+		resp.Diagnostics.AddError("failed parsing read job request", "JSON200 == nil")
+		return
+	}
+	plan.FromClientJob(res.JSON200.Data)
 
 	// update state
 	diags = resp.State.Set(ctx, &plan)
@@ -116,17 +144,18 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	c := r.client
+	c := r.client.Services
 	job := state.ToClientJob()
-
-	_, process, err := c.Argus.Jobs.Delete(ctx, state.ProjectID.ValueString(), state.ArgusInstanceID.ValueString(), job.JobName)
+	params := &scrapeconfig.DeleteParams{
+		JobName: []string{job.JobName},
+	}
+	res, err := c.Argus.ScrapeConfig.DeleteWithResponse(ctx, state.ProjectID.ValueString(), state.ArgusInstanceID.ValueString(), params)
 	if err != nil {
-		resp.Diagnostics.AddError("failed to delete job", err.Error())
+		resp.Diagnostics.AddError("failed to prepare delete job request", err.Error())
 		return
 	}
-
-	if _, err := process.Wait(); err != nil {
-		resp.Diagnostics.AddError("failed to verify job deletion", err.Error())
+	if res.HasError != nil {
+		resp.Diagnostics.AddError("failed to make delete job request", res.HasError.Error())
 		return
 	}
 

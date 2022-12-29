@@ -3,120 +3,109 @@ package job
 import (
 	"context"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus/instances"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-// GetSchema returns the terraform schema structure
-func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
-		Description: "Data source for Argus Jobs",
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+// Schema returns the terraform schema structure
+func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
+		Description: "Data source for Argus Instance Jobs",
+		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
 				Description: "Specifies the Argus Job ID",
-				Type:        types.StringType,
 				Computed:    true,
 			},
 
-			"name": {
+			"name": schema.StringAttribute{
 				Description: "Specifies the name of the scraping job",
-				Type:        types.StringType,
 				Required:    true,
-				Validators: []tfsdk.AttributeValidator{
-					validate.StringWith(
-						instances.ValidateInstanceName,
-						"validate argus instance name",
-					),
+				Validators: []validator.String{
+					stringvalidator.LengthBetween(0, 200),
 				},
 			},
 
-			"project_id": {
+			"project_id": schema.StringAttribute{
 				Description: "Specifies the Project ID the Argus instance belongs to",
-				Type:        types.StringType,
 				Required:    true,
-				Validators: []tfsdk.AttributeValidator{
+				Validators: []validator.String{
 					validate.ProjectID(),
 				},
 			},
 
-			"argus_instance_id": {
+			"argus_instance_id": schema.StringAttribute{
 				Description: "Specifies the Argus Instance ID the job belongs to",
-				Type:        types.StringType,
 				Required:    true,
 			},
 
-			"metrics_path": {
-				Description: "Specifies the job scraping path. Defaults to `/metrics`",
-				Type:        types.StringType,
+			"metrics_path": schema.StringAttribute{
+				Description: "Specifies the job scraping path.",
 				Computed:    true,
 			},
 
-			"scheme": {
-				Description: "Specifies the scheme. Default is `https`.",
-				Type:        types.StringType,
+			"scheme": schema.StringAttribute{
+				Description: "Specifies the scheme.",
 				Computed:    true,
 			},
 
-			"scrape_interval": {
-				Description: "Specifies the scrape interval as duration string. Default is `5m`.",
-				Type:        types.StringType,
+			"scrape_interval": schema.StringAttribute{
+				Description: "Specifies the scrape interval as duration string.",
 				Computed:    true,
 			},
 
-			"scrape_timeout": {
-				Description: "Specifies the scrape timeout as duration string. Default is `2m`.",
-				Type:        types.StringType,
+			"scrape_timeout": schema.StringAttribute{
+				Description: "Specifies the scrape timeout as duration string.",
 				Computed:    true,
 			},
 
-			"saml2": {
+			"saml2": schema.SingleNestedAttribute{
 				Description: "A saml2 configuration block",
 				Optional:    true,
-				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
-					"enable_url_parameters": {
-						Description: "Should URL parameters be enabled? Default is `true`",
-						Type:        types.BoolType,
+				Attributes: map[string]schema.Attribute{
+					"enable_url_parameters": schema.BoolAttribute{
+						Description: "Should URL parameters be enabled?",
 						Computed:    true,
 					},
-				}),
+				},
 			},
 
-			"basic_auth": {
+			"basic_auth": schema.SingleNestedAttribute{
 				Description: "A basic_auth block",
-				Optional:    true,
-				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
-					"username": {
+				Computed:    true,
+				Attributes: map[string]schema.Attribute{
+					"username": schema.StringAttribute{
 						Description: "Specifies basic auth username",
-						Type:        types.StringType,
 						Computed:    true,
 					},
-					"password": {
+					"password": schema.StringAttribute{
 						Description: "Specifies basic auth password",
-						Type:        types.StringType,
 						Computed:    true,
 					},
-				}),
+				},
 			},
 
-			"targets": {
+			"targets": schema.ListNestedAttribute{
 				Description: "targets list",
 				Computed:    true,
-				Attributes: tfsdk.ListNestedAttributes(map[string]tfsdk.Attribute{
-					"urls": {
-						Description: "Specifies basic auth username",
-						Type:        types.ListType{ElemType: types.StringType},
-						Computed:    true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"urls": schema.ListAttribute{
+							Description: "Specifies target URLs",
+							ElementType: types.StringType,
+							Computed:    true,
+						},
+						"labels": schema.ListAttribute{
+							Description: "Specifies labels",
+							ElementType: types.StringType,
+							Computed:    true,
+						},
 					},
-					"labels": {
-						Description: "Specifies basic auth password",
-						Type:        types.MapType{ElemType: types.StringType},
-						Computed:    true,
-					},
-				}),
+				},
 			},
 		},
-	}, nil
+	}
 }

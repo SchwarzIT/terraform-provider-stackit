@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus/instances"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/generated/instances"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -19,21 +19,32 @@ const (
 )
 
 func (r Resource) loadPlanID(ctx context.Context, diags *diag.Diagnostics, s *Instance) {
-	c := r.client
+	c := r.client.Services.Argus
 
-	res, err := c.Argus.Plans.List(ctx, s.ProjectID.ValueString())
+	res, err := c.Plans.ListPlansWithResponse(ctx, s.ProjectID.ValueString())
 	if err != nil {
-		diags.AddError("failed to list plans", err.Error())
+		diags.AddError("failed to prepare list plans request", err.Error())
+		return
+	}
+	if res.HasError != nil {
+		diags.AddError("failed to make list plans request", res.HasError.Error())
+		return
+	}
+	if res.JSON200 == nil {
+		diags.AddError("received an empty response", "JSON200 == nil")
 		return
 	}
 
 	avl := ""
-	for _, v := range res.Plans {
-		if v.Name == s.Plan.ValueString() {
-			s.PlanID = types.StringValue(v.PlanID)
+	for _, v := range res.JSON200.Plans {
+		if v.Name == nil {
+			continue
+		}
+		if *v.Name == s.Plan.ValueString() {
+			s.PlanID = types.StringValue(v.PlanID.String())
 			break
 		}
-		avl = fmt.Sprintf("%s\n- %s", avl, v.Name)
+		avl = fmt.Sprintf("%s\n- %s", avl, *v.Name)
 	}
 	if s.PlanID.ValueString() == "" {
 		diags.AddError("invalid plan", fmt.Sprintf("couldn't find plan '%s'.\navailable names are:%s", s.Plan.ValueString(), avl))
@@ -41,8 +52,8 @@ func (r Resource) loadPlanID(ctx context.Context, diags *diag.Diagnostics, s *In
 	}
 }
 
-func (l Instance) isEqual(got instances.Instance) bool {
-	if l.Name.ValueString() == got.Name &&
+func (l Instance) isEqual(got instances.ProjectInstanceUI) bool {
+	if got.Name != nil && l.Name.ValueString() == *got.Name &&
 		l.Plan.ValueString() == got.PlanName &&
 		l.PlanID.ValueString() == got.PlanID {
 		return true
@@ -50,13 +61,17 @@ func (l Instance) isEqual(got instances.Instance) bool {
 	return false
 }
 
-func updateByAPIResult(s *Instance, res instances.Instance) {
+func updateByAPIResult(s *Instance, res *instances.ProjectInstanceUI) {
 	s.ID = types.StringValue(res.ID)
 	s.Plan = types.StringValue(res.PlanName)
 	s.PlanID = types.StringValue(res.PlanID)
-	s.Name = types.StringValue(res.Name)
+	if res.Name != nil {
+		s.Name = types.StringValue(*res.Name)
+	}
 	s.DashboardURL = types.StringValue(res.DashboardURL)
-	s.IsUpdatable = types.Bool{Value: res.IsUpdatable}
+	if res.IsUpdatable != nil {
+		s.IsUpdatable = types.BoolValue(*res.IsUpdatable)
+	}
 	s.GrafanaURL = types.StringValue(res.Instance.GrafanaURL)
 	s.GrafanaInitialAdminPassword = types.StringValue(res.Instance.GrafanaAdminPassword)
 	s.GrafanaInitialAdminUser = types.StringValue(res.Instance.GrafanaAdminUser)
@@ -67,7 +82,7 @@ func updateByAPIResult(s *Instance, res instances.Instance) {
 	s.LogsURL = types.StringValue(res.Instance.LogsURL)
 	s.LogsPushURL = types.StringValue(res.Instance.LogsPushURL)
 	s.JaegerTracesURL = types.StringValue(res.Instance.JaegerTracesURL)
-	s.JaegerUIURL = types.StringValue(res.Instance.JaegerUIURL)
+	s.JaegerUIURL = types.StringValue(res.Instance.JaegerUiURL)
 	s.OtlpTracesURL = types.StringValue(res.Instance.OtlpTracesURL)
 	s.ZipkinSpansURL = types.StringValue(res.Instance.ZipkinSpansURL)
 }

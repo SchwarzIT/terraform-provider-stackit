@@ -5,56 +5,50 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage/buckets"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
-	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
-// GetSchema returns the terraform schema structure
-func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+// Schema returns the terraform schema structure
+func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		Description: "Data source for Object Storage buckets",
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
 				Description: "Specifies the resource ID",
-				Type:        types.StringType,
 				Computed:    true,
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				Description: "the bucket name",
-				Type:        types.StringType,
 				Required:    true,
-				Validators: []tfsdk.AttributeValidator{
+				Validators: []validator.String{
 					validate.StringWith(buckets.ValidateBucketName, "validate bucket name"),
 				},
 			},
 
-			"object_storage_project_id": {
+			"object_storage_project_id": schema.StringAttribute{
 				Description: "The ID returned from `stackit_object_storage_project`",
-				Type:        types.StringType,
 				Required:    true,
-				Validators: []tfsdk.AttributeValidator{
+				Validators: []validator.String{
 					validate.ProjectID(),
 				},
 			},
 
-			"region": {
+			"region": schema.StringAttribute{
 				Description: "the region where the bucket was created",
-				Type:        types.StringType,
 				Computed:    true,
 			},
 
-			"host_style_url": {
+			"host_style_url": schema.StringAttribute{
 				Description: "url with dedicated host name",
-				Type:        types.StringType,
 				Computed:    true,
 			},
 
-			"path_style_url": {
+			"path_style_url": schema.StringAttribute{
 				Description: "url with path to the bucket",
-				Type:        types.StringType,
 				Computed:    true,
 			},
 		},
-	}, nil
+	}
 }

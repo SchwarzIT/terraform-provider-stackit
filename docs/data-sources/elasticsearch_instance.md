@@ -3,15 +3,15 @@
 page_title: "stackit_elasticsearch_instance Data Source - stackit"
 subcategory: ""
 description: |-
-  Data source for Elasticsearch instances
-  ~> Note: Elasticsearch API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this data source is not ready for production usage.
+  Data source for ElasticSearch instances
+  ~> Note: ElasticSearch API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this data source is not ready for production usage.
 ---
 
 # stackit_elasticsearch_instance (Data Source)
 
-Data source for Elasticsearch instances
+Data source for ElasticSearch instances
 
-~> **Note:** Elasticsearch API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this data source is not ready for production usage.
+~> **Note:** ElasticSearch API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this data source is not ready for production usage.
 
 ## Example Usage
 
@@ -32,14 +32,14 @@ data "stackit_elasticsearch_instance" "example" {
 
 ### Read-Only
 
-- `acl` (List of String) Access control rules
+- `acl` (List of String) Access Control rules to whitelist IP addresses
 - `cf_guid` (String) Cloud Foundry GUID
 - `cf_organization_guid` (String) Cloud Foundry Organization GUID
 - `cf_space_guid` (String) Cloud Foundry Space GUID
 - `dashboard_url` (String) Dashboard URL
-- `id` (String) The instance ID
-- `plan` (String) The Elasticsearch plan name
-- `plan_id` (String) Elasticsearch plan ID
-- `version` (String) Elasticsearch version
+- `id` (String) Specifies the resource ID
+- `plan` (String) The RabbitMQ Plan
+- `plan_id` (String) The selected plan ID
+- `version` (String) RabbitMQ version
 
 

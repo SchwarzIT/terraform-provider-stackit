@@ -3,34 +3,24 @@ package project
 import (
 	"context"
 
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
-	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 )
 
-// GetSchema returns the terraform schema structure
-func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
-		Description: "Data source for kubernetes project",
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
-				Description: "Specifies the resource ID",
-				Type:        types.StringType,
+// Schema returns the terraform schema structure
+func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
+		Description: "Data source for STACKIT Kubernetes Engine (SKE) project",
+		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
+				Description: "kubernetes project ID",
 				Computed:    true,
 			},
-			"project_id": {
-				Description: "The project ID in which SKE is enabled",
-				Type:        types.StringType,
+
+			"project_id": schema.StringAttribute{
+				Description: "the project ID that SKE will be enabled in",
 				Required:    true,
-				Validators: []tfsdk.AttributeValidator{
-					validate.ProjectID(),
-				},
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
-				},
 			},
 		},
-	}, nil
+	}
 }

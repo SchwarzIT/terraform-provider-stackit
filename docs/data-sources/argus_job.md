@@ -3,12 +3,12 @@
 page_title: "stackit_argus_job Data Source - stackit"
 subcategory: ""
 description: |-
-  Data source for Argus Jobs
+  Data source for Argus Instance Jobs
 ---
 
 # stackit_argus_job (Data Source)
 
-Data source for Argus Jobs
+Data source for Argus Instance Jobs
 
 ## Example Usage
 
@@ -37,17 +37,25 @@ data "stackit_argus_job" "example" {
 
 ### Optional
 
-- `basic_auth` (Attributes) A basic_auth block (see [below for nested schema](#nestedatt--basic_auth))
 - `saml2` (Attributes) A saml2 configuration block (see [below for nested schema](#nestedatt--saml2))
 
 ### Read-Only
 
+- `basic_auth` (Attributes) A basic_auth block (see [below for nested schema](#nestedatt--basic_auth))
 - `id` (String) Specifies the Argus Job ID
-- `metrics_path` (String) Specifies the job scraping path. Defaults to `/metrics`
-- `scheme` (String) Specifies the scheme. Default is `https`.
-- `scrape_interval` (String) Specifies the scrape interval as duration string. Default is `5m`.
-- `scrape_timeout` (String) Specifies the scrape timeout as duration string. Default is `2m`.
+- `metrics_path` (String) Specifies the job scraping path.
+- `scheme` (String) Specifies the scheme.
+- `scrape_interval` (String) Specifies the scrape interval as duration string.
+- `scrape_timeout` (String) Specifies the scrape timeout as duration string.
 - `targets` (Attributes List) targets list (see [below for nested schema](#nestedatt--targets))
+
+<a id="nestedatt--saml2"></a>
+### Nested Schema for `saml2`
+
+Read-Only:
+
+- `enable_url_parameters` (Boolean) Should URL parameters be enabled?
+
 
 <a id="nestedatt--basic_auth"></a>
 ### Nested Schema for `basic_auth`
@@ -58,20 +66,12 @@ Read-Only:
 - `username` (String) Specifies basic auth username
 
 
-<a id="nestedatt--saml2"></a>
-### Nested Schema for `saml2`
-
-Read-Only:
-
-- `enable_url_parameters` (Boolean) Should URL parameters be enabled? Default is `true`
-
-
 <a id="nestedatt--targets"></a>
 ### Nested Schema for `targets`
 
 Read-Only:
 
-- `labels` (Map of String) Specifies basic auth password
-- `urls` (List of String) Specifies basic auth username
+- `labels` (List of String) Specifies labels
+- `urls` (List of String) Specifies target URLs
 
 

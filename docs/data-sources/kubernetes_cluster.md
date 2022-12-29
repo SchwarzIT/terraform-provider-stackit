@@ -3,12 +3,12 @@
 page_title: "stackit_kubernetes_cluster Data Source - stackit"
 subcategory: ""
 description: |-
-  Data source for kubernetes clusters
+  Data source for STACKIT Kubernetes Engine (SKE) clusters
 ---
 
 # stackit_kubernetes_cluster (Data Source)
 
-Data source for kubernetes clusters
+Data source for STACKIT Kubernetes Engine (SKE) clusters
 
 ## Example Usage
 
@@ -34,28 +34,65 @@ data "stackit_kubernetes_cluster" "example" {
 
 ### Required
 
-- `kubernetes_project_id` (String) The project ID the cluster runs in
-- `name` (String) Specifies the cluster name
+- `kubernetes_project_id` (String) The ID of a `stackit_kubernetes_project` resource
+- `name` (String) Specifies the cluster name (lower case, alphanumeric, hypens allowed, up to 11 chars)
+
+### Optional
+
+- `allow_privileged_containers` (Boolean) Should containers be allowed to run in privileged mode?
+- `node_pools` (Attributes List) One or more `node_pool` block as defined below (see [below for nested schema](#nestedatt--node_pools))
 
 ### Read-Only
 
-- `allow_privileged_containers` (Boolean) Are containers allowed to run in privileged mode?
-- `extensions` (Attributes) A single extensions block (see [below for nested schema](#nestedatt--extensions))
-- `hibernations` (Attributes List) One or more hibernation blocks (see [below for nested schema](#nestedatt--hibernations))
+- `extensions` (Attributes) A single extensions block as defined below (see [below for nested schema](#nestedatt--extensions))
+- `hibernations` (Attributes List) One or more hibernation block as defined below (see [below for nested schema](#nestedatt--hibernations))
 - `id` (String) Specifies the resource ID
 - `kube_config` (String, Sensitive) Kube config file used for connecting to the cluster
-- `kubernetes_version` (String) Kubernetes version
-- `kubernetes_version_used` (String) Full Kubernetes version used. For the data source, it'll always match `kubernetes_version`
+- `kubernetes_version` (String) Kubernetes version.
+- `kubernetes_version_used` (String) Full Kubernetes version used. For example, if `1.22` was selected, this value may result to `1.22.15`
 - `maintenance` (Attributes) A single maintenance block as defined below (see [below for nested schema](#nestedatt--maintenance))
-- `node_pools` (Attributes List) One or more `node_pool` blocks (see [below for nested schema](#nestedatt--node_pools))
-- `status` (String) The cluster aggregated status
+- `status` (String) The cluster's aggregated status
+
+<a id="nestedatt--node_pools"></a>
+### Nested Schema for `node_pools`
+
+Required:
+
+- `machine_type` (String) The machine type.
+- `name` (String) Specifies the name of the node pool
+
+Read-Only:
+
+- `container_runtime` (String) Specifies the container runtime.
+- `labels` (Map of String) Labels to add to each node
+- `max_surge` (Number) The maximum number of nodes upgraded simultaneously.
+- `max_unavailable` (Number) The maximum number of nodes unavailable during upgraded.
+- `maximum` (Number) Maximum nodes in the pool.
+- `minimum` (Number) Minimum nodes in the pool.
+- `os_name` (String) The name of the OS image.
+- `os_version` (String) The OS image version.
+- `taints` (Attributes List) Specifies a taint list as defined below (see [below for nested schema](#nestedatt--node_pools--taints))
+- `volume_size_gb` (Number) The volume size in GB.
+- `volume_type` (String) Specifies the volume type.
+- `zones` (List of String) Specify a list of availability zones.
+
+<a id="nestedatt--node_pools--taints"></a>
+### Nested Schema for `node_pools.taints`
+
+Read-Only:
+
+- `effect` (String) The taint effect. Only `PreferNoSchedule` is supported at the moment
+- `key` (String) Taint key to be applied to a node
+- `value` (String) Taint value corresponding to the taint key
+
+
 
 <a id="nestedatt--extensions"></a>
 ### Nested Schema for `extensions`
 
-Optional:
+Read-Only:
 
-- `argus` (Attributes) A single argus block (see [below for nested schema](#nestedatt--extensions--argus))
+- `argus` (Attributes) A single argus block as defined below (see [below for nested schema](#nestedatt--extensions--argus))
 
 <a id="nestedatt--extensions--argus"></a>
 ### Nested Schema for `extensions.argus`
@@ -63,7 +100,7 @@ Optional:
 Read-Only:
 
 - `argus_instance_id` (String) Instance ID of argus
-- `enabled` (Boolean) Is argus extension enabled?
+- `enabled` (Boolean) Flag to enable/disable argus extensions.
 
 
 
@@ -72,9 +109,9 @@ Read-Only:
 
 Read-Only:
 
-- `end` (String) End time of hibernation
-- `start` (String) Start time of cluster hibernation
-- `timezone` (String) Timezone
+- `end` (String) End time of hibernation, in crontab syntax, i.e. `0 8 * * *` for waking up the cluster at 8am
+- `start` (String) Start time of cluster hibernation, in crontab syntax, i.e. `0 18 * * *` for starting everyday at 6pm
+- `timezone` (String) Timezone name corresponding to a file in the IANA Time Zone database. i.e. `Europe/Berlin`
 
 
 <a id="nestedatt--maintenance"></a>
@@ -86,35 +123,5 @@ Read-Only:
 - `enable_machine_image_version_updates` (Boolean) Flag to enable/disable auto-updates of the OS image version
 - `end` (String) RFC3339 Date time for maintenance window end. i.e. `2019-08-24T23:30:00Z`
 - `start` (String) RFC3339 Date time for maintenance window start. i.e. `2019-08-24T23:00:00Z`
-
-
-<a id="nestedatt--node_pools"></a>
-### Nested Schema for `node_pools`
-
-Read-Only:
-
-- `container_runtime` (String) The container runtime
-- `labels` (Map of String) Labels added to each node
-- `machine_type` (String) The machine type
-- `max_surge` (Number) The maximum number of nodes upgraded simultaneously
-- `max_unavailable` (Number) The maximum number of nodes unavailable during upgraded
-- `maximum` (Number) Maximum nodes in the pool
-- `minimum` (Number) Minimum nodes in the pool
-- `name` (String) The name of the node pool
-- `os_name` (String) The name of the OS image
-- `os_version` (String) The OS image version
-- `taints` (Attributes List) Taint blocks (see [below for nested schema](#nestedatt--node_pools--taints))
-- `volume_size_gb` (Number) The volume size in GB
-- `volume_type` (String) Specifies the volume type
-- `zones` (List of String) List of availability zones
-
-<a id="nestedatt--node_pools--taints"></a>
-### Nested Schema for `node_pools.taints`
-
-Read-Only:
-
-- `effect` (String) The taint effect
-- `key` (String) Taint key applied to a node
-- `value` (String) Taint value corresponding to the taint key
 
 

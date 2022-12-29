@@ -3,11 +3,10 @@ package instance
 import (
 	"context"
 
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -24,83 +23,64 @@ type Instance struct {
 	Storage        types.Object `tfsdk:"storage"`
 }
 
-// GetSchema returns the terraform schema structure
-func (r DataSource) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+// Schema returns the terraform schema structure
+func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		MarkdownDescription: `Data source for Postgres Flex instance
 		
 ~> **Note:** Postgres Flex is in 'alpha' stage in STACKIT
 `,
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
 				Description: "Specifies the resource ID",
-				Type:        types.StringType,
 				Computed:    true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
-				},
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				Description: "Specifies the instance name",
-				Type:        types.StringType,
 				Required:    true,
 			},
-			"project_id": {
+			"project_id": schema.StringAttribute{
 				Description: "The project ID",
-				Type:        types.StringType,
 				Required:    true,
-				Validators: []tfsdk.AttributeValidator{
+				Validators: []validator.String{
 					validate.ProjectID(),
 				},
 			},
-			"machine_type": {
+			"machine_type": schema.StringAttribute{
 				Description: "The Machine Type",
-				Type:        types.StringType,
 				Computed:    true,
 			},
-			"version": {
+			"version": schema.StringAttribute{
 				Description: "Postgres version",
-				Type:        types.StringType,
 				Computed:    true,
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					resource.RequiresReplace(),
-				},
 			},
-			"replicas": {
+			"replicas": schema.Int64Attribute{
 				Description: "Number of replicas",
-				Type:        types.Int64Type,
 				Computed:    true,
-				PlanModifiers: []tfsdk.AttributePlanModifier{
-					modifiers.Int64Default(1),
-					resource.RequiresReplace(),
-				},
 			},
-			"backup_schedule": {
+			"backup_schedule": schema.StringAttribute{
 				Description: "Specifies the backup schedule (cron style)",
-				Type:        types.StringType,
 				Computed:    true,
 			},
-			"storage": {
+			"storage": schema.SingleNestedAttribute{
 				Description: "A signle `storage` block as defined below",
 				Computed:    true,
-				Attributes: tfsdk.SingleNestedAttributes(map[string]tfsdk.Attribute{
-					"class": {
+				Attributes: map[string]schema.Attribute{
+					"class": schema.StringAttribute{
 						Description: "Specifies the storage class. Available option: `premium-perf6-stackit`",
-						Type:        types.StringType,
 						Computed:    true,
 					},
-					"size": {
+					"size": schema.Int64Attribute{
 						Description: "The storage size in GB",
-						Type:        types.Int64Type,
 						Computed:    true,
 					},
-				}),
+				},
 			},
-			"acl": {
+			"acl": schema.ListAttribute{
 				Description: "Access Control rules to whitelist IP addresses",
-				Type:        types.ListType{ElemType: types.StringType},
+				ElementType: types.StringType,
 				Computed:    true,
 			},
 		},
-	}, nil
+	}
 }

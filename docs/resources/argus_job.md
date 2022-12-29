@@ -3,12 +3,12 @@
 page_title: "stackit_argus_job Resource - stackit"
 subcategory: ""
 description: |-
-  Manages Argus Instance Jobs
+  
 ---
 
 # stackit_argus_job (Resource)
 
-Manages Argus Instance Jobs
+
 
 ## Example Usage
 
@@ -59,11 +59,11 @@ resource "stackit_argus_job" "example" {
 
 Required:
 
-- `urls` (List of String) Specifies basic auth username
+- `urls` (List of String) Specifies target URLs
 
 Optional:
 
-- `labels` (Map of String) Specifies basic auth password
+- `labels` (List of String) Specifies labels
 
 
 <a id="nestedatt--basic_auth"></a>

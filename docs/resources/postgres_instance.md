@@ -3,15 +3,15 @@
 page_title: "stackit_postgres_instance Resource - stackit"
 subcategory: ""
 description: |-
-  Manages PostgresDB instances
-  ~> Note: PostgresDB API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
+  Manages Postgres instances
+  ~> Note: Postgres API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
 ---
 
 # stackit_postgres_instance (Resource)
 
-Manages PostgresDB instances
+Manages Postgres instances
 
-~> **Note:** PostgresDB API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
+~> **Note:** Postgres API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
 
 ## Example Usage
 
@@ -35,9 +35,8 @@ resource "stackit_postgres_instance" "example" {
 ### Optional
 
 - `acl` (List of String) Access Control rules to whitelist IP addresses
-- `plan` (String) The PostgresDB Plan. Default is `stackit-postgresql-single-small`.
-Options are: `stackit-postgresql-cluster-big`, `stackit-postgresql-cluster-extra-large`, `stackit-postgresql-cluster-medium`, `stackit-postgresql-cluster-small`, `stackit-postgresql-single-medium`, `stackit-postgresql-single-small`, `stackit-postgresql-cluster-extra-large-non-ssl`, `stackit-postgresql-cluster-medium-non-ssl`, `stackit-postgresql-single-small-non-ss`, `stackit-postgresql-cluster-big-non-ssl`, `stackit-postgresql-cluster-small-non-ssl`, `stackit-postgresql-single-medium-non-ssl`
-- `version` (String) PostgresDB version. Options: `10`, `11`. Changing this value requires the resource to be recreated.
+- `plan` (String) The RabbitMQ Plan. Default is `stackit-postgresql-single-small`
+- `version` (String) RabbitMQ version. Default is 11
 
 ### Read-Only
 

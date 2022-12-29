@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus/grafana"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus/instances"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus/metrics"
+	grafanaConfigs "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/generated/grafana-configs"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/generated/instances"
+	metricsStorageRetention "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/generated/metrics-storage-retention"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -37,6 +37,9 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
+	// artificial wait for instance to be ready
+	time.Sleep(1 * time.Minute)
+
 	r.setGrafanaConfig(ctx, &resp.Diagnostics, &plan, nil)
 	if resp.Diagnostics.HasError() {
 		return
@@ -55,23 +58,38 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 }
 
 func (r Resource) createInstance(ctx context.Context, diags *diag.Diagnostics, plan *Instance) {
-	c := r.client
-
-	_, process, err := c.Argus.Instances.Create(ctx, plan.ProjectID.ValueString(), plan.Name.ValueString(), plan.PlanID.ValueString(), map[string]string{})
+	c := r.client.Services.Argus
+	n := plan.Name.ValueString()
+	pa := map[string]interface{}{}
+	body := instances.InstanceCreateJSONRequestBody{
+		Name:      &n,
+		PlanID:    plan.PlanID.ValueString(),
+		Parameter: &pa,
+	}
+	res, err := c.Instances.InstanceCreateWithResponse(ctx, plan.ProjectID.ValueString(), body)
 	if err != nil {
-		diags.AddError("failed during instance creation", err.Error())
+		diags.AddError("failed preparing instance creation request", err.Error())
+		return
+	}
+	if res.HasError != nil {
+		diags.AddError("failed making instance creation request", res.HasError.Error())
+		return
+	}
+	if res.JSON202 == nil {
+		diags.AddError("got an empty response", "JSON202 == nil")
 		return
 	}
 
-	res, err := process.Wait()
+	process := res.WaitHandler(ctx, c.Instances, plan.ProjectID.ValueString(), res.JSON202.InstanceID)
+	wr, err := process.WaitWithContext(ctx)
 	if err != nil {
 		diags.AddError("failed validating instance creation", err.Error())
 		return
 	}
 
-	got, ok := res.(instances.Instance)
+	got, ok := wr.(*instances.ProjectInstanceUI)
 	if !ok {
-		diags.AddError("failed wait result conversion", err.Error())
+		diags.AddError("failed wait result conversion", "result is not of *instances.ProjectInstanceUI")
 		return
 	}
 
@@ -85,23 +103,27 @@ func (r Resource) setGrafanaConfig(ctx context.Context, diags *diag.Diagnostics,
 
 	if ref != nil && ref.Grafana != nil {
 		if s.Grafana == nil {
-			s.Grafana = &Grafana{EnablePublicAccess: types.Bool{Value: default_grafana_enable_public_access}}
+			s.Grafana = &Grafana{EnablePublicAccess: types.BoolValue(default_grafana_enable_public_access)}
 		} else if ref.Grafana.EnablePublicAccess.Equal(s.Grafana.EnablePublicAccess) {
 			return
 		}
 	}
 
-	c := r.client
-	cfg := grafana.Config{
-		PublicReadAccess: s.Grafana.EnablePublicAccess.ValueBool(),
+	c := r.client.Services
+	epa := s.Grafana.EnablePublicAccess.ValueBool()
+	cfg := grafanaConfigs.UpdateJSONRequestBody{
+		PublicReadAccess: &epa,
 	}
 
-	_, err := c.Argus.Grafana.UpdateConfig(ctx, s.ProjectID.ValueString(), s.ID.ValueString(), cfg)
+	res, err := c.Argus.GrafanaConfigs.UpdateWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString(), cfg)
 	if err != nil {
-		diags.AddError("failed to set grafana config", err.Error())
+		diags.AddError("failed to prepare grafana config request", err.Error())
 		return
 	}
-
+	if res.HasError != nil {
+		diags.AddError("failed to make grafana config request", res.HasError.Error())
+		return
+	}
 }
 
 func (r Resource) setMetricsConfig(ctx context.Context, diags *diag.Diagnostics, s *Instance, ref *Instance) {
@@ -123,16 +145,20 @@ func (r Resource) setMetricsConfig(ctx context.Context, diags *diag.Diagnostics,
 		}
 	}
 
-	c := r.client
-	cfg := metrics.Config{
+	c := r.client.Services
+	cfg := metricsStorageRetention.UpdateJSONRequestBody{
 		MetricsRetentionTimeRaw: fmt.Sprintf("%dd", s.Metrics.RetentionDays.ValueInt64()),
 		MetricsRetentionTime5m:  fmt.Sprintf("%dd", s.Metrics.RetentionDays5mDownsampling.ValueInt64()),
 		MetricsRetentionTime1h:  fmt.Sprintf("%dd", s.Metrics.RetentionDays1hDownsampling.ValueInt64()),
 	}
 
-	_, err := c.Argus.Metrics.UpdateConfig(ctx, s.ProjectID.ValueString(), s.ID.ValueString(), cfg)
+	res, err := c.Argus.MetricsStorageRetention.UpdateWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString(), cfg)
 	if err != nil {
-		diags.AddError("failed to set metrics config", err.Error())
+		diags.AddError("failed to prepare metrics config request", err.Error())
+		return
+	}
+	if res.HasError != nil {
+		diags.AddWarning("failed to make metrics config request", res.HasError.Error())
 		return
 	}
 }
@@ -175,18 +201,25 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 }
 
 func (r Resource) readInstance(ctx context.Context, diags *diag.Diagnostics, s *Instance) {
-	c := r.client
-	res, err := c.Argus.Instances.Get(ctx, s.ProjectID.ValueString(), s.ID.ValueString())
+	c := r.client.Services
+	res, err := c.Argus.Instances.InstanceReadWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString())
 	if err != nil {
-		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+		diags.AddError(fmt.Sprintf("failed to prepare read instance request (ctx.Err() is: %+v)", ctx.Err()), err.Error())
+		return
+	}
+	if res.HasError != nil {
+		if res.StatusCode() == http.StatusNotFound {
 			s.ID = types.StringValue("")
 			return
 		}
-		diags.AddError("failed to read instance", err.Error())
+		diags.AddError("failed to read instance", res.HasError.Error())
 		return
 	}
-
-	updateByAPIResult(s, res)
+	if res.JSON200 == nil {
+		diags.AddError("read instance returned an empty response", "JSON200 == nil")
+		return
+	}
+	updateByAPIResult(s, res.JSON200)
 }
 
 func (r Resource) readGrafana(ctx context.Context, diags *diag.Diagnostics, s *Instance) {
@@ -198,14 +231,22 @@ func (r Resource) readGrafana(ctx context.Context, diags *diag.Diagnostics, s *I
 		return
 	}
 
-	c := r.client
-	res, err := c.Argus.Grafana.GetConfig(ctx, s.ProjectID.ValueString(), s.ID.ValueString())
+	c := r.client.Services
+	res, err := c.Argus.GrafanaConfigs.ListWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString())
 	if err != nil {
-		diags.AddError("failed to read grafana config", err.Error())
+		diags.AddError("failed to prepare read grafana configs request", err.Error())
+		return
+	}
+	if res.HasError != nil {
+		diags.AddError("failed to make read grafana configs request", res.HasError.Error())
+		return
+	}
+	if res.JSON200 == nil {
+		diags.AddError("read grafana configs returned an empty response", "JSON200 == nil")
 		return
 	}
 
-	s.Grafana.EnablePublicAccess = types.Bool{Value: res.PublicReadAccess}
+	s.Grafana.EnablePublicAccess = types.BoolValue(*res.JSON200.PublicReadAccess)
 }
 
 func (r Resource) readMetrics(ctx context.Context, diags *diag.Diagnostics, s *Instance) {
@@ -217,15 +258,23 @@ func (r Resource) readMetrics(ctx context.Context, diags *diag.Diagnostics, s *I
 		return
 	}
 
-	c := r.client
-	res, err := c.Argus.Metrics.GetConfig(ctx, s.ProjectID.ValueString(), s.ID.ValueString())
+	c := r.client.Services
+	res, err := c.Argus.MetricsStorageRetention.ListWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString())
 	if err != nil {
-		diags.AddError("failed to read grafana config", err.Error())
+		diags.AddError("failed to prepare read metrics storage retention request", err.Error())
 		return
 	}
-	s.Metrics.RetentionDays = types.Int64Value(transformDayMetric(res.MetricsRetentionTimeRaw))
-	s.Metrics.RetentionDays5mDownsampling = types.Int64Value(transformDayMetric(res.MetricsRetentionTime5m))
-	s.Metrics.RetentionDays1hDownsampling = types.Int64Value(transformDayMetric(res.MetricsRetentionTime1h))
+	if res.HasError != nil {
+		diags.AddError("failed to make read metrics storage retention request", res.HasError.Error())
+		return
+	}
+	if res.JSON200 == nil {
+		diags.AddError("read metrics storage retention returned an empty response", "JSON200 == nil")
+		return
+	}
+	s.Metrics.RetentionDays = types.Int64Value(transformDayMetric(res.JSON200.MetricsRetentionTimeRaw))
+	s.Metrics.RetentionDays5mDownsampling = types.Int64Value(transformDayMetric(res.JSON200.MetricsRetentionTime5m))
+	s.Metrics.RetentionDays1hDownsampling = types.Int64Value(transformDayMetric(res.JSON200.MetricsRetentionTime1h))
 }
 
 // Update - lifecycle function
@@ -299,27 +348,42 @@ func (r Resource) updateInstance(ctx context.Context, diags *diag.Diagnostics, p
 		return
 	}
 
-	c := r.client
-	_, process, err := c.Argus.Instances.Update(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), plan.Name.ValueString(), plan.PlanID.ValueString(), map[string]string{})
+	c := r.client.Services
+	n := plan.Name.ValueString()
+	p := map[string]interface{}{}
+	body := instances.InstanceUpdateJSONRequestBody{
+		Name:      &n,
+		Parameter: &p,
+		PlanID:    plan.PlanID.ValueString(),
+	}
+	res, err := c.Argus.Instances.InstanceUpdateWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
 	if err != nil {
-		diags.AddError("failed during instance update", err.Error())
+		diags.AddError("failed preparing instance update request", err.Error())
 		return
 	}
-
+	if res.HasError != nil {
+		diags.AddError("failed during instance update", res.HasError.Error())
+		return
+	}
+	if res.JSON202 == nil {
+		diags.AddError("read instance returned an empty response", "JSON202 == nil")
+		return
+	}
+	process := res.WaitHandler(ctx, c.Argus.Instances, plan.ProjectID.ValueString(), plan.ID.ValueString())
 	process.SetTimeout(2 * time.Hour)
-	res, err := process.Wait()
+	wr, err := process.WaitWithContext(ctx)
 	if err != nil {
 		diags.AddError("failed validating instance update", err.Error())
 		return
 	}
 
-	got, ok := res.(instances.Instance)
-	if !ok {
-		diags.AddError("failed wait result conversion", err.Error())
+	got, ok := wr.(*instances.ProjectInstanceUI)
+	if !ok || got == nil {
+		diags.AddError("failed wait result conversion", "response is not of *instances.ProjectInstanceUI or nil")
 		return
 	}
 
-	if !plan.isEqual(got) {
+	if !plan.isEqual(*got) {
 		updateByAPIResult(plan, got)
 	}
 }
@@ -336,13 +400,18 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		resp.Diagnostics.AddError("can't perform deletion", "argus instance id is unknown or null")
 	}
 
-	c := r.client
-	_, process, err := c.Argus.Instances.Delete(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
+	c := r.client.Services
+	res, err := c.Argus.Instances.InstanceDeleteWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("failed to delete instance", err.Error())
+		resp.Diagnostics.AddError("failed preparing instance delete request", err.Error())
+		return
 	}
-
-	if _, err := process.Wait(); err != nil {
+	if res.HasError != nil {
+		resp.Diagnostics.AddError("failed during instance delete", res.HasError.Error())
+		return
+	}
+	process := res.WaitHandler(ctx, r.client.Services.Argus.Instances, state.ProjectID.ValueString(), state.ID.ValueString())
+	if _, err := process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed verify instance deletion", err.Error())
 		return
 	}
@@ -392,7 +461,7 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 	r.readGrafana(ctx, &resp.Diagnostics, &inst)
 	if inst.Grafana.EnablePublicAccess.ValueBool() {
 		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("grafana"), &Grafana{
-			EnablePublicAccess: types.Bool{Value: true},
+			EnablePublicAccess: types.BoolValue(true),
 		})...)
 	}
 

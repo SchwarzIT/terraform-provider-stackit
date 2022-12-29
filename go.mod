@@ -4,9 +4,10 @@ go 1.19
 
 require (
 	github.com/Masterminds/semver v1.5.0
-	github.com/SchwarzIT/community-stackit-go-client v1.5.0
-	github.com/hashicorp/terraform-plugin-framework v0.15.0
-	github.com/hashicorp/terraform-plugin-go v0.14.1
+	github.com/SchwarzIT/community-stackit-go-client v1.8.0
+	github.com/hashicorp/terraform-plugin-framework v1.0.1
+	github.com/hashicorp/terraform-plugin-framework-validators v0.9.0
+	github.com/hashicorp/terraform-plugin-go v0.14.2
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.24.1
 	github.com/pkg/errors v0.9.1
 )
@@ -38,7 +39,7 @@ require (
 	github.com/hashicorp/terraform-exec v0.17.3 // indirect
 	github.com/hashicorp/terraform-json v0.14.0 // indirect
 	github.com/hashicorp/terraform-plugin-log v0.7.0 // indirect
-	github.com/hashicorp/terraform-registry-address v0.0.0-20220623143253-7d51757b572c // indirect
+	github.com/hashicorp/terraform-registry-address v0.1.0 // indirect
 	github.com/hashicorp/terraform-svchost v0.0.0-20200729002733-f050f53b9734 // indirect
 	github.com/hashicorp/yamux v0.0.0-20181012175058-2f1d1f20f75d // indirect
 	github.com/karrick/tparse/v2 v2.8.2 // indirect
@@ -52,7 +53,7 @@ require (
 	github.com/oklog/run v1.0.0 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/vmihailenco/msgpack/v4 v4.3.12 // indirect
-	github.com/vmihailenco/tagparser v0.1.1 // indirect
+	github.com/vmihailenco/tagparser v0.1.2 // indirect
 	github.com/zclconf/go-cty v1.12.1 // indirect
 	golang.org/x/crypto v0.1.0 // indirect
 	golang.org/x/net v0.3.1-0.20221206200815-1e63c2f08a10 // indirect
@@ -61,7 +62,7 @@ require (
 	golang.org/x/text v0.5.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20200825200019-8632dd797987 // indirect
-	google.golang.org/grpc v1.50.1 // indirect
+	google.golang.org/grpc v1.51.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	k8s.io/apimachinery v0.26.0 // indirect
 	k8s.io/klog/v2 v2.80.1 // indirect

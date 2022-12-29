@@ -55,7 +55,7 @@ func (r Resource) createBucket(ctx context.Context, resp *resource.CreateRespons
 		return b
 	}
 	process.SetTimeout(10 * time.Minute)
-	tmp, err := process.Wait()
+	tmp, err := process.WaitWithContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to verify bucket creation", err.Error())
 		return b
@@ -111,23 +111,16 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	c := r.client
-
-	httpClient := c.GetHTTPClient()
-	t := httpClient.Timeout
-
-	httpClient.Timeout = time.Minute
 	process, err := c.ObjectStorage.Buckets.Delete(ctx, state.ObjectStorageProjectID.ValueString(), state.Name.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to verify bucket deletion", err.Error())
 		return
 	}
 	process.SetTimeout(10 * time.Minute)
-	_, err = process.Wait()
-	if err != nil {
+	if _, err = process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed to verify bucket deletion", err.Error())
 		return
 	}
-	httpClient.Timeout = t
 
 	resp.State.RemoveResource(ctx)
 }

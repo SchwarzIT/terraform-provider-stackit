@@ -15,7 +15,7 @@ func transform(c *kubernetesCluster.Cluster, cl *cluster.Cluster) {
 	c.KubernetesVersion = types.StringValue(cl.Kubernetes.Version)
 	c.KubernetesVersionUsed = types.StringValue(cl.Kubernetes.Version)
 	if cl.Kubernetes.AllowPrivilegedContainers != nil {
-		c.AllowPrivilegedContainers = types.Bool{Value: *cl.Kubernetes.AllowPrivilegedContainers}
+		c.AllowPrivilegedContainers = types.BoolValue(*cl.Kubernetes.AllowPrivilegedContainers)
 	}
 	if cl.Status.Aggregated != nil {
 		c.Status = types.StringValue(string(*cl.Status.Aggregated))
@@ -60,19 +60,18 @@ func transformNodepools(c *kubernetesCluster.Cluster, cl *cluster.Cluster) {
 			MaxUnavailable:   mu,
 			VolumeType:       vt,
 			VolumeSizeGB:     types.Int64Value(int64(np.Volume.Size)),
-			Labels:           types.Map{ElemType: types.StringType, Null: true},
+			Labels:           types.MapNull(types.StringType),
 			Taints:           nil,
 			ContainerRuntime: crin,
-			Zones:            types.List{ElemType: types.StringType, Null: true},
+			Zones:            types.ListNull(types.StringType),
 		}
+
 		if np.Labels != nil {
+			elems := map[string]attr.Value{}
 			for k, v := range *np.Labels {
-				if n.Labels.Null {
-					n.Labels.Null = false
-					n.Labels.Elems = make(map[string]attr.Value, len(*np.Labels))
-				}
-				n.Labels.Elems[k] = types.StringValue(v)
+				elems[k] = types.StringValue(v)
 			}
+			n.Labels = types.MapValueMust(types.StringType, elems)
 		}
 		if np.Taints != nil {
 			for _, v := range *np.Taints {
@@ -90,12 +89,11 @@ func transformNodepools(c *kubernetesCluster.Cluster, cl *cluster.Cluster) {
 				})
 			}
 		}
+		zones := []attr.Value{}
 		for _, v := range np.AvailabilityZones {
-			if n.Zones.Null {
-				n.Zones.Null = false
-			}
-			n.Zones.Elems = append(n.Zones.Elems, types.StringValue(v))
+			zones = append(zones, types.StringValue(v))
 		}
+		n.Zones = types.ListValueMust(types.StringType, zones)
 		c.NodePools = append(c.NodePools, n)
 	}
 }

@@ -21,14 +21,14 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	// handle creation
 	c := r.client.ObjectStorage.Projects
-	if _, err := c.Create(ctx, plan.ProjectID.Value); err != nil {
+	if _, err := c.Create(ctx, plan.ProjectID.ValueString()); err != nil {
 		if !strings.Contains(err.Error(), common.ERR_UNEXPECTED_EOF) {
 			resp.Diagnostics.AddError("failed ObjectStorage project creation", err.Error())
 			return
 		}
 	}
 
-	plan.ID = types.StringValue(plan.ProjectID.Value)
+	plan.ID = types.StringValue(plan.ProjectID.ValueString())
 
 	// update state
 	resp.Diagnostics.Append(resp.State.Set(ctx, plan)...)
@@ -48,7 +48,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 	// read
 	c := r.client.ObjectStorage.Projects
-	_, err := c.Get(ctx, state.ID.Value)
+	_, err := c.Get(ctx, state.ID.ValueString())
 	if err != nil {
 		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.State.RemoveResource(ctx)
@@ -73,7 +73,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 
 	// handle creation
 	c := r.client.ObjectStorage.Projects
-	if err := c.Delete(ctx, state.ID.Value); err != nil {
+	if err := c.Delete(ctx, state.ID.ValueString()); err != nil {
 		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.State.RemoveResource(ctx)
 			return

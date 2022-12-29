@@ -3,12 +3,12 @@
 page_title: "stackit_mariadb_credential Data Source - stackit"
 subcategory: ""
 description: |-
-  Data source for MariaDB credentials
+  Manages MariaDB credentials
 ---
 
 # stackit_mariadb_credential (Data Source)
 
-Data source for MariaDB credentials
+Manages MariaDB credentials
 
 ## Example Usage
 
@@ -36,7 +36,7 @@ data "stackit_mariadb_credential" "example" {
 ### Required
 
 - `id` (String) Specifies the resource ID
-- `instance_id` (String) MariaDB instance ID the credential belongs to
+- `instance_id` (String) Instance ID the credential belongs to
 - `project_id` (String) Project ID the credential belongs to
 
 ### Read-Only

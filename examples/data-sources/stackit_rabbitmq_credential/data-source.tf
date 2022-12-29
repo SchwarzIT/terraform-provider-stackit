@@ -1,0 +1,15 @@
+resource "stackit_rabbitmq_instance" "example" {
+  name       = "example"
+  project_id = "example"
+}
+
+resource "stackit_rabbitmq_credential" "example" {
+  project_id  = "example"
+  instance_id = stackit_redis_instance.example.id
+}
+
+data "stackit_rabbitmq_credential" "example" {
+  project_id  = "example"
+  instance_id = stackit_rabbitmq_instance.example.id
+  id          = stackit_rabbitmq_credential.example.id
+}

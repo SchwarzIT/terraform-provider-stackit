@@ -32,14 +32,14 @@ data "stackit_logme_instance" "example" {
 
 ### Read-Only
 
-- `acl` (List of String) Access control rules
+- `acl` (List of String) Access Control rules to whitelist IP addresses
 - `cf_guid` (String) Cloud Foundry GUID
 - `cf_organization_guid` (String) Cloud Foundry Organization GUID
 - `cf_space_guid` (String) Cloud Foundry Space GUID
 - `dashboard_url` (String) Dashboard URL
-- `id` (String) The instance ID
-- `plan` (String) The LogMe plan name
-- `plan_id` (String) LogMe plan ID
-- `version` (String) LogMe version
+- `id` (String) Specifies the resource ID
+- `plan` (String) The RabbitMQ Plan
+- `plan_id` (String) The selected plan ID
+- `version` (String) RabbitMQ version
 
 

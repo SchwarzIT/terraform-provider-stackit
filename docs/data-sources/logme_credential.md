@@ -3,12 +3,12 @@
 page_title: "stackit_logme_credential Data Source - stackit"
 subcategory: ""
 description: |-
-  Data source for LogMe credentials
+  Manages LogMe credentials
 ---
 
 # stackit_logme_credential (Data Source)
 
-Data source for LogMe credentials
+Manages LogMe credentials
 
 ## Example Usage
 
@@ -36,7 +36,7 @@ data "stackit_logme_credential" "example" {
 ### Required
 
 - `id` (String) Specifies the resource ID
-- `instance_id` (String) LogMe instance ID the credential belongs to
+- `instance_id` (String) Instance ID the credential belongs to
 - `project_id` (String) Project ID the credential belongs to
 
 ### Read-Only
