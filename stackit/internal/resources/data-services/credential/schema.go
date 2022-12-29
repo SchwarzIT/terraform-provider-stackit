@@ -54,7 +54,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"instance_id": schema.StringAttribute{
-				Description: "Elasticsearch instance ID the credential belongs to",
+				Description: "Instance ID the credential belongs to",
 				Required:    true,
 			},
 
