@@ -10,6 +10,25 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
+// Instance is the schema model
+type Instance struct {
+	ID             types.String `tfsdk:"id"`
+	Name           types.String `tfsdk:"name"`
+	ProjectID      types.String `tfsdk:"project_id"`
+	MachineType    types.String `tfsdk:"machine_type"` // aka FlavorID
+	Version        types.String `tfsdk:"version"`
+	Replicas       types.Int64  `tfsdk:"replicas"`
+	BackupSchedule types.String `tfsdk:"backup_schedule"`
+	ACL            types.List   `tfsdk:"acl"`
+	Storage        types.Object `tfsdk:"storage"`
+}
+
+// Storage represent instance storage
+type Storage struct {
+	Class types.String `tfsdk:"class"`
+	Size  types.Int64  `tfsdk:"size"`
+}
+
 // Schema returns the terraform schema structure
 func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{

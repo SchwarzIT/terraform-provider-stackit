@@ -136,7 +136,7 @@ func (r Resource) validateStorage(ctx context.Context, projectID, machineType st
 	return fmt.Errorf("couldn't find version '%s'. Available options are:%s\n", storage.Class.ValueString(), opts)
 }
 
-func ApplyClientResponse(pi *Instance, i *instance.InstancesSingleInstance) error {
+func applyClientResponse(pi *Instance, i *instance.InstancesSingleInstance) error {
 	elems := []attr.Value{}
 	if i == nil {
 		return errors.New("instance response is empty")

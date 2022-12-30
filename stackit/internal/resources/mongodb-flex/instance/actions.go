@@ -120,7 +120,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	if err := ApplyClientResponse(&plan, i); err != nil {
+	if err := applyClientResponse(&plan, i); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
 	}
@@ -223,7 +223,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	if err := ApplyClientResponse(&state, res.JSON200.Item); err != nil {
+	if err := applyClientResponse(&state, res.JSON200.Item); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
 	}
@@ -324,7 +324,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		return
 	}
 
-	if err := ApplyClientResponse(&plan, i); err != nil {
+	if err := applyClientResponse(&plan, i); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
 	}
