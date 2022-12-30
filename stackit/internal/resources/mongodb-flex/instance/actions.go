@@ -7,7 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb-flex/instances"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/generated/instance"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/generated/user"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -56,21 +57,47 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 			return
 		}
 	}
+	cl := storage.Class.ValueString()
+	sz := int(storage.Size.ValueInt64())
 
 	// handle creation
-	res, wait, err := r.client.MongoDBFlex.Instances.Create(ctx, plan.ProjectID.ValueString(), plan.Name.ValueString(), plan.MachineType.ValueString(), instances.Storage{
-		Class: storage.Class.ValueString(),
-		Size:  int(storage.Size.ValueInt64()),
-	}, plan.Version.ValueString(), int(plan.Replicas.ValueInt64()), plan.BackupSchedule.ValueString(), plan.Labels, plan.Options, instances.ACL{Items: acl})
+	bus := plan.BackupSchedule.ValueString()
+	fid := plan.MachineType.ValueString()
+	name := plan.Name.ValueString()
+	rpl := int(plan.Replicas.ValueInt64())
+	ver := plan.Version.ValueString()
+	body := instance.InstanceCreateInstanceRequest{
+		ACL: &instance.InstanceACL{Items: &acl},
+		Storage: &instance.InstanceStorage{
+			Class: &cl,
+			Size:  &sz,
+		},
+		BackupSchedule: &bus,
+		FlavorID:       &fid,
+		Labels:         &plan.Labels,
+		Name:           &name,
+		Options:        &plan.Options,
+		Replicas:       &rpl,
+		Version:        &ver,
+	}
 
+	res, err := r.client.Services.MongoDBFlex.Instance.CreateWithResponse(ctx, plan.ProjectID.ValueString(), body)
 	if err != nil {
-		resp.Diagnostics.AddError("failed MongoDB instance creation", err.Error())
+		resp.Diagnostics.AddError("failed making MongoDB instance creation request", err.Error())
+		return
+	}
+	if res.HasError != nil {
+		resp.Diagnostics.AddError("MongoDB instance creation response returned an error", err.Error())
+		return
+	}
+	if res.JSON202 == nil || res.JSON202.ID == nil {
+		resp.Diagnostics.AddError("MongoDB instance creation response is empty", "JSON202 == nil or ID is nil")
 		return
 	}
 
 	// set state
-	plan.ID = types.StringValue(res.ID)
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), res.ID)...)
+	plan.ID = types.StringValue(*res.JSON202.ID)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), plan.ID)...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project_id"), plan.ProjectID.ValueString())...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -80,13 +107,14 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	// To overcome the bug, we'll wait an initial 30 sec
 	time.Sleep(30 * time.Second)
 
-	instance, err := wait.WaitWithContext(ctx)
+	process := res.WaitHandler(ctx, r.client.Services.MongoDBFlex.Instance, plan.ProjectID.ValueString(), plan.ID.ValueString())
+	ins, err := process.WaitWithContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("failed MongoDB instance creation validation", err.Error())
 		return
 	}
 
-	i, ok := instance.(instances.Instance)
+	i, ok := ins.(*instance.InstancesSingleInstance)
 	if !ok {
 		resp.Diagnostics.AddError("failed to parse client response", "response is not of instances.Instance")
 		return
@@ -119,51 +147,55 @@ func (r Resource) createUser(ctx context.Context, plan *Instance, d *diag.Diagno
 	database := "stackit"
 	roles := []string{}
 
-	for maxTries := 10; maxTries > -1; maxTries-- {
-		res, err := r.client.MongoDBFlex.Users.Create(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), username, database, roles)
-		if err != nil {
-			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) && maxTries > 0 {
-				time.Sleep(time.Second * 5)
-				continue
-			}
-			if strings.Contains(err.Error(), http.StatusText(http.StatusBadRequest)) && maxTries > 0 {
-				time.Sleep(time.Second * 30)
-				continue
-			}
-			d.AddError("failed to create user", err.Error())
-			return
-		}
-
-		elems := []attr.Value{}
-		for _, v := range res.Item.Roles {
+	body := user.InstanceCreateUserRequest{
+		Database: database,
+		Roles:    roles,
+		Username: &username,
+	}
+	res, err := r.client.Services.MongoDBFlex.User.CreateWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
+	if err != nil {
+		d.AddError("failed making create user request", err.Error())
+		return
+	}
+	if res.HasError != nil {
+		d.AddError("create user response has an error", res.HasError.Error())
+		return
+	}
+	if res.JSON202 == nil || res.JSON202.Item == nil {
+		d.AddError("failed to process response", "JSON202 == nil or Item == nil")
+		return
+	}
+	item := *res.JSON202.Item
+	elems := []attr.Value{}
+	if *res.JSON202.Item.Roles != nil {
+		for _, v := range *res.JSON202.Item.Roles {
 			elems = append(elems, types.StringValue(v))
 		}
-		u, diags := types.ObjectValue(
-			map[string]attr.Type{
-				"id":       types.StringType,
-				"username": types.StringType,
-				"database": types.StringType,
-				"password": types.StringType,
-				"host":     types.StringType,
-				"port":     types.Int64Type,
-				"uri":      types.StringType,
-				"roles":    types.ListType{ElemType: types.StringType},
-			},
-			map[string]attr.Value{
-				"id":       types.StringValue(res.Item.ID),
-				"username": types.StringValue(res.Item.Username),
-				"database": types.StringValue(res.Item.Database),
-				"password": types.StringValue(res.Item.Password),
-				"host":     types.StringValue(res.Item.Host),
-				"port":     types.Int64Value(int64(res.Item.Port)),
-				"uri":      types.StringValue(res.Item.URI),
-				"roles":    types.ListValueMust(types.StringType, elems),
-			},
-		)
-		plan.User = u
-		d.Append(diags...)
-		break
 	}
+	u, diags := types.ObjectValue(
+		map[string]attr.Type{
+			"id":       types.StringType,
+			"username": types.StringType,
+			"database": types.StringType,
+			"password": types.StringType,
+			"host":     types.StringType,
+			"port":     types.Int64Type,
+			"uri":      types.StringType,
+			"roles":    types.ListType{ElemType: types.StringType},
+		},
+		map[string]attr.Value{
+			"id":       nullOrValStr(item.ID),
+			"username": nullOrValStr(item.Username),
+			"database": nullOrValStr(item.Database),
+			"password": nullOrValStr(item.Password),
+			"host":     nullOrValStr(item.Host),
+			"port":     nullOrValInt64(item.Port),
+			"uri":      nullOrValStr(item.Uri),
+			"roles":    types.ListValueMust(types.StringType, elems),
+		},
+	)
+	plan.User = u
+	d.Append(diags...)
 }
 
 // Read - lifecycle function
@@ -177,17 +209,21 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	// read cluster
-	instance, err := r.client.MongoDBFlex.Instances.Get(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
+	res, err := r.client.Services.MongoDBFlex.Instance.GetWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if err != nil {
-		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
-			resp.State.RemoveResource(ctx)
-			return
-		}
-		resp.Diagnostics.AddError("failed to read mongodb instance", err.Error())
+		resp.Diagnostics.AddError("failed making read instance request", err.Error())
+		return
+	}
+	if res.HasError != nil {
+		resp.Diagnostics.AddError("instance read response has an error", res.HasError.Error())
+		return
+	}
+	if res.JSON200 == nil || res.JSON200.Item == nil {
+		resp.Diagnostics.AddError("failed to process response", "JSON200 == nil or Item == nil")
 		return
 	}
 
-	if err := applyClientResponse(&state, instance.Item); err != nil {
+	if err := applyClientResponse(&state, res.JSON200.Item); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
 	}
@@ -236,24 +272,53 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 			return
 		}
 	}
+	cl := storage.Class.ValueString()
+	sz := int(storage.Size.ValueInt64())
+
+	// handle creation
+	bus := plan.BackupSchedule.ValueString()
+	fid := plan.MachineType.ValueString()
+	name := plan.Name.ValueString()
+	rpl := int(plan.Replicas.ValueInt64())
+	ver := plan.Version.ValueString()
+	body := instance.InstanceUpdateInstanceRequest{
+		ACL: &instance.InstanceACL{Items: &acl},
+		Storage: &instance.InstanceStorage{
+			Class: &cl,
+			Size:  &sz,
+		},
+		BackupSchedule: &bus,
+		FlavorID:       &fid,
+		Labels:         &plan.Labels,
+		Name:           &name,
+		Options:        &plan.Options,
+		Replicas:       &rpl,
+		Version:        &ver,
+	}
 
 	// handle update
-	_, wait, err := r.client.MongoDBFlex.Instances.Update(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), plan.Name.ValueString(), plan.MachineType.ValueString(), instances.Storage{
-		Class: storage.Class.ValueString(),
-		Size:  int(storage.Size.ValueInt64()),
-	}, plan.Version.ValueString(), int(plan.Replicas.ValueInt64()), plan.BackupSchedule.ValueString(), plan.Labels, plan.Options, instances.ACL{Items: acl})
+	res, err := r.client.Services.MongoDBFlex.Instance.PutWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
 	if err != nil {
-		resp.Diagnostics.AddError("failed MongoDB instance update", err.Error())
+		resp.Diagnostics.AddError("failed making MongoDB instance update request", err.Error())
+		return
+	}
+	if res.HasError != nil {
+		resp.Diagnostics.AddError("instance update response has an error", res.HasError.Error())
+		return
+	}
+	if res.JSON202 == nil || res.JSON202.Item == nil {
+		resp.Diagnostics.AddError("failed to process response", "JSON202 == nil or Item == nil")
 		return
 	}
 
-	instance, err := wait.WaitWithContext(ctx)
+	process := res.WaitHandler(ctx, r.client.Services.MongoDBFlex.Instance, plan.ProjectID.ValueString(), plan.ID.ValueString())
+	ins, err := process.WaitWithContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("failed MongoDB instance update validation", err.Error())
 		return
 	}
 
-	i, ok := instance.(instances.Instance)
+	i, ok := ins.(*instance.InstancesSingleInstance)
 	if !ok {
 		resp.Diagnostics.AddError("failed to parse client response", "response is not of instances.Instance")
 		return
@@ -280,12 +345,21 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	process, err := r.client.MongoDBFlex.Instances.Delete(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
+	res, err := r.client.Services.MongoDBFlex.Instance.DeleteWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("failed to delete mongodb instance", err.Error())
+		resp.Diagnostics.AddError("failed making MongoDB instance deletion request", err.Error())
+		return
+	}
+	if res.HasError != nil {
+		if res.StatusCode() == http.StatusNotFound {
+			resp.State.RemoveResource(ctx)
+			return
+		}
+		resp.Diagnostics.AddError("instance deletion response has an error", res.HasError.Error())
 		return
 	}
 
+	process := res.WaitHandler(ctx, r.client.Services.MongoDBFlex.Instance, state.ProjectID.ValueString(), state.ID.ValueString())
 	if _, err = process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed to verify mongodb instance deletion", err.Error())
 		return

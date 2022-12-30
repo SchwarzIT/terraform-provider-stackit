@@ -15,7 +15,7 @@ type Instance struct {
 	ID             types.String `tfsdk:"id"`
 	Name           types.String `tfsdk:"name"`
 	ProjectID      types.String `tfsdk:"project_id"`
-	MachineType    types.String `tfsdk:"machine_type"`
+	MachineType    types.String `tfsdk:"machine_type"` // aka FlavorID
 	Version        types.String `tfsdk:"version"`
 	Replicas       types.Int64  `tfsdk:"replicas"`
 	BackupSchedule types.String `tfsdk:"backup_schedule"`
