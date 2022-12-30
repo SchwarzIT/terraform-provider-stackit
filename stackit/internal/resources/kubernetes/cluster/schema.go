@@ -209,6 +209,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 							Description: "Labels to add to each node",
 							ElementType: types.StringType,
 							Optional:    true,
+							Computed:    true,
 						},
 						"taints": schema.ListNestedAttribute{
 							Description: "Specifies a taint list as defined below",

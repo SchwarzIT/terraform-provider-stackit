@@ -22,7 +22,7 @@ func TestAcc_ArgusJob(t *testing.T) {
 		return
 	}
 
-	name := "e1-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
+	name := "e1" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
 
 	resource.ParallelTest(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){

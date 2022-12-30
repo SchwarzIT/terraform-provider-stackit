@@ -5,6 +5,7 @@ import (
 
 	scrapeconfig "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/generated/scrape-config"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -230,10 +231,14 @@ func (j *Job) handleTargets(cj scrapeconfig.Job) {
 			nt.URLs = append(nt.URLs, types.StringValue(v))
 		}
 
-		if len(j.Targets) > i && j.Targets[i].Labels.IsNull() {
-			nt.Labels = j.Targets[i].Labels
+		if len(j.Targets) > i && j.Targets[i].Labels.IsNull() || sc.Labels == nil {
+			nt.Labels = types.MapNull(types.StringType)
 		} else {
-			nt.Labels, _ = types.MapValueFrom(context.TODO(), types.StringType, sc.Labels)
+			newl := map[string]attr.Value{}
+			for k, v := range *sc.Labels {
+				newl[k] = types.StringValue(v)
+			}
+			nt.Labels = types.MapValueMust(types.StringType, newl)
 		}
 		newTargets = append(newTargets, nt)
 	}

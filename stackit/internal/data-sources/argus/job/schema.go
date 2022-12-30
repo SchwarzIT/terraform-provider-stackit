@@ -98,7 +98,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 							ElementType: types.StringType,
 							Computed:    true,
 						},
-						"labels": schema.ListAttribute{
+						"labels": schema.MapAttribute{
 							Description: "Specifies labels",
 							ElementType: types.StringType,
 							Computed:    true,
