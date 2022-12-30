@@ -23,12 +23,6 @@ type Instance struct {
 	Storage        types.Object `tfsdk:"storage"`
 }
 
-// Storage represent instance storage
-type Storage struct {
-	Class types.String `tfsdk:"class"`
-	Size  types.Int64  `tfsdk:"size"`
-}
-
 // Schema returns the terraform schema structure
 func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
