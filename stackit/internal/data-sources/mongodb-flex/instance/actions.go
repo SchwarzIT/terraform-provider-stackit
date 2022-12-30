@@ -3,16 +3,17 @@ package instance
 import (
 	"context"
 	"fmt"
+	"strings"
 
-	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/generated/instance"
+	resource "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mongodb-flex/instance"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 // Read - lifecycle function
 func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	c := r.client.MongoDBFlex
-	var config Instance
+	c := r.client.Services.MongoDBFlex
+	var config resource.Instance
 	diags := req.Config.Get(ctx, &config)
 
 	resp.Diagnostics.Append(diags...)
@@ -20,23 +21,35 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	list, err := c.Instances.List(ctx, config.ProjectID.ValueString())
+	res, err := c.Instance.ListWithResponse(ctx, config.ProjectID.ValueString(), &instance.ListParams{})
 	if err != nil {
-		resp.Diagnostics.AddError("failed to list instances", err.Error())
+		resp.Diagnostics.AddError("failed making list instances request", err.Error())
+		return
+	}
+	if res.HasError != nil {
+		resp.Diagnostics.AddError("list instances response has an error", res.HasError.Error())
+		return
+	}
+	if res.JSON200 == nil || res.JSON200.Items == nil {
+		resp.Diagnostics.AddError("failed to parse response", "JSON200 == nil or .Items == nil")
 		return
 	}
 
+	list := *res.JSON200.Items
 	found := -1
 	existing := ""
-	for i, instance := range list.Items {
-		if instance.Name == config.Name.ValueString() {
+	for i, instance := range list {
+		if instance.Name == nil || instance.ID == nil {
+			continue
+		}
+		if strings.EqualFold(*instance.Name, config.Name.ValueString()) {
 			found = i
 			break
 		}
 		if existing == "" {
 			existing = "\navailable instances in the project are:"
 		}
-		existing = fmt.Sprintf("%s\n- %s", existing, instance.Name)
+		existing = fmt.Sprintf("%s\n- %s", existing, *instance.Name)
 	}
 
 	if found == -1 {
@@ -47,44 +60,22 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	}
 
 	// set found instance
-	instance := list.Items[found]
-	ires, err := c.Instances.Get(ctx, config.ProjectID.ValueString(), instance.ID)
+	instance := list[found]
+	ires, err := c.Instance.GetWithResponse(ctx, config.ProjectID.ValueString(), *instance.ID)
 	if err != nil {
-		resp.Diagnostics.AddError("failed to get instances", err.Error())
+		resp.Diagnostics.AddError("failed making get instance request", err.Error())
 		return
 	}
-	i := ires.Item
-	config.ID = types.StringValue(instance.ID)
-	elems := []attr.Value{}
-	for _, v := range i.ACL.Items {
-		elems = append(elems, types.StringValue(v))
+	if ires.HasError != nil {
+		resp.Diagnostics.AddError("list instances response has an error", ires.HasError.Error())
+		return
 	}
-	config.ACL = types.ListValueMust(types.StringType, elems)
-	config.BackupSchedule = types.StringValue(i.BackupSchedule)
-	config.MachineType = types.StringValue(i.Flavor.ID)
-	config.Name = types.StringValue(i.Name)
-	config.Replicas = types.Int64Value(int64(i.Replicas))
-	storage, d := types.ObjectValue(
-		map[string]attr.Type{
-			"class": types.StringType,
-			"size":  types.Int64Type,
-		},
-		map[string]attr.Value{
-			"class": types.StringValue(i.Storage.Class),
-			"size":  types.Int64Value(int64(i.Storage.Size)),
-		})
-
-	resp.Diagnostics.Append(d...)
-	if resp.Diagnostics.HasError() {
+	if ires.JSON200 == nil || ires.JSON200.Item == nil {
+		resp.Diagnostics.AddError("failed to parse response", "JSON200 == nil or .Items == nil")
 		return
 	}
 
-	config.Storage = storage
-
-	if len(i.Version) > 3 {
-		i.Version = i.Version[0:3]
-	}
-	config.Version = types.StringValue(i.Version)
+	resource.ApplyClientResponse(&config, ires.JSON200.Item)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &config)...)
 	if resp.Diagnostics.HasError() {
 		return
