@@ -161,7 +161,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 							ElementType: types.StringType,
 							Required:    true,
 						},
-						"labels": schema.ListAttribute{
+						"labels": schema.MapAttribute{
 							Description: "Specifies labels",
 							ElementType: types.StringType,
 							Optional:    true,
