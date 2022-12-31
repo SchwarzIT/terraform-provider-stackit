@@ -26,6 +26,9 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	if err != nil {
 		resp.Diagnostics.AddError("failed preparing credential creation request", err.Error())
 	}
+	if res == nil {
+		resp.Diagnostics.AddError("empty response", "received an empty response during credential creatopn. res == nil")
+	}
 	if res.HasError != nil {
 		if strings.Contains(res.HasError.Error(), "service bind failed") {
 			time.Sleep(30 * time.Second)

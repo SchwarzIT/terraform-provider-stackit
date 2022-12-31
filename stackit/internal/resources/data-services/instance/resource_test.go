@@ -44,7 +44,6 @@ func TestAcc_RabbitMQJob(t *testing.T) {
 					resource.TestCheckResourceAttrSet("stackit_rabbitmq_instance.example", "dashboard_url"),
 					resource.TestCheckResourceAttrSet("stackit_rabbitmq_instance.example", "cf_guid"),
 					resource.TestCheckResourceAttrSet("stackit_rabbitmq_instance.example", "cf_space_guid"),
-					resource.TestCheckResourceAttrSet("stackit_rabbitmq_instance.example", "cf_organization_guid"),
 				),
 			},
 			// check update plan
@@ -60,7 +59,6 @@ func TestAcc_RabbitMQJob(t *testing.T) {
 					resource.TestCheckResourceAttrSet("stackit_rabbitmq_instance.example", "dashboard_url"),
 					resource.TestCheckResourceAttrSet("stackit_rabbitmq_instance.example", "cf_guid"),
 					resource.TestCheckResourceAttrSet("stackit_rabbitmq_instance.example", "cf_space_guid"),
-					resource.TestCheckResourceAttrSet("stackit_rabbitmq_instance.example", "cf_organization_guid"),
 				),
 			},
 			// test import

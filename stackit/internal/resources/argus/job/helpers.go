@@ -209,6 +209,9 @@ func (j *Job) handleSAML2(cj scrapeconfig.Job) {
 	}
 
 	flag := true
+	if cj.Params == nil || *cj.Params == nil {
+		return
+	}
 	p := *cj.Params
 	if v, ok := p["saml2"]; ok {
 		if len(v) == 1 && v[0] == "disabled" {
