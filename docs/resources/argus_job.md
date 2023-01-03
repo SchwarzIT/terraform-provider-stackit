@@ -63,7 +63,7 @@ Required:
 
 Optional:
 
-- `labels` (List of String) Specifies labels
+- `labels` (Map of String) Specifies labels
 
 
 <a id="nestedatt--basic_auth"></a>
