@@ -3,7 +3,7 @@ package credential
 import (
 	"context"
 
-	credentialsgroup "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage/credentials-group"
+	credentialsgroup "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1/credentials-group"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/resource"

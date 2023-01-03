@@ -3,7 +3,7 @@ package credential
 import (
 	"context"
 
-	keys "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage/access-keys"
+	keys "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1/access-keys"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )

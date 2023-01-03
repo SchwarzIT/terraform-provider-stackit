@@ -20,7 +20,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	cl, err := c.Services.Kubernetes.Cluster.GetClusterWithResponse(ctx, config.KubernetesProjectID.ValueString(), config.Name.ValueString())
+	cl, err := c.Kubernetes.Cluster.GetClusterWithResponse(ctx, config.KubernetesProjectID.ValueString(), config.Name.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to prepare read request for cluster", err.Error())
 		return
@@ -47,7 +47,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 
 func (r DataSource) getCredential(ctx context.Context, diags *diag.Diagnostics, cl *cluster.Cluster) {
 	c := r.client
-	res, err := c.Services.Kubernetes.Credentials.GetClusterCredentialsWithResponse(ctx, cl.KubernetesProjectID.ValueString(), cl.Name.ValueString())
+	res, err := c.Kubernetes.Credentials.GetClusterCredentialsWithResponse(ctx, cl.KubernetesProjectID.ValueString(), cl.Name.ValueString())
 	if err != nil {
 		diags.AddError("failed to prepare get request for cluster credentials", err.Error())
 		return

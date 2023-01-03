@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage/buckets"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1/buckets"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"

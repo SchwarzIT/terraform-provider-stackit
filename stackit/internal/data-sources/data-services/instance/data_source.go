@@ -101,16 +101,16 @@ func (d *DataSource) Configure(ctx context.Context, req datasource.ConfigureRequ
 
 	switch d.service {
 	case ElasticSearch:
-		d.client = c.Services.ElasticSearch
+		d.client = c.ElasticSearch
 	case LogMe:
-		d.client = c.Services.LogMe
+		d.client = c.LogMe
 	case MariaDB:
-		d.client = c.Services.MariaDB
+		d.client = c.MariaDB
 	case Postgres:
-		d.client = c.Services.PostgresDB
+		d.client = c.PostgresDB
 	case Redis:
-		d.client = c.Services.Reddis
+		d.client = c.Reddis
 	case RabbitMQ:
-		d.client = c.Services.RabbitMQ
+		d.client = c.RabbitMQ
 	}
 }

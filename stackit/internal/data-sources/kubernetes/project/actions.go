@@ -18,7 +18,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	c := r.client.Services.Kubernetes.Project
+	c := r.client.Kubernetes.Project
 	p, err := c.GetProjectWithResponse(ctx, config.ProjectID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to prepare read request for SKE project", err.Error())

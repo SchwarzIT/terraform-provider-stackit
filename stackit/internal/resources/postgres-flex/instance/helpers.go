@@ -61,7 +61,7 @@ func (r Resource) validate(ctx context.Context, data Instance) error {
 }
 
 func (r Resource) validateVersion(ctx context.Context, projectID, version string) error {
-	res, err := r.client.Services.PostgresFlex.Versions.GetVersionsWithResponse(ctx, projectID, &versions.GetVersionsParams{})
+	res, err := r.client.PostgresFlex.Versions.GetVersionsWithResponse(ctx, projectID, &versions.GetVersionsParams{})
 	if err != nil {
 		return err
 	}
@@ -83,7 +83,7 @@ func (r Resource) validateVersion(ctx context.Context, projectID, version string
 }
 
 func (r Resource) validateMachineType(ctx context.Context, projectID, flavorID string) error {
-	res, err := r.client.Services.PostgresFlex.Flavors.GetFlavorsWithResponse(ctx, projectID)
+	res, err := r.client.PostgresFlex.Flavors.GetFlavorsWithResponse(ctx, projectID)
 	if err != nil {
 		return err
 	}
@@ -108,7 +108,7 @@ func (r Resource) validateMachineType(ctx context.Context, projectID, flavorID s
 }
 
 func (r Resource) validateStorage(ctx context.Context, projectID, machineType string, storage Storage) error {
-	res, err := r.client.Services.PostgresFlex.Storage.GetFlavorWithResponse(ctx, projectID, machineType)
+	res, err := r.client.PostgresFlex.Storage.GetFlavorWithResponse(ctx, projectID, machineType)
 	if err != nil {
 		return err
 	}

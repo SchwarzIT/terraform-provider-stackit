@@ -63,6 +63,7 @@ func config(name, owner, billing string) string {
 	}
 
 	data "stackit_project" "ex1" {
+		depends_on   = [stackit_project.example]
 		container_id = stackit_project.example.container_id
 	}
 

@@ -73,7 +73,7 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 		return
 	}
 
-	resp, err := c.Services.Kubernetes.Cluster.CreateOrUpdateClusterWithResponse(ctx,
+	resp, err := c.Kubernetes.Cluster.CreateOrUpdateClusterWithResponse(ctx,
 		projectID,
 		clusterName, cluster.SkeServiceCreateOrUpdateClusterRequest{
 			Extensions:  extensions,
@@ -92,7 +92,7 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 		return
 	}
 
-	process := resp.WaitHandler(ctx, c.Services.Kubernetes.Cluster, projectID, clusterName)
+	process := resp.WaitHandler(ctx, c.Kubernetes.Cluster, projectID, clusterName)
 	res, err := process.WaitWithContext(ctx)
 	if err != nil {
 		diags.AddError("failed to validate SKE Create/Update", err.Error())
@@ -114,7 +114,7 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 
 func (r Resource) getCredential(ctx context.Context, diags *diag.Diagnostics, cl *Cluster) {
 	c := r.client
-	res, err := c.Services.Kubernetes.Credentials.GetClusterCredentialsWithResponse(ctx, cl.KubernetesProjectID.ValueString(), cl.Name.ValueString())
+	res, err := c.Kubernetes.Credentials.GetClusterCredentialsWithResponse(ctx, cl.KubernetesProjectID.ValueString(), cl.Name.ValueString())
 	if err != nil {
 		diags.AddError("failed to initiate request for cluster credentials", err.Error())
 		return
@@ -139,7 +139,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	// read cluster
-	res, err := c.Services.Kubernetes.Cluster.GetClusterWithResponse(ctx, state.KubernetesProjectID.ValueString(), state.Name.ValueString())
+	res, err := c.Kubernetes.Cluster.GetClusterWithResponse(ctx, state.KubernetesProjectID.ValueString(), state.Name.ValueString())
 	if err != nil {
 		diags.AddError("failed to initiate request for fetching cluster", err.Error())
 		return
@@ -203,7 +203,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	c := r.client
-	res, err := c.Services.Kubernetes.Cluster.DeleteClusterWithResponse(ctx, state.KubernetesProjectID.ValueString(), state.Name.ValueString())
+	res, err := c.Kubernetes.Cluster.DeleteClusterWithResponse(ctx, state.KubernetesProjectID.ValueString(), state.Name.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to initiate cluster deletion", err.Error())
 		return
@@ -213,7 +213,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	if _, err := res.WaitHandler(ctx, c.Services.Kubernetes.Cluster, state.KubernetesProjectID.ValueString(), state.Name.ValueString()).WaitWithContext(ctx); err != nil {
+	if _, err := res.WaitHandler(ctx, c.Kubernetes.Cluster, state.KubernetesProjectID.ValueString(), state.Name.ValueString()).WaitWithContext(ctx); err != nil {
 		if !strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.Diagnostics.AddError("failed to verify cluster deletion", err.Error())
 			return
@@ -264,7 +264,7 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 
 	// pre-read imports
 	c := r.client
-	res, err := c.Services.Kubernetes.Cluster.GetClusterWithResponse(ctx, idParts[0], idParts[1])
+	res, err := c.Kubernetes.Cluster.GetClusterWithResponse(ctx, idParts[0], idParts[1])
 	if err != nil {
 		resp.Diagnostics.AddError("error during import pre-read", err.Error())
 		return

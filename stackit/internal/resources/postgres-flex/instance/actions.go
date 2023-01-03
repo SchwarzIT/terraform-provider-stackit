@@ -60,7 +60,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	// handle creation
 
-	c := r.client.Services.PostgresFlex
+	c := r.client.PostgresFlex
 
 	// prepare values
 	name := plan.Name.ValueString()
@@ -153,7 +153,7 @@ func (r Resource) createUser(ctx context.Context, plan *Instance, d *diag.Diagno
 	roles := []string{}
 
 	for maxTries := 10; maxTries > -1; maxTries-- {
-		c := r.client.Services.PostgresFlex
+		c := r.client.PostgresFlex
 		body := users.CreateUserJSONRequestBody{
 			Database: &database,
 			Roles:    &roles,
@@ -260,7 +260,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 	// read cluster
 
-	c := r.client.Services.PostgresFlex
+	c := r.client.PostgresFlex
 	res, err := c.Instance.GetWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to prepare read postgres instance request", err.Error())
@@ -366,7 +366,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	// handle update
-	c := r.client.Services.PostgresFlex.Instance
+	c := r.client.PostgresFlex.Instance
 	res, err := c.UpdateWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
 	if err != nil {
 		resp.Diagnostics.AddError("failed prepare Postgres instance update request", err.Error())
@@ -415,7 +415,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	c := r.client.Services.PostgresFlex.Instance
+	c := r.client.PostgresFlex.Instance
 	res, err := c.DeleteWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed to prepare delete postgres instance request", err.Error())

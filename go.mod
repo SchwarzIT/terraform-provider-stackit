@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/Masterminds/semver v1.5.0
-	github.com/SchwarzIT/community-stackit-go-client v1.8.1
+	github.com/SchwarzIT/community-stackit-go-client v1.10.2
 	github.com/hashicorp/terraform-plugin-framework v1.0.1
 	github.com/hashicorp/terraform-plugin-framework-validators v0.9.0
 	github.com/hashicorp/terraform-plugin-go v0.14.2
@@ -51,6 +51,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/oklog/run v1.0.0 // indirect
+	github.com/oleiade/reflections v1.0.1 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/vmihailenco/msgpack/v4 v4.3.12 // indirect
 	github.com/vmihailenco/tagparser v0.1.2 // indirect

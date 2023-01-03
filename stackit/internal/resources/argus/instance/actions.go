@@ -58,7 +58,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 }
 
 func (r Resource) createInstance(ctx context.Context, diags *diag.Diagnostics, plan *Instance) {
-	c := r.client.Services.Argus
+	c := r.client.Argus
 	n := plan.Name.ValueString()
 	pa := map[string]interface{}{}
 	body := instances.InstanceCreateJSONRequestBody{
@@ -109,7 +109,7 @@ func (r Resource) setGrafanaConfig(ctx context.Context, diags *diag.Diagnostics,
 		}
 	}
 
-	c := r.client.Services
+	c := r.client
 	epa := s.Grafana.EnablePublicAccess.ValueBool()
 	cfg := grafanaConfigs.UpdateJSONRequestBody{
 		PublicReadAccess: &epa,
@@ -145,7 +145,7 @@ func (r Resource) setMetricsConfig(ctx context.Context, diags *diag.Diagnostics,
 		}
 	}
 
-	c := r.client.Services
+	c := r.client
 	cfg := metricsStorageRetention.UpdateJSONRequestBody{
 		MetricsRetentionTimeRaw: fmt.Sprintf("%dd", s.Metrics.RetentionDays.ValueInt64()),
 		MetricsRetentionTime5m:  fmt.Sprintf("%dd", s.Metrics.RetentionDays5mDownsampling.ValueInt64()),
@@ -201,7 +201,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 }
 
 func (r Resource) readInstance(ctx context.Context, diags *diag.Diagnostics, s *Instance) {
-	c := r.client.Services
+	c := r.client
 	res, err := c.Argus.Instances.InstanceReadWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString())
 	if err != nil {
 		diags.AddError(fmt.Sprintf("failed to prepare read instance request (ctx.Err() is: %+v)", ctx.Err()), err.Error())
@@ -231,7 +231,7 @@ func (r Resource) readGrafana(ctx context.Context, diags *diag.Diagnostics, s *I
 		return
 	}
 
-	c := r.client.Services
+	c := r.client
 	res, err := c.Argus.GrafanaConfigs.ListWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString())
 	if err != nil {
 		diags.AddError("failed to prepare read grafana configs request", err.Error())
@@ -258,7 +258,7 @@ func (r Resource) readMetrics(ctx context.Context, diags *diag.Diagnostics, s *I
 		return
 	}
 
-	c := r.client.Services
+	c := r.client
 	res, err := c.Argus.MetricsStorageRetention.ListWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString())
 	if err != nil {
 		diags.AddError("failed to prepare read metrics storage retention request", err.Error())
@@ -348,7 +348,7 @@ func (r Resource) updateInstance(ctx context.Context, diags *diag.Diagnostics, p
 		return
 	}
 
-	c := r.client.Services
+	c := r.client
 	n := plan.Name.ValueString()
 	p := map[string]interface{}{}
 	body := instances.InstanceUpdateJSONRequestBody{
@@ -400,7 +400,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		resp.Diagnostics.AddError("can't perform deletion", "argus instance id is unknown or null")
 	}
 
-	c := r.client.Services
+	c := r.client
 	res, err := c.Argus.Instances.InstanceDeleteWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed preparing instance delete request", err.Error())
@@ -410,7 +410,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		resp.Diagnostics.AddError("failed during instance delete", res.HasError.Error())
 		return
 	}
-	process := res.WaitHandler(ctx, r.client.Services.Argus.Instances, state.ProjectID.ValueString(), state.ID.ValueString())
+	process := res.WaitHandler(ctx, r.client.Argus.Instances, state.ProjectID.ValueString(), state.ID.ValueString())
 	if _, err := process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed verify instance deletion", err.Error())
 		return

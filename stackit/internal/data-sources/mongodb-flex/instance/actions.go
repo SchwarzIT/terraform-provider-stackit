@@ -15,7 +15,7 @@ import (
 
 // Read - lifecycle function
 func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	c := r.client.Services.MongoDBFlex
+	c := r.client.MongoDBFlex
 	var config Instance
 	diags := req.Config.Get(ctx, &config)
 
