@@ -109,7 +109,7 @@ func (d *DataSource) Configure(ctx context.Context, req datasource.ConfigureRequ
 	case Postgres:
 		d.client = c.PostgresDB
 	case Redis:
-		d.client = c.Reddis
+		d.client = c.Redis
 	case RabbitMQ:
 		d.client = c.RabbitMQ
 	}

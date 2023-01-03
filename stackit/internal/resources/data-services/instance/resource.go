@@ -109,7 +109,7 @@ func (r *Resource) Configure(ctx context.Context, req resource.ConfigureRequest,
 	case Postgres:
 		r.client = c.PostgresDB
 	case Redis:
-		r.client = c.Reddis
+		r.client = c.Redis
 	case RabbitMQ:
 		r.client = c.RabbitMQ
 	}
