@@ -20,6 +20,7 @@ import (
 type Cluster struct {
 	ID                        types.String  `tfsdk:"id"`
 	Name                      types.String  `tfsdk:"name"`
+	ProjectID                 types.String  `tfsdk:"project_id"`
 	KubernetesProjectID       types.String  `tfsdk:"kubernetes_project_id"`
 	KubernetesVersion         types.String  `tfsdk:"kubernetes_version"`
 	KubernetesVersionUsed     types.String  `tfsdk:"kubernetes_version_used"`
@@ -94,6 +95,14 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
+				},
+			},
+			"project_id": schema.StringAttribute{
+				Description:        "this attribure is deprecated. please remove it from your terraform config and use `kubernetes_project_id` instead",
+				Optional:           true,
+				DeprecationMessage: "this attribure is deprecated. please remove it from your terraform config and use `kubernetes_project_id` instead",
+				Validators: []validator.String{
+					validate.ProjectID(),
 				},
 			},
 			"kubernetes_project_id": schema.StringAttribute{

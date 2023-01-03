@@ -71,7 +71,7 @@ Read-Only:
 
 Read-Only:
 
-- `labels` (List of String) Specifies labels
+- `labels` (Map of String) Specifies labels
 - `urls` (List of String) Specifies target URLs
 
 
