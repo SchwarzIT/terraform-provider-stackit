@@ -116,8 +116,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 								rrifr.RequiresReplace = false
 								return
 							}
-						}
-						if sr.StateValue.ValueString() != sr.ConfigValue.ValueString() {
+						} else if sr.StateValue.ValueString() != sr.ConfigValue.ValueString() {
 							rrifr.RequiresReplace = true
 							return
 						}
