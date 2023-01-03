@@ -114,14 +114,14 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplaceIf(func(ctx context.Context, sr planmodifier.StringRequest, rrifr *stringplanmodifier.RequiresReplaceIfFuncResponse) {
 						if sr.StateValue.IsNull() || sr.StateValue.IsUnknown() {
-							var s string
+							var s *string
 							diags := sr.State.GetAttribute(ctx, path.Root("project_id"), &s)
 							rrifr.Diagnostics.Append(diags...)
 							if rrifr.Diagnostics.HasError() {
 								rrifr.RequiresReplace = true
 								return
 							}
-							if s == sr.ConfigValue.ValueString() {
+							if s != nil && *s == sr.ConfigValue.ValueString() {
 								rrifr.RequiresReplace = false
 								return
 							}
