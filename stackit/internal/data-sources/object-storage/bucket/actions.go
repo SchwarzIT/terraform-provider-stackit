@@ -3,7 +3,7 @@ package bucket
 import (
 	"context"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage/buckets"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1/buckets"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/bucket"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"

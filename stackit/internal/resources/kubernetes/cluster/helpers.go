@@ -32,7 +32,7 @@ const (
 func (r Resource) loadAvaiableVersions(ctx context.Context) ([]*semver.Version, error) {
 	c := r.client
 	var versionOptions []*semver.Version
-	resp, err := c.Services.Kubernetes.ProviderOptions.GetProviderOptionsWithResponse(ctx)
+	resp, err := c.Kubernetes.ProviderOptions.GetProviderOptionsWithResponse(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed making options request")
 	}

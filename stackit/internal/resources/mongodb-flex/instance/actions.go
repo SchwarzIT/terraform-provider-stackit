@@ -81,7 +81,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		Version:        &ver,
 	}
 
-	res, err := r.client.Services.MongoDBFlex.Instance.CreateWithResponse(ctx, plan.ProjectID.ValueString(), body)
+	res, err := r.client.MongoDBFlex.Instance.CreateWithResponse(ctx, plan.ProjectID.ValueString(), body)
 	if err != nil {
 		resp.Diagnostics.AddError("failed making MongoDB instance creation request", err.Error())
 		return
@@ -107,7 +107,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	// To overcome the bug, we'll wait an initial 30 sec
 	time.Sleep(30 * time.Second)
 
-	process := res.WaitHandler(ctx, r.client.Services.MongoDBFlex.Instance, plan.ProjectID.ValueString(), plan.ID.ValueString())
+	process := res.WaitHandler(ctx, r.client.MongoDBFlex.Instance, plan.ProjectID.ValueString(), plan.ID.ValueString())
 	ins, err := process.WaitWithContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("failed MongoDB instance creation validation", err.Error())
@@ -152,7 +152,7 @@ func (r Resource) createUser(ctx context.Context, plan *Instance, d *diag.Diagno
 		Roles:    roles,
 		Username: &username,
 	}
-	res, err := r.client.Services.MongoDBFlex.User.CreateWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
+	res, err := r.client.MongoDBFlex.User.CreateWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
 	if err != nil {
 		d.AddError("failed making create user request", err.Error())
 		return
@@ -209,7 +209,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	// read cluster
-	res, err := r.client.Services.MongoDBFlex.Instance.GetWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
+	res, err := r.client.MongoDBFlex.Instance.GetWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed making read instance request", err.Error())
 		return
@@ -297,7 +297,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	// handle update
-	res, err := r.client.Services.MongoDBFlex.Instance.PutWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
+	res, err := r.client.MongoDBFlex.Instance.PutWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
 	if err != nil {
 		resp.Diagnostics.AddError("failed making MongoDB instance update request", err.Error())
 		return
@@ -311,7 +311,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		return
 	}
 
-	process := res.WaitHandler(ctx, r.client.Services.MongoDBFlex.Instance, plan.ProjectID.ValueString(), plan.ID.ValueString())
+	process := res.WaitHandler(ctx, r.client.MongoDBFlex.Instance, plan.ProjectID.ValueString(), plan.ID.ValueString())
 	ins, err := process.WaitWithContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("failed MongoDB instance update validation", err.Error())
@@ -345,7 +345,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	res, err := r.client.Services.MongoDBFlex.Instance.DeleteWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
+	res, err := r.client.MongoDBFlex.Instance.DeleteWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed making MongoDB instance deletion request", err.Error())
 		return
@@ -359,7 +359,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	process := res.WaitHandler(ctx, r.client.Services.MongoDBFlex.Instance, state.ProjectID.ValueString(), state.ID.ValueString())
+	process := res.WaitHandler(ctx, r.client.MongoDBFlex.Instance, state.ProjectID.ValueString(), state.ID.ValueString())
 	if _, err = process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed to verify mongodb instance deletion", err.Error())
 		return

@@ -20,7 +20,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	c := r.client.Services
+	c := r.client
 	job := scrapeconfig.CreateJSONRequestBody(plan.ToClientJob())
 	res, err := c.Argus.ScrapeConfig.CreateWithResponse(ctx, plan.ProjectID.ValueString(), plan.ArgusInstanceID.ValueString(), job)
 	if err != nil {
@@ -67,7 +67,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	c := r.client.Services
+	c := r.client
 
 	res, err := c.Argus.ScrapeConfig.ReadWithResponse(ctx, state.ProjectID.ValueString(), state.ArgusInstanceID.ValueString(), state.Name.ValueString())
 	if err != nil {
@@ -100,7 +100,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		return
 	}
 
-	c := r.client.Services
+	c := r.client
 	job := scrapeconfig.UpdateJSONRequestBody(plan.ToClientUpdateJob())
 	ures, err := c.Argus.ScrapeConfig.UpdateWithResponse(ctx, plan.ProjectID.ValueString(), plan.ArgusInstanceID.ValueString(), plan.Name.ValueString(), job)
 	if err != nil {
@@ -144,7 +144,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	c := r.client.Services
+	c := r.client
 	job := state.ToClientJob()
 	params := &scrapeconfig.DeleteParams{
 		JobName: []string{job.JobName},

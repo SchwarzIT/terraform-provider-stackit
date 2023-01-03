@@ -60,7 +60,7 @@ func (r Resource) validate(ctx context.Context, data Instance) error {
 }
 
 func (r Resource) validateVersion(ctx context.Context, projectID, version string) error {
-	res, err := r.client.Services.MongoDBFlex.Versions.GetVersionsWithResponse(ctx, projectID)
+	res, err := r.client.MongoDBFlex.Versions.GetVersionsWithResponse(ctx, projectID)
 	if err != nil {
 		return err
 	}
@@ -83,7 +83,7 @@ func (r Resource) validateVersion(ctx context.Context, projectID, version string
 }
 
 func (r Resource) validateMachineType(ctx context.Context, projectID, flavorID string) error {
-	res, err := r.client.Services.MongoDBFlex.Flavors.GetFlavorsWithResponse(ctx, projectID)
+	res, err := r.client.MongoDBFlex.Flavors.GetFlavorsWithResponse(ctx, projectID)
 	if err != nil {
 		return err
 	}
@@ -108,7 +108,7 @@ func (r Resource) validateMachineType(ctx context.Context, projectID, flavorID s
 }
 
 func (r Resource) validateStorage(ctx context.Context, projectID, machineType string, storage Storage) error {
-	res, err := r.client.Services.MongoDBFlex.Storage.GetStoragesFlavorWithResponse(ctx, projectID, machineType)
+	res, err := r.client.MongoDBFlex.Storage.GetStoragesFlavorWithResponse(ctx, projectID, machineType)
 	if err != nil {
 		return err
 	}

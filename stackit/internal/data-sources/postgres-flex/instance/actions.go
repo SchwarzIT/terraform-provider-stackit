@@ -11,7 +11,7 @@ import (
 
 // Read - lifecycle function
 func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	c := d.client.Services.PostgresFlex.Instance
+	c := d.client.PostgresFlex.Instance
 	var config Instance
 	diags := req.Config.Get(ctx, &config)
 

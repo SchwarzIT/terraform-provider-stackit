@@ -29,7 +29,7 @@ func (r Resource) validate(
 
 	// Validate against real options
 	c := r.client
-	opts, err := c.Services.Kubernetes.ProviderOptions.GetProviderOptionsWithResponse(ctx)
+	opts, err := c.Kubernetes.ProviderOptions.GetProviderOptionsWithResponse(ctx)
 	if err != nil || opts.HasError != nil || opts.JSON200.KubernetesVersions == nil {
 		// if options cannot be fetched, skip validation
 		return nil

@@ -20,7 +20,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	// handle creation
 	eof := false
-	c := r.client.Services.Kubernetes.Project
+	c := r.client.Kubernetes.Project
 	res, err := c.CreateProjectWithResponse(ctx, plan.ProjectID.ValueString())
 	if err != nil {
 		if !strings.Contains(err.Error(), common.ERR_UNEXPECTED_EOF) {
@@ -60,7 +60,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	// read
-	c := r.client.Services.Kubernetes.Project
+	c := r.client.Kubernetes.Project
 	res, err := c.GetProjectWithResponse(ctx, state.ID.ValueString())
 	if err != nil {
 		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
@@ -94,7 +94,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	// handle creation
-	c := r.client.Services.Kubernetes.Project
+	c := r.client.Kubernetes.Project
 	res, err := c.DeleteProjectWithResponse(ctx, state.ID.ValueString())
 	if err != nil {
 		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
