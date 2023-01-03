@@ -7,6 +7,7 @@ import (
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -102,7 +103,25 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 					validate.ProjectID(),
 				},
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.RequiresReplaceIf(func(ctx context.Context, sr planmodifier.StringRequest, rrifr *stringplanmodifier.RequiresReplaceIfFuncResponse) {
+						if sr.StateValue.IsNull() || sr.StateValue.IsUnknown() {
+							var s string
+							diags := sr.State.GetAttribute(ctx, path.Root("project_id"), &s)
+							rrifr.Diagnostics.Append(diags...)
+							if rrifr.Diagnostics.HasError() {
+								rrifr.RequiresReplace = true
+								return
+							}
+							if s == sr.ConfigValue.ValueString() {
+								rrifr.RequiresReplace = false
+								return
+							}
+						}
+						if sr.StateValue.ValueString() != sr.ConfigValue.ValueString() {
+							rrifr.RequiresReplace = true
+							return
+						}
+					}, "require modification if project ID has been modified", "require modification if project ID has been modified"),
 				},
 			},
 			"kubernetes_version": schema.StringAttribute{
