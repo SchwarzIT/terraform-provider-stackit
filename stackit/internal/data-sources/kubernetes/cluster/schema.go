@@ -34,6 +34,14 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 					validate.ProjectID(),
 				},
 			},
+			"project_id": schema.StringAttribute{
+				Description:        "this attribure is deprecated. please remove it from your terraform config and use `kubernetes_project_id` instead",
+				Optional:           true,
+				DeprecationMessage: "this attribure is deprecated. please remove it from your terraform config and use `kubernetes_project_id` instead",
+				Validators: []validator.String{
+					validate.ProjectID(),
+				},
+			},
 			"kubernetes_version": schema.StringAttribute{
 				Description: "Kubernetes version. ",
 				Computed:    true,

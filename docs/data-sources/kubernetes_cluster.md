@@ -41,6 +41,7 @@ data "stackit_kubernetes_cluster" "example" {
 
 - `allow_privileged_containers` (Boolean) Should containers be allowed to run in privileged mode?
 - `node_pools` (Attributes List) One or more `node_pool` block as defined below (see [below for nested schema](#nestedatt--node_pools))
+- `project_id` (String, Deprecated) this attribure is deprecated. please remove it from your terraform config and use `kubernetes_project_id` instead
 
 ### Read-Only
 

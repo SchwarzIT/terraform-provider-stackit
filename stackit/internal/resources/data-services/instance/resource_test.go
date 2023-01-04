@@ -52,7 +52,7 @@ func TestAcc_RabbitMQJob(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "name", name),
 					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
-					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "version", "7"),
+					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "version", "3.7"),
 					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "plan", plan2),
 					resource.TestCheckResourceAttrSet("stackit_rabbitmq_instance.example", "id"),
 					resource.TestCheckResourceAttrSet("stackit_rabbitmq_instance.example", "plan_id"),

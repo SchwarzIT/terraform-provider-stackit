@@ -92,7 +92,7 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 	config.DashboardURL = types.StringValue(instance.DashboardUrl)
 	config.CFGUID = types.StringValue(instance.CFGUID)
 	config.CFSpaceGUID = types.StringValue(instance.CFSpaceGUID)
-	config.CFOrganizationGUID = types.StringNull()
+	config.CFOrganizationGUID = types.StringValue("")
 	if instance.OrganizationGUID != nil {
 		config.CFOrganizationGUID = types.StringValue(*instance.OrganizationGUID)
 	}
