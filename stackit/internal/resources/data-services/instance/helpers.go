@@ -123,7 +123,7 @@ func (r Resource) applyClientResponse(ctx context.Context, pi *Instance, i *inst
 	pi.DashboardURL = types.StringValue(i.DashboardUrl)
 	pi.CFGUID = types.StringValue(i.CFGUID)
 	pi.CFSpaceGUID = types.StringValue(i.CFSpaceGUID)
-	pi.CFOrganizationGUID = types.StringNull()
+	pi.CFOrganizationGUID = types.StringValue("")
 	if i.OrganizationGUID != nil {
 		pi.CFOrganizationGUID = types.StringValue(*i.OrganizationGUID)
 	}
