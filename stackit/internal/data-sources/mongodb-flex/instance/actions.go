@@ -95,6 +95,10 @@ func ApplyClientResponse(pi *Instance, i *instance.InstancesSingleInstance) erro
 			elems = append(elems, types.StringValue(v))
 		}
 	}
+	if i.ID == nil {
+		return errors.New("received a nil ID")
+	}
+	pi.ID = types.StringValue(*i.ID)
 	pi.ACL = types.ListValueMust(types.StringType, elems)
 	pi.BackupSchedule = nullOrValStr(i.BackupSchedule)
 	pi.MachineType = nullOrValStr(i.Flavor.ID)
