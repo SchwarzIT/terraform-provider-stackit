@@ -11,6 +11,7 @@ import (
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -247,17 +248,29 @@ func (c *Cluster) hibernations() *cluster.Hibernation {
 	}
 }
 
-func (c *Cluster) extensions() *cluster.Extension {
-	if c.Extensions == nil || c.Extensions.Argus == nil {
-		return nil
+func (c *Cluster) extensions(ctx context.Context) (*cluster.Extension, diag.Diagnostics) {
+	if c.Extensions == nil {
+		return nil, nil
 	}
-
-	return &cluster.Extension{
-		Argus: &cluster.Argus{
+	ex := &cluster.Extension{}
+	if c.Extensions.Argus != nil {
+		ex.Argus = &cluster.Argus{
 			Enabled:         c.Extensions.Argus.Enabled.ValueBool(),
 			ArgusInstanceID: c.Extensions.Argus.ArgusInstanceID.ValueString(),
-		},
+		}
 	}
+	if c.Extensions.ACL != nil {
+		var cidrs []string
+		diags := c.Extensions.ACL.AllowedCIDRs.ElementsAs(ctx, &cidrs, true)
+		if diags.HasError() {
+			return nil, diags
+		}
+		ex.Acl = &cluster.ACL{
+			Enabled:      c.Extensions.ACL.Enabled.ValueBool(),
+			AllowedCidrs: cidrs,
+		}
+	}
+	return ex, nil
 }
 
 func (c *Cluster) maintenance() *cluster.Maintenance {
@@ -410,11 +423,26 @@ func (c *Cluster) transformExtensions(cl cluster.Cluster) {
 			Enabled:         types.BoolValue(false),
 			ArgusInstanceID: types.StringNull(),
 		},
+		ACL: &ACL{
+			Enabled:      types.BoolValue(false),
+			AllowedCIDRs: types.ListNull(types.StringType),
+		},
 	}
 	if cl.Extensions.Argus != nil {
 		c.Extensions.Argus = &ArgusExtension{
 			Enabled:         types.BoolValue(cl.Extensions.Argus.Enabled),
 			ArgusInstanceID: types.StringValue(cl.Extensions.Argus.ArgusInstanceID),
+		}
+	}
+
+	if cl.Extensions.Acl != nil {
+		cidr := []attr.Value{}
+		for _, v := range cl.Extensions.Acl.AllowedCidrs {
+			cidr = append(cidr, types.StringValue(v))
+		}
+		c.Extensions.ACL = &ACL{
+			Enabled:      types.BoolValue(cl.Extensions.Acl.Enabled),
+			AllowedCIDRs: types.ListValueMust(types.StringType, cidr),
 		}
 	}
 }
