@@ -1,4 +1,4 @@
-package test
+package credential_test
 
 import (
 	"fmt"
@@ -15,7 +15,7 @@ import (
 
 const es_cred_run_this_test = false
 
-func TestAcc_ElasticSearchCredential(t *testing.T) {
+func TestAcc_DataSourceElasticSearchCredentialJob(t *testing.T) {
 	if !common.ShouldAccTestRun(es_cred_run_this_test) {
 		t.Skip()
 		return
@@ -31,7 +31,7 @@ func TestAcc_ElasticSearchCredential(t *testing.T) {
 		Steps: []resource.TestStep{
 			// check minimal configuration
 			{
-				Config: configESCred(projectID, name),
+				Config: configCredElasticSearch(projectID, name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.stackit_elasticsearch_credential.example", "project_id", projectID),
 					resource.TestCheckTypeSetElemAttrPair("stackit_elasticsearch_credential.example", "project_id", "data.stackit_elasticsearch_credential.example", "project_id"),
@@ -50,7 +50,7 @@ func TestAcc_ElasticSearchCredential(t *testing.T) {
 	})
 }
 
-func configESCred(projectID, name string) string {
+func configCredElasticSearch(projectID, name string) string {
 	return fmt.Sprintf(`
 	resource "stackit_elasticsearch_instance" "example" {
 		name       = "%s"
@@ -64,6 +64,7 @@ func configESCred(projectID, name string) string {
 	}
 
 	data "stackit_elasticsearch_credential" "example" {
+		depends_on = [stackit_elasticsearch_credential.example]
 		project_id = "%s"
 		instance_id = stackit_elasticsearch_instance.example.id
 		id = stackit_elasticsearch_credential.example.id

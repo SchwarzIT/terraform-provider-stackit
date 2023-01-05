@@ -77,6 +77,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			"version": schema.StringAttribute{
 				Description: fmt.Sprintf("RabbitMQ version. Default is %s", r.getDefaultVersion()),
 				Optional:    true,
+				Computed:    true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 					modifiers.StringDefault(r.getDefaultVersion()),
