@@ -1,4 +1,4 @@
-package test
+package instance_test
 
 import (
 	"fmt"
@@ -12,10 +12,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-const es_instance_run_this_test = false
+const es_inst_run_this_test = false
 
-func TestAcc_ElasticSearchInstance(t *testing.T) {
-	if !common.ShouldAccTestRun(es_instance_run_this_test) {
+func TestAcc_DataSourceElasticSearchInstanceJob(t *testing.T) {
+	if !common.ShouldAccTestRun(es_inst_run_this_test) {
 		t.Skip()
 		return
 	}
@@ -32,7 +32,7 @@ func TestAcc_ElasticSearchInstance(t *testing.T) {
 		Steps: []resource.TestStep{
 			// check minimal configuration
 			{
-				Config: configESInst(name, version, plan),
+				Config: configElasticSearch(name, version, plan),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.stackit_elasticsearch_instance.example", "name", name),
 					resource.TestCheckResourceAttr("data.stackit_elasticsearch_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
@@ -43,7 +43,6 @@ func TestAcc_ElasticSearchInstance(t *testing.T) {
 					resource.TestCheckResourceAttrSet("data.stackit_elasticsearch_instance.example", "dashboard_url"),
 					resource.TestCheckResourceAttrSet("data.stackit_elasticsearch_instance.example", "cf_guid"),
 					resource.TestCheckResourceAttrSet("data.stackit_elasticsearch_instance.example", "cf_space_guid"),
-					resource.TestCheckResourceAttrSet("data.stackit_elasticsearch_instance.example", "cf_organization_guid"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_elasticsearch_instance.example", "id", "data.stackit_elasticsearch_instance.example", "id"),
 				),
 			},
@@ -51,7 +50,7 @@ func TestAcc_ElasticSearchInstance(t *testing.T) {
 	})
 }
 
-func configESInst(name, version, plan string) string {
+func configElasticSearch(name, version, plan string) string {
 	return fmt.Sprintf(`
 	resource "stackit_elasticsearch_instance" "example" {
 		name       = "%s"

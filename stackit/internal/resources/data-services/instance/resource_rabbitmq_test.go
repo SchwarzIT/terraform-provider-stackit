@@ -14,17 +14,20 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-const run_this_test = false
+const rabbitmq_inst_run_this_test = false
 
-func TestAcc_RabbitMQJob(t *testing.T) {
-	if !common.ShouldAccTestRun(run_this_test) {
+func TestAcc_ResourceRabbitMQInstanceJob(t *testing.T) {
+	if !common.ShouldAccTestRun(rabbitmq_inst_run_this_test) {
 		t.Skip()
 		return
 	}
 
 	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
 	plan1 := "stackit-rabbitmq-single-small"
+	planID1 := "4bc417ff-cb98-4064-bb56-8a2654120768"
 	plan2 := "stackit-rabbitmq-single-medium"
+	planID2 := "4e7dcd06-13f0-4e4d-9c2b-6b057d166e1d"
+	version := "3.7"
 
 	resource.ParallelTest(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){
@@ -33,14 +36,14 @@ func TestAcc_RabbitMQJob(t *testing.T) {
 		Steps: []resource.TestStep{
 			// check minimal configuration
 			{
-				Config: config(name, plan1),
+				Config: configInstRabbitMQ(name, plan1, version),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "name", name),
 					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
-					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "version", "3.7"),
+					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "version", version),
 					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "plan", plan1),
+					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "plan_id", planID1),
 					resource.TestCheckResourceAttrSet("stackit_rabbitmq_instance.example", "id"),
-					resource.TestCheckResourceAttrSet("stackit_rabbitmq_instance.example", "plan_id"),
 					resource.TestCheckResourceAttrSet("stackit_rabbitmq_instance.example", "dashboard_url"),
 					resource.TestCheckResourceAttrSet("stackit_rabbitmq_instance.example", "cf_guid"),
 					resource.TestCheckResourceAttrSet("stackit_rabbitmq_instance.example", "cf_space_guid"),
@@ -48,14 +51,14 @@ func TestAcc_RabbitMQJob(t *testing.T) {
 			},
 			// check update plan
 			{
-				Config: config(name, plan2),
+				Config: configInstRabbitMQ(name, plan2, version),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "name", name),
 					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
-					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "version", "3.7"),
+					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "version", version),
 					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "plan", plan2),
+					resource.TestCheckResourceAttr("stackit_rabbitmq_instance.example", "plan_id", planID2),
 					resource.TestCheckResourceAttrSet("stackit_rabbitmq_instance.example", "id"),
-					resource.TestCheckResourceAttrSet("stackit_rabbitmq_instance.example", "plan_id"),
 					resource.TestCheckResourceAttrSet("stackit_rabbitmq_instance.example", "dashboard_url"),
 					resource.TestCheckResourceAttrSet("stackit_rabbitmq_instance.example", "cf_guid"),
 					resource.TestCheckResourceAttrSet("stackit_rabbitmq_instance.example", "cf_space_guid"),
@@ -83,18 +86,19 @@ func TestAcc_RabbitMQJob(t *testing.T) {
 	})
 }
 
-func config(name, plan string) string {
+func configInstRabbitMQ(name, plan, version string) string {
 	return fmt.Sprintf(`
 	resource "stackit_rabbitmq_instance" "example" {
 		name       = "%s"
 		project_id = "%s"
-		version    = "3.7"
+		version    = "%s"
 		plan       = "%s"
 	  }
 	  
 	  `,
 		name,
 		common.GetAcceptanceTestsProjectID(),
+		version,
 		plan,
 	)
 }
