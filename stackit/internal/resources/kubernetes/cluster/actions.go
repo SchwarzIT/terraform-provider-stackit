@@ -63,7 +63,11 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 	nodePools := setNodepoolDefaults(cl.nodePools())
 	maintenance := cl.maintenance()
 	hibernations := cl.hibernations()
-	extensions := cl.extensions()
+	extensions, diag := cl.extensions(ctx)
+	diags.Append(diag...)
+	if diags.HasError() {
+		return
+	}
 
 	if err := r.validate(ctx, projectID, clusterName, clusterConfig, &nodePools, maintenance, hibernations, extensions); err != nil {
 		diags.AddError(

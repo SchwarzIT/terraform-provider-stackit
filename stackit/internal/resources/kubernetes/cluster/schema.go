@@ -71,6 +71,12 @@ type Hibernation struct {
 
 type Extensions struct {
 	Argus *ArgusExtension `tfsdk:"argus"`
+	ACL   *ACL            `tfsdk:"acl"`
+}
+
+type ACL struct {
+	Enabled      types.Bool `tfsdk:"enabled"`
+	AllowedCIDRs types.List `tfsdk:"allowed_cidrs"`
 }
 
 type ArgusExtension struct {
@@ -343,6 +349,27 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 							"argus_instance_id": schema.StringAttribute{
 								Description: "Instance ID of argus, Required when enabled is set to `true`",
 								Optional:    true,
+							},
+						},
+					},
+					"acl": schema.SingleNestedAttribute{
+						Description: "Cluster access control configuration",
+						Optional:    true,
+						Computed:    true,
+						Attributes: map[string]schema.Attribute{
+							"enabled": schema.BoolAttribute{
+								Description: "Is ACL enabled? Defaults to `false`",
+								Optional:    true,
+								Computed:    true,
+								PlanModifiers: []planmodifier.Bool{
+									modifiers.BoolDefault(false),
+								},
+							},
+							"allowed_cidrs": schema.ListAttribute{
+								Description: "Specify a list of CIDRs to whitelist",
+								ElementType: types.StringType,
+								Optional:    true,
+								Computed:    true,
 							},
 						},
 					},

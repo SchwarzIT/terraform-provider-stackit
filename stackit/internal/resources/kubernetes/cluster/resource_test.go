@@ -77,6 +77,8 @@ func TestAcc_kubernetes(t *testing.T) {
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "hibernations.0.end", "30 20 * * *"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "hibernations.0.timezone", "Europe/Berlin"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "extensions.argus.enabled", "false"),
+					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "extensions.acl.enabled", "true"),
+					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "extensions.acl.allowed_cidrs.0", "185.124.192.0/22"),
 					resource.TestCheckResourceAttrSet("stackit_kubernetes_cluster.example", "status"),
 					resource.TestCheckResourceAttrSet("stackit_kubernetes_cluster.example", "kube_config"),
 				),
@@ -169,6 +171,10 @@ resource "stackit_kubernetes_cluster" "example" {
 	extensions = {
 		argus = {
 			enabled = false
+		}
+		acl = {
+			enabled = true
+			allowed_cidrs = ["185.124.192.0/22"]
 		}
 	}
 }
