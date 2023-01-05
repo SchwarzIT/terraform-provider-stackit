@@ -202,6 +202,21 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 							},
 						},
 					},
+					"acl": schema.SingleNestedAttribute{
+						Description: "Manage access to cluster",
+						Computed:    true,
+						Attributes: map[string]schema.Attribute{
+							"enabled": schema.BoolAttribute{
+								Description: "Is ACL enabled? Defaults to `false`",
+								Computed:    true,
+							},
+							"allowed_cidrs": schema.ListAttribute{
+								Description: "Specify a list of CIDRs to whitelist",
+								ElementType: types.StringType,
+								Computed:    true,
+							},
+						},
+					},
 				},
 			},
 
