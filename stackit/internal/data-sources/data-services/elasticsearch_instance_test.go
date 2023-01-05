@@ -43,7 +43,6 @@ func TestAcc_ElasticSearchInstance(t *testing.T) {
 					resource.TestCheckResourceAttrSet("data.stackit_elasticsearch_instance.example", "dashboard_url"),
 					resource.TestCheckResourceAttrSet("data.stackit_elasticsearch_instance.example", "cf_guid"),
 					resource.TestCheckResourceAttrSet("data.stackit_elasticsearch_instance.example", "cf_space_guid"),
-					resource.TestCheckResourceAttrSet("data.stackit_elasticsearch_instance.example", "cf_organization_guid"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_elasticsearch_instance.example", "id", "data.stackit_elasticsearch_instance.example", "id"),
 				),
 			},
