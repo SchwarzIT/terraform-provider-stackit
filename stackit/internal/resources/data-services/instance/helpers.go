@@ -102,7 +102,7 @@ func (r Resource) validatePlan(ctx context.Context, offers []offerings.Offering,
 		}
 		opts = append(opts, fmt.Sprintf("- %s (%s)", plan.Name, plan.Description))
 	}
-	return "", fmt.Errorf("couldn't find plan name '%s'. Available options are:\n%s\n", version, strings.Join(opts, "\n"))
+	return "", fmt.Errorf("couldn't find plan name '%s' for version '%s'. Available options are:\n%s\n", planName, version, strings.Join(opts, "\n"))
 }
 
 func (r Resource) applyClientResponse(ctx context.Context, pi *Instance, i *instances.Instance) error {
