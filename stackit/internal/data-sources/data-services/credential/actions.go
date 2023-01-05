@@ -21,6 +21,7 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 	res, err := d.client.Credentials.GetWithResponse(ctx, config.ProjectID.ValueString(), config.InstanceID.ValueString(), config.ID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed preparing get credential request", err.Error())
+		return
 	}
 	if res.HasError != nil {
 		if res.StatusCode() == http.StatusNotFound {
@@ -32,6 +33,7 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 	}
 	if res.JSON200 == nil || res.JSON200.Raw == nil {
 		resp.Diagnostics.AddError("failed parsing get credential response", "JSON200 == nil or .Raw == nil")
+		return
 	}
 
 	i := res.JSON200

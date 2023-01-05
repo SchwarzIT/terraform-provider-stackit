@@ -25,9 +25,11 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	res, err := r.client.Credentials.PostWithResponse(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("failed preparing credential creation request", err.Error())
+		return
 	}
 	if res == nil {
-		resp.Diagnostics.AddError("empty response", "received an empty response during credential creatopn. res == nil")
+		resp.Diagnostics.AddError("empty response", "received an empty response during credential creation. res == nil")
+		return
 	}
 	if res.HasError != nil {
 		if strings.Contains(res.HasError.Error(), "service bind failed") {
@@ -35,6 +37,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 			res, err = r.client.Credentials.PostWithResponse(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString())
 			if err != nil {
 				resp.Diagnostics.AddError("failed preparing 2nd credential creation request", err.Error())
+				return
 			}
 		}
 		if res.HasError != nil {
