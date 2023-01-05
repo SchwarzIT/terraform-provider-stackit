@@ -39,10 +39,14 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 				resp.Diagnostics.AddError("failed preparing 2nd credential creation request", err.Error())
 				return
 			}
-		}
-		if res.HasError != nil {
-			resp.Diagnostics.AddError("failed credential creation", err.Error())
-			return
+			if res == nil {
+				resp.Diagnostics.AddError("failed credential creation", "received an empty response during credential creation. res == nil")
+				return
+			}
+			if res.HasError != nil {
+				resp.Diagnostics.AddError("failed credential creation", res.HasError.Error())
+				return
+			}
 		}
 	}
 	if res.JSON200 == nil {
