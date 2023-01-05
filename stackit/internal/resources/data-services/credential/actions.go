@@ -47,6 +47,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 	if res.JSON200 == nil {
 		resp.Diagnostics.AddError("failed parsing credential creation response", "JSON200 == nil")
+		return
 	}
 
 	if err := r.applyClientResponse(ctx, &cred, res.JSON200); err != nil {
