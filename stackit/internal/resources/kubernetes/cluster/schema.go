@@ -353,7 +353,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 						},
 					},
 					"acl": schema.SingleNestedAttribute{
-						Description: "Manage access to cluster",
+						Description: "Cluster access control configuration",
 						Optional:    true,
 						Computed:    true,
 						Attributes: map[string]schema.Attribute{

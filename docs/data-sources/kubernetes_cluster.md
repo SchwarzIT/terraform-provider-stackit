@@ -93,7 +93,17 @@ Read-Only:
 
 Read-Only:
 
+- `acl` (Attributes) Cluster access control configuration (see [below for nested schema](#nestedatt--extensions--acl))
 - `argus` (Attributes) A single argus block as defined below (see [below for nested schema](#nestedatt--extensions--argus))
+
+<a id="nestedatt--extensions--acl"></a>
+### Nested Schema for `extensions.acl`
+
+Read-Only:
+
+- `allowed_cidrs` (List of String) Specify a list of CIDRs to whitelist
+- `enabled` (Boolean) Is ACL enabled? Defaults to `false`
+
 
 <a id="nestedatt--extensions--argus"></a>
 ### Nested Schema for `extensions.argus`
