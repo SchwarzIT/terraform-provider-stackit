@@ -9,6 +9,7 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/generated/instance"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/generated/users"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -88,16 +89,9 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		Version: &v,
 	}
 	res, err := c.Instance.CreateWithResponse(ctx, plan.ProjectID.ValueString(), body)
-	if err != nil {
-		resp.Diagnostics.AddError("failed preparing Postgres instance creation request", err.Error())
+	if agg := validate.Response(res, err, "JSON200.ID"); agg != nil {
+		resp.Diagnostics.AddError("failed creating Postgres flex instance", agg.Error())
 		return
-	}
-	if res.HasError != nil {
-		resp.Diagnostics.AddError("failed Postgres instance creation", res.HasError.Error())
-		return
-	}
-	if res.JSON200.ID == nil {
-		resp.Diagnostics.AddError("received nil ID", "postgres flex API returned a nil ID")
 	}
 
 	// set state

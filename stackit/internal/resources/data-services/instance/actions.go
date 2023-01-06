@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/generated/instances"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -49,16 +50,8 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		Parameters:   &params,
 	}
 	res, err := r.client.Instances.ProvisionWithResponse(ctx, plan.ProjectID.ValueString(), body)
-	if err != nil {
-		resp.Diagnostics.AddError("failed preparing instance provisioning request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		resp.Diagnostics.AddError("failed making instance provisioning request", res.HasError.Error())
-		return
-	}
-	if res.JSON202 == nil {
-		resp.Diagnostics.AddError("received an empty response", "JSON202 == nil")
+	if agg := validate.Response(res, err, "JSON202"); agg != nil {
+		diags.AddError("failed instance provisioning", agg.Error())
 		return
 	}
 
@@ -179,12 +172,8 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		Parameters: &params,
 	}
 	res, err := r.client.Instances.UpdateWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString(), body)
-	if err != nil {
-		resp.Diagnostics.AddError("failed preparing update instance request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		resp.Diagnostics.AddError("failed making update instance request", res.HasError.Error())
+	if agg := validate.Response(res, err); agg != nil {
+		resp.Diagnostics.AddError("failed instance update", agg.Error())
 		return
 	}
 

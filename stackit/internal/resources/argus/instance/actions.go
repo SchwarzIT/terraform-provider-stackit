@@ -10,6 +10,7 @@ import (
 	grafanaConfigs "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/generated/grafana-configs"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/generated/instances"
 	metricsStorageRetention "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/generated/metrics-storage-retention"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -67,16 +68,8 @@ func (r Resource) createInstance(ctx context.Context, diags *diag.Diagnostics, p
 		Parameter: &pa,
 	}
 	res, err := c.Instances.InstanceCreateWithResponse(ctx, plan.ProjectID.ValueString(), body)
-	if err != nil {
-		diags.AddError("failed preparing instance creation request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		diags.AddError("failed making instance creation request", res.HasError.Error())
-		return
-	}
-	if res.JSON202 == nil {
-		diags.AddError("got an empty response", "JSON202 == nil")
+	if agg := validate.Response(res, err, "JSON202"); agg != nil {
+		diags.AddError("failed to create argus instance", agg.Error())
 		return
 	}
 
@@ -233,16 +226,8 @@ func (r Resource) readGrafana(ctx context.Context, diags *diag.Diagnostics, s *I
 
 	c := r.client
 	res, err := c.Argus.GrafanaConfigs.ListWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString())
-	if err != nil {
-		diags.AddError("failed to prepare read grafana configs request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		diags.AddError("failed to make read grafana configs request", res.HasError.Error())
-		return
-	}
-	if res.JSON200 == nil {
-		diags.AddError("read grafana configs returned an empty response", "JSON200 == nil")
+	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+		diags.AddError("failed to read grafana configs", agg.Error())
 		return
 	}
 
@@ -260,16 +245,8 @@ func (r Resource) readMetrics(ctx context.Context, diags *diag.Diagnostics, s *I
 
 	c := r.client
 	res, err := c.Argus.MetricsStorageRetention.ListWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString())
-	if err != nil {
-		diags.AddError("failed to prepare read metrics storage retention request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		diags.AddError("failed to make read metrics storage retention request", res.HasError.Error())
-		return
-	}
-	if res.JSON200 == nil {
-		diags.AddError("read metrics storage retention returned an empty response", "JSON200 == nil")
+	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+		diags.AddError("failed to read metrics storage retention", agg.Error())
 		return
 	}
 	s.Metrics.RetentionDays = types.Int64Value(transformDayMetric(res.JSON200.MetricsRetentionTimeRaw))
@@ -357,16 +334,8 @@ func (r Resource) updateInstance(ctx context.Context, diags *diag.Diagnostics, p
 		PlanID:    plan.PlanID.ValueString(),
 	}
 	res, err := c.Argus.Instances.InstanceUpdateWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
-	if err != nil {
-		diags.AddError("failed preparing instance update request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		diags.AddError("failed during instance update", res.HasError.Error())
-		return
-	}
-	if res.JSON202 == nil {
-		diags.AddError("read instance returned an empty response", "JSON202 == nil")
+	if agg := validate.Response(res, err, "JSON202"); agg != nil {
+		diags.AddError("failed to update instance", agg.Error())
 		return
 	}
 	process := res.WaitHandler(ctx, c.Argus.Instances, plan.ProjectID.ValueString(), plan.ID.ValueString())
@@ -402,12 +371,8 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 
 	c := r.client
 	res, err := c.Argus.Instances.InstanceDeleteWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed preparing instance delete request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		resp.Diagnostics.AddError("failed during instance delete", res.HasError.Error())
+	if agg := validate.Response(res, err); agg != nil {
+		resp.Diagnostics.AddError("failed to delete instance", agg.Error())
 		return
 	}
 	process := res.WaitHandler(ctx, r.client.Argus.Instances, state.ProjectID.ValueString(), state.ID.ValueString())

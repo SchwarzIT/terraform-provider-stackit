@@ -2,8 +2,8 @@ package credential
 
 import (
 	"context"
-	"net/http"
 
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -19,20 +19,8 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 	}
 
 	res, err := d.client.Credentials.GetWithResponse(ctx, config.ProjectID.ValueString(), config.InstanceID.ValueString(), config.ID.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed preparing get credential request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		if res.StatusCode() == http.StatusNotFound {
-			resp.State.RemoveResource(ctx)
-			return
-		}
-		resp.Diagnostics.AddError("failed to read credential", res.HasError.Error())
-		return
-	}
-	if res.JSON200 == nil || res.JSON200.Raw == nil {
-		resp.Diagnostics.AddError("failed parsing get credential response", "JSON200 == nil or .Raw == nil")
+	if agg := validate.Response(res, err, "JSON200.Raw"); agg != nil {
+		diags.AddError("failed to read credential", agg.Error())
 		return
 	}
 

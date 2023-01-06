@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/generated/instance"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -25,16 +26,8 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	}
 
 	res, err := c.Instance.ListWithResponse(ctx, config.ProjectID.ValueString(), &instance.ListParams{})
-	if err != nil {
-		resp.Diagnostics.AddError("failed making list instances request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		resp.Diagnostics.AddError("list instances response has an error", res.HasError.Error())
-		return
-	}
-	if res.JSON200 == nil || res.JSON200.Items == nil {
-		resp.Diagnostics.AddError("failed to parse response", "JSON200 == nil or .Items == nil")
+	if agg := validate.Response(res, err, "JSON200.Items"); agg != nil {
+		diags.AddError("failed to list mongodb instances", agg.Error())
 		return
 	}
 
@@ -65,16 +58,8 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	// set found instance
 	instance := list[found]
 	ires, err := c.Instance.GetWithResponse(ctx, config.ProjectID.ValueString(), *instance.ID)
-	if err != nil {
-		resp.Diagnostics.AddError("failed making get instance request", err.Error())
-		return
-	}
-	if ires.HasError != nil {
-		resp.Diagnostics.AddError("list instances response has an error", ires.HasError.Error())
-		return
-	}
-	if ires.JSON200 == nil || ires.JSON200.Item == nil {
-		resp.Diagnostics.AddError("failed to parse response", "JSON200 == nil or .Items == nil")
+	if agg := validate.Response(ires, err, "JSON200.Item"); agg != nil {
+		diags.AddError("failed to get mongodb instance", agg.Error())
 		return
 	}
 

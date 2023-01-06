@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	scrapeconfig "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/generated/scrape-config"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -23,16 +24,8 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	c := r.client
 	job := scrapeconfig.CreateJSONRequestBody(plan.ToClientJob())
 	res, err := c.Argus.ScrapeConfig.CreateWithResponse(ctx, plan.ProjectID.ValueString(), plan.ArgusInstanceID.ValueString(), job)
-	if err != nil {
-		resp.Diagnostics.AddError("failed preparing create job request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		resp.Diagnostics.AddError("failed making create job request", res.HasError.Error())
-		return
-	}
-	if res.JSON202 == nil {
-		resp.Diagnostics.AddError("create job request returned an empty response", "JSON202 == nil")
+	if agg := validate.Response(res, err, "JSON202"); agg != nil {
+		diags.AddError("failed to create argus job", agg.Error())
 		return
 	}
 
@@ -70,16 +63,8 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	c := r.client
 
 	res, err := c.Argus.ScrapeConfig.ReadWithResponse(ctx, state.ProjectID.ValueString(), state.ArgusInstanceID.ValueString(), state.Name.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed preparing read job request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		resp.Diagnostics.AddError("failed making read job request", res.HasError.Error())
-		return
-	}
-	if res.JSON200 == nil {
-		resp.Diagnostics.AddError("failed parsing read job request", "JSON200 == nil")
+	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+		diags.AddError("failed to read argus job", agg.Error())
 		return
 	}
 
@@ -103,27 +88,15 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	c := r.client
 	job := scrapeconfig.UpdateJSONRequestBody(plan.ToClientUpdateJob())
 	ures, err := c.Argus.ScrapeConfig.UpdateWithResponse(ctx, plan.ProjectID.ValueString(), plan.ArgusInstanceID.ValueString(), plan.Name.ValueString(), job)
-	if err != nil {
-		resp.Diagnostics.AddError("failed preparing update job request", err.Error())
-		return
-	}
-	if ures.HasError != nil {
-		resp.Diagnostics.AddError("failed making update job request", ures.HasError.Error())
+	if agg := validate.Response(ures, err); agg != nil {
+		diags.AddError("failed to update argus job", agg.Error())
 		return
 	}
 
 	// read job to verify update
 	res, err := c.Argus.ScrapeConfig.ReadWithResponse(ctx, plan.ProjectID.ValueString(), plan.ArgusInstanceID.ValueString(), plan.Name.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed preparing read job request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		resp.Diagnostics.AddError("failed making read job request", res.HasError.Error())
-		return
-	}
-	if res.JSON200 == nil {
-		resp.Diagnostics.AddError("failed parsing read job request", "JSON200 == nil")
+	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+		diags.AddError("failed to read argus job", agg.Error())
 		return
 	}
 	plan.FromClientJob(res.JSON200.Data)
@@ -150,12 +123,8 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		JobName: []string{job.JobName},
 	}
 	res, err := c.Argus.ScrapeConfig.DeleteWithResponse(ctx, state.ProjectID.ValueString(), state.ArgusInstanceID.ValueString(), params)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to prepare delete job request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		resp.Diagnostics.AddError("failed to make delete job request", res.HasError.Error())
+	if agg := validate.Response(res, err); agg != nil {
+		resp.Diagnostics.AddError("failed to delete argus job", agg.Error())
 		return
 	}
 

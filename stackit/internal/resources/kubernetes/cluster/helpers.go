@@ -7,6 +7,7 @@ import (
 
 	"github.com/Masterminds/semver"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated/cluster"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/pkg/errors"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
@@ -39,6 +40,9 @@ func (r Resource) loadAvaiableVersions(ctx context.Context) ([]*semver.Version, 
 	}
 	if resp.HasError != nil {
 		return nil, errors.Wrap(resp.HasError, "Couldn't fetch options")
+	}
+	if agg := validate.Response(resp, err, "JSON200"); agg != nil {
+		return nil, agg
 	}
 
 	opts := resp.JSON200

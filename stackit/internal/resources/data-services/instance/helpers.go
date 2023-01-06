@@ -7,6 +7,7 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/generated/instances"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/generated/offerings"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/pkg/errors"
@@ -54,14 +55,8 @@ func (r Resource) validate(ctx context.Context, data *Instance) error {
 	}
 
 	res, err := r.client.Offerings.GetWithResponse(ctx, data.ProjectID.ValueString())
-	if err != nil {
-		return errors.Wrap(err, "failed to prepare get offerings call")
-	}
-	if res.HasError != nil {
-		return errors.Wrap(res.HasError, "failed making get offerings call")
-	}
-	if res.JSON200 == nil {
-		return errors.New("received an empty response for offerings")
+	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+		return agg
 	}
 
 	if err := r.validateVersion(ctx, res.JSON200.Offerings, data.Version.ValueString()); err != nil {
@@ -132,25 +127,13 @@ func (r Resource) applyClientResponse(ctx context.Context, pi *Instance, i *inst
 
 func (r Resource) getPlanAndVersion(ctx context.Context, projectID, instanceID string) (plan, version string, err error) {
 	i, err := r.client.Instances.GetWithResponse(ctx, projectID, instanceID)
-	if err != nil {
-		return "", "", errors.Wrap(err, "failed to prepare get instance request")
-	}
-	if i.HasError != nil {
-		return "", "", errors.Wrap(i.HasError, "failed to making get instance request")
-	}
-	if i.JSON200 == nil {
-		return "", "", errors.Wrap(i.HasError, "got an empty response from get instance request")
+	if agg := validate.Response(i, err, "JSON200"); agg != nil {
+		return "", "", agg
 	}
 
 	res, err := r.client.Offerings.GetWithResponse(ctx, projectID)
-	if err != nil {
-		return "", "", errors.Wrap(err, "failed to prepare get offerings call")
-	}
-	if res.HasError != nil {
-		return "", "", errors.Wrap(res.HasError, "failed making get offerings call")
-	}
-	if res.JSON200 == nil {
-		return "", "", errors.New("received an empty response for offerings")
+	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+		return "", "", agg
 	}
 
 	for _, offer := range res.JSON200.Offerings {
