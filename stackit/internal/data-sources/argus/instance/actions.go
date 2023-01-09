@@ -3,6 +3,7 @@ package instance
 import (
 	"context"
 
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/instance"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -18,16 +19,8 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 	}
 
 	res, err := d.client.Argus.Instances.InstanceReadWithResponse(ctx, config.ProjectID.ValueString(), config.ID.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed to prepare read instance request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		diags.AddError("failed to read instance", res.HasError.Error())
-		return
-	}
-	if res.JSON200 == nil {
-		diags.AddError("read instance returned an empty response", "JSON200 == nil")
+	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+		diags.AddError("failed instance read", agg.Error())
 		return
 	}
 	b := res.JSON200

@@ -9,6 +9,7 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/generated/instance"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/generated/user"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -82,16 +83,8 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	res, err := r.client.MongoDBFlex.Instance.CreateWithResponse(ctx, plan.ProjectID.ValueString(), body)
-	if err != nil {
-		resp.Diagnostics.AddError("failed making MongoDB instance creation request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		resp.Diagnostics.AddError("MongoDB instance creation response returned an error", err.Error())
-		return
-	}
-	if res.JSON202 == nil || res.JSON202.ID == nil {
-		resp.Diagnostics.AddError("MongoDB instance creation response is empty", "JSON202 == nil or ID is nil")
+	if agg := validate.Response(res, err, "JSON202.ID"); agg != nil {
+		resp.Diagnostics.AddError("failed MongoDB flex instance creation", agg.Error())
 		return
 	}
 
@@ -153,18 +146,11 @@ func (r Resource) createUser(ctx context.Context, plan *Instance, d *diag.Diagno
 		Username: &username,
 	}
 	res, err := r.client.MongoDBFlex.User.CreateWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
-	if err != nil {
-		d.AddError("failed making create user request", err.Error())
+	if agg := validate.Response(res, err, "JSON202.Item"); agg != nil {
+		d.AddError("failed creating mongodb flex db user", agg.Error())
 		return
 	}
-	if res.HasError != nil {
-		d.AddError("create user response has an error", res.HasError.Error())
-		return
-	}
-	if res.JSON202 == nil || res.JSON202.Item == nil {
-		d.AddError("failed to process response", "JSON202 == nil or Item == nil")
-		return
-	}
+
 	item := *res.JSON202.Item
 	elems := []attr.Value{}
 	if *res.JSON202.Item.Roles != nil {
@@ -298,16 +284,8 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 
 	// handle update
 	res, err := r.client.MongoDBFlex.Instance.PutWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
-	if err != nil {
-		resp.Diagnostics.AddError("failed making MongoDB instance update request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		resp.Diagnostics.AddError("instance update response has an error", res.HasError.Error())
-		return
-	}
-	if res.JSON202 == nil || res.JSON202.Item == nil {
-		resp.Diagnostics.AddError("failed to process response", "JSON202 == nil or Item == nil")
+	if agg := validate.Response(res, err, "JSON202.Item"); agg != nil {
+		resp.Diagnostics.AddError("failed updating mongodb flex instance", agg.Error())
 		return
 	}
 

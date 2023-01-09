@@ -33,7 +33,6 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 	}
 	if res.JSON200 == nil || res.JSON200.Raw == nil {
 		resp.Diagnostics.AddError("failed parsing get credential response", "JSON200 == nil or .Raw == nil")
-		return
 	}
 
 	i := res.JSON200

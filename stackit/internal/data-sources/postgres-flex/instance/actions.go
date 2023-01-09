@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -21,16 +22,8 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 	}
 
 	res, err := c.ListWithResponse(ctx, config.ProjectID.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed to prepare list instances request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		resp.Diagnostics.AddError("failed to make list instances request", res.HasError.Error())
-		return
-	}
-	if res.JSON200 == nil || res.JSON200.Items == nil {
-		resp.Diagnostics.AddError("received a nil response", "JSON200 == nil or nil items list")
+	if agg := validate.Response(res, err, "JSON200.Items"); agg != nil {
+		diags.AddError("failed to list postgres flex instances", agg.Error())
 		return
 	}
 
@@ -65,16 +58,8 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 		return
 	}
 	ires, err := c.GetWithResponse(ctx, config.ProjectID.ValueString(), *instance.ID)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to prepare get instances request", err.Error())
-		return
-	}
-	if ires.HasError != nil {
-		resp.Diagnostics.AddError("failed to make get instances request", res.HasError.Error())
-		return
-	}
-	if ires.JSON200 == nil || ires.JSON200.Item == nil {
-		resp.Diagnostics.AddError("received a nil response", "JSON200 == nil or nil Item")
+	if agg := validate.Response(ires, err, "JSON200.Item"); agg != nil {
+		diags.AddError("failed to get postgres flex instance", agg.Error())
 		return
 	}
 

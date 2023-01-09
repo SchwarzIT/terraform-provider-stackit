@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated/cluster"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -144,12 +145,8 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 	// read cluster
 	res, err := c.Kubernetes.Cluster.GetClusterWithResponse(ctx, state.KubernetesProjectID.ValueString(), state.Name.ValueString())
-	if err != nil {
-		diags.AddError("failed to initiate request for fetching cluster", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		diags.AddError("failed fetching cluster", res.HasError.Error())
+	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+		diags.AddError("failed fetching cluster", agg.Error())
 		return
 	}
 
@@ -208,12 +205,8 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 
 	c := r.client
 	res, err := c.Kubernetes.Cluster.DeleteClusterWithResponse(ctx, state.KubernetesProjectID.ValueString(), state.Name.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed to initiate cluster deletion", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		resp.Diagnostics.AddError("failed cluster deletion request", res.HasError.Error())
+	if agg := validate.Response(res, err); agg != nil {
+		resp.Diagnostics.AddError("failed deleting cluster", agg.Error())
 		return
 	}
 
@@ -269,12 +262,8 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 	// pre-read imports
 	c := r.client
 	res, err := c.Kubernetes.Cluster.GetClusterWithResponse(ctx, idParts[0], idParts[1])
-	if err != nil {
-		resp.Diagnostics.AddError("error during import pre-read", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		resp.Diagnostics.AddError("import pre-read request failure", res.HasError.Error())
+	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+		resp.Diagnostics.AddError("failed import pre-read", agg.Error())
 		return
 	}
 

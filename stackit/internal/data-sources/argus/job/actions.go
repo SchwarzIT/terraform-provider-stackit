@@ -4,6 +4,7 @@ import (
 	"context"
 
 	scrapeconfig "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/generated/scrape-config"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/job"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -18,16 +19,8 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 	}
 
 	res, err := d.client.Argus.ScrapeConfig.ReadWithResponse(ctx, config.ProjectID.ValueString(), config.ArgusInstanceID.ValueString(), config.Name.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed preparing read job request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		resp.Diagnostics.AddError("failed making read job request", res.HasError.Error())
-		return
-	}
-	if res.JSON200 == nil {
-		resp.Diagnostics.AddError("failed parsing read job request", "JSON200 == nil")
+	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+		diags.AddError("failed to read job", agg.Error())
 		return
 	}
 

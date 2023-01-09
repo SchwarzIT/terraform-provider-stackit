@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -21,16 +22,8 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 	}
 
 	res, err := d.client.Instances.ListWithResponse(ctx, config.ProjectID.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed to prepare list instances request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		resp.Diagnostics.AddError("failed to make list instances request", res.HasError.Error())
-		return
-	}
-	if res.JSON200 == nil {
-		resp.Diagnostics.AddError("failed to parse list instances response", "JSON200 == nil")
+	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+		diags.AddError("failed to list instances", agg.Error())
 		return
 	}
 
@@ -59,16 +52,8 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 	instance := list.Instances[found]
 
 	ores, err := d.client.Offerings.GetWithResponse(ctx, config.ProjectID.ValueString())
-	if err != nil {
-		diags.AddError(err.Error(), "failed to prepare get offerings call")
-		return
-	}
-	if ores.HasError != nil {
-		diags.AddError(res.HasError.Error(), "failed making get offerings call")
-		return
-	}
-	if ores.JSON200 == nil {
-		diags.AddError("received an empty response for offerings", "JSON200 == nil")
+	if agg := validate.Response(ores, err, "JSON200"); agg != nil {
+		diags.AddError("failed to get offerings", agg.Error())
 		return
 	}
 

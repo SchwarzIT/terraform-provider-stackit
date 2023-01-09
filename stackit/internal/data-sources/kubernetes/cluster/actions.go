@@ -3,6 +3,7 @@ package cluster
 import (
 	"context"
 
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/kubernetes/cluster"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -48,12 +49,8 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 func (r DataSource) getCredential(ctx context.Context, diags *diag.Diagnostics, cl *cluster.Cluster) {
 	c := r.client
 	res, err := c.Kubernetes.Credentials.GetClusterCredentialsWithResponse(ctx, cl.KubernetesProjectID.ValueString(), cl.Name.ValueString())
-	if err != nil {
-		diags.AddError("failed to prepare get request for cluster credentials", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		diags.AddError("failed to get cluster credentials", res.HasError.Error())
+	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+		diags.AddError("failed to get cluster credentials", agg.Error())
 		return
 	}
 	if res.JSON200.Kubeconfig != nil {
