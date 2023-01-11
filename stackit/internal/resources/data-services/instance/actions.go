@@ -194,14 +194,8 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		return
 	}
 
-	planID := plan.PlanID
 	if err := r.applyClientResponse(ctx, &plan, newRes.JSON200); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
-		return
-	}
-
-	if !plan.PlanID.Equal(planID) {
-		resp.Diagnostics.AddError("server returned wrong plan ID after update", fmt.Sprintf("expected plan ID %s but received %s", planID.ValueString(), plan.PlanID.ValueString()))
 		return
 	}
 
