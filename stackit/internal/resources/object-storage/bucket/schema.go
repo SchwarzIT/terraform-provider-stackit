@@ -3,7 +3,6 @@ package bucket
 import (
 	"context"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1/buckets"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -33,11 +32,8 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Computed:    true,
 			},
 			"name": schema.StringAttribute{
-				Description: "the bucket name",
+				Description: "Bucket name",
 				Required:    true,
-				Validators: []validator.String{
-					validate.StringWith(buckets.ValidateBucketName, "validate bucket name"),
-				},
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},

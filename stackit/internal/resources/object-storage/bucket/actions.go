@@ -7,7 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1/buckets"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1.0.1/generated/bucket"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -24,19 +25,20 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	// handle creation
-	b := r.createBucket(ctx, resp, bucket)
+	res := r.createBucket(ctx, resp, bucket)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
+	b := res.JSON200
 	// update state
 	diags = resp.State.Set(ctx, Bucket{
 		ID:                     types.StringValue(b.Bucket.Name),
 		Name:                   types.StringValue(b.Bucket.Name),
 		ObjectStorageProjectID: types.StringValue(b.Project),
 		Region:                 types.StringValue(b.Bucket.Region),
-		HostStyleURL:           types.StringValue(b.Bucket.URLVirtualHostedStyle),
-		PathStyleURL:           types.StringValue(b.Bucket.URLPathStyle),
+		HostStyleURL:           types.StringValue(b.Bucket.UrlVirtualHostedStyle),
+		PathStyleURL:           types.StringValue(b.Bucket.UrlPathStyle),
 	})
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -44,29 +46,29 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 }
 
-func (r Resource) createBucket(ctx context.Context, resp *resource.CreateResponse, plan Bucket) buckets.BucketResponse {
+func (r Resource) createBucket(ctx context.Context, resp *resource.CreateResponse, plan Bucket) *bucket.GetResponse {
 	c := r.client
-	var b buckets.BucketResponse
+	b := &bucket.GetResponse{}
 
 	// Create bucket
-	process, err := c.ObjectStorage.Buckets.Create(ctx, plan.ObjectStorageProjectID.ValueString(), plan.Name.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed to verify bucket creation", err.Error())
+	res, err := c.ObjectStorage.Bucket.CreateWithResponse(ctx, plan.ObjectStorageProjectID.ValueString(), plan.Name.ValueString())
+	if agg := validate.Response(res, err, "JSON201"); agg != nil {
+		resp.Diagnostics.AddError("failed to create bucket", agg.Error())
 		return b
 	}
+	process := res.WaitHandler(ctx, c.ObjectStorage.Bucket, plan.ObjectStorageProjectID.ValueString(), plan.Name.ValueString())
 	process.SetTimeout(10 * time.Minute)
 	tmp, err := process.WaitWithContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to verify bucket creation", err.Error())
 		return b
 	}
-	b = tmp.(buckets.BucketResponse)
-	if err != nil {
-		resp.Diagnostics.AddError("failed to verify bucket creation", err.Error())
+	nb, ok := tmp.(*bucket.GetResponse)
+	if !ok {
+		resp.Diagnostics.AddError("failed to parse wait response", "not *bucket.GetResponse")
 		return b
 	}
-
-	return b
+	return nb
 }
 
 // Read - lifecycle function
@@ -80,18 +82,20 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	b, err := c.ObjectStorage.Buckets.Get(ctx, state.ObjectStorageProjectID.ValueString(), state.Name.ValueString())
-	if err != nil {
-		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
-			resp.State.RemoveResource(ctx)
-			return
-		}
-		resp.Diagnostics.AddError("failed to read bucket", err.Error())
+	res, err := c.ObjectStorage.Bucket.GetWithResponse(ctx, state.ObjectStorageProjectID.ValueString(), state.Name.ValueString())
+	if agg := validate.Response(res, err, "JSON200.Bucket"); agg != nil {
+		resp.Diagnostics.AddError("failed to read bucket", agg.Error())
 		return
 	}
-	state.Region = types.StringValue(b.Bucket.Region)
-	state.HostStyleURL = types.StringValue(b.Bucket.URLVirtualHostedStyle)
-	state.PathStyleURL = types.StringValue(b.Bucket.URLPathStyle)
+
+	if res.StatusCode() == http.StatusNotFound {
+		resp.State.RemoveResource(ctx)
+		return
+	}
+
+	state.Region = types.StringValue(res.JSON200.Bucket.Region)
+	state.HostStyleURL = types.StringValue(res.JSON200.Bucket.UrlVirtualHostedStyle)
+	state.PathStyleURL = types.StringValue(res.JSON200.Bucket.UrlPathStyle)
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -111,11 +115,12 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	c := r.client
-	process, err := c.ObjectStorage.Buckets.Delete(ctx, state.ObjectStorageProjectID.ValueString(), state.Name.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed to verify bucket deletion", err.Error())
+	res, err := c.ObjectStorage.Bucket.DeleteWithResponse(ctx, state.ObjectStorageProjectID.ValueString(), state.Name.ValueString())
+	if agg := validate.Response(res, err); agg != nil {
+		resp.Diagnostics.AddError("failed to delete bucket", agg.Error())
 		return
 	}
+	process := res.WaitHandler(ctx, c.ObjectStorage.Bucket, state.ObjectStorageProjectID.ValueString(), state.Name.ValueString())
 	process.SetTimeout(10 * time.Minute)
 	if _, err = process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed to verify bucket deletion", err.Error())
@@ -142,15 +147,6 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 		resp.Diagnostics.AddError(
 			"Unexpected Import Identifier",
 			fmt.Sprintf("Couldn't validate project_id.\n%s", err.Error()),
-		)
-		return
-	}
-
-	// validate bucket name
-	if err := buckets.ValidateBucketName(idParts[1]); err != nil {
-		resp.Diagnostics.AddError(
-			"Unexpected Import Identifier",
-			fmt.Sprintf("Couldn't validate bucket name.\n%s", err.Error()),
 		)
 		return
 	}

@@ -3,6 +3,8 @@ package credential
 import (
 	"context"
 
+	accesskey "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1.0.1/generated/access-key"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -23,12 +25,14 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	list, err := c.ObjectStorage.AccessKeys.List(ctx, config.ObjectStorageProjectID.ValueString(), "")
-	if err != nil {
-		resp.Diagnostics.AddError("failed to read credential", err.Error())
+	params := &accesskey.GetParams{}
+	res, err := c.ObjectStorage.AccessKey.GetWithResponse(ctx, config.ObjectStorageProjectID.ValueString(), params)
+	if agg := validate.Response(res, err, "JSON200.AccessKeys"); agg != nil {
+		resp.Diagnostics.AddError("failed to list credentials", agg.Error())
 		return
 	}
 
+	list := res.JSON200
 	found := false
 	for _, k := range list.AccessKeys {
 		if k.KeyID != config.ID.ValueString() && k.DisplayName != config.DisplayName.ValueString() {

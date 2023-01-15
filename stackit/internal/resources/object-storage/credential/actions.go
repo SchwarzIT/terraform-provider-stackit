@@ -2,8 +2,10 @@ package credential
 
 import (
 	"context"
+	"time"
 
-	keys "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1/access-keys"
+	accesskey "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1.0.1/generated/access-key"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -18,11 +20,12 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	// handle creation
-	k := r.createAccessKey(ctx, resp, data)
+	res := r.createAccessKey(ctx, resp, data)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
+	k := res.JSON201
 	// update state
 	diags = resp.State.Set(ctx, Credential{
 		ID:                     types.StringValue(k.KeyID),
@@ -39,13 +42,28 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 }
 
-func (r Resource) createAccessKey(ctx context.Context, resp *resource.CreateResponse, key Credential) keys.AccessKeyCreateResponse {
+func (r Resource) createAccessKey(ctx context.Context, resp *resource.CreateResponse, key Credential) *accesskey.CreateResponse {
 	c := r.client
-	res, err := c.ObjectStorage.AccessKeys.Create(ctx, key.ObjectStorageProjectID.ValueString(), key.Expiry.ValueString(), key.CredentialsGroupID.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed to create credential", err.Error())
+	body := accesskey.CreateJSONRequestBody{}
+	if !key.Expiry.IsNull() && !key.Expiry.IsUnknown() {
+		t, err := time.Parse("2006-01-02T15:04:05.999Z", key.Expiry.ValueString())
+		if err != nil {
+			resp.Diagnostics.AddError("couldn't parse expiry", err.Error())
+			return nil
+		}
+		body.Expires = &t
+	}
+	cg := key.CredentialsGroupID.ValueString()
+	params := &accesskey.CreateParams{}
+	if !key.CredentialsGroupID.IsNull() {
+		params.CredentialsGroup = &cg
+	}
+	res, err := c.ObjectStorage.AccessKey.CreateWithResponse(ctx, key.ObjectStorageProjectID.ValueString(), params, body)
+	if agg := validate.Response(res, err, "JSON201"); agg != nil {
+		resp.Diagnostics.AddError("failed to create credential", agg.Error())
 		return res
 	}
+
 	return res
 }
 
@@ -60,14 +78,19 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	list, err := c.ObjectStorage.AccessKeys.List(ctx, state.ObjectStorageProjectID.ValueString(), state.CredentialsGroupID.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed to read credential list", err.Error())
+	cg := state.CredentialsGroupID.ValueString()
+	params := &accesskey.GetParams{}
+	if !state.CredentialsGroupID.IsNull() {
+		params.CredentialsGroup = &cg
+	}
+	res, err := c.ObjectStorage.AccessKey.GetWithResponse(ctx, state.ObjectStorageProjectID.ValueString(), params)
+	if agg := validate.Response(res, err, "JSON200.AccessKeys"); agg != nil {
+		resp.Diagnostics.AddError("failed to list credentials", agg.Error())
 		return
 	}
 
 	found := false
-	for _, k := range list.AccessKeys {
+	for _, k := range res.JSON200.AccessKeys {
 		if k.KeyID != state.ID.ValueString() {
 			continue
 		}
@@ -99,10 +122,16 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
+	cg := state.CredentialsGroupID.ValueString()
+	params := &accesskey.DeleteParams{}
+	if !state.CredentialsGroupID.IsNull() {
+		params.CredentialsGroup = &cg
+	}
+
 	c := r.client
-	err := c.ObjectStorage.AccessKeys.Delete(ctx, state.ObjectStorageProjectID.ValueString(), state.ID.ValueString(), state.CredentialsGroupID.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed to delete credential", err.Error())
+	res, err := c.ObjectStorage.AccessKey.DeleteWithResponse(ctx, state.ObjectStorageProjectID.ValueString(), state.ID.ValueString(), params)
+	if agg := validate.Response(res, err); agg != nil {
+		resp.Diagnostics.AddError("failed to delete credential", agg.Error())
 		return
 	}
 

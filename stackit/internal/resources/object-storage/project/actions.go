@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -20,9 +21,10 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	// handle creation
-	c := r.client.ObjectStorage.Projects
-	if _, err := c.Create(ctx, plan.ProjectID.ValueString()); err != nil {
-		if !strings.Contains(err.Error(), common.ERR_UNEXPECTED_EOF) {
+	c := r.client.ObjectStorage.Project
+	res, err := c.CreateWithResponse(ctx, plan.ProjectID.ValueString())
+	if agg := validate.Response(res, err); agg != nil {
+		if !strings.Contains(agg.Error(), common.ERR_UNEXPECTED_EOF) {
 			resp.Diagnostics.AddError("failed ObjectStorage project creation", err.Error())
 			return
 		}
@@ -47,14 +49,14 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	// read
-	c := r.client.ObjectStorage.Projects
-	_, err := c.Get(ctx, state.ID.ValueString())
-	if err != nil {
-		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
-			resp.State.RemoveResource(ctx)
-			return
-		}
-		diags.AddError("failed ObjectStorage project read", err.Error())
+	c := r.client.ObjectStorage.Project
+	res, err := c.GetWithResponse(ctx, state.ID.ValueString())
+	if agg := validate.Response(res, err); agg != nil {
+		resp.Diagnostics.AddError("failed ObjectStorage project read", err.Error())
+		return
+	}
+	if res.StatusCode() == http.StatusNotFound {
+		resp.State.RemoveResource(ctx)
 		return
 	}
 }
@@ -72,15 +74,11 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	// handle creation
-	c := r.client.ObjectStorage.Projects
-	if err := c.Delete(ctx, state.ID.ValueString()); err != nil {
-		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
-			resp.State.RemoveResource(ctx)
-			return
-		}
+	c := r.client.ObjectStorage.Project
+	res, err := c.DeleteWithResponse(ctx, state.ID.ValueString())
+	if agg := validate.Response(res, err); agg != nil {
 		resp.Diagnostics.AddError("failed ObjectStorage project deletion", err.Error())
 		return
-
 	}
 	resp.State.RemoveResource(ctx)
 }

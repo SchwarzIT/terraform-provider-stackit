@@ -2,7 +2,9 @@ package project
 
 import (
 	"context"
+	"net/http"
 
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/project"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -18,10 +20,14 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	c := r.client.ObjectStorage.Projects
-	_, err := c.Get(ctx, config.ProjectID.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed to read request for Object Storage project", err.Error())
+	c := r.client.ObjectStorage.Project
+	res, err := c.GetWithResponse(ctx, config.ID.ValueString())
+	if agg := validate.Response(res, err); agg != nil {
+		resp.Diagnostics.AddError("failed ObjectStorage project read", err.Error())
+		return
+	}
+	if res.StatusCode() == http.StatusNotFound {
+		resp.State.RemoveResource(ctx)
 		return
 	}
 

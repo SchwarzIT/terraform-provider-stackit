@@ -28,7 +28,7 @@ resource "stackit_object_storage_bucket" "example" {
 
 ### Required
 
-- `name` (String) the bucket name
+- `name` (String) Bucket name
 - `object_storage_project_id` (String) The ID returned from `stackit_object_storage_project`
 
 ### Read-Only

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	credentialsgroup "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1.0.1/generated/credentials-group"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -37,18 +39,21 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 func (r Resource) createCredentialGroup(ctx context.Context, data *CredentialsGroup) diag.Diagnostic {
 	c := r.client
-	err := c.ObjectStorage.CredentialsGroup.Create(ctx, data.ObjectStorageProjectID.ValueString(), data.Name.ValueString())
-	if err != nil {
+	body := credentialsgroup.CreateJSONRequestBody{
+		DisplayName: data.Name.ValueString(),
+	}
+	cres, err := c.ObjectStorage.CredentialsGroup.CreateWithResponse(ctx, data.ObjectStorageProjectID.ValueString(), body)
+	if agg := validate.Response(cres, err); agg != nil {
 		return diag.NewErrorDiagnostic("failed to create credential group", err.Error())
 
 	}
 
-	res, err := c.ObjectStorage.CredentialsGroup.List(ctx, data.ObjectStorageProjectID.ValueString())
-	if err != nil {
+	res, err := c.ObjectStorage.CredentialsGroup.GetWithResponse(ctx, data.ObjectStorageProjectID.ValueString())
+	if agg := validate.Response(res, err, "JSON200.CredentialsGroups"); agg != nil {
 		return diag.NewErrorDiagnostic("failed to list credential groups", err.Error())
 	}
 
-	for _, group := range res.CredentialsGroups {
+	for _, group := range res.JSON200.CredentialsGroups {
 		if group.DisplayName == data.Name.ValueString() {
 			data.ID = types.StringValue(group.CredentialsGroupID)
 			data.URN = types.StringValue(group.URN)
@@ -68,14 +73,14 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	res, err := c.ObjectStorage.CredentialsGroup.List(ctx, state.ObjectStorageProjectID.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed to read credential group", err.Error())
+	res, err := c.ObjectStorage.CredentialsGroup.GetWithResponse(ctx, state.ObjectStorageProjectID.ValueString())
+	if agg := validate.Response(res, err, "JSON200.CredentialsGroups"); agg != nil {
+		resp.Diagnostics.AddError("failed to read credential groups", err.Error())
 		return
 	}
 
 	found := false
-	for _, group := range res.CredentialsGroups {
+	for _, group := range res.JSON200.CredentialsGroups {
 		if group.DisplayName == state.Name.ValueString() {
 			found = true
 			state.ID = types.StringValue(group.CredentialsGroupID)
@@ -107,9 +112,10 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	c := r.client
-	if err := c.ObjectStorage.CredentialsGroup.Delete(ctx, state.ObjectStorageProjectID.ValueString(), state.ID.ValueString()); err != nil {
-		resp.Diagnostics.AddError("failed to delete credential group", err.Error())
+	c := r.client.ObjectStorage.CredentialsGroup
+	res, err := c.DeleteWithResponse(ctx, state.ObjectStorageProjectID.ValueString(), state.ID.ValueString())
+	if agg := validate.Response(res, err); agg != nil {
+		resp.Diagnostics.AddError("failed to delete credential groups", err.Error())
 		return
 	}
 

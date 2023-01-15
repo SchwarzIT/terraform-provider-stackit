@@ -3,6 +3,7 @@ package credentialsgroup
 import (
 	"context"
 
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	credentialsGroup "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/credentials-group"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -18,14 +19,14 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	list, err := c.ObjectStorage.CredentialsGroup.List(ctx, data.ObjectStorageProjectID.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed to list credentials group", err.Error())
+	res, err := c.ObjectStorage.CredentialsGroup.GetWithResponse(ctx, data.ObjectStorageProjectID.ValueString())
+	if agg := validate.Response(res, err, "JSON200.CredentialsGroups"); agg != nil {
+		resp.Diagnostics.AddError("failed to read credential groups", err.Error())
 		return
 	}
 
 	found := false
-	for _, group := range list.CredentialsGroups {
+	for _, group := range res.JSON200.CredentialsGroups {
 		if group.CredentialsGroupID == data.ID.ValueString() {
 			found = true
 			data.Name = types.StringValue(group.DisplayName)

@@ -3,7 +3,6 @@ package credential
 import (
 	"context"
 
-	credentialsgroup "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1/credentials-group"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -55,9 +54,6 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Description: "credential group ID. changing this field will recreate the credential.",
 				Optional:    true,
 				Computed:    true,
-				Validators: []validator.String{
-					validate.StringWith(credentialsgroup.ValidateCredentialsGroupID, "credentials group ID"),
-				},
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
