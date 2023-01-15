@@ -54,9 +54,11 @@ func (r Resource) createAccessKey(ctx context.Context, resp *resource.CreateResp
 		body.Expires = &t
 	}
 	cg := key.CredentialsGroupID.ValueString()
-	params := &accesskey.CreateParams{}
-	if !key.CredentialsGroupID.IsNull() {
-		params.CredentialsGroup = &cg
+	params := &accesskey.CreateParams{
+		CredentialsGroup: &cg,
+	}
+	if cg == "" {
+		params.CredentialsGroup = nil
 	}
 	res, err := c.ObjectStorage.AccessKey.CreateWithResponse(ctx, key.ObjectStorageProjectID.ValueString(), params, body)
 	if agg := validate.Response(res, err, "JSON201"); agg != nil {
@@ -79,9 +81,11 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	cg := state.CredentialsGroupID.ValueString()
-	params := &accesskey.GetParams{}
-	if !state.CredentialsGroupID.IsNull() {
-		params.CredentialsGroup = &cg
+	params := &accesskey.GetParams{
+		CredentialsGroup: &cg,
+	}
+	if cg == "" {
+		params.CredentialsGroup = nil
 	}
 	res, err := c.ObjectStorage.AccessKey.GetWithResponse(ctx, state.ObjectStorageProjectID.ValueString(), params)
 	if agg := validate.Response(res, err, "JSON200.AccessKeys"); agg != nil {
@@ -123,9 +127,11 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	cg := state.CredentialsGroupID.ValueString()
-	params := &accesskey.DeleteParams{}
-	if !state.CredentialsGroupID.IsNull() {
-		params.CredentialsGroup = &cg
+	params := &accesskey.DeleteParams{
+		CredentialsGroup: &cg,
+	}
+	if cg == "" {
+		params.CredentialsGroup = nil
 	}
 
 	c := r.client
