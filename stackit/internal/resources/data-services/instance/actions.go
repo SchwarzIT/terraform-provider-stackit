@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/generated/instances"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
@@ -178,19 +179,17 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	process := res.WaitHandler(ctx, r.client.Instances, state.ProjectID.ValueString(), state.ID.ValueString())
-	instancesGetResp, err := process.WaitWithContext(ctx)
-	if err != nil {
+	if _, err := process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed instance update validation", err.Error())
 		return
 	}
 
-	newRes, ok := instancesGetResp.(*instances.GetResponse)
-	if !ok {
-		resp.Diagnostics.AddError("can't parse response", "returned value is not of *instances.GetResponse")
-		return
-	}
-	if newRes.JSON200 == nil {
-		resp.Diagnostics.AddError("received an empty response", "JSON200 == nil")
+	// mitigate an API bug that returns old data after an update completed
+	time.Sleep(30 * time.Second)
+
+	newRes, err := r.client.Instances.GetWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
+	if agg := validate.Response(newRes, err); agg != nil {
+		resp.Diagnostics.AddError("failed to read after update", agg.Error())
 		return
 	}
 
