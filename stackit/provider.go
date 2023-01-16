@@ -31,10 +31,12 @@ import (
 	resourcePostgresFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/postgres-flex/instance"
 	resourceProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/project"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -57,6 +59,7 @@ var _ = provider.Provider(&StackitProvider{})
 type providerSchema struct {
 	ServiceAccountEmail types.String `tfsdk:"service_account_email"`
 	ServiceAccountToken types.String `tfsdk:"service_account_token"`
+	Environment         types.String `tfsdk:"environment"`
 }
 
 // Schema returns the provider's schema
@@ -76,6 +79,13 @@ This provider is built and maintained by the STACKIT community in Schwarz IT and
 				Optional:            true,
 				Sensitive:           true,
 				MarkdownDescription: "Service Account Token.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_TOKEN` environment variable instead.",
+			},
+			"environment": schema.StringAttribute{
+				Optional:            true,
+				MarkdownDescription: "The API environment that the provider interacts with. Options are `dev`, `qa`, `prod`.<br />This attribute can also be loaded from `STACKIT_ENV` environment variable instead.",
+				Validators: []validator.String{
+					stringvalidator.OneOf("dev", "qa", "prod"),
+				},
 			},
 		},
 	}
