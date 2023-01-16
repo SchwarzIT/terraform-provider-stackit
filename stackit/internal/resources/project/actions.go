@@ -22,15 +22,8 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	var email string
-	diags = req.ProviderMeta.GetAttribute(ctx, path.Root("service_account_email"), &email)
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
 	// handle creation
-	plan = r.createProject(ctx, resp, plan, email)
+	plan = r.createProject(ctx, resp, plan)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -52,14 +45,14 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 }
 
-func (r Resource) createProject(ctx context.Context, resp *resource.CreateResponse, plan Project, email string) Project {
+func (r Resource) createProject(ctx context.Context, resp *resource.CreateResponse, plan Project) Project {
 	labels := projects.ResourceLabels{
 		"billingReference": plan.BillingRef.ValueString(),
 		"scope":            "PUBLIC",
 	}
 
 	owner := projects.PROJECT_OWNER
-	subj1 := email
+	subj1 := r.client.GetConfig().ServiceAccountEmail
 	subj2 := plan.OwnerEmail.ValueString()
 	members := []projects.ProjectMember{
 		{
