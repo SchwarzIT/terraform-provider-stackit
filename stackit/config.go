@@ -45,9 +45,17 @@ func (p *StackitProvider) Configure(ctx context.Context, req provider.ConfigureR
 		return
 	}
 
+	var env string
+	if config.Environment.IsUnknown() || config.Environment.IsNull() {
+		env = os.Getenv("STACKIT_ENV")
+	} else {
+		env = config.ServiceAccountToken.ValueString()
+	}
+
 	c, err := client.New(context.Background(), client.Config{
 		ServiceAccountEmail: email,
 		ServiceAccountToken: token,
+		Environment:         env,
 	})
 	if err != nil {
 		resp.Diagnostics.AddError(

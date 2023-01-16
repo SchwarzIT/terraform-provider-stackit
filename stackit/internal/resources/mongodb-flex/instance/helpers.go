@@ -2,14 +2,15 @@ package instance
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/generated/instance"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -61,15 +62,8 @@ func (r Resource) validate(ctx context.Context, data Instance) error {
 
 func (r Resource) validateVersion(ctx context.Context, projectID, version string) error {
 	res, err := r.client.MongoDBFlex.Versions.GetVersionsWithResponse(ctx, projectID)
-	if err != nil {
-		return err
-	}
-	if res.HasError != nil {
-		return res.HasError
-	}
-	if res.JSON200 == nil || res.JSON200.Versions == nil {
-
-		return fmt.Errorf("JSON200 == nil or Versions == nil.\nRequest URL: %s\nStatus: %s\nBody: %s", res.HTTPResponse.Request.URL, res.Status(), string(res.Body))
+	if agg := validate.Response(res, err, "JSON200.Versions"); agg != nil {
+		return errors.Wrap(agg, "failed validating version")
 	}
 
 	opts := ""
@@ -84,14 +78,8 @@ func (r Resource) validateVersion(ctx context.Context, projectID, version string
 
 func (r Resource) validateMachineType(ctx context.Context, projectID, flavorID string) error {
 	res, err := r.client.MongoDBFlex.Flavors.GetFlavorsWithResponse(ctx, projectID)
-	if err != nil {
-		return err
-	}
-	if res.HasError != nil {
-		return res.HasError
-	}
-	if res.JSON200 == nil || res.JSON200.Flavors == nil {
-		return errors.New("JSON200 == nil or Flavors == nil")
+	if agg := validate.Response(res, err, "JSON200.Flavors"); agg != nil {
+		return errors.Wrap(agg, "failed validating machine type (flavors)")
 	}
 
 	opts := ""
@@ -109,14 +97,8 @@ func (r Resource) validateMachineType(ctx context.Context, projectID, flavorID s
 
 func (r Resource) validateStorage(ctx context.Context, projectID, machineType string, storage Storage) error {
 	res, err := r.client.MongoDBFlex.Storage.GetStoragesFlavorWithResponse(ctx, projectID, machineType)
-	if err != nil {
-		return err
-	}
-	if res.HasError != nil {
-		return res.HasError
-	}
-	if res.JSON200 == nil || res.JSON200.StorageRange == nil {
-		return errors.New("JSON200 == nil or Flavors == nil")
+	if agg := validate.Response(res, err, "JSON200.StorageRange"); agg != nil {
+		return errors.Wrap(agg, "failed validating storage range")
 	}
 
 	size := storage.Size.ValueInt64()

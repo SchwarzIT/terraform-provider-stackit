@@ -27,5 +27,6 @@ provider "stackit" {
 
 ### Optional
 
+- `environment` (String) The API environment that the provider interacts with. Options are `dev`, `qa`, `prod`.<br />This attribute can also be loaded from `STACKIT_ENV` environment variable instead.
 - `service_account_email` (String) Service Account Email.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_EMAIL` environment variable instead.
 - `service_account_token` (String, Sensitive) Service Account Token.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_TOKEN` environment variable instead.
