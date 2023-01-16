@@ -23,7 +23,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	c := r.client.ObjectStorage.Project
 	res, err := c.GetWithResponse(ctx, config.ID.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
-		resp.Diagnostics.AddError("failed ObjectStorage project read", err.Error())
+		resp.Diagnostics.AddError("failed ObjectStorage project read", agg.Error())
 		return
 	}
 	if res.StatusCode() == http.StatusNotFound {
