@@ -185,7 +185,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	// mitigate an API bug that returns old data after an update completed
-	time.Sleep(30 * time.Second)
+	time.Sleep(1 * time.Minute)
 
 	newRes, err := r.client.Instances.GetWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if agg := validate.Response(newRes, err); agg != nil {
