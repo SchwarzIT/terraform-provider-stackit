@@ -5,7 +5,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
@@ -14,7 +13,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-const run_this_test = false
+const (
+	run_this_test        = false
+	schwarz_container_id = "schwarz-it-kg-WJACUK1"
+)
 
 func TestAcc_Project(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
@@ -79,6 +81,6 @@ func config(name, billingRef, user string) string {
 		name,
 		billingRef,
 		user,
-		consts.SCHWARZ_CONTAINER_ID,
+		schwarz_container_id,
 	)
 }
