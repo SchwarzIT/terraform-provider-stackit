@@ -272,12 +272,10 @@ func (c *Cluster) extensions(ctx context.Context) (*cluster.Extension, diag.Diag
 		var acl ACLExtension
 		obj, diags := c.Extensions.ACL.ToObjectValue(ctx)
 		if diags.HasError() {
-			diags.AddError("failed here", "HEREEE")
 			return nil, diags
 		}
 		diags = obj.As(ctx, &acl, basetypes.ObjectAsOptions{})
 		if diags.HasError() {
-			diags.AddError("failed here 2", "HEREEE 2")
 			return nil, diags
 		}
 
@@ -285,7 +283,6 @@ func (c *Cluster) extensions(ctx context.Context) (*cluster.Extension, diag.Diag
 		if !acl.AllowedCIDRs.IsNull() && !acl.AllowedCIDRs.IsUnknown() {
 			diags := acl.AllowedCIDRs.ElementsAs(ctx, &cidrs, true)
 			if diags.HasError() {
-				diags.AddError("failed here 3", "HEREEE 3")
 				return nil, diags
 			}
 		}
