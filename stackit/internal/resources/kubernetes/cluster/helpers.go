@@ -14,6 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
 
 const (
@@ -257,20 +258,41 @@ func (c *Cluster) extensions(ctx context.Context) (*cluster.Extension, diag.Diag
 		return nil, nil
 	}
 	ex := &cluster.Extension{}
+
+	// argus
 	if c.Extensions.Argus != nil {
 		ex.Argus = &cluster.Argus{
 			Enabled:         c.Extensions.Argus.Enabled.ValueBool(),
 			ArgusInstanceID: c.Extensions.Argus.ArgusInstanceID.ValueString(),
 		}
 	}
-	if c.Extensions.ACL != nil {
-		var cidrs []string
-		diags := c.Extensions.ACL.AllowedCIDRs.ElementsAs(ctx, &cidrs, true)
+
+	// acl
+	if !c.Extensions.ACL.IsNull() && !c.Extensions.ACL.IsUnknown() {
+		var acl ACLExtension
+		obj, diags := c.Extensions.ACL.ToObjectValue(ctx)
 		if diags.HasError() {
 			return nil, diags
 		}
+		diags = obj.As(ctx, &acl, basetypes.ObjectAsOptions{})
+		if diags.HasError() {
+			return nil, diags
+		}
+
+		var cidrs []string
+		if !acl.AllowedCIDRs.IsNull() && !acl.AllowedCIDRs.IsUnknown() {
+			diags := acl.AllowedCIDRs.ElementsAs(ctx, &cidrs, true)
+			if diags.HasError() {
+				return nil, diags
+			}
+		}
+
+		enabled := false
+		if !acl.Enabled.IsNull() && !acl.Enabled.IsUnknown() {
+			enabled = acl.Enabled.ValueBool()
+		}
 		ex.Acl = &cluster.ACL{
-			Enabled:      c.Extensions.ACL.Enabled.ValueBool(),
+			Enabled:      enabled,
 			AllowedCidrs: cidrs,
 		}
 	}
@@ -427,10 +449,13 @@ func (c *Cluster) transformExtensions(cl cluster.Cluster) {
 			Enabled:         types.BoolValue(false),
 			ArgusInstanceID: types.StringNull(),
 		},
-		ACL: &ACL{
-			Enabled:      types.BoolValue(false),
-			AllowedCIDRs: types.ListNull(types.StringType),
-		},
+		ACL: types.ObjectValueMust(map[string]attr.Type{
+			"enabled":       types.BoolType,
+			"allowed_cidrs": types.ListType{ElemType: types.StringType},
+		}, map[string]attr.Value{
+			"enabled":       types.BoolValue(false),
+			"allowed_cidrs": types.ListNull(types.StringType),
+		}),
 	}
 	if cl.Extensions.Argus != nil {
 		c.Extensions.Argus = &ArgusExtension{
@@ -444,9 +469,16 @@ func (c *Cluster) transformExtensions(cl cluster.Cluster) {
 		for _, v := range cl.Extensions.Acl.AllowedCidrs {
 			cidr = append(cidr, types.StringValue(v))
 		}
-		c.Extensions.ACL = &ACL{
-			Enabled:      types.BoolValue(cl.Extensions.Acl.Enabled),
-			AllowedCIDRs: types.ListValueMust(types.StringType, cidr),
+		cidrList, diags := types.ListValue(types.StringType, cidr)
+		if diags.HasError() {
+			cidrList = types.ListNull(types.StringType)
 		}
+		c.Extensions.ACL = types.ObjectValueMust(map[string]attr.Type{
+			"enabled":       types.BoolType,
+			"allowed_cidrs": types.ListType{ElemType: types.StringType},
+		}, map[string]attr.Value{
+			"enabled":       types.BoolValue(cl.Extensions.Acl.Enabled),
+			"allowed_cidrs": cidrList,
+		})
 	}
 }
