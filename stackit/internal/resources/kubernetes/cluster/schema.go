@@ -71,10 +71,10 @@ type Hibernation struct {
 
 type Extensions struct {
 	Argus *ArgusExtension `tfsdk:"argus"`
-	ACL   *ACL            `tfsdk:"acl"`
+	ACL   types.Object    `tfsdk:"acl"`
 }
 
-type ACL struct {
+type ACLExtension struct {
 	Enabled      types.Bool `tfsdk:"enabled"`
 	AllowedCIDRs types.List `tfsdk:"allowed_cidrs"`
 }

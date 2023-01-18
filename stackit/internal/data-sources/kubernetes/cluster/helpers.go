@@ -136,7 +136,7 @@ func transformMaintenance(c *kubernetesCluster.Cluster, cl *cluster.Cluster) {
 }
 
 func transformExtensions(c *kubernetesCluster.Cluster, cl *cluster.Cluster) {
-	if cl.Extensions == nil {
+	if c.Extensions == nil || cl.Extensions == nil {
 		return
 	}
 	c.Extensions = &kubernetesCluster.Extensions{
@@ -144,10 +144,13 @@ func transformExtensions(c *kubernetesCluster.Cluster, cl *cluster.Cluster) {
 			Enabled:         types.BoolValue(false),
 			ArgusInstanceID: types.StringNull(),
 		},
-		ACL: &kubernetesCluster.ACL{
-			Enabled:      types.BoolValue(false),
-			AllowedCIDRs: types.ListNull(types.StringType),
-		},
+		ACL: types.ObjectValueMust(map[string]attr.Type{
+			"enabled":       types.BoolType,
+			"allowed_cidrs": types.ListType{ElemType: types.StringType},
+		}, map[string]attr.Value{
+			"enabled":       types.BoolValue(false),
+			"allowed_cidrs": types.ListNull(types.StringType),
+		}),
 	}
 	if cl.Extensions.Argus != nil {
 		c.Extensions.Argus = &kubernetesCluster.ArgusExtension{
@@ -155,14 +158,22 @@ func transformExtensions(c *kubernetesCluster.Cluster, cl *cluster.Cluster) {
 			ArgusInstanceID: types.StringValue(cl.Extensions.Argus.ArgusInstanceID),
 		}
 	}
+
 	if cl.Extensions.Acl != nil {
 		cidr := []attr.Value{}
 		for _, v := range cl.Extensions.Acl.AllowedCidrs {
 			cidr = append(cidr, types.StringValue(v))
 		}
-		c.Extensions.ACL = &kubernetesCluster.ACL{
-			Enabled:      types.BoolValue(cl.Extensions.Acl.Enabled),
-			AllowedCIDRs: types.ListValueMust(types.StringType, cidr),
+		cidrList, diags := types.ListValue(types.StringType, cidr)
+		if diags.HasError() {
+			cidrList = types.ListNull(types.StringType)
 		}
+		c.Extensions.ACL = types.ObjectValueMust(map[string]attr.Type{
+			"enabled":       types.BoolType,
+			"allowed_cidrs": types.ListType{ElemType: types.StringType},
+		}, map[string]attr.Value{
+			"enabled":       types.BoolValue(cl.Extensions.Acl.Enabled),
+			"allowed_cidrs": cidrList,
+		})
 	}
 }
