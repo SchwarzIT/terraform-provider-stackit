@@ -136,7 +136,7 @@ func transformMaintenance(c *kubernetesCluster.Cluster, cl *cluster.Cluster) {
 }
 
 func transformExtensions(c *kubernetesCluster.Cluster, cl *cluster.Cluster) {
-	if c.Extensions == nil || cl.Extensions == nil {
+	if cl.Extensions == nil {
 		return
 	}
 	c.Extensions = &kubernetesCluster.Extensions{
