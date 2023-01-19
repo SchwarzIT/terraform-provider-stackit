@@ -339,7 +339,6 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 					"argus": schema.SingleNestedAttribute{
 						Description: "A single argus block as defined below",
 						Optional:    true,
-						Computed:    true,
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Flag to enable/disable argus extensions. Defaults to `false`",
@@ -355,7 +354,6 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 					"acl": schema.SingleNestedAttribute{
 						Description: "Cluster access control configuration",
 						Optional:    true,
-						Computed:    true,
 						Attributes: map[string]schema.Attribute{
 							"enabled": schema.BoolAttribute{
 								Description: "Is ACL enabled? Defaults to `false`",
