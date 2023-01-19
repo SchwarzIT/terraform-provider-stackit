@@ -170,6 +170,9 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 						"name": schema.StringAttribute{
 							Description: "Specifies the name of the node pool",
 							Required:    true,
+							Validators: []validator.String{
+								validate.StringWith(cluster.ValidateNodePoolName, "validate node pool name"),
+							},
 						},
 						"machine_type": schema.StringAttribute{
 							Description: "The machine type. Accepted options are: `c1.2`, `c1.3`, `c1.4`, `c1.5`, `g1.2`, `g1.3`, `g1.4`, `g1.5`, `m1.2`, `m1.3`, `m1.4`",
