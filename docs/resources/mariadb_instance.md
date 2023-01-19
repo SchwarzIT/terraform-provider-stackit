@@ -35,8 +35,8 @@ resource "stackit_mariadb_instance" "example" {
 ### Optional
 
 - `acl` (List of String) Access Control rules to whitelist IP addresses
-- `plan` (String) The RabbitMQ Plan. Default is `stackit-mariadb-single-small`
-- `version` (String) RabbitMQ version. Default is 10.4
+- `plan` (String) The MariaDB Plan. Default is `stackit-mariadb-single-small`
+- `version` (String) MariaDB version. Default is 10.4
 
 ### Read-Only
 

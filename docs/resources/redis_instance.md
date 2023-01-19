@@ -35,8 +35,8 @@ resource "stackit_redis_instance" "example" {
 ### Optional
 
 - `acl` (List of String) Access Control rules to whitelist IP addresses
-- `plan` (String) The RabbitMQ Plan. Default is `stackit-redis-single-small`
-- `version` (String) RabbitMQ version. Default is 6.0
+- `plan` (String) The Redis Plan. Default is `stackit-redis-single-small`
+- `version` (String) Redis version. Default is 6.0
 
 ### Read-Only
 

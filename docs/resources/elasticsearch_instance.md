@@ -35,8 +35,8 @@ resource "stackit_elasticsearch_instance" "example" {
 ### Optional
 
 - `acl` (List of String) Access Control rules to whitelist IP addresses
-- `plan` (String) The RabbitMQ Plan. Default is `stackit-elasticsearch-single-small`
-- `version` (String) RabbitMQ version. Default is 7
+- `plan` (String) The ElasticSearch Plan. Default is `stackit-elasticsearch-single-small`
+- `version` (String) ElasticSearch version. Default is 7
 
 ### Read-Only
 
