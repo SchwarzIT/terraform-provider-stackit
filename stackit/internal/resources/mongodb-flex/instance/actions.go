@@ -101,6 +101,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	time.Sleep(30 * time.Second)
 
 	process := res.WaitHandler(ctx, r.client.MongoDBFlex.Instance, plan.ProjectID.ValueString(), plan.ID.ValueString())
+	process.SetTimeout(1 * time.Hour)
 	ins, err := process.WaitWithContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("failed MongoDB instance creation validation", err.Error())

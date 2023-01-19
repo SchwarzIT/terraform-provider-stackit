@@ -144,13 +144,11 @@ func (r Resource) createUser(ctx context.Context, plan *Instance, d *diag.Diagno
 	// the default user credentials won't change
 	username := "stackit"
 	database := "stackit"
-	roles := []string{}
 
 	for maxTries := 10; maxTries > -1; maxTries-- {
 		c := r.client.PostgresFlex
 		body := users.CreateUserJSONRequestBody{
 			Database: &database,
-			Roles:    &roles,
 			Username: &username,
 		}
 		res, err := c.Users.CreateUserWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
@@ -161,11 +159,26 @@ func (r Resource) createUser(ctx context.Context, plan *Instance, d *diag.Diagno
 		if (res.StatusCode() == http.StatusNotFound ||
 			res.StatusCode() == http.StatusBadRequest) &&
 			maxTries > 0 {
-			time.Sleep(time.Second * 5)
+			time.Sleep(time.Second * 10)
 			continue
 		}
 		if res.HasError != nil {
 			d.AddError("failed create user request", res.HasError.Error())
+		}
+
+		if res.JSON400 != nil {
+			e := ""
+			if res.JSON400.Message != nil {
+				e = "message: " + *res.JSON400.Message
+			}
+			if res.JSON400.Fields != nil {
+				for k, v := range *res.JSON400.Fields {
+					e = e + "\n" + k + ": " + strings.Join(v, ", ")
+
+				}
+			}
+			d.AddError("response is 400", e)
+			return
 		}
 
 		if res.JSON200 == nil {
