@@ -35,8 +35,8 @@ resource "stackit_postgres_instance" "example" {
 ### Optional
 
 - `acl` (List of String) Access Control rules to whitelist IP addresses
-- `plan` (String) The RabbitMQ Plan. Default is `stackit-postgresql-single-small`
-- `version` (String) RabbitMQ version. Default is 11
+- `plan` (String) The Postgres Plan. Default is `stackit-postgresql-single-small`
+- `version` (String) Postgres version. Default is 11
 
 ### Read-Only
 

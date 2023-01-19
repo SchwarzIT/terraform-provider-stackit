@@ -63,7 +63,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"plan": schema.StringAttribute{
-				Description: fmt.Sprintf("The RabbitMQ Plan. Default is `%s`", r.getDefaultPlan()),
+				Description: fmt.Sprintf("The %s Plan. Default is `%s`", r.service.Display(), r.getDefaultPlan()),
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []planmodifier.String{
@@ -75,7 +75,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Computed:    true,
 			},
 			"version": schema.StringAttribute{
-				Description: fmt.Sprintf("RabbitMQ version. Default is %s", r.getDefaultVersion()),
+				Description: fmt.Sprintf("%s version. Default is %s", r.service.Display(), r.getDefaultVersion()),
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []planmodifier.String{
