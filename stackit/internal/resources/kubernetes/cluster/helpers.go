@@ -422,16 +422,7 @@ func (c *Cluster) transformExtensions(cl cluster.Cluster) {
 	if c.Extensions == nil || cl.Extensions == nil {
 		return
 	}
-	c.Extensions = &Extensions{
-		Argus: &ArgusExtension{
-			Enabled:         types.BoolValue(false),
-			ArgusInstanceID: types.StringNull(),
-		},
-		ACL: &ACL{
-			Enabled:      types.BoolValue(false),
-			AllowedCIDRs: types.ListNull(types.StringType),
-		},
-	}
+
 	if cl.Extensions.Argus != nil {
 		c.Extensions.Argus = &ArgusExtension{
 			Enabled:         types.BoolValue(cl.Extensions.Argus.Enabled),
