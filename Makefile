@@ -39,7 +39,6 @@ ci-docs:
 	@${GITHUB_WORKSPACE}/tfplugindocs generate --rendered-provider-name "STACKIT" --provider-name stackit
 	@find . -name 'index.md' -exec sed -i 's/page_title: "stackit Provider"/page_title: "STACKIT Provider"/g' {} \;
 	@find . -name 'index.md' -exec sed -i 's/# stackit Provider/# STACKIT Provider/g' {} \;
-	@cat docs/index.md
 
 preview-docs: docs
 	@tfplugindocs serve 	
@@ -72,6 +71,10 @@ ci-verify: ci-docs
 		rm .github/files/pre-commit-check/checksum-check; \
 		echo "files are identical";  \
 	else \
+		echo "expected:"
+		cat .github/files/pre-commit-check/checksum
+		echo "got:"
+		cat .github/files/pre-commit-check/checksum-check
 		rm .github/files/pre-commit-check/checksum-check; \
 		echo "incorrect checksum. please run 'make pre-commit'"; flag=$(true); \
 		exit 1; \
