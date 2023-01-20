@@ -204,17 +204,17 @@ jobs:
   datasources:
     strategy:
       matrix:
-        name: [postgres-flex instance,project,mongodb-flex instance]
+        name: [mongodb-flex instance,postgres-flex instance,project]
         include:
+
+        - name: mongodb-flex instance
+          path: stackit/internal/data-sources/mongodb-flex/instance
 
         - name: postgres-flex instance
           path: stackit/internal/data-sources/postgres-flex/instance
 
         - name: project
           path: stackit/internal/data-sources/project
-
-        - name: mongodb-flex instance
-          path: stackit/internal/data-sources/mongodb-flex/instance
 
     name: ${{ matrix.name }}
     needs: createproject
@@ -236,44 +236,6 @@ jobs:
           make dummy PATH=${{ matrix.path }}
 
 
-
-  resource-object-storage:
-    strategy:
-      max-parallel: 1
-      matrix:
-        name: [object-storage bucket,object-storage credential,object-storage credentials-group,object-storage project
-        - name: object-storage bucket
-          path: stackit/internal/resources/object-storage/bucket
-
-        - name: object-storage credential
-          path: stackit/internal/resources/object-storage/credential
-
-        - name: object-storage credentials-group
-          path: stackit/internal/resources/object-storage/credentials-group
-
-        - name: object-storage project
-          path: stackit/internal/resources/object-storage/project
-]
-        include:
-datasource-
-    name: ${{ matrix.name }}
-    needs: [createproject,object-storage]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.18
-      - name: Prepare environment
-        shell: bash
-        run: |
-          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
-      - name: Test ${{ matrix.name }} Data Source
-        shell: bash
-        run: |
-          make dummy PATH=${{ matrix.path }}
 
   resource-argus:
     strategy:
@@ -371,20 +333,58 @@ datasource-
         run: |
           make dummy PATH=${{ matrix.path }}
 
+  resource-object-storage:
+    strategy:
+      max-parallel: 1
+      matrix:
+        name: [object-storage bucket,object-storage credential,object-storage credentials-group,object-storage project
+        - name: object-storage bucket
+          path: stackit/internal/resources/object-storage/bucket
+
+        - name: object-storage credential
+          path: stackit/internal/resources/object-storage/credential
+
+        - name: object-storage credentials-group
+          path: stackit/internal/resources/object-storage/credentials-group
+
+        - name: object-storage project
+          path: stackit/internal/resources/object-storage/project
+]
+        include:
+datasource-
+    name: ${{ matrix.name }}
+    needs: [createproject,object-storage]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+      - name: Prepare environment
+        shell: bash
+        run: |
+          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
+      - name: Test ${{ matrix.name }} Data Source
+        shell: bash
+        run: |
+          make dummy PATH=${{ matrix.path }}
+
   resources:
     strategy:
       matrix:
-        name: [postgres-flex instance,project,mongodb-flex instance]
+        name: [mongodb-flex instance,postgres-flex instance,project]
         include:
+
+        - name: mongodb-flex instance
+          path: stackit/internal/resources/mongodb-flex/instance
 
         - name: postgres-flex instance
           path: stackit/internal/resources/postgres-flex/instance
 
         - name: project
           path: stackit/internal/resources/project
-
-        - name: mongodb-flex instance
-          path: stackit/internal/resources/mongodb-flex/instance
 
     name: ${{ matrix.name }}
     needs: [createproject,datasources]
@@ -413,7 +413,7 @@ datasource-
   deleteproject:
     name: Delete Project
     runs-on: ubuntu-latest
-    needs: [createproject,resources,resource-object-storage,resource-argus,resource-data-services,resource-kubernetes]
+    needs: [createproject,resources,resource-argus,resource-data-services,resource-kubernetes,resource-object-storage]
     if: ${{ always() }}
     steps:
       - name: Prepare deletion
