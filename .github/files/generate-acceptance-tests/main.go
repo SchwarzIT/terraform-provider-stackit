@@ -91,7 +91,7 @@ func main() {
 
 func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAndPathMap map[string]string, prefix string) (string, string) {
 	s := ""
-	nextNeeds := []string{}
+	nextNeeds := []string{"datasources"}
 
 	// sort keys and names with their prefixes
 	sorted := map[string][]string{}
@@ -151,8 +151,7 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
 	// handle non restricted matrix
 	// collect names
 	collectedNames := []string{}
-	for id, names := range sorted {
-		nextNeeds = append(nextNeeds, id)
+	for _, names := range sorted {
 		if len(names) != 1 {
 			continue
 		}
