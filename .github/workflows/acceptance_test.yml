@@ -80,10 +80,10 @@ jobs:
         - name: argus job
           path: stackit/internal/data-sources/argus/job
 
-    name: ${{ matrix.name }}
+    name: ${{ matrix.name }} data source
     needs: createproject
     runs-on: ubuntu-latest
-    continue-on-error: true
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -110,10 +110,10 @@ jobs:
         - name: data-services instance
           path: stackit/internal/data-sources/data-services/instance
 
-    name: ${{ matrix.name }}
+    name: ${{ matrix.name }} data source
     needs: createproject
     runs-on: ubuntu-latest
-    continue-on-error: true
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -140,10 +140,10 @@ jobs:
         - name: kubernetes project
           path: stackit/internal/data-sources/kubernetes/project
 
-    name: ${{ matrix.name }}
+    name: ${{ matrix.name }} data source
     needs: createproject
     runs-on: ubuntu-latest
-    continue-on-error: true
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -176,10 +176,10 @@ jobs:
         - name: object-storage project
           path: stackit/internal/data-sources/object-storage/project
 
-    name: ${{ matrix.name }}
+    name: ${{ matrix.name }} data source
     needs: createproject
     runs-on: ubuntu-latest
-    continue-on-error: true
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -208,10 +208,10 @@ jobs:
         - name: project
           path: stackit/internal/data-sources/project
 
-    name: ${{ matrix.name }}
+    name: ${{ matrix.name }} data source
     needs: createproject
     runs-on: ubuntu-latest
-    continue-on-error: true
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -239,10 +239,10 @@ jobs:
         - name: argus job
           path: stackit/internal/resources/argus/job
 
-    name: ${{ matrix.name }}
+    name: ${{ matrix.name }} resource
     needs: [createproject,datasource-argus]
     runs-on: ubuntu-latest
-    continue-on-error: true
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -250,7 +250,7 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: 1.18
-      - name: Test ${{ matrix.name }} Data Source
+      - name: Test ${{ matrix.name }} resource
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
           make testacc TEST="${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
@@ -268,10 +268,10 @@ jobs:
         - name: data-services instance
           path: stackit/internal/resources/data-services/instance
 
-    name: ${{ matrix.name }}
+    name: ${{ matrix.name }} resource
     needs: [createproject,datasource-data-services]
     runs-on: ubuntu-latest
-    continue-on-error: true
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -279,7 +279,7 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: 1.18
-      - name: Test ${{ matrix.name }} Data Source
+      - name: Test ${{ matrix.name }} resource
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
           make testacc TEST="${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
@@ -297,10 +297,10 @@ jobs:
         - name: kubernetes project
           path: stackit/internal/resources/kubernetes/project
 
-    name: ${{ matrix.name }}
+    name: ${{ matrix.name }} resource
     needs: [createproject,datasource-kubernetes]
     runs-on: ubuntu-latest
-    continue-on-error: true
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -308,7 +308,7 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: 1.18
-      - name: Test ${{ matrix.name }} Data Source
+      - name: Test ${{ matrix.name }} resource
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
           make testacc TEST="${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
@@ -332,10 +332,10 @@ jobs:
         - name: object-storage project
           path: stackit/internal/resources/object-storage/project
 
-    name: ${{ matrix.name }}
+    name: ${{ matrix.name }} resource
     needs: [createproject,datasource-object-storage]
     runs-on: ubuntu-latest
-    continue-on-error: true
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -343,7 +343,7 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: 1.18
-      - name: Test ${{ matrix.name }} Data Source
+      - name: Test ${{ matrix.name }} resource
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
           make testacc TEST="${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
@@ -363,10 +363,10 @@ jobs:
         - name: project
           path: stackit/internal/resources/project
 
-    name: ${{ matrix.name }}
+    name: ${{ matrix.name }} resource
     needs: [createproject,datasources]
     runs-on: ubuntu-latest
-    continue-on-error: true
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -374,7 +374,7 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: 1.18
-      - name: Test ${{ matrix.name }} Data Source
+      - name: Test ${{ matrix.name }} resource
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
           make testacc TEST="${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"

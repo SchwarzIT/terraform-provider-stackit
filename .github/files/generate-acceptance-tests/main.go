@@ -129,10 +129,10 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
         name: [%s]
         include:
 %s
-    name: ${{ matrix.name }}
+    name: ${{ matrix.name }} data source
     needs: createproject
     runs-on: ubuntu-latest
-    continue-on-error: true
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -173,10 +173,10 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
         name: [%s]
         include:
 %s
-    name: ${{ matrix.name }}
+    name: ${{ matrix.name }} data source
     needs: createproject
     runs-on: ubuntu-latest
-    continue-on-error: true
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -234,10 +234,10 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
         name: [%s]
         include:
 %s
-    name: ${{ matrix.name }}
+    name: ${{ matrix.name }} resource
     needs: [createproject,%s%s]
     runs-on: ubuntu-latest
-    continue-on-error: true
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -245,7 +245,7 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
         uses: actions/setup-go@v3
         with:
           go-version: 1.18
-      - name: Test ${{ matrix.name }} Data Source
+      - name: Test ${{ matrix.name }} resource
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
           make testacc TEST="${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
@@ -278,10 +278,10 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
         name: [%s]
         include:
 %s
-    name: ${{ matrix.name }}
+    name: ${{ matrix.name }} resource
     needs: [createproject,datasources]
     runs-on: ubuntu-latest
-    continue-on-error: true
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -289,7 +289,7 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
         uses: actions/setup-go@v3
         with:
           go-version: 1.18
-      - name: Test ${{ matrix.name }} Data Source
+      - name: Test ${{ matrix.name }} resource
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
           make testacc TEST="${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
