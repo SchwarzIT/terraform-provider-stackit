@@ -115,8 +115,8 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
 		incl := ""
 		for _, n := range names {
 			incl = incl + fmt.Sprintf(`
-      - name: %s
-        path: %s
+        - name: %s
+          path: %s
 `, n, keyAndPathMap[n])
 		}
 		s = s + fmt.Sprintf(`
@@ -162,8 +162,8 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
 	incl := ""
 	for _, n := range collectedNames {
 		incl = incl + fmt.Sprintf(`
-      - name: %s
-        path: %s
+        - name: %s
+          path: %s
 `, n, keyAndPathMap[n])
 	}
 
