@@ -107,10 +107,12 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
 		}
 	}
 	// handle restricted matrix
-	for id, names := range sorted {
+	for _, id := range sortedglobalKeys {
+		names := sorted[id]
 		if len(names) < 2 {
 			continue
 		}
+		sort.Strings(names)
 		nextNeeds = append(nextNeeds, prefix+id)
 		incl := ""
 		for _, n := range names {
@@ -215,10 +217,12 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
 		}
 	}
 	// handle restricted matrix
-	for id, names := range sorted {
+	for _, id := range sortedglobalKeys {
+		names := sorted[id]
 		if len(names) < 2 {
 			continue
 		}
+		sort.Strings(names)
 		nextNeeds = append(nextNeeds, prefix+id)
 		incl := ""
 		for _, n := range names {
