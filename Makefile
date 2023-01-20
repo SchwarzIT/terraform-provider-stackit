@@ -35,6 +35,11 @@ docs:
 	@find . -name 'index.md' -exec sed -i '' 's/page_title: "stackit Provider"/page_title: "STACKIT Provider"/g' {} \;
 	@find . -name 'index.md' -exec sed -i '' 's/# stackit Provider/# STACKIT Provider/g' {} \;
 
+ci-docs:
+	@${GITHUB_WORKSPACE}/tfplugindocs generate --rendered-provider-name "STACKIT" --provider-name stackit
+	@find . -name 'index.md' -exec sed -i 's/page_title: "stackit Provider"/page_title: "STACKIT Provider"/g' {} \;
+	@find . -name 'index.md' -exec sed -i 's/# stackit Provider/# STACKIT Provider/g' {} \;
+
 preview-docs: docs
 	@tfplugindocs serve 	
 
@@ -55,5 +60,24 @@ quality:
 	@goreportcard-cli -v .
 
 pre-commit: docs quality
+	@find docs -type f | sort | cat | md5 > .github/files/pre-commit-check/checksum
+	@cat .github/workflows/acceptance_test.yml | md5 >> .github/files/pre-commit-check/checksum
 
-.PHONY: all docs testacc
+ci-verify: ci-docs
+	@find docs -type f | sort | cat | md5sum  | cut -d' ' -f1 > .github/files/pre-commit-check/checksum-check
+	@cat .github/workflows/acceptance_test.yml | md5sum  | cut -d' ' -f1 >> .github/files/pre-commit-check/checksum-check
+	@flag=$(false)
+	@if cmp -s ".github/files/pre-commit-check/checksum-check" ".github/files/pre-commit-check/checksum"; then \
+		rm .github/files/pre-commit-check/checksum-check; \
+		echo "files are identical";  \
+	else \
+		echo "expected:"; \
+		cat .github/files/pre-commit-check/checksum; \
+		echo "got:"; \
+		cat .github/files/pre-commit-check/checksum-check; \
+		rm .github/files/pre-commit-check/checksum-check; \
+		echo "incorrect checksum. please run 'make pre-commit'"; flag=$(true); \
+		exit 1; \
+	fi
+
+.PHONY: all docs testacc ci-verify pre-commit
