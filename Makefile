@@ -37,8 +37,8 @@ docs:
 
 ci-docs:
 	@${GITHUB_WORKSPACE}/tfplugindocs generate --rendered-provider-name "STACKIT" --provider-name stackit
-	@find . -name 'index.md' -exec sed -i '' 's/page_title: "stackit Provider"/page_title: "STACKIT Provider"/g' {} \;
-	@find . -name 'index.md' -exec sed -i '' 's/# stackit Provider/# STACKIT Provider/g' {} \;
+	@find . -name 'index.md' -exec sed -i '' 's/page_title: "stackit Provider"/page_title: "STACKIT Provider"/' {} \;
+	@find . -name 'index.md' -exec sed -i '' 's/# stackit Provider/# STACKIT Provider/' {} \;
 
 preview-docs: docs
 	@tfplugindocs serve 	
