@@ -115,17 +115,17 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
 		incl := ""
 		for _, n := range names {
 			incl = incl + fmt.Sprintf(`
-    - name: %s
-      path: %s
+      - name: %s
+        path: %s
 `, n, keyAndPathMap[n])
 		}
 		s = s + fmt.Sprintf(`
   %s%s:
     strategy:
-    max-parallel: 1
-    matrix:
-      name: [%s]
-    include:
+      max-parallel: 1
+      matrix:
+        name: [%s]
+      include:
 %s
     name: ${{ matrix.name }}
     needs: createproject
@@ -162,17 +162,17 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
 	incl := ""
 	for _, n := range collectedNames {
 		incl = incl + fmt.Sprintf(`
-    - name: %s
-      path: %s
+      - name: %s
+        path: %s
 `, n, keyAndPathMap[n])
 	}
 
 	s = s + fmt.Sprintf(`
   datasources:
     strategy:
-    matrix:
-      name: [%s]
-    include:
+      matrix:
+        name: [%s]
+      include:
 %s
     name: ${{ matrix.name }}
     needs: createproject
