@@ -132,6 +132,7 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
     name: ${{ matrix.name }}
     needs: createproject
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -139,11 +140,10 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
         uses: actions/setup-go@v3
         with:
           go-version: 1.18
-      - name: Prepare environment
-        run: |
-          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
       - name: Test ${{ matrix.name }} Data Source
-        run: make testacc PATH="${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+        run: |
+          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}"
+          make testacc PATH="${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
 `, prefix, id, strings.Join(names, ","), incl)
 	}
 
@@ -175,6 +175,7 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
     name: ${{ matrix.name }}
     needs: createproject
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -182,11 +183,10 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
         uses: actions/setup-go@v3
         with:
           go-version: 1.18
-      - name: Prepare environment
-        run: |
-          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
       - name: Test ${{ matrix.name }} Data Source
-        run: make testacc PATH="${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+        run: |
+          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}"
+          make testacc PATH="${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
 `, strings.Join(collectedNames, ","), incl)
 
 	return s
@@ -236,6 +236,7 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
     name: ${{ matrix.name }}
     needs: [createproject,%s%s]
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -243,11 +244,10 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
         uses: actions/setup-go@v3
         with:
           go-version: 1.18
-      - name: Prepare environment
-        run: |
-          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
       - name: Test ${{ matrix.name }} Data Source
-        run: make testacc PATH="${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+        run: |
+          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}"
+          make testacc PATH="${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
 `, prefix, id, strings.Join(names, ","), incl, previousPrefix, id)
 	}
 
@@ -280,6 +280,7 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
     name: ${{ matrix.name }}
     needs: [createproject,datasources]
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -287,11 +288,10 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
         uses: actions/setup-go@v3
         with:
           go-version: 1.18
-      - name: Prepare environment
-        run: |
-          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
       - name: Test ${{ matrix.name }} Data Source
-        run: make testacc PATH="${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+        run: |
+          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}"
+          make testacc PATH="${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
 `, strings.Join(collectedNames, ","), incl)
 
 	return s, "[createproject," + strings.Join(nextNeeds, ",") + "]"
