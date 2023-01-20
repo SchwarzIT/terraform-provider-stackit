@@ -78,7 +78,7 @@ func main() {
 	sData := string(data)
 
 	sData = strings.Replace(sData, "__data_sources_names__", "          - "+strings.Join(dsk, "\n          - "), 1)
-	sData = strings.Replace(sData, "__data_sources_include__", printOutcome(sortedGlobalKeysDS, dsk, sds), 1)
+	sData = strings.Replace(sData, "__data_sources_include__", printOutcome(sortedGlobalKeysDS, dsk, sds, "ds"), 1)
 
 	err = ioutil.WriteFile(".github/workflows/acceptance_test.yml", []byte(s+sData), 0644)
 	if err != nil {
@@ -86,14 +86,20 @@ func main() {
 	}
 }
 
-func printOutcome(sortedglobalKeys []string, sortedKeys []string, keyAndPathMap map[string]string) string {
+func printOutcome(sortedglobalKeys []string, sortedKeys []string, keyAndPathMap map[string]string, prefix string) string {
 	s := ""
+	needs := map[string][]string{}
 	for _, key := range sortedglobalKeys {
+		if _, ok := needs[key]; !ok {
+			needs[key] = []string{}
+		}
 		for _, v := range sortedKeys {
 			if !strings.HasPrefix(v, key) {
 				continue
 			}
-			s = s + fmt.Sprintf("          - name: %s\n            path: %s\n            concurrency: %s\n", v, keyAndPathMap[v], key)
+			id := prefix + strings.ReplaceAll(v, " ", "-")
+			s = s + fmt.Sprintf("          - name: %s\n            id: %s\n            path: %s\n            needs: [%s]\n", v, id, keyAndPathMap[v], strings.Join(needs[key], ","))
+			needs[key] = append(needs[key], id)
 		}
 	}
 	return s

@@ -88,52 +88,62 @@ jobs:
           - project        
         include:
           - name: argus instance
+            id: dsargus-instance
             path: stackit/internal/data-sources/argus/instance
-            concurrency: argus
+            needs: []
           - name: argus job
+            id: dsargus-job
             path: stackit/internal/data-sources/argus/job
-            concurrency: argus
+            needs: [dsargus-instance]
           - name: data-services credential
+            id: dsdata-services-credential
             path: stackit/internal/data-sources/data-services/credential
-            concurrency: data-services
+            needs: []
           - name: data-services instance
+            id: dsdata-services-instance
             path: stackit/internal/data-sources/data-services/instance
-            concurrency: data-services
+            needs: [dsdata-services-credential]
           - name: kubernetes cluster
+            id: dskubernetes-cluster
             path: stackit/internal/data-sources/kubernetes/cluster
-            concurrency: kubernetes
+            needs: []
           - name: kubernetes project
+            id: dskubernetes-project
             path: stackit/internal/data-sources/kubernetes/project
-            concurrency: kubernetes
+            needs: [dskubernetes-cluster]
           - name: mongodb-flex instance
+            id: dsmongodb-flex-instance
             path: stackit/internal/data-sources/mongodb-flex/instance
-            concurrency: mongodb-flex
+            needs: []
           - name: object-storage bucket
+            id: dsobject-storage-bucket
             path: stackit/internal/data-sources/object-storage/bucket
-            concurrency: object-storage
+            needs: []
           - name: object-storage credential
+            id: dsobject-storage-credential
             path: stackit/internal/data-sources/object-storage/credential
-            concurrency: object-storage
+            needs: [dsobject-storage-bucket]
           - name: object-storage credentials-group
+            id: dsobject-storage-credentials-group
             path: stackit/internal/data-sources/object-storage/credentials-group
-            concurrency: object-storage
+            needs: [dsobject-storage-bucket,dsobject-storage-credential]
           - name: object-storage project
+            id: dsobject-storage-project
             path: stackit/internal/data-sources/object-storage/project
-            concurrency: object-storage
+            needs: [dsobject-storage-bucket,dsobject-storage-credential,dsobject-storage-credentials-group]
           - name: postgres-flex instance
+            id: dspostgres-flex-instance
             path: stackit/internal/data-sources/postgres-flex/instance
-            concurrency: postgres-flex
+            needs: []
           - name: project
+            id: dsproject
             path: stackit/internal/data-sources/project
-            concurrency: project
+            needs: []
 
     name: ${{ matrix.name }}
-    concurrency: 
-      cancel-in-progress: false
-      group: ${{ matrix.concurrency }}
+    needs: ${{ matrix.needs }}
     runs-on: ubuntu-latest
     continue-on-error: true
-    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v3

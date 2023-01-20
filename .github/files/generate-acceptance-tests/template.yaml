@@ -75,9 +75,7 @@ __data_sources_names__
         include:
 __data_sources_include__
     name: ${{ matrix.name }}
-    concurrency: 
-      cancel-in-progress: false
-      group: ${{ matrix.concurrency }}
+    needs: ${{ matrix.needs }}
     runs-on: ubuntu-latest
     continue-on-error: true
     timeout-minutes: 60
