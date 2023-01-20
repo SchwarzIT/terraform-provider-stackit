@@ -81,7 +81,7 @@ jobs:
     needs: [createproject]
     steps:
       - name: Prepare deletion
-        id: delete_project
+        id: prep_deletion
         if: always()
         shell: bash
         run:   |
