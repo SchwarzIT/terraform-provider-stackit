@@ -141,9 +141,11 @@ jobs:
             needs: []
 
     name: ${{ matrix.name }}
+    id: ${{ matrix.id }}
     needs: ${{ matrix.needs }}
     runs-on: ubuntu-latest
     continue-on-error: true
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v3

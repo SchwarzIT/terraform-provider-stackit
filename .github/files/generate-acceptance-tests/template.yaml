@@ -75,6 +75,7 @@ __data_sources_names__
         include:
 __data_sources_include__
     name: ${{ matrix.name }}
+    id: ${{ matrix.id }}
     needs: ${{ matrix.needs }}
     runs-on: ubuntu-latest
     continue-on-error: true
