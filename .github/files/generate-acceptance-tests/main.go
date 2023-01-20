@@ -140,7 +140,6 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
         with:
           go-version: 1.18
       - name: Prepare environment
-        shell: bash
         run: |
           echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
       - name: Test ${{ matrix.name }} Data Source
@@ -184,7 +183,6 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
         with:
           go-version: 1.18
       - name: Prepare environment
-        shell: bash
         run: |
           echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
       - name: Test ${{ matrix.name }} Data Source
@@ -246,7 +244,6 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
         with:
           go-version: 1.18
       - name: Prepare environment
-        shell: bash
         run: |
           echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
       - name: Test ${{ matrix.name }} Data Source
@@ -291,7 +288,6 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
         with:
           go-version: 1.18
       - name: Prepare environment
-        shell: bash
         run: |
           echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
       - name: Test ${{ matrix.name }} Data Source
