@@ -107,24 +107,24 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
 			}
 			nextNeeds = append(nextNeeds, id)
 			s = s + fmt.Sprintf(`
-    %s:
-      needs: %s
-      name: %s
-      runs-on: ubuntu-latest
-      steps:
-        - name: Checkout
-          uses: actions/checkout@v3
-        - name: Set up Go
-          uses: actions/setup-go@v3
-          with:
-            go-version: 1.18
-        - name: Prepare environment
-          shell: bash
-          run: |
-            echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
-        - name: Test %s Data Source
-          shell: bash
-          run: |
+  %s:
+    needs: %s
+    name: %s
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+      - name: Prepare environment
+        shell: bash
+        run: |
+          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
+      - name: Test %s Data Source
+        shell: bash
+        run: |
           make dummy PATH=%s
 `, id, needsstr, name, name, keyAndPathMap[name],
 			)
