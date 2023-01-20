@@ -157,7 +157,7 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
 		}
 		collectedNames = append(collectedNames, names...)
 	}
-
+	sort.Strings(collectedNames)
 	incl := ""
 	for _, n := range collectedNames {
 		incl = incl + fmt.Sprintf(`
@@ -265,6 +265,7 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
 		}
 		collectedNames = append(collectedNames, names...)
 	}
+	sort.Strings(collectedNames)
 
 	incl := ""
 	for _, n := range collectedNames {
