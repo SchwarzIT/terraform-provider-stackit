@@ -35,6 +35,11 @@ docs:
 	@find . -name 'index.md' -exec sed -i '' 's/page_title: "stackit Provider"/page_title: "STACKIT Provider"/g' {} \;
 	@find . -name 'index.md' -exec sed -i '' 's/# stackit Provider/# STACKIT Provider/g' {} \;
 
+ci-docs:
+	@${GITHUB_WORKSPACE}/tfplugindocs generate --rendered-provider-name "STACKIT" --provider-name stackit
+	@find . -name 'index.md' -exec sed -i '' 's/page_title: "stackit Provider"/page_title: "STACKIT Provider"/g' {} \;
+	@find . -name 'index.md' -exec sed -i '' 's/# stackit Provider/# STACKIT Provider/g' {} \;
+
 preview-docs: docs
 	@tfplugindocs serve 	
 
@@ -58,7 +63,7 @@ pre-commit: docs quality
 	@find docs -type f -exec md5 {} \; | sort -k 2 | md5 > .github/files/pre-commit-check/checksum
 	@cat .github/workflows/acceptance_test.yml | md5 >> .github/files/pre-commit-check/checksum
 
-ci-verify: docs
+ci-verify: ci-docs
 	@find docs -type f -exec md5 {} \; | sort -k 2 | md5 > .github/files/pre-commit-check/checksum-check
 	@cat .github/workflows/acceptance_test.yml | md5 >> .github/files/pre-commit-check/checksum-check
 	@flag=$(false)
