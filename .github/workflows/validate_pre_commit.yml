@@ -17,6 +17,6 @@ jobs:
         go-version: 1.18
     - uses: actions/checkout@v3
     - name: Install tfplugindocs
-      run: go install .github/files/pre-commit-check
+      run: go install .github/files/pre-commit-check/main.go
     - name: Validate Pre-Commit
       run: make ci-verify 
