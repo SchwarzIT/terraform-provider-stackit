@@ -125,7 +125,7 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
       max-parallel: 1
       matrix:
         name: [%s]
-      include:
+        include:
 %s
     name: ${{ matrix.name }}
     needs: createproject
@@ -172,7 +172,7 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
     strategy:
       matrix:
         name: [%s]
-      include:
+        include:
 %s
     name: ${{ matrix.name }}
     needs: createproject
