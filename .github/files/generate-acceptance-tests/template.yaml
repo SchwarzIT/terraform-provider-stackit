@@ -85,7 +85,7 @@ jobs:
         if: always()
         shell: bash
         run:   |
-          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_OUTPUT
+          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
       - name: Delete test project
         id: delete_project
         if: always()
