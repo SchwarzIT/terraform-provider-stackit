@@ -58,7 +58,7 @@ pre-commit: docs quality
 	@find docs -type f -exec md5 {} \; | sort -k 2 | md5 > .github/files/pre-commit-check/checksum
 	@cat .github/workflows/acceptance_test.yml | md5 >> .github/files/pre-commit-check/checksum
 
-ci-verify: docs quality
+ci-verify: docs
 	@find docs -type f -exec md5 {} \; | sort -k 2 | md5 > .github/files/pre-commit-check/checksum-check
 	@cat .github/workflows/acceptance_test.yml | md5 >> .github/files/pre-commit-check/checksum-check
 	@flag=$(false)
