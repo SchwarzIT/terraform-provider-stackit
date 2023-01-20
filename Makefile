@@ -60,12 +60,12 @@ quality:
 	@goreportcard-cli -v .
 
 pre-commit: docs quality
-	@find docs -type f -exec md5 {} \; | sort -k 2 | md5 > .github/files/pre-commit-check/checksum
-	@cat .github/workflows/acceptance_test.yml | md5 >> .github/files/pre-commit-check/checksum
+	@find docs -type f -exec md5sum {} \; | sort -k 2 | md5sum > .github/files/pre-commit-check/checksum
+	@cat .github/workflows/acceptance_test.yml | md5sum >> .github/files/pre-commit-check/checksum
 
 ci-verify: ci-docs
-	@find docs -type f -exec md5 {} \; | sort -k 2 | md5 > .github/files/pre-commit-check/checksum-check
-	@cat .github/workflows/acceptance_test.yml | md5 >> .github/files/pre-commit-check/checksum-check
+	@find docs -type f -exec md5sum {} \; | sort -k 2 | md5sum > .github/files/pre-commit-check/checksum-check
+	@cat .github/workflows/acceptance_test.yml | md5sum >> .github/files/pre-commit-check/checksum-check
 	@flag=$(false)
 	@if cmp -s ".github/files/pre-commit-check/checksum-check" ".github/files/pre-commit-check/checksum"; then \
 		rm .github/files/pre-commit-check/checksum-check; \
