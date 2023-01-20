@@ -237,7 +237,7 @@ jobs:
 
 
 
-  resargus:
+  resource-argus:
     strategy:
       max-parallel: 1
       matrix:
@@ -269,7 +269,7 @@ jobs:
         run: |
           make dummy PATH=${{ matrix.path }}
 
-  resdata-services:
+  resource-data-services:
     strategy:
       max-parallel: 1
       matrix:
@@ -301,7 +301,7 @@ jobs:
         run: |
           make dummy PATH=${{ matrix.path }}
 
-  reskubernetes:
+  resource-kubernetes:
     strategy:
       max-parallel: 1
       matrix:
@@ -333,7 +333,7 @@ jobs:
         run: |
           make dummy PATH=${{ matrix.path }}
 
-  resobject-storage:
+  resource-object-storage:
     strategy:
       max-parallel: 1
       matrix:
@@ -413,7 +413,7 @@ jobs:
   deleteproject:
     name: Delete Project
     runs-on: ubuntu-latest
-    needs: [createproject,resources,resargus,resdata-services,reskubernetes,resobject-storage]
+    needs: [createproject,resources,resource-argus,resource-data-services,resource-kubernetes,resource-object-storage]
     if: ${{ always() }}
     steps:
       - name: Prepare deletion

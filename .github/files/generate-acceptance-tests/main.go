@@ -78,7 +78,7 @@ func main() {
 	sData := string(data)
 
 	dsstr, resNeeds := printDataSourceOutcome(sortedGlobalKeysDS, dsk, sds, "datasource-")
-	resstr, deleteNeeds := printResourceOutcome(sortedGlobalKeysRes, rk, sr, "res", resNeeds)
+	resstr, deleteNeeds := printResourceOutcome(sortedGlobalKeysRes, rk, sr, "resource-", resNeeds)
 	sData = strings.Replace(sData, "__data_sources__", dsstr, 1)
 	sData = strings.Replace(sData, "__resources__", resstr, 1)
 	sData = strings.Replace(sData, "__delete_needs__", deleteNeeds, 1)
