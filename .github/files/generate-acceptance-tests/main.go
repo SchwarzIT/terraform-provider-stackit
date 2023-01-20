@@ -108,7 +108,7 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
 			nextNeeds = append(nextNeeds, id)
 			s = s + fmt.Sprintf(`
     %s:
-	  needs: %s
+      needs: %s
       name: %s
       runs-on: ubuntu-latest
       steps:
