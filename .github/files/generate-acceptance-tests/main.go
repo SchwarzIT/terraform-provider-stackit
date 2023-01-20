@@ -77,8 +77,9 @@ func main() {
 	}
 	sData := string(data)
 
-	dsstr, _ := printDataSourceOutcome(sortedGlobalKeysDS, dsk, sds, "ds")
+	dsstr, deleteNeeds := printDataSourceOutcome(sortedGlobalKeysDS, dsk, sds, "ds")
 	sData = strings.Replace(sData, "__data_sources__", dsstr, 1)
+	sData = strings.Replace(sData, "__delete_needs__", deleteNeeds, 1)
 
 	err = ioutil.WriteFile(".github/workflows/acceptance_test.yml", []byte(s+sData), 0644)
 	if err != nil {
@@ -86,7 +87,7 @@ func main() {
 	}
 }
 
-func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAndPathMap map[string]string, prefix string) (string, []string) {
+func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAndPathMap map[string]string, prefix string) (string, string) {
 	s := ""
 	needs := map[string][]string{}
 	nextNeeds := []string{}
@@ -131,6 +132,6 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
 			needs[key] = append(needs[key], id)
 		}
 	}
-	return s, nextNeeds
+	return s, "[" + strings.Join(nextNeeds, ",") + "]"
 
 }

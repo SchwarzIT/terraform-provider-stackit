@@ -335,7 +335,7 @@ jobs:
   deleteproject:
     name: Delete Project
     runs-on: ubuntu-latest
-    needs: [createproject,datasourcestest]
+    needs: [dsargus-instance,dsargus-job,dsdata-services-credential,dsdata-services-instance,dskubernetes-cluster,dskubernetes-project,dsmongodb-flex-instance,dsobject-storage-bucket,dsobject-storage-credential,dsobject-storage-credentials-group,dsobject-storage-project,dspostgres-flex-instance,dsproject]
     if: ${{ always() }}
     steps:
       - name: Prepare deletion
