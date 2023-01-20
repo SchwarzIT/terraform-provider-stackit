@@ -77,7 +77,7 @@ func main() {
 	}
 	sData := string(data)
 
-	dsstr, resNeeds := printDataSourceOutcome(sortedGlobalKeysDS, dsk, sds, "ds")
+	dsstr, resNeeds := printDataSourceOutcome(sortedGlobalKeysDS, dsk, sds, "datasource-")
 	resstr, deleteNeeds := printResourceOutcome(sortedGlobalKeysRes, rk, sr, "res", resNeeds)
 	sData = strings.Replace(sData, "__data_sources__", dsstr, 1)
 	sData = strings.Replace(sData, "__resources__", resstr, 1)
@@ -193,34 +193,50 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
           make dummy PATH=${{ matrix.path }}
 `, strings.Join(collectedNames, ","), incl)
 
-	return s, strings.Join(nextNeeds, ",")
+	return s, "[createproject," + strings.Join(nextNeeds, ",") + "]"
 
 }
 
-func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAndPathMap map[string]string, prefix, resNeeds string) (string, string) {
+func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAndPathMap map[string]string, prefix string, resNeeds string) (string, string) {
 	s := ""
-	needs := map[string][]string{}
-	nextNeeds := []string{}
+	nextNeeds := []string{"resources"}
+
+	// sort keys and names with their prefixes
+	sorted := map[string][]string{}
 	for _, key := range sortedglobalKeys {
-		if _, ok := needs[key]; !ok {
-			needs[key] = []string{}
+		if _, ok := sorted[key]; !ok {
+			sorted[key] = []string{}
 		}
 		for _, name := range sortedKeys {
 			if !strings.HasPrefix(name, key) {
 				continue
 			}
-			id := prefix + strings.ReplaceAll(name, " ", "-")
-			needsstr := strings.Join(needs[key], ",")
-			if len(needsstr) > 0 {
-				needsstr = "[" + resNeeds + "," + needsstr + "]"
-			} else {
-				needsstr = "[" + resNeeds + "]"
-			}
-			nextNeeds = append(nextNeeds, id)
-			s = s + fmt.Sprintf(`
-  %s:
+			sorted[key] = append(sorted[key], name)
+		}
+	}
+	// handle restricted matrix
+	for id, names := range sorted {
+		if len(names) < 2 {
+			continue
+		}
+		nextNeeds = append(nextNeeds, prefix+id)
+		incl := ""
+		for _, n := range names {
+			incl = incl + fmt.Sprintf(`
+        - name: %s
+          path: %s
+`, n, keyAndPathMap[n])
+		}
+		s = s + fmt.Sprintf(`
+  %s%s:
+    strategy:
+      max-parallel: 1
+      matrix:
+        name: [%s]
+        include:
+%s
+    name: ${{ matrix.name }}
     needs: %s
-    name: Test %s Resource
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -233,15 +249,58 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
         shell: bash
         run: |
           echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
-      - name: Test %s Resource
+      - name: Test ${{ matrix.name }} Data Source
         shell: bash
         run: |
-          make dummy PATH=%s
-`, id, needsstr, name, name, keyAndPathMap[name],
-			)
-			needs[key] = append(needs[key], id)
-		}
+          make dummy PATH=${{ matrix.path }}
+`, prefix, id, strings.Join(names, ","), incl, resNeeds)
 	}
-	return s, "[" + strings.Join(nextNeeds, ",") + "]"
+
+	// handle non restricted matrix
+	// collect names
+	collectedNames := []string{}
+	for _, names := range sorted {
+		if len(names) != 1 {
+			continue
+		}
+		collectedNames = append(collectedNames, names...)
+	}
+
+	incl := ""
+	for _, n := range collectedNames {
+		incl = incl + fmt.Sprintf(`
+        - name: %s
+          path: %s
+`, n, keyAndPathMap[n])
+	}
+
+	s = s + fmt.Sprintf(`
+  resources:
+    strategy:
+      matrix:
+        name: [%s]
+        include:
+%s
+    name: ${{ matrix.name }}
+    needs: %s
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+      - name: Prepare environment
+        shell: bash
+        run: |
+          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
+      - name: Test ${{ matrix.name }} Data Source
+        shell: bash
+        run: |
+          make dummy PATH=${{ matrix.path }}
+`, strings.Join(collectedNames, ","), incl, resNeeds)
+
+	return s, "[createproject," + strings.Join(nextNeeds, ",") + "]"
 
 }

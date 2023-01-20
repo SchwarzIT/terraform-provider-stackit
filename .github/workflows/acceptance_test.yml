@@ -67,77 +67,7 @@ jobs:
           expected-response-field-value: 'ACTIVE'
 
 
-  dskubernetes:
-    strategy:
-      max-parallel: 1
-      matrix:
-        name: [kubernetes cluster,kubernetes project]
-        include:
-
-        - name: kubernetes cluster
-          path: stackit/internal/data-sources/kubernetes/cluster
-
-        - name: kubernetes project
-          path: stackit/internal/data-sources/kubernetes/project
-
-    name: ${{ matrix.name }}
-    needs: createproject
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.18
-      - name: Prepare environment
-        shell: bash
-        run: |
-          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
-      - name: Test ${{ matrix.name }} Data Source
-        shell: bash
-        run: |
-          make dummy PATH=${{ matrix.path }}
-
-  dsobject-storage:
-    strategy:
-      max-parallel: 1
-      matrix:
-        name: [object-storage bucket,object-storage credential,object-storage credentials-group,object-storage project]
-        include:
-
-        - name: object-storage bucket
-          path: stackit/internal/data-sources/object-storage/bucket
-
-        - name: object-storage credential
-          path: stackit/internal/data-sources/object-storage/credential
-
-        - name: object-storage credentials-group
-          path: stackit/internal/data-sources/object-storage/credentials-group
-
-        - name: object-storage project
-          path: stackit/internal/data-sources/object-storage/project
-
-    name: ${{ matrix.name }}
-    needs: createproject
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.18
-      - name: Prepare environment
-        shell: bash
-        run: |
-          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
-      - name: Test ${{ matrix.name }} Data Source
-        shell: bash
-        run: |
-          make dummy PATH=${{ matrix.path }}
-
-  dsargus:
+  datasource-argus:
     strategy:
       max-parallel: 1
       matrix:
@@ -169,7 +99,7 @@ jobs:
         run: |
           make dummy PATH=${{ matrix.path }}
 
-  dsdata-services:
+  datasource-data-services:
     strategy:
       max-parallel: 1
       matrix:
@@ -181,6 +111,76 @@ jobs:
 
         - name: data-services instance
           path: stackit/internal/data-sources/data-services/instance
+
+    name: ${{ matrix.name }}
+    needs: createproject
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+      - name: Prepare environment
+        shell: bash
+        run: |
+          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
+      - name: Test ${{ matrix.name }} Data Source
+        shell: bash
+        run: |
+          make dummy PATH=${{ matrix.path }}
+
+  datasource-kubernetes:
+    strategy:
+      max-parallel: 1
+      matrix:
+        name: [kubernetes cluster,kubernetes project]
+        include:
+
+        - name: kubernetes cluster
+          path: stackit/internal/data-sources/kubernetes/cluster
+
+        - name: kubernetes project
+          path: stackit/internal/data-sources/kubernetes/project
+
+    name: ${{ matrix.name }}
+    needs: createproject
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+      - name: Prepare environment
+        shell: bash
+        run: |
+          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
+      - name: Test ${{ matrix.name }} Data Source
+        shell: bash
+        run: |
+          make dummy PATH=${{ matrix.path }}
+
+  datasource-object-storage:
+    strategy:
+      max-parallel: 1
+      matrix:
+        name: [object-storage bucket,object-storage credential,object-storage credentials-group,object-storage project]
+        include:
+
+        - name: object-storage bucket
+          path: stackit/internal/data-sources/object-storage/bucket
+
+        - name: object-storage credential
+          path: stackit/internal/data-sources/object-storage/credential
+
+        - name: object-storage credentials-group
+          path: stackit/internal/data-sources/object-storage/credentials-group
+
+        - name: object-storage project
+          path: stackit/internal/data-sources/object-storage/project
 
     name: ${{ matrix.name }}
     needs: createproject
@@ -237,69 +237,21 @@ jobs:
 
 
 
-  resargus-instance:
-    needs: [datasources,dskubernetes,dsobject-storage,dsargus,dsdata-services]
-    name: Test argus instance Resource
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.18
-      - name: Prepare environment
-        shell: bash
-        run: |
-          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
-      - name: Test argus instance Resource
-        shell: bash
-        run: |
-          make dummy PATH=stackit/internal/resources/argus/instance
+  resargus:
+    strategy:
+      max-parallel: 1
+      matrix:
+        name: [argus instance,argus job]
+        include:
 
-  resargus-job:
-    needs: [datasources,dskubernetes,dsobject-storage,dsargus,dsdata-services,resargus-instance]
-    name: Test argus job Resource
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.18
-      - name: Prepare environment
-        shell: bash
-        run: |
-          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
-      - name: Test argus job Resource
-        shell: bash
-        run: |
-          make dummy PATH=stackit/internal/resources/argus/job
+        - name: argus instance
+          path: stackit/internal/resources/argus/instance
 
-  resdata-services-credential:
-    needs: [datasources,dskubernetes,dsobject-storage,dsargus,dsdata-services]
-    name: Test data-services credential Resource
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.18
-      - name: Prepare environment
-        shell: bash
-        run: |
-          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
-      - name: Test data-services credential Resource
-        shell: bash
-        run: |
-          make dummy PATH=stackit/internal/resources/data-services/credential
+        - name: argus job
+          path: stackit/internal/resources/argus/job
 
-  resdata-services-instance:
-    needs: [datasources,dskubernetes,dsobject-storage,dsargus,dsdata-services,resdata-services-credential]
-    name: Test data-services instance Resource
+    name: ${{ matrix.name }}
+    needs: [createproject,datasources,datasource-argus,datasource-data-services,datasource-kubernetes,datasource-object-storage]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -312,74 +264,26 @@ jobs:
         shell: bash
         run: |
           echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
-      - name: Test data-services instance Resource
+      - name: Test ${{ matrix.name }} Data Source
         shell: bash
         run: |
-          make dummy PATH=stackit/internal/resources/data-services/instance
+          make dummy PATH=${{ matrix.path }}
 
-  reskubernetes-cluster:
-    needs: [datasources,dskubernetes,dsobject-storage,dsargus,dsdata-services]
-    name: Test kubernetes cluster Resource
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.18
-      - name: Prepare environment
-        shell: bash
-        run: |
-          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
-      - name: Test kubernetes cluster Resource
-        shell: bash
-        run: |
-          make dummy PATH=stackit/internal/resources/kubernetes/cluster
+  resdata-services:
+    strategy:
+      max-parallel: 1
+      matrix:
+        name: [data-services credential,data-services instance]
+        include:
 
-  reskubernetes-project:
-    needs: [datasources,dskubernetes,dsobject-storage,dsargus,dsdata-services,reskubernetes-cluster]
-    name: Test kubernetes project Resource
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.18
-      - name: Prepare environment
-        shell: bash
-        run: |
-          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
-      - name: Test kubernetes project Resource
-        shell: bash
-        run: |
-          make dummy PATH=stackit/internal/resources/kubernetes/project
+        - name: data-services credential
+          path: stackit/internal/resources/data-services/credential
 
-  resmongodb-flex-instance:
-    needs: [datasources,dskubernetes,dsobject-storage,dsargus,dsdata-services]
-    name: Test mongodb-flex instance Resource
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.18
-      - name: Prepare environment
-        shell: bash
-        run: |
-          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
-      - name: Test mongodb-flex instance Resource
-        shell: bash
-        run: |
-          make dummy PATH=stackit/internal/resources/mongodb-flex/instance
+        - name: data-services instance
+          path: stackit/internal/resources/data-services/instance
 
-  resobject-storage-bucket:
-    needs: [datasources,dskubernetes,dsobject-storage,dsargus,dsdata-services]
-    name: Test object-storage bucket Resource
+    name: ${{ matrix.name }}
+    needs: [createproject,datasources,datasource-argus,datasource-data-services,datasource-kubernetes,datasource-object-storage]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -392,74 +296,26 @@ jobs:
         shell: bash
         run: |
           echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
-      - name: Test object-storage bucket Resource
+      - name: Test ${{ matrix.name }} Data Source
         shell: bash
         run: |
-          make dummy PATH=stackit/internal/resources/object-storage/bucket
+          make dummy PATH=${{ matrix.path }}
 
-  resobject-storage-credential:
-    needs: [datasources,dskubernetes,dsobject-storage,dsargus,dsdata-services,resobject-storage-bucket]
-    name: Test object-storage credential Resource
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.18
-      - name: Prepare environment
-        shell: bash
-        run: |
-          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
-      - name: Test object-storage credential Resource
-        shell: bash
-        run: |
-          make dummy PATH=stackit/internal/resources/object-storage/credential
+  reskubernetes:
+    strategy:
+      max-parallel: 1
+      matrix:
+        name: [kubernetes cluster,kubernetes project]
+        include:
 
-  resobject-storage-credentials-group:
-    needs: [datasources,dskubernetes,dsobject-storage,dsargus,dsdata-services,resobject-storage-bucket,resobject-storage-credential]
-    name: Test object-storage credentials-group Resource
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.18
-      - name: Prepare environment
-        shell: bash
-        run: |
-          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
-      - name: Test object-storage credentials-group Resource
-        shell: bash
-        run: |
-          make dummy PATH=stackit/internal/resources/object-storage/credentials-group
+        - name: kubernetes cluster
+          path: stackit/internal/resources/kubernetes/cluster
 
-  resobject-storage-project:
-    needs: [datasources,dskubernetes,dsobject-storage,dsargus,dsdata-services,resobject-storage-bucket,resobject-storage-credential,resobject-storage-credentials-group]
-    name: Test object-storage project Resource
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.18
-      - name: Prepare environment
-        shell: bash
-        run: |
-          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
-      - name: Test object-storage project Resource
-        shell: bash
-        run: |
-          make dummy PATH=stackit/internal/resources/object-storage/project
+        - name: kubernetes project
+          path: stackit/internal/resources/kubernetes/project
 
-  respostgres-flex-instance:
-    needs: [datasources,dskubernetes,dsobject-storage,dsargus,dsdata-services]
-    name: Test postgres-flex instance Resource
+    name: ${{ matrix.name }}
+    needs: [createproject,datasources,datasource-argus,datasource-data-services,datasource-kubernetes,datasource-object-storage]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -472,14 +328,32 @@ jobs:
         shell: bash
         run: |
           echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
-      - name: Test postgres-flex instance Resource
+      - name: Test ${{ matrix.name }} Data Source
         shell: bash
         run: |
-          make dummy PATH=stackit/internal/resources/postgres-flex/instance
+          make dummy PATH=${{ matrix.path }}
 
-  resproject:
-    needs: [datasources,dskubernetes,dsobject-storage,dsargus,dsdata-services]
-    name: Test project Resource
+  resobject-storage:
+    strategy:
+      max-parallel: 1
+      matrix:
+        name: [object-storage bucket,object-storage credential,object-storage credentials-group,object-storage project]
+        include:
+
+        - name: object-storage bucket
+          path: stackit/internal/resources/object-storage/bucket
+
+        - name: object-storage credential
+          path: stackit/internal/resources/object-storage/credential
+
+        - name: object-storage credentials-group
+          path: stackit/internal/resources/object-storage/credentials-group
+
+        - name: object-storage project
+          path: stackit/internal/resources/object-storage/project
+
+    name: ${{ matrix.name }}
+    needs: [createproject,datasources,datasource-argus,datasource-data-services,datasource-kubernetes,datasource-object-storage]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -492,10 +366,44 @@ jobs:
         shell: bash
         run: |
           echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
-      - name: Test project Resource
+      - name: Test ${{ matrix.name }} Data Source
         shell: bash
         run: |
-          make dummy PATH=stackit/internal/resources/project
+          make dummy PATH=${{ matrix.path }}
+
+  resources:
+    strategy:
+      matrix:
+        name: [mongodb-flex instance,postgres-flex instance,project]
+        include:
+
+        - name: mongodb-flex instance
+          path: stackit/internal/resources/mongodb-flex/instance
+
+        - name: postgres-flex instance
+          path: stackit/internal/resources/postgres-flex/instance
+
+        - name: project
+          path: stackit/internal/resources/project
+
+    name: ${{ matrix.name }}
+    needs: [createproject,datasources,datasource-argus,datasource-data-services,datasource-kubernetes,datasource-object-storage]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+      - name: Prepare environment
+        shell: bash
+        run: |
+          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
+      - name: Test ${{ matrix.name }} Data Source
+        shell: bash
+        run: |
+          make dummy PATH=${{ matrix.path }}
 
 
       # - name: Test
@@ -505,7 +413,7 @@ jobs:
   deleteproject:
     name: Delete Project
     runs-on: ubuntu-latest
-    needs: [resargus-instance,resargus-job,resdata-services-credential,resdata-services-instance,reskubernetes-cluster,reskubernetes-project,resmongodb-flex-instance,resobject-storage-bucket,resobject-storage-credential,resobject-storage-credentials-group,resobject-storage-project,respostgres-flex-instance,resproject]
+    needs: [createproject,resources,resargus,resdata-services,reskubernetes,resobject-storage]
     if: ${{ always() }}
     steps:
       - name: Prepare deletion
