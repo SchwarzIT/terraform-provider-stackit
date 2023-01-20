@@ -21,32 +21,33 @@ jobs:
         id: create_project
         shell: bash
         run: |
-          JSON_DATA=$(cat << EOF
-          { 
-          "name": "${{ github.event.repository.name }}_${{ github.run_id }}", 
-          "containerParentId": "${{ secrets.ACC_TEST_PARENT_CONTAINER_ID }}", 
-          "members": [{ 
-          "role": "project.owner", 
-          "subject": "${{ secrets.ACC_TEST_USER_EMAIL }}" 
-          },{ 
-          "role": "project.owner", 
-          "subject": "${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}" 
-          }], 
-          "labels": { 
-          "billingReference": "${{ secrets.ACC_TEST_BILLING_REF }}", 
-          "scope": "PUBLIC" 
-          }
-          }
-          EOF
-          )
+          # JSON_DATA=$(cat << EOF
+          # { 
+          # "name": "${{ github.event.repository.name }}_${{ github.run_id }}", 
+          # "containerParentId": "${{ secrets.ACC_TEST_PARENT_CONTAINER_ID }}", 
+          # "members": [{ 
+          # "role": "project.owner", 
+          # "subject": "${{ secrets.ACC_TEST_USER_EMAIL }}" 
+          # },{ 
+          # "role": "project.owner", 
+          # "subject": "${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}" 
+          # }], 
+          # "labels": { 
+          # "billingReference": "${{ secrets.ACC_TEST_BILLING_REF }}", 
+          # "scope": "PUBLIC" 
+          # }
+          # }
+          # EOF
+          # )
           
-          curl --location --request POST 'https://api.stackit.cloud/resource-management/v2/projects' \
-            --header 'Content-Type: application/json' \
-            --header 'Accept: application/json' \
-            --header 'Authorization: Bearer ${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}' \
-            --data-raw "${JSON_DATA}" > $HOME/pr.json
+          # curl --location --request POST 'https://api.stackit.cloud/resource-management/v2/projects' \
+          #   --header 'Content-Type: application/json' \
+          #   --header 'Accept: application/json' \
+          #   --header 'Authorization: Bearer ${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}' \
+          #   --data-raw "${JSON_DATA}" > $HOME/pr.json
           
-          ACC_TEST_PROJECT_ID="$(jq -r '.projectId' $HOME/pr.json)"
+          # ACC_TEST_PROJECT_ID="$(jq -r '.projectId' $HOME/pr.json)"
+          ACC_TEST_PROJECT_ID="a4d42390-a3fb-40a5-bbab-ecc3988f8091"
           echo "ACC_TEST_PROJECT_ID=${ACC_TEST_PROJECT_ID}" >> $GITHUB_ENV
           echo "ACC_TEST_PROJECT_ID=${ACC_TEST_PROJECT_ID}" >> $GITHUB_OUTPUT
           [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]] && exit 1 || exit 0
@@ -87,6 +88,6 @@ __resources__
         run:   |
           [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]] && exit 0
           echo "Deleting project ID: ${ACC_TEST_PROJECT_ID}"
-          curl --location --request DELETE 'https://api.stackit.cloud/resource-management/v2/projects/${{ env.ACC_TEST_PROJECT_ID }}' \
-            --header 'Accept: application/json' \
-            --header 'Authorization: Bearer ${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}'
+          # curl --location --request DELETE 'https://api.stackit.cloud/resource-management/v2/projects/${{ env.ACC_TEST_PROJECT_ID }}' \
+          #   --header 'Accept: application/json' \
+          #   --header 'Authorization: Bearer ${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}'
