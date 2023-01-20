@@ -69,7 +69,7 @@ jobs:
   datasourcestest:
     needs: [createproject]
     strategy:
-      # max-parallel: 5
+      max-parallel: 5
       matrix:
         name:
           - argus instance
@@ -154,7 +154,7 @@ jobs:
   deleteproject:
     name: Delete Project
     runs-on: ubuntu-latest
-    needs: [datasourcestest]
+    needs: [createproject,datasourcestest]
     if: ${{ always() }}
     steps:
       - name: Prepare deletion
