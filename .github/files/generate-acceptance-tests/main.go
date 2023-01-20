@@ -77,8 +77,8 @@ func main() {
 	}
 	sData := string(data)
 
-	dsstr, resNeeds := printDataSourceOutcome(sortedGlobalKeysDS, dsk, sds, "datasource-")
-	resstr, deleteNeeds := printResourceOutcome(sortedGlobalKeysRes, rk, sr, "resource-", resNeeds)
+	dsstr := printDataSourceOutcome(sortedGlobalKeysDS, dsk, sds, "datasource-")
+	resstr, deleteNeeds := printResourceOutcome(sortedGlobalKeysRes, rk, sr, "resource-", "datasource-")
 	sData = strings.Replace(sData, "__data_sources__", dsstr, 1)
 	sData = strings.Replace(sData, "__resources__", resstr, 1)
 	sData = strings.Replace(sData, "__delete_needs__", deleteNeeds, 1)
@@ -89,7 +89,7 @@ func main() {
 	}
 }
 
-func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAndPathMap map[string]string, prefix string) (string, string) {
+func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAndPathMap map[string]string, prefix string) string {
 	s := ""
 	nextNeeds := []string{"datasources"}
 
@@ -193,11 +193,11 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
           make dummy PATH=${{ matrix.path }}
 `, strings.Join(collectedNames, ","), incl)
 
-	return s, "[createproject," + strings.Join(nextNeeds, ",") + "]"
+	return s
 
 }
 
-func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAndPathMap map[string]string, prefix string, resNeeds string) (string, string) {
+func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAndPathMap map[string]string, prefix, previousPrefix string) (string, string) {
 	s := ""
 	nextNeeds := []string{"resources"}
 
@@ -232,11 +232,11 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
     strategy:
       max-parallel: 1
       matrix:
-        name: [%s]
+        name: [%s%s]
         include:
 %s
     name: ${{ matrix.name }}
-    needs: %s
+    needs: [createproject,%s]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -253,7 +253,7 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
         shell: bash
         run: |
           make dummy PATH=${{ matrix.path }}
-`, prefix, id, strings.Join(names, ","), incl, resNeeds)
+`, prefix, id, strings.Join(names, ","), incl, previousPrefix, id)
 	}
 
 	// handle non restricted matrix
@@ -282,7 +282,7 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
         include:
 %s
     name: ${{ matrix.name }}
-    needs: %s
+    needs: [createproject,datasources]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -299,7 +299,7 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
         shell: bash
         run: |
           make dummy PATH=${{ matrix.path }}
-`, strings.Join(collectedNames, ","), incl, resNeeds)
+`, strings.Join(collectedNames, ","), incl)
 
 	return s, "[createproject," + strings.Join(nextNeeds, ",") + "]"
 
