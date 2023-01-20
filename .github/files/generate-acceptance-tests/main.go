@@ -176,15 +176,17 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
     name: ${{ matrix.name }} data source
     needs: createproject
     runs-on: ubuntu-latest
-    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        if: always()
       - name: Set up Go
         uses: actions/setup-go@v3
+        if: always()
         with:
           go-version: 1.18
       - name: Test ${{ matrix.name }} Data Source
+        if: always()
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
           make testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
@@ -240,12 +242,15 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
     if: always()
     steps:
       - name: Checkout
+        if: always()
         uses: actions/checkout@v3
       - name: Set up Go
+        if: always()
         uses: actions/setup-go@v3
         with:
           go-version: 1.18
       - name: Test ${{ matrix.name }} resource
+        if: always()
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
           make testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
@@ -285,11 +290,14 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        if: always()
       - name: Set up Go
         uses: actions/setup-go@v3
+        if: always()
         with:
           go-version: 1.18
       - name: Test ${{ matrix.name }} resource
+        if: always()
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
           make testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
