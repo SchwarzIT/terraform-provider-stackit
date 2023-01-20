@@ -49,7 +49,6 @@ jobs:
             --data-raw "${JSON_DATA}" > $HOME/pr.json
           
           ACC_TEST_PROJECT_ID="$(jq -r '.projectId' $HOME/pr.json)"
-          ACC_TEST_PROJECT_ID="a4d42390-a3fb-40a5-bbab-ecc3988f8091"
           echo "ACC_TEST_PROJECT_ID=${ACC_TEST_PROJECT_ID}" >> $GITHUB_ENV
           echo "ACC_TEST_PROJECT_ID=${ACC_TEST_PROJECT_ID}" >> $GITHUB_OUTPUT
           [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]] && exit 1 || exit 0
