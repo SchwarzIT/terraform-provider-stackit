@@ -84,4 +84,4 @@ ci-verify: ci-docs
 		exit 1; \
 	fi
 
-.PHONY: all docs testacc ci-verify pre-commit
+.PHONY: all docs testacc ci-verify pre-commit dummy test ci-docs quality preview-docs install build
