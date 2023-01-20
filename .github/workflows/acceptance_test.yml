@@ -127,6 +127,7 @@ jobs:
 
     name: ${{ matrix.name }}
     concurrency: ${{ matrix.concurrency }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3

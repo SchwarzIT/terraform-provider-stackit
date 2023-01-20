@@ -74,6 +74,7 @@ __data_sources_names__
 __data_sources_include__
     name: ${{ matrix.name }}
     concurrency: ${{ matrix.concurrency }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
