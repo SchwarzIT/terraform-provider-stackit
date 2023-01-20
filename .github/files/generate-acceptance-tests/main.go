@@ -232,11 +232,11 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
     strategy:
       max-parallel: 1
       matrix:
-        name: [%s%s]
+        name: [%s]
         include:
 %s
     name: ${{ matrix.name }}
-    needs: [createproject,%s]
+    needs: [createproject,%s%s]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

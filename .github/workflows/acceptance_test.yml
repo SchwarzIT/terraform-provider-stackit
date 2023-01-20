@@ -204,17 +204,17 @@ jobs:
   datasources:
     strategy:
       matrix:
-        name: [mongodb-flex instance,postgres-flex instance,project]
+        name: [postgres-flex instance,project,mongodb-flex instance]
         include:
-
-        - name: mongodb-flex instance
-          path: stackit/internal/data-sources/mongodb-flex/instance
 
         - name: postgres-flex instance
           path: stackit/internal/data-sources/postgres-flex/instance
 
         - name: project
           path: stackit/internal/data-sources/project
+
+        - name: mongodb-flex instance
+          path: stackit/internal/data-sources/mongodb-flex/instance
 
     name: ${{ matrix.name }}
     needs: createproject
@@ -241,17 +241,17 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        name: [argus instance,argus job
+        name: [argus instance,argus job]
+        include:
+
         - name: argus instance
           path: stackit/internal/resources/argus/instance
 
         - name: argus job
           path: stackit/internal/resources/argus/job
-]
-        include:
-datasource-
+
     name: ${{ matrix.name }}
-    needs: [createproject,argus]
+    needs: [createproject,datasource-argus]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -273,17 +273,17 @@ datasource-
     strategy:
       max-parallel: 1
       matrix:
-        name: [data-services credential,data-services instance
+        name: [data-services credential,data-services instance]
+        include:
+
         - name: data-services credential
           path: stackit/internal/resources/data-services/credential
 
         - name: data-services instance
           path: stackit/internal/resources/data-services/instance
-]
-        include:
-datasource-
+
     name: ${{ matrix.name }}
-    needs: [createproject,data-services]
+    needs: [createproject,datasource-data-services]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -305,17 +305,17 @@ datasource-
     strategy:
       max-parallel: 1
       matrix:
-        name: [kubernetes cluster,kubernetes project
+        name: [kubernetes cluster,kubernetes project]
+        include:
+
         - name: kubernetes cluster
           path: stackit/internal/resources/kubernetes/cluster
 
         - name: kubernetes project
           path: stackit/internal/resources/kubernetes/project
-]
-        include:
-datasource-
+
     name: ${{ matrix.name }}
-    needs: [createproject,kubernetes]
+    needs: [createproject,datasource-kubernetes]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -337,7 +337,9 @@ datasource-
     strategy:
       max-parallel: 1
       matrix:
-        name: [object-storage bucket,object-storage credential,object-storage credentials-group,object-storage project
+        name: [object-storage bucket,object-storage credential,object-storage credentials-group,object-storage project]
+        include:
+
         - name: object-storage bucket
           path: stackit/internal/resources/object-storage/bucket
 
@@ -349,11 +351,9 @@ datasource-
 
         - name: object-storage project
           path: stackit/internal/resources/object-storage/project
-]
-        include:
-datasource-
+
     name: ${{ matrix.name }}
-    needs: [createproject,object-storage]
+    needs: [createproject,datasource-object-storage]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
