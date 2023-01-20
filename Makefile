@@ -56,7 +56,7 @@ testacc:
 		STACKIT_CUSTOMER_ACCOUNT_ID="$(STACKIT_CUSTOMER_ACCOUNT_ID)" \
 		go test -p 1 -timeout 99999s -v $(TEST)
 
-testaccdummy:
+dummy:
 	@echo $(TEST)
 
 quality:

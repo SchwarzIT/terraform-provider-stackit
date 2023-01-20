@@ -146,7 +146,7 @@ jobs:
       - name: Test ${{ matrix.name }} Data Source
         shell: bash
         run: |
-          make testaccdummy PATH=${{ matrix.path }}
+          make dummy PATH=${{ matrix.path }}
       # - name: Test
       #   id: acceptance-test
       #   run: make testacc ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
