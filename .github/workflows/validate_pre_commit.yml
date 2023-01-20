@@ -16,8 +16,6 @@ jobs:
       with:
         go-version: 1.18
     - uses: actions/checkout@v3
-    - name: Install tfplugindocs
-      run: go install hashicorp/terraform-plugin-docs
     - uses: robinraju/release-downloader@v1.7
       with: 
         repository: hashicorp/terraform-plugin-docs
