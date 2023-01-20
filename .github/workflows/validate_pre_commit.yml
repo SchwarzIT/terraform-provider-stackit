@@ -17,6 +17,6 @@ jobs:
         go-version: 1.18
     - uses: actions/checkout@v3
     - name: Install tfplugindocs
-      run: go install hashicorp/terraform-plugin-docs
+      run: go install hashicorp/terraform-plugin-docs@latest
     - name: Validate Pre-Commit
       run: make ci-verify 
