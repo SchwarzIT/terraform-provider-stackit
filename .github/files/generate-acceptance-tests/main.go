@@ -108,10 +108,10 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
 	}
 	// handle restricted matrix
 	for id, names := range sorted {
-		nextNeeds = append(nextNeeds, prefix+id)
 		if len(names) < 2 {
 			continue
 		}
+		nextNeeds = append(nextNeeds, prefix+id)
 		incl := ""
 		for _, n := range names {
 			incl = incl + fmt.Sprintf(`

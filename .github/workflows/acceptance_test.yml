@@ -67,6 +67,38 @@ jobs:
           expected-response-field-value: 'ACTIVE'
 
 
+  dskubernetes:
+    strategy:
+      max-parallel: 1
+      matrix:
+        name: [kubernetes cluster,kubernetes project]
+        include:
+
+        - name: kubernetes cluster
+          path: stackit/internal/data-sources/kubernetes/cluster
+
+        - name: kubernetes project
+          path: stackit/internal/data-sources/kubernetes/project
+
+    name: ${{ matrix.name }}
+    needs: createproject
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+      - name: Prepare environment
+        shell: bash
+        run: |
+          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
+      - name: Test ${{ matrix.name }} Data Source
+        shell: bash
+        run: |
+          make dummy PATH=${{ matrix.path }}
+
   dsobject-storage:
     strategy:
       max-parallel: 1
@@ -169,38 +201,6 @@ jobs:
         run: |
           make dummy PATH=${{ matrix.path }}
 
-  dskubernetes:
-    strategy:
-      max-parallel: 1
-      matrix:
-        name: [kubernetes cluster,kubernetes project]
-        include:
-
-        - name: kubernetes cluster
-          path: stackit/internal/data-sources/kubernetes/cluster
-
-        - name: kubernetes project
-          path: stackit/internal/data-sources/kubernetes/project
-
-    name: ${{ matrix.name }}
-    needs: createproject
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.18
-      - name: Prepare environment
-        shell: bash
-        run: |
-          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
-      - name: Test ${{ matrix.name }} Data Source
-        shell: bash
-        run: |
-          make dummy PATH=${{ matrix.path }}
-
   datasources:
     strategy:
       matrix:
@@ -238,7 +238,7 @@ jobs:
 
 
   resargus-instance:
-    needs: [datasources,dsmongodb-flex,dsobject-storage,dspostgres-flex,dsproject,dsargus,dsdata-services,dskubernetes]
+    needs: [datasources,dskubernetes,dsobject-storage,dsargus,dsdata-services]
     name: Test argus instance Resource
     runs-on: ubuntu-latest
     steps:
@@ -258,7 +258,7 @@ jobs:
           make dummy PATH=stackit/internal/resources/argus/instance
 
   resargus-job:
-    needs: [datasources,dsmongodb-flex,dsobject-storage,dspostgres-flex,dsproject,dsargus,dsdata-services,dskubernetes,resargus-instance]
+    needs: [datasources,dskubernetes,dsobject-storage,dsargus,dsdata-services,resargus-instance]
     name: Test argus job Resource
     runs-on: ubuntu-latest
     steps:
@@ -278,7 +278,7 @@ jobs:
           make dummy PATH=stackit/internal/resources/argus/job
 
   resdata-services-credential:
-    needs: [datasources,dsmongodb-flex,dsobject-storage,dspostgres-flex,dsproject,dsargus,dsdata-services,dskubernetes]
+    needs: [datasources,dskubernetes,dsobject-storage,dsargus,dsdata-services]
     name: Test data-services credential Resource
     runs-on: ubuntu-latest
     steps:
@@ -298,7 +298,7 @@ jobs:
           make dummy PATH=stackit/internal/resources/data-services/credential
 
   resdata-services-instance:
-    needs: [datasources,dsmongodb-flex,dsobject-storage,dspostgres-flex,dsproject,dsargus,dsdata-services,dskubernetes,resdata-services-credential]
+    needs: [datasources,dskubernetes,dsobject-storage,dsargus,dsdata-services,resdata-services-credential]
     name: Test data-services instance Resource
     runs-on: ubuntu-latest
     steps:
@@ -318,7 +318,7 @@ jobs:
           make dummy PATH=stackit/internal/resources/data-services/instance
 
   reskubernetes-cluster:
-    needs: [datasources,dsmongodb-flex,dsobject-storage,dspostgres-flex,dsproject,dsargus,dsdata-services,dskubernetes]
+    needs: [datasources,dskubernetes,dsobject-storage,dsargus,dsdata-services]
     name: Test kubernetes cluster Resource
     runs-on: ubuntu-latest
     steps:
@@ -338,7 +338,7 @@ jobs:
           make dummy PATH=stackit/internal/resources/kubernetes/cluster
 
   reskubernetes-project:
-    needs: [datasources,dsmongodb-flex,dsobject-storage,dspostgres-flex,dsproject,dsargus,dsdata-services,dskubernetes,reskubernetes-cluster]
+    needs: [datasources,dskubernetes,dsobject-storage,dsargus,dsdata-services,reskubernetes-cluster]
     name: Test kubernetes project Resource
     runs-on: ubuntu-latest
     steps:
@@ -358,7 +358,7 @@ jobs:
           make dummy PATH=stackit/internal/resources/kubernetes/project
 
   resmongodb-flex-instance:
-    needs: [datasources,dsmongodb-flex,dsobject-storage,dspostgres-flex,dsproject,dsargus,dsdata-services,dskubernetes]
+    needs: [datasources,dskubernetes,dsobject-storage,dsargus,dsdata-services]
     name: Test mongodb-flex instance Resource
     runs-on: ubuntu-latest
     steps:
@@ -378,7 +378,7 @@ jobs:
           make dummy PATH=stackit/internal/resources/mongodb-flex/instance
 
   resobject-storage-bucket:
-    needs: [datasources,dsmongodb-flex,dsobject-storage,dspostgres-flex,dsproject,dsargus,dsdata-services,dskubernetes]
+    needs: [datasources,dskubernetes,dsobject-storage,dsargus,dsdata-services]
     name: Test object-storage bucket Resource
     runs-on: ubuntu-latest
     steps:
@@ -398,7 +398,7 @@ jobs:
           make dummy PATH=stackit/internal/resources/object-storage/bucket
 
   resobject-storage-credential:
-    needs: [datasources,dsmongodb-flex,dsobject-storage,dspostgres-flex,dsproject,dsargus,dsdata-services,dskubernetes,resobject-storage-bucket]
+    needs: [datasources,dskubernetes,dsobject-storage,dsargus,dsdata-services,resobject-storage-bucket]
     name: Test object-storage credential Resource
     runs-on: ubuntu-latest
     steps:
@@ -418,7 +418,7 @@ jobs:
           make dummy PATH=stackit/internal/resources/object-storage/credential
 
   resobject-storage-credentials-group:
-    needs: [datasources,dsmongodb-flex,dsobject-storage,dspostgres-flex,dsproject,dsargus,dsdata-services,dskubernetes,resobject-storage-bucket,resobject-storage-credential]
+    needs: [datasources,dskubernetes,dsobject-storage,dsargus,dsdata-services,resobject-storage-bucket,resobject-storage-credential]
     name: Test object-storage credentials-group Resource
     runs-on: ubuntu-latest
     steps:
@@ -438,7 +438,7 @@ jobs:
           make dummy PATH=stackit/internal/resources/object-storage/credentials-group
 
   resobject-storage-project:
-    needs: [datasources,dsmongodb-flex,dsobject-storage,dspostgres-flex,dsproject,dsargus,dsdata-services,dskubernetes,resobject-storage-bucket,resobject-storage-credential,resobject-storage-credentials-group]
+    needs: [datasources,dskubernetes,dsobject-storage,dsargus,dsdata-services,resobject-storage-bucket,resobject-storage-credential,resobject-storage-credentials-group]
     name: Test object-storage project Resource
     runs-on: ubuntu-latest
     steps:
@@ -458,7 +458,7 @@ jobs:
           make dummy PATH=stackit/internal/resources/object-storage/project
 
   respostgres-flex-instance:
-    needs: [datasources,dsmongodb-flex,dsobject-storage,dspostgres-flex,dsproject,dsargus,dsdata-services,dskubernetes]
+    needs: [datasources,dskubernetes,dsobject-storage,dsargus,dsdata-services]
     name: Test postgres-flex instance Resource
     runs-on: ubuntu-latest
     steps:
@@ -478,7 +478,7 @@ jobs:
           make dummy PATH=stackit/internal/resources/postgres-flex/instance
 
   resproject:
-    needs: [datasources,dsmongodb-flex,dsobject-storage,dspostgres-flex,dsproject,dsargus,dsdata-services,dskubernetes]
+    needs: [datasources,dskubernetes,dsobject-storage,dsargus,dsdata-services]
     name: Test project Resource
     runs-on: ubuntu-latest
     steps:
