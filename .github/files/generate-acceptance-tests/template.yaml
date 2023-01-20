@@ -1,5 +1,3 @@
-# this is a generated file, DO NOT EDIT
-# to generate this file run make pre-commit
 
 name: Acceptance Tests
 on:
