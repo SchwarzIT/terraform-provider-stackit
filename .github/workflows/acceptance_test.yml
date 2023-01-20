@@ -133,6 +133,7 @@ jobs:
       group: ${{ matrix.concurrency }}
     runs-on: ubuntu-latest
     continue-on-error: true
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v3
