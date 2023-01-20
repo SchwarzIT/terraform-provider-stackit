@@ -56,10 +56,14 @@ testacc:
 		STACKIT_CUSTOMER_ACCOUNT_ID="$(STACKIT_CUSTOMER_ACCOUNT_ID)" \
 		go test -p 1 -timeout 99999s -v $(TEST)
 
+dummy:
+	@echo $(TEST)
+
 quality:
 	@goreportcard-cli -v .
 
 pre-commit: docs quality
+	@go run .github/files/generate-acceptance-tests/main.go  
 	@find docs -type f | sort | cat | md5 > .github/files/pre-commit-check/checksum
 	@cat .github/workflows/acceptance_test.yml | md5 >> .github/files/pre-commit-check/checksum
 
@@ -80,4 +84,4 @@ ci-verify: ci-docs
 		exit 1; \
 	fi
 
-.PHONY: all docs testacc ci-verify pre-commit
+.PHONY: all docs testacc ci-verify pre-commit dummy test ci-docs quality preview-docs install build

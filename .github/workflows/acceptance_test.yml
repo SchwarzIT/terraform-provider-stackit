@@ -1,3 +1,8 @@
+# this is a generated file, DO NOT EDIT
+# to generate this file run make pre-commit
+# this is a generated file, DO NOT EDIT
+# to generate this file run make pre-commit
+
 name: Acceptance Tests
 on:
   schedule:
@@ -8,11 +13,14 @@ env:
   ACC_TEST_CI: 1
 
 jobs:
-  test:
+  createproject:
+    name: Create Project
     runs-on: ubuntu-latest
+    outputs:
+      projectID: ${{ steps.create_project.outputs.ACC_TEST_PROJECT_ID }}
     steps:
       - name: Create test project
-        id: create-project
+        id: create_project
         shell: bash
         run: |
           JSON_DATA=$(cat << EOF
@@ -42,10 +50,11 @@ jobs:
           
           ACC_TEST_PROJECT_ID="$(jq -r '.projectId' $HOME/pr.json)"
           echo "ACC_TEST_PROJECT_ID=${ACC_TEST_PROJECT_ID}" >> $GITHUB_ENV
+          echo "ACC_TEST_PROJECT_ID=${ACC_TEST_PROJECT_ID}" >> $GITHUB_OUTPUT
           [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]] && exit 1 || exit 0
 
       - name: Wait project created
-        id: wait-project-active
+        id: wait_project_active
         uses: mydea/action-wait-for-api@v1
         with:
           url: 'https://api.stackit.cloud/resource-management/v2/projects/${{ env.ACC_TEST_PROJECT_ID }}'
@@ -56,25 +65,357 @@ jobs:
           expected-response-field: 'lifecycleState'
           expected-response-field-value: 'ACTIVE'
 
+
+  datasource-argus:
+    strategy:
+      max-parallel: 1
+      matrix:
+        name: [argus instance,argus job]
+        include:
+
+        - name: argus instance
+          path: stackit/internal/data-sources/argus/instance
+
+        - name: argus job
+          path: stackit/internal/data-sources/argus/job
+
+    name: ${{ matrix.name }} data source
+    needs: createproject
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
       - name: Checkout
         uses: actions/checkout@v3
-
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
           go-version: 1.18
+      - name: Test ${{ matrix.name }} Data Source
+        run: |
+          echo $path
+          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
+          make testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
 
-      - name: Test
-        id: acceptance-test
-        run: make testacc ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+  datasource-data-services:
+    strategy:
+      max-parallel: 1
+      matrix:
+        name: [data-services credential,data-services instance]
+        include:
 
+        - name: data-services credential
+          path: stackit/internal/data-sources/data-services/credential
+
+        - name: data-services instance
+          path: stackit/internal/data-sources/data-services/instance
+
+    name: ${{ matrix.name }} data source
+    needs: createproject
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+      - name: Test ${{ matrix.name }} Data Source
+        run: |
+          echo $path
+          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
+          make testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+
+  datasource-kubernetes:
+    strategy:
+      max-parallel: 1
+      matrix:
+        name: [kubernetes cluster,kubernetes project]
+        include:
+
+        - name: kubernetes cluster
+          path: stackit/internal/data-sources/kubernetes/cluster
+
+        - name: kubernetes project
+          path: stackit/internal/data-sources/kubernetes/project
+
+    name: ${{ matrix.name }} data source
+    needs: createproject
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+      - name: Test ${{ matrix.name }} Data Source
+        run: |
+          echo $path
+          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
+          make testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+
+  datasource-object-storage:
+    strategy:
+      max-parallel: 1
+      matrix:
+        name: [object-storage bucket,object-storage credential,object-storage credentials-group,object-storage project]
+        include:
+
+        - name: object-storage bucket
+          path: stackit/internal/data-sources/object-storage/bucket
+
+        - name: object-storage credential
+          path: stackit/internal/data-sources/object-storage/credential
+
+        - name: object-storage credentials-group
+          path: stackit/internal/data-sources/object-storage/credentials-group
+
+        - name: object-storage project
+          path: stackit/internal/data-sources/object-storage/project
+
+    name: ${{ matrix.name }} data source
+    needs: createproject
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+      - name: Test ${{ matrix.name }} Data Source
+        run: |
+          echo $path
+          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
+          make testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+
+  datasources:
+    strategy:
+      matrix:
+        name: [mongodb-flex instance,postgres-flex instance,project]
+        include:
+
+        - name: mongodb-flex instance
+          path: stackit/internal/data-sources/mongodb-flex/instance
+
+        - name: postgres-flex instance
+          path: stackit/internal/data-sources/postgres-flex/instance
+
+        - name: project
+          path: stackit/internal/data-sources/project
+
+    name: ${{ matrix.name }} data source
+    needs: createproject
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        if: always()
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        if: always()
+        with:
+          go-version: 1.18
+      - name: Test ${{ matrix.name }} Data Source
+        if: always()
+        run: |
+          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
+          make testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+
+
+
+  resource-argus:
+    strategy:
+      max-parallel: 1
+      matrix:
+        name: [argus instance,argus job]
+        include:
+
+        - name: argus instance
+          path: stackit/internal/resources/argus/instance
+
+        - name: argus job
+          path: stackit/internal/resources/argus/job
+
+    name: ${{ matrix.name }} resource
+    needs: [createproject,datasource-argus]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout
+        if: always()
+        uses: actions/checkout@v3
+      - name: Set up Go
+        if: always()
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+      - name: Test ${{ matrix.name }} resource
+        if: always()
+        run: |
+          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
+          make testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+
+  resource-data-services:
+    strategy:
+      max-parallel: 1
+      matrix:
+        name: [data-services credential,data-services instance]
+        include:
+
+        - name: data-services credential
+          path: stackit/internal/resources/data-services/credential
+
+        - name: data-services instance
+          path: stackit/internal/resources/data-services/instance
+
+    name: ${{ matrix.name }} resource
+    needs: [createproject,datasource-data-services]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout
+        if: always()
+        uses: actions/checkout@v3
+      - name: Set up Go
+        if: always()
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+      - name: Test ${{ matrix.name }} resource
+        if: always()
+        run: |
+          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
+          make testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+
+  resource-kubernetes:
+    strategy:
+      max-parallel: 1
+      matrix:
+        name: [kubernetes cluster,kubernetes project]
+        include:
+
+        - name: kubernetes cluster
+          path: stackit/internal/resources/kubernetes/cluster
+
+        - name: kubernetes project
+          path: stackit/internal/resources/kubernetes/project
+
+    name: ${{ matrix.name }} resource
+    needs: [createproject,datasource-kubernetes]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout
+        if: always()
+        uses: actions/checkout@v3
+      - name: Set up Go
+        if: always()
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+      - name: Test ${{ matrix.name }} resource
+        if: always()
+        run: |
+          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
+          make testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+
+  resource-object-storage:
+    strategy:
+      max-parallel: 1
+      matrix:
+        name: [object-storage bucket,object-storage credential,object-storage credentials-group,object-storage project]
+        include:
+
+        - name: object-storage bucket
+          path: stackit/internal/resources/object-storage/bucket
+
+        - name: object-storage credential
+          path: stackit/internal/resources/object-storage/credential
+
+        - name: object-storage credentials-group
+          path: stackit/internal/resources/object-storage/credentials-group
+
+        - name: object-storage project
+          path: stackit/internal/resources/object-storage/project
+
+    name: ${{ matrix.name }} resource
+    needs: [createproject,datasource-object-storage]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout
+        if: always()
+        uses: actions/checkout@v3
+      - name: Set up Go
+        if: always()
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+      - name: Test ${{ matrix.name }} resource
+        if: always()
+        run: |
+          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
+          make testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+
+  resources:
+    strategy:
+      matrix:
+        name: [mongodb-flex instance,postgres-flex instance,project]
+        include:
+
+        - name: mongodb-flex instance
+          path: stackit/internal/resources/mongodb-flex/instance
+
+        - name: postgres-flex instance
+          path: stackit/internal/resources/postgres-flex/instance
+
+        - name: project
+          path: stackit/internal/resources/project
+
+    name: ${{ matrix.name }} resource
+    needs: [createproject,datasources]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        if: always()
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        if: always()
+        with:
+          go-version: 1.18
+      - name: Test ${{ matrix.name }} resource
+        if: always()
+        run: |
+          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
+          make testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+
+
+
+  deleteproject:
+    name: Delete Project
+    runs-on: ubuntu-latest
+    needs: [createproject,resources,resource-argus,resource-data-services,resource-kubernetes,resource-object-storage]
+    if: ${{ always() }}
+    steps:
+      - name: Prepare deletion
+        id: prep_deletion
+        if: always()
+        shell: bash
+        run: |
+          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
       - name: Delete test project
-        id: delete-project
+        id: delete_project
         if: always()
         shell: bash
         run:   |
           [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]] && exit 0
-          
+          echo "Deleting project ID: ${ACC_TEST_PROJECT_ID}"
           curl --location --request DELETE 'https://api.stackit.cloud/resource-management/v2/projects/${{ env.ACC_TEST_PROJECT_ID }}' \
             --header 'Accept: application/json' \
             --header 'Authorization: Bearer ${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}'
