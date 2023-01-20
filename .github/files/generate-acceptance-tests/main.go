@@ -90,26 +90,26 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
 	s := ""
 	needs := map[string][]string{}
 	nextNeeds := []string{}
-	for i, key := range sortedglobalKeys {
+	for _, key := range sortedglobalKeys {
 		if _, ok := needs[key]; !ok {
 			needs[key] = []string{}
 		}
-		for j, name := range sortedKeys {
+		for _, name := range sortedKeys {
 			if !strings.HasPrefix(name, key) {
 				continue
 			}
 			id := prefix + strings.ReplaceAll(name, " ", "-")
 			needsstr := strings.Join(needs[key], ",")
 			if len(needsstr) > 0 {
-				needsstr = "," + needsstr
+				needsstr = "[createproject," + needsstr + "]"
+			} else {
+				needsstr = "createproject"
 			}
-			jobID := fmt.Sprintf(`%s%d%d`, prefix, i, j)
-			nextNeeds = append(nextNeeds, jobID)
+			nextNeeds = append(nextNeeds, id)
 			s = s + fmt.Sprintf(`
 	%s:
-    needs: [createproject%s]
+    needs: %s
     name: %s
-    id: %s
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -126,7 +126,7 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
         shell: bash
         run: |
           make dummy PATH=%s
-`, jobID, needsstr, name, id, name, keyAndPathMap[name],
+`, id, needsstr, name, name, keyAndPathMap[name],
 			)
 			needs[key] = append(needs[key], id)
 		}

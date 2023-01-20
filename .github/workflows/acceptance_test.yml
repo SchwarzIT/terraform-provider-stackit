@@ -68,10 +68,9 @@ jobs:
 
 
 
-	ds00:
-    needs: [createproject]
+	dsargus-instance:
+    needs: createproject
     name: argus instance
-    id: dsargus-instance
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -89,10 +88,9 @@ jobs:
         run: |
           make dummy PATH=stackit/internal/data-sources/argus/instance
 
-	ds01:
+	dsargus-job:
     needs: [createproject,dsargus-instance]
     name: argus job
-    id: dsargus-job
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -110,10 +108,9 @@ jobs:
         run: |
           make dummy PATH=stackit/internal/data-sources/argus/job
 
-	ds12:
-    needs: [createproject]
+	dsdata-services-credential:
+    needs: createproject
     name: data-services credential
-    id: dsdata-services-credential
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -131,10 +128,9 @@ jobs:
         run: |
           make dummy PATH=stackit/internal/data-sources/data-services/credential
 
-	ds13:
+	dsdata-services-instance:
     needs: [createproject,dsdata-services-credential]
     name: data-services instance
-    id: dsdata-services-instance
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -152,10 +148,9 @@ jobs:
         run: |
           make dummy PATH=stackit/internal/data-sources/data-services/instance
 
-	ds24:
-    needs: [createproject]
+	dskubernetes-cluster:
+    needs: createproject
     name: kubernetes cluster
-    id: dskubernetes-cluster
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -173,10 +168,9 @@ jobs:
         run: |
           make dummy PATH=stackit/internal/data-sources/kubernetes/cluster
 
-	ds25:
+	dskubernetes-project:
     needs: [createproject,dskubernetes-cluster]
     name: kubernetes project
-    id: dskubernetes-project
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -194,10 +188,9 @@ jobs:
         run: |
           make dummy PATH=stackit/internal/data-sources/kubernetes/project
 
-	ds36:
-    needs: [createproject]
+	dsmongodb-flex-instance:
+    needs: createproject
     name: mongodb-flex instance
-    id: dsmongodb-flex-instance
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -215,10 +208,9 @@ jobs:
         run: |
           make dummy PATH=stackit/internal/data-sources/mongodb-flex/instance
 
-	ds47:
-    needs: [createproject]
+	dsobject-storage-bucket:
+    needs: createproject
     name: object-storage bucket
-    id: dsobject-storage-bucket
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -236,10 +228,9 @@ jobs:
         run: |
           make dummy PATH=stackit/internal/data-sources/object-storage/bucket
 
-	ds48:
+	dsobject-storage-credential:
     needs: [createproject,dsobject-storage-bucket]
     name: object-storage credential
-    id: dsobject-storage-credential
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -257,10 +248,9 @@ jobs:
         run: |
           make dummy PATH=stackit/internal/data-sources/object-storage/credential
 
-	ds49:
+	dsobject-storage-credentials-group:
     needs: [createproject,dsobject-storage-bucket,dsobject-storage-credential]
     name: object-storage credentials-group
-    id: dsobject-storage-credentials-group
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -278,10 +268,9 @@ jobs:
         run: |
           make dummy PATH=stackit/internal/data-sources/object-storage/credentials-group
 
-	ds410:
+	dsobject-storage-project:
     needs: [createproject,dsobject-storage-bucket,dsobject-storage-credential,dsobject-storage-credentials-group]
     name: object-storage project
-    id: dsobject-storage-project
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -299,10 +288,9 @@ jobs:
         run: |
           make dummy PATH=stackit/internal/data-sources/object-storage/project
 
-	ds511:
-    needs: [createproject]
+	dspostgres-flex-instance:
+    needs: createproject
     name: postgres-flex instance
-    id: dspostgres-flex-instance
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -320,10 +308,9 @@ jobs:
         run: |
           make dummy PATH=stackit/internal/data-sources/postgres-flex/instance
 
-	ds612:
-    needs: [createproject]
+	dsproject:
+    needs: createproject
     name: project
-    id: dsproject
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
