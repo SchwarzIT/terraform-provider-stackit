@@ -71,10 +71,10 @@ ci-verify: ci-docs
 		rm .github/files/pre-commit-check/checksum-check; \
 		echo "files are identical";  \
 	else \
-		echo "expected:"
-		cat .github/files/pre-commit-check/checksum
-		echo "got:"
-		cat .github/files/pre-commit-check/checksum-check
+		echo "expected:"; \
+		cat .github/files/pre-commit-check/checksum; \
+		echo "got:"; \
+		cat .github/files/pre-commit-check/checksum-check; \
 		rm .github/files/pre-commit-check/checksum-check; \
 		echo "incorrect checksum. please run 'make pre-commit'"; flag=$(true); \
 		exit 1; \
