@@ -65,14 +65,82 @@ jobs:
           expected-response-field: 'lifecycleState'
           expected-response-field-value: 'ACTIVE'
 
-      # - name: Checkout
-      #   uses: actions/checkout@v3
 
-      # - name: Set up Go
-      #   uses: actions/setup-go@v3
-      #   with:
-      #     go-version: 1.18
+  datasourcestest:
+    needs: [createproject]
+    strategy:
+      matrix:
+        name:
+          - argus instance
+          - argus job
+          - data-services credential
+          - data-services instance
+          - kubernetes cluster
+          - kubernetes project
+          - mongodb-flex instance
+          - object-storage bucket
+          - object-storage credential
+          - object-storage credentials-group
+          - object-storage project
+          - postgres-flex instance
+          - project        
+        include:
+          - name: argus instance
+            path: stackit/internal/data-sources/argus/instance
+            concurrency: argus
+          - name: argus job
+            path: stackit/internal/data-sources/argus/job
+            concurrency: argus
+          - name: data-services credential
+            path: stackit/internal/data-sources/data-services/credential
+            concurrency: data-services
+          - name: data-services instance
+            path: stackit/internal/data-sources/data-services/instance
+            concurrency: data-services
+          - name: kubernetes cluster
+            path: stackit/internal/data-sources/kubernetes/cluster
+            concurrency: kubernetes
+          - name: kubernetes project
+            path: stackit/internal/data-sources/kubernetes/project
+            concurrency: kubernetes
+          - name: mongodb-flex instance
+            path: stackit/internal/data-sources/mongodb-flex/instance
+            concurrency: mongodb-flex
+          - name: object-storage bucket
+            path: stackit/internal/data-sources/object-storage/bucket
+            concurrency: object-storage
+          - name: object-storage credential
+            path: stackit/internal/data-sources/object-storage/credential
+            concurrency: object-storage
+          - name: object-storage credentials-group
+            path: stackit/internal/data-sources/object-storage/credentials-group
+            concurrency: object-storage
+          - name: object-storage project
+            path: stackit/internal/data-sources/object-storage/project
+            concurrency: object-storage
+          - name: postgres-flex instance
+            path: stackit/internal/data-sources/postgres-flex/instance
+            concurrency: postgres-flex
+          - name: project
+            path: stackit/internal/data-sources/project
+            concurrency: project
 
+    name: ${{ matrix.name }}
+    concurrency: ${{ matrix.concurrency }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+      - name: Prepare environment
+        shell: bash
+        run: |
+          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
+      - name: Test ${{ matrix.name }} Data Source
+        shell: bash
+        run: make testaccdummy PATH=${{ matrix.path }}
       # - name: Test
       #   id: acceptance-test
       #   run: make testacc ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
@@ -80,13 +148,13 @@ jobs:
   deleteproject:
     name: Delete Project
     runs-on: ubuntu-latest
-    needs: [createproject]
+    needs: [datasourcestest]
     steps:
       - name: Prepare deletion
         id: prep_deletion
         if: always()
         shell: bash
-        run:   |
+        run: |
           echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
       - name: Delete test project
         id: delete_project

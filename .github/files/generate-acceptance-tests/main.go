@@ -30,7 +30,7 @@ func main() {
 					return nil
 				}
 				globalKeysRes[sl[3]] = nil
-				rk = append(rk, key)
+				dsk = append(dsk, key)
 				sds[key] = strings.Join(sl[:len(sl)-1], "/")
 			}
 			if strings.HasPrefix(path, "stackit/internal/resources") && strings.HasSuffix(path, "_test.go") {
@@ -40,7 +40,7 @@ func main() {
 					return nil
 				}
 				globalKeysDS[sl[3]] = nil
-				dsk = append(rk, key)
+				rk = append(rk, key)
 				sr[key] = strings.Join(sl[:len(sl)-1], "/")
 			}
 			return nil
@@ -64,11 +64,11 @@ func main() {
 	sort.Strings(rk)
 	sort.Strings(dsk)
 
-	fmt.Println("found resources:")
-	printOutcome(sortedGlobalKeysRes, rk, sr)
+	// fmt.Println("found resources:")
+	// printOutcome(sortedGlobalKeysRes, rk, sr)
 
-	fmt.Println("\nfound data sources:")
-	printOutcome(sortedGlobalKeysDS, dsk, sds)
+	// fmt.Println("\nfound data sources:")
+	// printOutcome(sortedGlobalKeysDS, dsk, sds)
 
 	s := "# this is a generated file, DO NOT EDIT\n# to generate this file run make pre-commit\n"
 	data, err := ioutil.ReadFile(".github/files/generate-acceptance-tests/template.yaml")
@@ -76,30 +76,25 @@ func main() {
 		fmt.Println(err)
 	}
 	sData := string(data)
+
+	sData = strings.Replace(sData, "__data_sources_names__", "          - "+strings.Join(dsk, "\n          - "), 1)
+	sData = strings.Replace(sData, "__data_sources_include__", printOutcome(sortedGlobalKeysDS, dsk, sds), 1)
+
 	err = ioutil.WriteFile(".github/workflows/acceptance_test.yml", []byte(s+sData), 0644)
 	if err != nil {
 		fmt.Println(err)
 	}
 }
 
-func printOutcome(sortedglobalKeys []string, sortedKeys []string, keyAndPathMap map[string]string) {
+func printOutcome(sortedglobalKeys []string, sortedKeys []string, keyAndPathMap map[string]string) string {
+	s := ""
 	for _, key := range sortedglobalKeys {
-		fmt.Printf("- name: %s", key)
-		parts := false
 		for _, v := range sortedKeys {
-			if v == key {
-				fmt.Printf("\n  path:%s\n\n", keyAndPathMap[v])
-				break
-			}
 			if !strings.HasPrefix(v, key) {
 				continue
 			}
-			if !parts {
-				fmt.Printf("\n  parts:\n")
-				parts = true
-			}
-			fmt.Printf("  - name: %s\n    path:%s\n\n", v, keyAndPathMap[v])
-
+			s = s + fmt.Sprintf("          - name: %s\n            path: %s\n            concurrency: %s\n", v, keyAndPathMap[v], key)
 		}
 	}
+	return s
 }
