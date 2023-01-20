@@ -55,5 +55,20 @@ quality:
 	@goreportcard-cli -v .
 
 pre-commit: docs quality
+	@find docs -type f -exec md5 {} \; | sort -k 2 | md5 > .github/files/pre-commit-check/checksum
+	@cat .github/workflows/acceptance_test.yml | md5 >> .github/files/pre-commit-check/checksum
 
-.PHONY: all docs testacc
+ci-verify: docs quality
+	@find docs -type f -exec md5 {} \; | sort -k 2 | md5 > .github/files/pre-commit-check/checksum-check
+	@cat .github/workflows/acceptance_test.yml | md5 >> .github/files/pre-commit-check/checksum-check
+	@flag=$(false)
+	@if cmp -s ".github/files/pre-commit-check/checksum-check" ".github/files/pre-commit-check/checksum"; then \
+		rm .github/files/pre-commit-check/checksum-check; \
+		echo "files are identical";  \
+	else \
+		rm .github/files/pre-commit-check/checksum-check; \
+		echo "incorrect checksum. please run 'make pre-commit'"; flag=$(true); \
+		exit 1; \
+	fi
+
+.PHONY: all docs testacc ci-verify pre-commit
