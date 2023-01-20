@@ -67,8 +67,103 @@ jobs:
           expected-response-field-value: 'ACTIVE'
 
 
+  dsargus:
+    strategy:
+    max-parallel: 1
+    matrix:
+      name: [argus instance,argus job]
+    include:
+
+    - name: argus instance
+      path: stackit/internal/data-sources/argus/instance
+
+    - name: argus job
+      path: stackit/internal/data-sources/argus/job
+
+    name: ${{ matrix.name }}
+    needs: createproject
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+      - name: Prepare environment
+        shell: bash
+        run: |
+          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
+      - name: Test ${{ matrix.name }} Data Source
+        shell: bash
+        run: |
+          make dummy PATH=${{ matrix.path }}
+
+  dsdata-services:
+    strategy:
+    max-parallel: 1
+    matrix:
+      name: [data-services credential,data-services instance]
+    include:
+
+    - name: data-services credential
+      path: stackit/internal/data-sources/data-services/credential
+
+    - name: data-services instance
+      path: stackit/internal/data-sources/data-services/instance
+
+    name: ${{ matrix.name }}
+    needs: createproject
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+      - name: Prepare environment
+        shell: bash
+        run: |
+          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
+      - name: Test ${{ matrix.name }} Data Source
+        shell: bash
+        run: |
+          make dummy PATH=${{ matrix.path }}
+
+  dskubernetes:
+    strategy:
+    max-parallel: 1
+    matrix:
+      name: [kubernetes cluster,kubernetes project]
+    include:
+
+    - name: kubernetes cluster
+      path: stackit/internal/data-sources/kubernetes/cluster
+
+    - name: kubernetes project
+      path: stackit/internal/data-sources/kubernetes/project
+
+    name: ${{ matrix.name }}
+    needs: createproject
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+      - name: Prepare environment
+        shell: bash
+        run: |
+          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
+      - name: Test ${{ matrix.name }} Data Source
+        shell: bash
+        run: |
+          make dummy PATH=${{ matrix.path }}
+
   dsobject-storage:
-    needs: [createproject]
     strategy:
     max-parallel: 1
     matrix:
@@ -106,107 +201,7 @@ jobs:
         run: |
           make dummy PATH=${{ matrix.path }}
 
-  dsargus:
-    needs: [createproject]
-    strategy:
-    max-parallel: 1
-    matrix:
-      name: [argus instance,argus job]
-    include:
-
-    - name: argus instance
-      path: stackit/internal/data-sources/argus/instance
-
-    - name: argus job
-      path: stackit/internal/data-sources/argus/job
-
-    name: ${{ matrix.name }}
-    needs: createproject
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.18
-      - name: Prepare environment
-        shell: bash
-        run: |
-          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
-      - name: Test ${{ matrix.name }} Data Source
-        shell: bash
-        run: |
-          make dummy PATH=${{ matrix.path }}
-
-  dsdata-services:
-    needs: [createproject]
-    strategy:
-    max-parallel: 1
-    matrix:
-      name: [data-services credential,data-services instance]
-    include:
-
-    - name: data-services credential
-      path: stackit/internal/data-sources/data-services/credential
-
-    - name: data-services instance
-      path: stackit/internal/data-sources/data-services/instance
-
-    name: ${{ matrix.name }}
-    needs: createproject
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.18
-      - name: Prepare environment
-        shell: bash
-        run: |
-          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
-      - name: Test ${{ matrix.name }} Data Source
-        shell: bash
-        run: |
-          make dummy PATH=${{ matrix.path }}
-
-  dskubernetes:
-    needs: [createproject]
-    strategy:
-    max-parallel: 1
-    matrix:
-      name: [kubernetes cluster,kubernetes project]
-    include:
-
-    - name: kubernetes cluster
-      path: stackit/internal/data-sources/kubernetes/cluster
-
-    - name: kubernetes project
-      path: stackit/internal/data-sources/kubernetes/project
-
-    name: ${{ matrix.name }}
-    needs: createproject
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.18
-      - name: Prepare environment
-        shell: bash
-        run: |
-          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
-      - name: Test ${{ matrix.name }} Data Source
-        shell: bash
-        run: |
-          make dummy PATH=${{ matrix.path }}
-
   datasources:
-    needs: [createproject]
     strategy:
     matrix:
       name: [postgres-flex instance,project,mongodb-flex instance]
@@ -243,7 +238,7 @@ jobs:
 
 
   resargus-instance:
-    needs: [object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex]
+    needs: [postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,object-storage,object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex]
     name: Test argus instance Resource
     runs-on: ubuntu-latest
     steps:
@@ -263,7 +258,7 @@ jobs:
           make dummy PATH=stackit/internal/resources/argus/instance
 
   resargus-job:
-    needs: [object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,resargus-instance]
+    needs: [postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,object-storage,object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,resargus-instance]
     name: Test argus job Resource
     runs-on: ubuntu-latest
     steps:
@@ -283,7 +278,7 @@ jobs:
           make dummy PATH=stackit/internal/resources/argus/job
 
   resdata-services-credential:
-    needs: [object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex]
+    needs: [postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,object-storage,object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex]
     name: Test data-services credential Resource
     runs-on: ubuntu-latest
     steps:
@@ -303,7 +298,7 @@ jobs:
           make dummy PATH=stackit/internal/resources/data-services/credential
 
   resdata-services-instance:
-    needs: [object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,resdata-services-credential]
+    needs: [postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,object-storage,object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,resdata-services-credential]
     name: Test data-services instance Resource
     runs-on: ubuntu-latest
     steps:
@@ -323,7 +318,7 @@ jobs:
           make dummy PATH=stackit/internal/resources/data-services/instance
 
   reskubernetes-cluster:
-    needs: [object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex]
+    needs: [postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,object-storage,object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex]
     name: Test kubernetes cluster Resource
     runs-on: ubuntu-latest
     steps:
@@ -343,7 +338,7 @@ jobs:
           make dummy PATH=stackit/internal/resources/kubernetes/cluster
 
   reskubernetes-project:
-    needs: [object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,reskubernetes-cluster]
+    needs: [postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,object-storage,object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,reskubernetes-cluster]
     name: Test kubernetes project Resource
     runs-on: ubuntu-latest
     steps:
@@ -363,7 +358,7 @@ jobs:
           make dummy PATH=stackit/internal/resources/kubernetes/project
 
   resmongodb-flex-instance:
-    needs: [object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex]
+    needs: [postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,object-storage,object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex]
     name: Test mongodb-flex instance Resource
     runs-on: ubuntu-latest
     steps:
@@ -383,7 +378,7 @@ jobs:
           make dummy PATH=stackit/internal/resources/mongodb-flex/instance
 
   resobject-storage-bucket:
-    needs: [object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex]
+    needs: [postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,object-storage,object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex]
     name: Test object-storage bucket Resource
     runs-on: ubuntu-latest
     steps:
@@ -403,7 +398,7 @@ jobs:
           make dummy PATH=stackit/internal/resources/object-storage/bucket
 
   resobject-storage-credential:
-    needs: [object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,resobject-storage-bucket]
+    needs: [postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,object-storage,object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,resobject-storage-bucket]
     name: Test object-storage credential Resource
     runs-on: ubuntu-latest
     steps:
@@ -423,7 +418,7 @@ jobs:
           make dummy PATH=stackit/internal/resources/object-storage/credential
 
   resobject-storage-credentials-group:
-    needs: [object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,resobject-storage-bucket,resobject-storage-credential]
+    needs: [postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,object-storage,object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,resobject-storage-bucket,resobject-storage-credential]
     name: Test object-storage credentials-group Resource
     runs-on: ubuntu-latest
     steps:
@@ -443,7 +438,7 @@ jobs:
           make dummy PATH=stackit/internal/resources/object-storage/credentials-group
 
   resobject-storage-project:
-    needs: [object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,resobject-storage-bucket,resobject-storage-credential,resobject-storage-credentials-group]
+    needs: [postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,object-storage,object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,resobject-storage-bucket,resobject-storage-credential,resobject-storage-credentials-group]
     name: Test object-storage project Resource
     runs-on: ubuntu-latest
     steps:
@@ -463,7 +458,7 @@ jobs:
           make dummy PATH=stackit/internal/resources/object-storage/project
 
   respostgres-flex-instance:
-    needs: [object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex]
+    needs: [postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,object-storage,object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex]
     name: Test postgres-flex instance Resource
     runs-on: ubuntu-latest
     steps:
@@ -483,7 +478,7 @@ jobs:
           make dummy PATH=stackit/internal/resources/postgres-flex/instance
 
   resproject:
-    needs: [object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex]
+    needs: [postgres-flex,project,argus,data-services,kubernetes,mongodb-flex,object-storage,object-storage,postgres-flex,project,argus,data-services,kubernetes,mongodb-flex]
     name: Test project Resource
     runs-on: ubuntu-latest
     steps:

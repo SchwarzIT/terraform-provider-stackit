@@ -121,7 +121,6 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
 		}
 		s = s + fmt.Sprintf(`
   %s%s:
-    needs: [createproject]
     strategy:
     max-parallel: 1
     matrix:
@@ -170,7 +169,6 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
 
 	s = s + fmt.Sprintf(`
   datasources:
-    needs: [createproject]
     strategy:
     matrix:
       name: [%s]
