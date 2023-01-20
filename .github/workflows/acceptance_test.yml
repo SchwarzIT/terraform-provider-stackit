@@ -92,7 +92,7 @@ jobs:
           go-version: 1.18
       - name: Test ${{ matrix.name }} Data Source
         run: |
-          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}"
+          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
           make testacc PATH="${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
 
   datasource-data-services:
@@ -121,7 +121,7 @@ jobs:
           go-version: 1.18
       - name: Test ${{ matrix.name }} Data Source
         run: |
-          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}"
+          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
           make testacc PATH="${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
 
   datasource-kubernetes:
@@ -150,7 +150,7 @@ jobs:
           go-version: 1.18
       - name: Test ${{ matrix.name }} Data Source
         run: |
-          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}"
+          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
           make testacc PATH="${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
 
   datasource-object-storage:
@@ -185,7 +185,7 @@ jobs:
           go-version: 1.18
       - name: Test ${{ matrix.name }} Data Source
         run: |
-          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}"
+          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
           make testacc PATH="${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
 
   datasources:
@@ -216,7 +216,7 @@ jobs:
           go-version: 1.18
       - name: Test ${{ matrix.name }} Data Source
         run: |
-          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}"
+          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
           make testacc PATH="${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
 
 
@@ -247,7 +247,7 @@ jobs:
           go-version: 1.18
       - name: Test ${{ matrix.name }} Data Source
         run: |
-          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}"
+          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
           make testacc PATH="${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
 
   resource-data-services:
@@ -276,7 +276,7 @@ jobs:
           go-version: 1.18
       - name: Test ${{ matrix.name }} Data Source
         run: |
-          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}"
+          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
           make testacc PATH="${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
 
   resource-kubernetes:
@@ -305,7 +305,7 @@ jobs:
           go-version: 1.18
       - name: Test ${{ matrix.name }} Data Source
         run: |
-          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}"
+          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
           make testacc PATH="${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
 
   resource-object-storage:
@@ -340,7 +340,7 @@ jobs:
           go-version: 1.18
       - name: Test ${{ matrix.name }} Data Source
         run: |
-          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}"
+          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
           make testacc PATH="${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
 
   resources:
@@ -371,7 +371,7 @@ jobs:
           go-version: 1.18
       - name: Test ${{ matrix.name }} Data Source
         run: |
-          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}"
+          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
           make testacc PATH="${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
 
 
