@@ -77,8 +77,8 @@ func main() {
 	}
 	sData := string(data)
 
-	sData = strings.Replace(sData, "__data_sources_names__", "          - "+strings.Join(dsk, "\n          - "), 1)
-	sData = strings.Replace(sData, "__data_sources_include__", printOutcome(sortedGlobalKeysDS, dsk, sds, "ds"), 1)
+	dsstr, _ := printDataSourceOutcome(sortedGlobalKeysDS, dsk, sds, "ds")
+	sData = strings.Replace(sData, "__data_sources__", dsstr, 1)
 
 	err = ioutil.WriteFile(".github/workflows/acceptance_test.yml", []byte(s+sData), 0644)
 	if err != nil {
@@ -86,21 +86,51 @@ func main() {
 	}
 }
 
-func printOutcome(sortedglobalKeys []string, sortedKeys []string, keyAndPathMap map[string]string, prefix string) string {
+func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAndPathMap map[string]string, prefix string) (string, []string) {
 	s := ""
 	needs := map[string][]string{}
-	for _, key := range sortedglobalKeys {
+	nextNeeds := []string{}
+	for i, key := range sortedglobalKeys {
 		if _, ok := needs[key]; !ok {
 			needs[key] = []string{}
 		}
-		for _, v := range sortedKeys {
-			if !strings.HasPrefix(v, key) {
+		for j, name := range sortedKeys {
+			if !strings.HasPrefix(name, key) {
 				continue
 			}
-			id := prefix + strings.ReplaceAll(v, " ", "-")
-			s = s + fmt.Sprintf("          - name: %s\n            id: %s\n            path: %s\n            needs: [%s]\n", v, id, keyAndPathMap[v], strings.Join(needs[key], ","))
+			id := prefix + strings.ReplaceAll(name, " ", "-")
+			needsstr := strings.Join(needs[key], ",")
+			if len(needsstr) > 0 {
+				needsstr = "," + needsstr
+			}
+			jobID := fmt.Sprintf(`%s%d%d`, prefix, i, j)
+			nextNeeds = append(nextNeeds, jobID)
+			s = s + fmt.Sprintf(`
+	%s:
+    needs: [createproject%s]
+    name: %s
+    id: %s
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+      - name: Prepare environment
+        shell: bash
+        run: |
+          echo "ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}" >> $GITHUB_ENV
+      - name: Test %s Data Source
+        shell: bash
+        run: |
+          make dummy PATH=%s
+`, jobID, needsstr, name, id, name, keyAndPathMap[name],
+			)
 			needs[key] = append(needs[key], id)
 		}
 	}
-	return s
+	return s, nextNeeds
+
 }
