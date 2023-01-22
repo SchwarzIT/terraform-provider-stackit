@@ -145,7 +145,7 @@ func (r Resource) createUser(ctx context.Context, plan *Instance, d *diag.Diagno
 	username := "stackit"
 	database := "stackit"
 
-	for maxTries := 10; maxTries > -1; maxTries-- {
+	for maxTries := 10; maxTries >= 0; maxTries-- {
 		c := r.client.PostgresFlex
 		body := users.CreateUserJSONRequestBody{
 			Database: &database,
@@ -159,13 +159,9 @@ func (r Resource) createUser(ctx context.Context, plan *Instance, d *diag.Diagno
 		if (res.StatusCode() == http.StatusNotFound ||
 			res.StatusCode() == http.StatusBadRequest) &&
 			maxTries > 0 {
-			time.Sleep(time.Second * 10)
+			time.Sleep(time.Second * 30)
 			continue
 		}
-		if res.HasError != nil {
-			d.AddError("failed create user request", res.HasError.Error())
-		}
-
 		if res.JSON400 != nil {
 			e := ""
 			if res.JSON400.Message != nil {
@@ -180,7 +176,9 @@ func (r Resource) createUser(ctx context.Context, plan *Instance, d *diag.Diagno
 			d.AddError("response is 400", e)
 			return
 		}
-
+		if res.HasError != nil {
+			d.AddError("failed create user request", res.HasError.Error())
+		}
 		if res.JSON200 == nil {
 			d.AddError("response is nil", "api returned nil response")
 			return

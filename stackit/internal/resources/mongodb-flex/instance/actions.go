@@ -89,8 +89,10 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	// set state
-	plan.ID = types.StringValue(*res.JSON202.ID)
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), plan.ID)...)
+
+	instanceID := *res.JSON202.ID
+	plan.ID = types.StringValue(instanceID)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), instanceID)...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project_id"), plan.ProjectID.ValueString())...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -100,21 +102,20 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	// To overcome the bug, we'll wait an initial 30 sec
 	time.Sleep(30 * time.Second)
 
-	process := res.WaitHandler(ctx, r.client.MongoDBFlex.Instance, plan.ProjectID.ValueString(), plan.ID.ValueString())
-	process.SetTimeout(1 * time.Hour)
-	ins, err := process.WaitWithContext(ctx)
-	if err != nil {
+	process := res.WaitHandler(ctx, r.client.MongoDBFlex.Instance, plan.ProjectID.ValueString(), instanceID)
+	if _, err := process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed MongoDB instance creation validation", err.Error())
 		return
 	}
 
-	i, ok := ins.(*instance.InstancesSingleInstance)
-	if !ok {
-		resp.Diagnostics.AddError("failed to parse client response", "response is not of instances.Instance")
+	// read cluster
+	get, err := r.client.MongoDBFlex.Instance.GetWithResponse(ctx, plan.ProjectID.ValueString(), instanceID)
+	if agg := validate.Response(get, err, "JSON200.Item"); agg != nil {
+		resp.Diagnostics.AddError("failed to get instance after create", agg.Error())
 		return
 	}
 
-	if err := applyClientResponse(&plan, i); err != nil {
+	if err := applyClientResponse(&plan, get.JSON200.Item); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
 	}
@@ -291,19 +292,19 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	process := res.WaitHandler(ctx, r.client.MongoDBFlex.Instance, plan.ProjectID.ValueString(), plan.ID.ValueString())
-	ins, err := process.WaitWithContext(ctx)
-	if err != nil {
+	if _, err := process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed MongoDB instance update validation", err.Error())
 		return
 	}
 
-	i, ok := ins.(*instance.InstancesSingleInstance)
-	if !ok {
-		resp.Diagnostics.AddError("failed to parse client response", "response is not of instances.Instance")
+	// read cluster
+	get, err := r.client.MongoDBFlex.Instance.GetWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString())
+	if agg := validate.Response(get, err, "JSON200.Item"); agg != nil {
+		resp.Diagnostics.AddError("failed to get instance after create", agg.Error())
 		return
 	}
 
-	if err := applyClientResponse(&plan, i); err != nil {
+	if err := applyClientResponse(&plan, get.JSON200.Item); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
 	}
