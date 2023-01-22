@@ -2,7 +2,8 @@ package common
 
 const (
 	// Acceptance tests constants
-	ACC_TEST_PROJECT_ID = "a4d42390-a3fb-40a5-bbab-ecc3988f8091"
+	// https://portal.stackit.cloud/projects/8a2d2862-ac85-4084-8144-4c72d92ddcdd/dashboard
+	ACC_TEST_PROJECT_ID = "8a2d2862-ac85-4084-8144-4c72d92ddcdd"
 
 	// errors
 	ERR_UNEXPECTED_EOF = "unexpected EOF"
