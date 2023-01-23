@@ -80,6 +80,7 @@ jobs:
     name: ${{ matrix.name }} data source
     needs: createproject
     runs-on: ubuntu-latest
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -110,6 +111,7 @@ jobs:
     name: ${{ matrix.name }} data source
     needs: createproject
     runs-on: ubuntu-latest
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -140,6 +142,7 @@ jobs:
     name: ${{ matrix.name }} data source
     needs: createproject
     runs-on: ubuntu-latest
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -176,6 +179,7 @@ jobs:
     name: ${{ matrix.name }} data source
     needs: createproject
     runs-on: ubuntu-latest
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -208,6 +212,7 @@ jobs:
     name: ${{ matrix.name }} data source
     needs: createproject
     runs-on: ubuntu-latest
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -239,6 +244,7 @@ jobs:
     name: ${{ matrix.name }} resource
     needs: [createproject,datasource-argus]
     runs-on: ubuntu-latest
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -268,6 +274,7 @@ jobs:
     name: ${{ matrix.name }} resource
     needs: [createproject,datasource-data-services]
     runs-on: ubuntu-latest
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -297,6 +304,7 @@ jobs:
     name: ${{ matrix.name }} resource
     needs: [createproject,datasource-kubernetes]
     runs-on: ubuntu-latest
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -332,6 +340,7 @@ jobs:
     name: ${{ matrix.name }} resource
     needs: [createproject,datasource-object-storage]
     runs-on: ubuntu-latest
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -363,6 +372,7 @@ jobs:
     name: ${{ matrix.name }} resource
     needs: [createproject,datasources]
     runs-on: ubuntu-latest
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3

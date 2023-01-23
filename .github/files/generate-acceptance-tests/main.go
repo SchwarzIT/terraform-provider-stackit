@@ -133,6 +133,7 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
     name: ${{ matrix.name }} data source
     needs: createproject
     runs-on: ubuntu-latest
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -177,6 +178,7 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
     name: ${{ matrix.name }} data source
     needs: createproject
     runs-on: ubuntu-latest
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -238,6 +240,7 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
     name: ${{ matrix.name }} resource
     needs: [createproject,%s%s]
     runs-on: ubuntu-latest
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -282,6 +285,7 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
     name: ${{ matrix.name }} resource
     needs: [createproject,datasources]
     runs-on: ubuntu-latest
+    if: always()
     steps:
       - name: Checkout
         uses: actions/checkout@v3
