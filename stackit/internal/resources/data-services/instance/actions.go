@@ -188,7 +188,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	time.Sleep(1 * time.Minute)
 
 	newRes, err := r.client.Instances.GetWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
-	if agg := validate.Response(newRes, err); agg != nil {
+	if agg := validate.Response(newRes, err, "JSON200"); agg != nil {
 		resp.Diagnostics.AddError("failed to read after update", agg.Error())
 		return
 	}
