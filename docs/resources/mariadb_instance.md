@@ -3,7 +3,8 @@
 page_title: "stackit_mariadb_instance Resource - stackit"
 subcategory: ""
 description: |-
-  Manages
+  Manages MariaDB instances
+  
   
   
   Environment support
@@ -14,15 +15,12 @@ description: |-
   
   
   By default, production is used.To set a custom URL, set an environment variable STACKITmariadbBASEURL
-  
-  
-   instances
-  %!s(MISSING)MariaDB
 ---
 
 # stackit_mariadb_instance (Resource)
 
-Manages <div class="warning" style='color: #69337A; border: solid #E9D8FD 1px; border-radius: 4px; padding-left:0.7em;margin-top:5px;'>
+Manages MariaDB instances
+<div class="warning" style='color: #69337A; border: solid #E9D8FD 1px; border-radius: 4px; padding-left:0.7em;margin-top:5px;'>
 <span>
 <p style='margin-top:1em;'>
 <b>Environment support</b>
@@ -35,8 +33,7 @@ Manages <div class="warning" style='color: #69337A; border: solid #E9D8FD 1px; b
 <small>By default, <a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">production</a> is used.<br />To set a custom URL, set an environment variable STACKIT_mariadb_BASEURL</small>
 </p>
 </span>
-</div> instances
-%!s(MISSING)MariaDB
+</div>
 
 ## Example Usage
 

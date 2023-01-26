@@ -3,7 +3,8 @@
 page_title: "stackit_postgres_credential Resource - stackit"
 subcategory: ""
 description: |-
-  Manages
+  Manages Postgres credentials
+  
   
   
   Environment support
@@ -14,15 +15,12 @@ description: |-
   
   
   By default, production is used.To set a custom URL, set an environment variable STACKITpostgresqlBASEURL
-  
-  
-   credentials
-  %!s(MISSING)Postgres
 ---
 
 # stackit_postgres_credential (Resource)
 
-Manages <div class="warning" style='color: #69337A; border: solid #E9D8FD 1px; border-radius: 4px; padding-left:0.7em;margin-top:5px;'>
+Manages Postgres credentials
+<div class="warning" style='color: #69337A; border: solid #E9D8FD 1px; border-radius: 4px; padding-left:0.7em;margin-top:5px;'>
 <span>
 <p style='margin-top:1em;'>
 <b>Environment support</b>
@@ -35,8 +33,7 @@ Manages <div class="warning" style='color: #69337A; border: solid #E9D8FD 1px; b
 <small>By default, <a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">production</a> is used.<br />To set a custom URL, set an environment variable STACKIT_postgresql_BASEURL</small>
 </p>
 </span>
-</div> credentials
-%!s(MISSING)Postgres
+</div>
 
 ## Example Usage
 
