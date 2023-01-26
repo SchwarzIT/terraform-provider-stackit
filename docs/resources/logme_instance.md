@@ -3,15 +3,40 @@
 page_title: "stackit_logme_instance Resource - stackit"
 subcategory: ""
 description: |-
-  Manages LogMe instances
-  ~> Note: The following URLs are set for each environment: Prod:   https://logme.api.eu01.stackit.cloud    QA:     https://logme.api.eu01.qa.stackit.cloud Dev:    https://logme.api.eu01.dev.stackit.cloud    Override the URLs by setting STACKIT_logme_BASEURL environment variable
+  Manages
+  
+  
+  Environment support
+  
+  Productionhttps://logme.api.eu01.stackit.cloud
+  QAhttps://logme.api.eu01.qa.stackit.cloud
+  Devhttps://logme.api.eu01.dev.stackit.cloud
+  
+  
+  By default, production is used.To set a custom URL, set an environment variable STACKITlogmeBASEURL
+  
+  
+   instances
+  %!s(MISSING)LogMe
 ---
 
 # stackit_logme_instance (Resource)
 
-Manages LogMe instances
-
-~> **Note:** The following URLs are set for each environment:<br />	Prod: 	`https://logme.api.eu01.stackit.cloud`<br />	QA:		`https://logme.api.eu01.qa.stackit.cloud`<br />	Dev:	`https://logme.api.eu01.dev.stackit.cloud`<br />	Override the URLs by setting `STACKIT_logme_BASEURL` environment variable
+Manages <div class="warning" style='color: #69337A; border: solid #E9D8FD 1px; border-radius: 4px; padding-left:0.7em;margin-top:5px;'>
+<span>
+<p style='margin-top:1em;'>
+<b>Environment support</b>
+<table style='border-collapse: separate; margin:0;'>
+<tr><td style='width: 100px'>Production</td><td>https://logme.api.eu01.stackit.cloud<td></tr>
+<tr><td>QA</td><td>https://logme.api.eu01.qa.stackit.cloud<td></tr>
+<tr><td>Dev</td><td>https://logme.api.eu01.dev.stackit.cloud<td></tr>
+</table>
+<br />
+<small>By default, <a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">production</a> is used.<br />To set a custom URL, set an environment variable STACKIT_logme_BASEURL</small>
+</p>
+</span>
+</div> instances
+%!s(MISSING)LogMe
 
 ## Example Usage
 

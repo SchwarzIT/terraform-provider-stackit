@@ -3,15 +3,40 @@
 page_title: "stackit_elasticsearch_instance Resource - stackit"
 subcategory: ""
 description: |-
-  Manages ElasticSearch instances
-  ~> Note: The following URLs are set for each environment: Prod:   https://elasticsearch.api.eu01.stackit.cloud    QA:     https://elasticsearch.api.eu01.qa.stackit.cloud Dev:    https://elasticsearch.api.eu01.dev.stackit.cloud    Override the URLs by setting STACKIT_elasticsearch_BASEURL environment variable
+  Manages
+  
+  
+  Environment support
+  
+  Productionhttps://elasticsearch.api.eu01.stackit.cloud
+  QAhttps://elasticsearch.api.eu01.qa.stackit.cloud
+  Devhttps://elasticsearch.api.eu01.dev.stackit.cloud
+  
+  
+  By default, production is used.To set a custom URL, set an environment variable STACKITelasticsearchBASEURL
+  
+  
+   instances
+  %!s(MISSING)ElasticSearch
 ---
 
 # stackit_elasticsearch_instance (Resource)
 
-Manages ElasticSearch instances
-
-~> **Note:** The following URLs are set for each environment:<br />	Prod: 	`https://elasticsearch.api.eu01.stackit.cloud`<br />	QA:		`https://elasticsearch.api.eu01.qa.stackit.cloud`<br />	Dev:	`https://elasticsearch.api.eu01.dev.stackit.cloud`<br />	Override the URLs by setting `STACKIT_elasticsearch_BASEURL` environment variable
+Manages <div class="warning" style='color: #69337A; border: solid #E9D8FD 1px; border-radius: 4px; padding-left:0.7em;margin-top:5px;'>
+<span>
+<p style='margin-top:1em;'>
+<b>Environment support</b>
+<table style='border-collapse: separate; margin:0;'>
+<tr><td style='width: 100px'>Production</td><td>https://elasticsearch.api.eu01.stackit.cloud<td></tr>
+<tr><td>QA</td><td>https://elasticsearch.api.eu01.qa.stackit.cloud<td></tr>
+<tr><td>Dev</td><td>https://elasticsearch.api.eu01.dev.stackit.cloud<td></tr>
+</table>
+<br />
+<small>By default, <a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">production</a> is used.<br />To set a custom URL, set an environment variable STACKIT_elasticsearch_BASEURL</small>
+</p>
+</span>
+</div> instances
+%!s(MISSING)ElasticSearch
 
 ## Example Usage
 
