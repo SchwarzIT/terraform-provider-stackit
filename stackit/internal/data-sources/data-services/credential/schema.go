@@ -18,6 +18,7 @@ type Credential struct {
 	InstanceID      types.String `tfsdk:"instance_id"`
 	Host            types.String `tfsdk:"host"`
 	Hosts           types.List   `tfsdk:"hosts"`
+	DatabaseName    types.String `tfsdk:"database_name"`
 	Username        types.String `tfsdk:"username"`
 	Password        types.String `tfsdk:"password"`
 	Port            types.Int64  `tfsdk:"port"`
@@ -57,6 +58,11 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 			"hosts": schema.ListAttribute{
 				Description: "Credential hosts",
 				ElementType: types.StringType,
+				Computed:    true,
+			},
+
+			"database_name": schema.StringAttribute{
+				Description: "Database name",
 				Computed:    true,
 			},
 

@@ -46,7 +46,9 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 		}
 		config.Hosts = types.ListValueMust(types.StringType, h)
 	}
-	config.Username = types.StringValue(i.Raw.Credentials.Name)
+
+	config.DatabaseName = types.StringValue(i.Raw.Credentials.Name)
+	config.Username = types.StringValue(i.Raw.Credentials.Username)
 	config.Password = types.StringValue(i.Raw.Credentials.Password)
 	config.Port = types.Int64Value(int64(i.Raw.Credentials.Port))
 	config.SyslogDrainURL = types.StringValue(i.Raw.SyslogDrainUrl)

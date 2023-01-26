@@ -20,7 +20,9 @@ func (r Resource) applyClientResponse(ctx context.Context, c *Credential, cgr *c
 		}
 		c.Hosts = types.ListValueMust(types.StringType, h)
 	}
-	c.Username = types.StringValue(cgr.Raw.Credentials.Name)
+
+	c.DatabaseName = types.StringValue(cgr.Raw.Credentials.Name)
+	c.Username = types.StringValue(cgr.Raw.Credentials.Username)
 	c.Password = types.StringValue(cgr.Raw.Credentials.Password)
 	c.Port = types.Int64Value(int64(cgr.Raw.Credentials.Port))
 	c.SyslogDrainURL = types.StringValue(cgr.Raw.SyslogDrainUrl)

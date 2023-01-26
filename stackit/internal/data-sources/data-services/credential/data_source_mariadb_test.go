@@ -38,6 +38,7 @@ func TestAcc_DataSourceMariaDBCredentialJob(t *testing.T) {
 					resource.TestCheckTypeSetElemAttrPair("stackit_mariadb_credential.example", "instance_id", "data.stackit_mariadb_credential.example", "instance_id"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_mariadb_credential.example", "id", "data.stackit_mariadb_credential.example", "id"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_mariadb_credential.example", "host", "data.stackit_mariadb_credential.example", "host"),
+					resource.TestCheckTypeSetElemAttrPair("stackit_mariadb_credential.example", "database_name", "data.stackit_mariadb_credential.example", "database_name"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_mariadb_credential.example", "username", "data.stackit_mariadb_credential.example", "username"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_mariadb_credential.example", "password", "data.stackit_mariadb_credential.example", "password"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_mariadb_credential.example", "port", "data.stackit_mariadb_credential.example", "port"),

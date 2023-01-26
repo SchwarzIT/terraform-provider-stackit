@@ -20,6 +20,7 @@ type Credential struct {
 	InstanceID      types.String `tfsdk:"instance_id"`
 	Host            types.String `tfsdk:"host"`
 	Hosts           types.List   `tfsdk:"hosts"`
+	DatabaseName    types.String `tfsdk:"database_name"`
 	Username        types.String `tfsdk:"username"`
 	Password        types.String `tfsdk:"password"`
 	Port            types.Int64  `tfsdk:"port"`
@@ -71,6 +72,11 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 
 			"username": schema.StringAttribute{
 				Description: "Credential username",
+				Computed:    true,
+			},
+
+			"database_name": schema.StringAttribute{
+				Description: "Database name",
 				Computed:    true,
 			},
 
