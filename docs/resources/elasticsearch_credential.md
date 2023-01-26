@@ -4,11 +4,14 @@ page_title: "stackit_elasticsearch_credential Resource - stackit"
 subcategory: ""
 description: |-
   Manages ElasticSearch credentials
+  ~> Note: The following URLs are set for each environment: Prod:   https://elasticsearch.api.eu01.stackit.cloud    QA:     https://elasticsearch.api.eu01.qa.stackit.cloud Dev:    https://elasticsearch.api.eu01.dev.stackit.cloud    Override the URLs by setting STACKIT_elasticsearch_BASEURL environment variable
 ---
 
 # stackit_elasticsearch_credential (Resource)
 
 Manages ElasticSearch credentials
+
+~> **Note:** The following URLs are set for each environment:<br />	Prod: 	`https://elasticsearch.api.eu01.stackit.cloud`<br />	QA:		`https://elasticsearch.api.eu01.qa.stackit.cloud`<br />	Dev:	`https://elasticsearch.api.eu01.dev.stackit.cloud`<br />	Override the URLs by setting `STACKIT_elasticsearch_BASEURL` environment variable
 
 ## Example Usage
 
@@ -35,6 +38,7 @@ resource "stackit_elasticsearch_credential" "example" {
 
 ### Read-Only
 
+- `database_name` (String) Database name
 - `host` (String) Credential host
 - `hosts` (List of String) Credential hosts
 - `id` (String) Specifies the resource ID

@@ -4,11 +4,14 @@ page_title: "stackit_rabbitmq_credential Resource - stackit"
 subcategory: ""
 description: |-
   Manages RabbitMQ credentials
+  ~> Note: The following URLs are set for each environment: Prod:   https://rabbitmq.api.eu01.stackit.cloud QA:     https://rabbitmq.api.eu01.qa.stackit.cloud  Dev:    https://rabbitmq.api.eu01.dev.stackit.cloud Override the URLs by setting STACKIT_rabbitmq_BASEURL environment variable
 ---
 
 # stackit_rabbitmq_credential (Resource)
 
 Manages RabbitMQ credentials
+
+~> **Note:** The following URLs are set for each environment:<br />	Prod: 	`https://rabbitmq.api.eu01.stackit.cloud`<br />	QA:		`https://rabbitmq.api.eu01.qa.stackit.cloud`<br />	Dev:	`https://rabbitmq.api.eu01.dev.stackit.cloud`<br />	Override the URLs by setting `STACKIT_rabbitmq_BASEURL` environment variable
 
 ## Example Usage
 
@@ -36,6 +39,7 @@ resource "stackit_rabbitmq_credential" "example" {
 
 ### Read-Only
 
+- `database_name` (String) Database name
 - `host` (String) Credential host
 - `hosts` (List of String) Credential hosts
 - `id` (String) Specifies the resource ID

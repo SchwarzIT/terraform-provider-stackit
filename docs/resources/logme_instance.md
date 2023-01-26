@@ -4,14 +4,14 @@ page_title: "stackit_logme_instance Resource - stackit"
 subcategory: ""
 description: |-
   Manages LogMe instances
-  ~> Note: LogMe API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
+  ~> Note: The following URLs are set for each environment: Prod:   https://logme.api.eu01.stackit.cloud    QA:     https://logme.api.eu01.qa.stackit.cloud Dev:    https://logme.api.eu01.dev.stackit.cloud    Override the URLs by setting STACKIT_logme_BASEURL environment variable
 ---
 
 # stackit_logme_instance (Resource)
 
 Manages LogMe instances
 
-~> **Note:** LogMe API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
+~> **Note:** The following URLs are set for each environment:<br />	Prod: 	`https://logme.api.eu01.stackit.cloud`<br />	QA:		`https://logme.api.eu01.qa.stackit.cloud`<br />	Dev:	`https://logme.api.eu01.dev.stackit.cloud`<br />	Override the URLs by setting `STACKIT_logme_BASEURL` environment variable
 
 ## Example Usage
 

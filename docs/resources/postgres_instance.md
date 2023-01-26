@@ -4,14 +4,14 @@ page_title: "stackit_postgres_instance Resource - stackit"
 subcategory: ""
 description: |-
   Manages Postgres instances
-  ~> Note: Postgres API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
+  ~> Note: The following URLs are set for each environment: Prod:   https://postgresql.api.eu01.stackit.cloud   QA:     https://postgresql.api.eu01.qa.stackit.cloud    Dev:    https://postgresql.api.eu01.dev.stackit.cloud   Override the URLs by setting STACKIT_postgresql_BASEURL environment variable
 ---
 
 # stackit_postgres_instance (Resource)
 
 Manages Postgres instances
 
-~> **Note:** Postgres API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
+~> **Note:** The following URLs are set for each environment:<br />	Prod: 	`https://postgresql.api.eu01.stackit.cloud`<br />	QA:		`https://postgresql.api.eu01.qa.stackit.cloud`<br />	Dev:	`https://postgresql.api.eu01.dev.stackit.cloud`<br />	Override the URLs by setting `STACKIT_postgresql_BASEURL` environment variable
 
 ## Example Usage
 

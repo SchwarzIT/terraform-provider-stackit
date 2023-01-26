@@ -32,7 +32,18 @@ type Credential struct {
 // Schema returns the terraform schema structure
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: fmt.Sprintf("Manages %s credentials", r.service.Display()),
+		Description: fmt.Sprintf("Manages %s credentials\n\n"+
+			"~> **Note:** The following URLs are set for each environment:<br />"+
+			"	Prod: 	`%s`<br />"+
+			"	QA:		`%s`<br />"+
+			"	Dev:	`%s`<br />"+
+			"	Override the URLs by setting `%s` environment variable",
+			r.service.Display(),
+			r.urls.Prod,
+			r.urls.QA,
+			r.urls.Dev,
+			r.urls.OverrideWith,
+		),
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "Specifies the resource ID",

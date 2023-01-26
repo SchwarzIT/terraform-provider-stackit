@@ -4,11 +4,14 @@ page_title: "stackit_redis_credential Resource - stackit"
 subcategory: ""
 description: |-
   Manages Redis credentials
+  ~> Note: The following URLs are set for each environment: Prod:   https://redis.api.eu01.stackit.cloud    QA:     https://redis.api.eu01.qa.stackit.cloud Dev:    https://redis.api.eu01.dev.stackit.cloud    Override the URLs by setting STACKIT_redis_BASEURL environment variable
 ---
 
 # stackit_redis_credential (Resource)
 
 Manages Redis credentials
+
+~> **Note:** The following URLs are set for each environment:<br />	Prod: 	`https://redis.api.eu01.stackit.cloud`<br />	QA:		`https://redis.api.eu01.qa.stackit.cloud`<br />	Dev:	`https://redis.api.eu01.dev.stackit.cloud`<br />	Override the URLs by setting `STACKIT_redis_BASEURL` environment variable
 
 ## Example Usage
 
@@ -33,6 +36,7 @@ resource "stackit_redis_credential" "example" {
 
 ### Read-Only
 
+- `database_name` (String) Database name
 - `host` (String) Credential host
 - `hosts` (List of String) Credential hosts
 - `id` (String) Specifies the resource ID

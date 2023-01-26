@@ -42,6 +42,7 @@ data "stackit_elasticsearch_credential" "example" {
 
 ### Read-Only
 
+- `database_name` (String) Database name
 - `host` (String) Credential host
 - `hosts` (List of String) Credential hosts
 - `password` (String) Credential password

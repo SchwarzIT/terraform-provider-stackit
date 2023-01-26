@@ -4,14 +4,14 @@ page_title: "stackit_rabbitmq_instance Resource - stackit"
 subcategory: ""
 description: |-
   Manages RabbitMQ instances
-  ~> Note: RabbitMQ API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
+  ~> Note: The following URLs are set for each environment: Prod:   https://rabbitmq.api.eu01.stackit.cloud QA:     https://rabbitmq.api.eu01.qa.stackit.cloud  Dev:    https://rabbitmq.api.eu01.dev.stackit.cloud Override the URLs by setting STACKIT_rabbitmq_BASEURL environment variable
 ---
 
 # stackit_rabbitmq_instance (Resource)
 
 Manages RabbitMQ instances
 
-~> **Note:** RabbitMQ API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
+~> **Note:** The following URLs are set for each environment:<br />	Prod: 	`https://rabbitmq.api.eu01.stackit.cloud`<br />	QA:		`https://rabbitmq.api.eu01.qa.stackit.cloud`<br />	Dev:	`https://rabbitmq.api.eu01.dev.stackit.cloud`<br />	Override the URLs by setting `STACKIT_rabbitmq_BASEURL` environment variable
 
 ## Example Usage
 

@@ -33,10 +33,18 @@ type Instance struct {
 // Schema returns the terraform schema structure
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: fmt.Sprintf(`Manages %s instances
-
-~> **Note:** %s API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
-		`, r.service.Display(), r.service.Display()),
+		MarkdownDescription: fmt.Sprintf("Manages %s instances\n\n"+
+			"~> **Note:** The following URLs are set for each environment:<br />"+
+			"	Prod: 	`%s`<br />"+
+			"	QA:		`%s`<br />"+
+			"	Dev:	`%s`<br />"+
+			"	Override the URLs by setting `%s` environment variable",
+			r.service.Display(),
+			r.urls.Prod,
+			r.urls.QA,
+			r.urls.Dev,
+			r.urls.OverrideWith,
+		),
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "Specifies the resource ID",

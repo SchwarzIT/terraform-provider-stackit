@@ -6,6 +6,7 @@ import (
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
 	dataservices "github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/generated"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 )
 
@@ -40,38 +41,57 @@ func (s ResourceService) Display() string {
 
 // NewElasticSearch returns a new configured resource
 func NewElasticSearch() resource.Resource {
-	return &Resource{service: ElasticSearch}
+	return &Resource{
+		service: ElasticSearch,
+		urls:    dataservices.GetBaseURLs(dataservices.ElasticSearch),
+	}
 }
 
 // NewLogMe returns a new configured resource
 func NewLogMe() resource.Resource {
-	return &Resource{service: LogMe}
+	return &Resource{
+		service: LogMe,
+		urls:    dataservices.GetBaseURLs(dataservices.LogMe),
+	}
 }
 
 // NewMariaDB returns a new configured resource
 func NewMariaDB() resource.Resource {
-	return &Resource{service: MariaDB}
+	return &Resource{
+		service: MariaDB,
+		urls:    dataservices.GetBaseURLs(dataservices.MariaDB),
+	}
 }
 
 // NewPostgres returns a new configured resource
 func NewPostgres() resource.Resource {
-	return &Resource{service: Postgres}
+	return &Resource{
+		service: Postgres,
+		urls:    dataservices.GetBaseURLs(dataservices.PostgresDB),
+	}
 }
 
 // NewRedis returns a new configured resource
 func NewRedis() resource.Resource {
-	return &Resource{service: Redis}
+	return &Resource{
+		service: Redis,
+		urls:    dataservices.GetBaseURLs(dataservices.Redis),
+	}
 }
 
 // NewRabbitMQ returns a new configured resource
 func NewRabbitMQ() resource.Resource {
-	return &Resource{service: RabbitMQ}
+	return &Resource{
+		service: RabbitMQ,
+		urls:    dataservices.GetBaseURLs(dataservices.RabbitMQ),
+	}
 }
 
 // Resource is the exported resource
 type Resource struct {
 	client  *dataservices.ClientWithResponses
 	service ResourceService
+	urls    urls.ByEnvs
 }
 
 var _ = resource.Resource(&Resource{})
@@ -98,7 +118,10 @@ func (r *Resource) Configure(ctx context.Context, req resource.ConfigureRequest,
 
 		return
 	}
+	r.setClient(c)
+}
 
+func (r *Resource) setClient(c *client.Client) {
 	switch r.service {
 	case ElasticSearch:
 		r.client = c.ElasticSearch
