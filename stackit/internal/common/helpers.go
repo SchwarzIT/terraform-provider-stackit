@@ -49,21 +49,15 @@ func GetAcceptanceTestsProjectID() string {
 
 func EnvironmentInfo(u urls.ByEnvs) string {
 	return fmt.Sprintf(`
+<br />
 
-<div class="warning" style='color: #69337A; border: solid #E9D8FD 1px; border-radius: 4px; padding-left:0.7em;margin-top:5px;'>
-<span>
-<p style='margin-top:1em;'>
-<b>Environment support</b>
-<table style='border-collapse: separate; margin:0;'>
+-> __Environment support__<br /><table style='border-collapse: separate; border-spacing: 5px; margin-top:-20px; margin-left: 24px; font-size: smaller;'>
 <tr><td style='width: 100px'>Production</td><td>%s<td></tr>
 <tr><td>QA</td><td>%s<td></tr>
 <tr><td>Dev</td><td>%s<td></tr>
-</table>
-<br />
-<small><a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">By default</a>, production is used.<br />To set a custom URL, set an environment variable %s</small>
-</p>
-</span>
-</div>`,
+</table><br />
+<small style='margin-left: 24px; margin-top: -5px; display: inline-block;'><a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">By default</a>, production is used.<br />To set a custom URL, set an environment variable <code>%s</code></small>
+	`,
 		u.Prod, u.QA, u.Dev, u.OverrideWith,
 	)
 }

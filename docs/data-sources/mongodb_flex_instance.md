@@ -4,41 +4,27 @@ page_title: "stackit_mongodb_flex_instance Data Source - stackit"
 subcategory: ""
 description: |-
   Data source for MongoDB Flex instance
-  <div class="warning" style='color: #69337A; border: solid #E9D8FD 1px; border-radius: 4px; padding-left:0.7em;margin-top:5px;'>
-  <span>
-  <p style='margin-top:1em;'>
-  <b>Environment support</b>
-  <table style='border-collapse: separate; margin:0;'>
-  <tr><td style='width: 100px'>Production</td><td>https://api.stackit.cloud/mongodb/v1/<td></tr>
-  <tr><td>QA</td><td>https://api-qa.stackit.cloud/mongodb/v1/<td></tr>
-  <tr><td>Dev</td><td>https://api-dev.stackit.cloud/mongodb/v1/<td></tr>
-  </table>
-  <br />
-  <small><a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">By default</a>, production is used.<br />To set a custom URL, set an environment variable STACKIT_MONGODB_FLEX_BASEURL</small>
-  </p>
-  </span>
-  </div>
+  
+  -> Environment support
+  Productionhttps://api.stackit.cloud/mongodb/v1/
+  QAhttps://api-qa.stackit.cloud/mongodb/v1/
+  Devhttps://api-dev.stackit.cloud/mongodb/v1/
+  
+  By default, production is used.To set a custom URL, set an environment variable STACKITMONGODBFLEX_BASEURL
 ---
 
 # stackit_mongodb_flex_instance (Data Source)
 
 Data source for MongoDB Flex instance
 
+<br />
 
-<div class="warning" style='color: #69337A; border: solid #E9D8FD 1px; border-radius: 4px; padding-left:0.7em;margin-top:5px;'>
-<span>
-<p style='margin-top:1em;'>
-<b>Environment support</b>
-<table style='border-collapse: separate; margin:0;'>
+-> __Environment support__<br /><table style='border-collapse: separate; border-spacing: 5px; margin-top:-20px; margin-left: 24px; font-size: smaller;'>
 <tr><td style='width: 100px'>Production</td><td>https://api.stackit.cloud/mongodb/v1/<td></tr>
 <tr><td>QA</td><td>https://api-qa.stackit.cloud/mongodb/v1/<td></tr>
 <tr><td>Dev</td><td>https://api-dev.stackit.cloud/mongodb/v1/<td></tr>
-</table>
-<br />
-<small><a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">By default</a>, production is used.<br />To set a custom URL, set an environment variable STACKIT_MONGODB_FLEX_BASEURL</small>
-</p>
-</span>
-</div>
+</table><br />
+<small style='margin-left: 24px; margin-top: -5px; display: inline-block;'><a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">By default</a>, production is used.<br />To set a custom URL, set an environment variable <code>STACKIT_MONGODB_FLEX_BASEURL</code></small>
 
 ## Example Usage
 
