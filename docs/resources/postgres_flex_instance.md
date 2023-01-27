@@ -20,9 +20,9 @@ Manages Postgres Flex instances
 <br />
 
 -> __Environment support__<br /><table style='border-collapse: separate; border-spacing: 5px; margin-top:-20px; margin-left: 24px; font-size: smaller;'>
-<tr><td style='width: 100px; background: transparent; border: none;'>Production</td><td style='background: transparent; border: none;'>https://postgres-flex-service.api.eu01.stackit.cloud</td></tr>
-<tr><td style='background: transparent; border: none;'>QA</td><td style='background: transparent; border: none;'>https://postgres-flex-service.api.eu01.qa.stackit.cloud</td></tr>
-<tr><td style='background: transparent; border: none;'>Dev</td><td style='background: transparent; border: none;'>https://postgres-flex-service.api.eu01.dev.stackit.cloud</td></tr>
+<tr><td style='width: 100px; background: #fbfcff; border: none;'>Production</td><td style='background: #fbfcff; border: none;'>https://postgres-flex-service.api.eu01.stackit.cloud</td></tr>
+<tr><td style='background: #fbfcff; border: none;'>QA</td><td style='background: #fbfcff; border: none;'>https://postgres-flex-service.api.eu01.qa.stackit.cloud</td></tr>
+<tr><td style='background: #fbfcff; border: none;'>Dev</td><td style='background: #fbfcff; border: none;'>https://postgres-flex-service.api.eu01.dev.stackit.cloud</td></tr>
 </table><br />
 <small style='margin-left: 24px; margin-top: -5px; display: inline-block;'><a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">By default</a>, production is used.<br />To set a custom URL, set an environment variable <code>STACKIT_POSTGRES_FLEX_BASEURL</code></small>
 
