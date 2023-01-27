@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
+	mongodbflex "github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/generated"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 )
 
@@ -16,6 +18,7 @@ func New() datasource.DataSource {
 // DataSource is the exported data source
 type DataSource struct {
 	client *client.Client
+	urls   urls.ByEnvs
 }
 
 var _ = datasource.DataSource(&DataSource{})
@@ -44,4 +47,5 @@ func (d *DataSource) Configure(ctx context.Context, req datasource.ConfigureRequ
 	}
 
 	d.client = client
+	d.urls = mongodbflex.BaseURLs
 }

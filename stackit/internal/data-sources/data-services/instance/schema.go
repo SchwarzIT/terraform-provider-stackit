@@ -32,7 +32,7 @@ type Instance struct {
 // Schema returns the terraform schema structure
 func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: fmt.Sprintf("Data source for %s instances\n%s",
+		MarkdownDescription: fmt.Sprintf("Data source for %s instances\n%s",
 			d.service.Display(),
 			common.EnvironmentInfo(d.urls),
 		),

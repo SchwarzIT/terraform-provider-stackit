@@ -2,7 +2,9 @@ package instance
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -26,10 +28,9 @@ type Instance struct {
 // Schema returns the terraform schema structure
 func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: `Data source for Postgres Flex instance
-		
-~> **Note:** Postgres Flex is in 'alpha' stage in STACKIT
-`,
+		MarkdownDescription: fmt.Sprintf("Data source for Postgres Flex instance\n%s",
+			common.EnvironmentInfo(d.urls),
+		),
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "Specifies the resource ID",

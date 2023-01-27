@@ -3,12 +3,37 @@
 page_title: "stackit_project Resource - stackit"
 subcategory: ""
 description: |-
-  Manages projects
+  Manages STACKIT projects
+  
+  
+  
+  Environment support
+  
+  Production
+  QA
+  Dev
+  
+  
+  By default, production is used.To set a custom URL, set an environment variable
 ---
 
 # stackit_project (Resource)
 
-Manages projects
+Manages STACKIT projects
+<div class="warning" style='color: #69337A; border: solid #E9D8FD 1px; border-radius: 4px; padding-left:0.7em;margin-top:5px;'>
+<span>
+<p style='margin-top:1em;'>
+<b>Environment support</b>
+<table style='border-collapse: separate; margin:0;'>
+<tr><td style='width: 100px'>Production</td><td><td></tr>
+<tr><td>QA</td><td><td></tr>
+<tr><td>Dev</td><td><td></tr>
+</table>
+<br />
+<small><a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">By default</a>, production is used.<br />To set a custom URL, set an environment variable </small>
+</p>
+</span>
+</div>
 
 ## Example Usage
 

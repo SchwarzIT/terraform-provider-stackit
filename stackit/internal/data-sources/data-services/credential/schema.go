@@ -31,7 +31,7 @@ type Credential struct {
 // Schema returns the terraform schema structure
 func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: fmt.Sprintf("Manages %s credentials\n%s",
+		MarkdownDescription: fmt.Sprintf("Manages %s credentials\n%s",
 			d.service.Display(),
 			common.EnvironmentInfo(d.urls),
 		),

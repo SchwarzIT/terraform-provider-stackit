@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 )
 
@@ -16,6 +17,7 @@ func New() resource.Resource {
 // Resource is the exported resource
 type Resource struct {
 	client *client.Client
+	urls   urls.ByEnvs
 }
 
 var _ = resource.Resource(&Resource{})
