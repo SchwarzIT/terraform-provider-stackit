@@ -14,7 +14,7 @@ description: |-
   Devhttps://elasticsearch.api.eu01.dev.stackit.cloud
   
   
-  By default, production is used.To set a custom URL, set an environment variable STACKITelasticsearchBASEURL
+  By default, production is used.To set a custom URL, set an environment variable STACKITELASTICSEARCHBASEURL
 ---
 
 # stackit_elasticsearch_instance (Resource)
@@ -30,7 +30,7 @@ Manages ElasticSearch instances
 <tr><td>Dev</td><td>https://elasticsearch.api.eu01.dev.stackit.cloud<td></tr>
 </table>
 <br />
-<small>By default, <a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">production</a> is used.<br />To set a custom URL, set an environment variable STACKIT_elasticsearch_BASEURL</small>
+<small>By default, <a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">production</a> is used.<br />To set a custom URL, set an environment variable STACKIT_ELASTICSEARCH_BASEURL</small>
 </p>
 </span>
 </div>

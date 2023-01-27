@@ -14,7 +14,7 @@ description: |-
   Devhttps://rabbitmq.api.eu01.dev.stackit.cloud
   
   
-  By default, production is used.To set a custom URL, set an environment variable STACKITrabbitmqBASEURL
+  By default, production is used.To set a custom URL, set an environment variable STACKITRABBITMQBASEURL
 ---
 
 # stackit_rabbitmq_credential (Resource)
@@ -30,7 +30,7 @@ Manages RabbitMQ credentials
 <tr><td>Dev</td><td>https://rabbitmq.api.eu01.dev.stackit.cloud<td></tr>
 </table>
 <br />
-<small>By default, <a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">production</a> is used.<br />To set a custom URL, set an environment variable STACKIT_rabbitmq_BASEURL</small>
+<small>By default, <a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">production</a> is used.<br />To set a custom URL, set an environment variable STACKIT_RABBITMQ_BASEURL</small>
 </p>
 </span>
 </div>

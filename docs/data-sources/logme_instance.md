@@ -4,14 +4,36 @@ page_title: "stackit_logme_instance Data Source - stackit"
 subcategory: ""
 description: |-
   Data source for LogMe instances
-  ~> Note: LogMe API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this data source is not ready for production usage.
+  
+  
+  
+  Environment support
+  
+  Productionhttps://logme.api.eu01.stackit.cloud
+  QAhttps://logme.api.eu01.qa.stackit.cloud
+  Devhttps://logme.api.eu01.dev.stackit.cloud
+  
+  
+  By default, production is used.To set a custom URL, set an environment variable STACKITLOGMEBASEURL
 ---
 
 # stackit_logme_instance (Data Source)
 
 Data source for LogMe instances
-
-~> **Note:** LogMe API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this data source is not ready for production usage.
+<div class="warning" style='color: #69337A; border: solid #E9D8FD 1px; border-radius: 4px; padding-left:0.7em;margin-top:5px;'>
+<span>
+<p style='margin-top:1em;'>
+<b>Environment support</b>
+<table style='border-collapse: separate; margin:0;'>
+<tr><td style='width: 100px'>Production</td><td>https://logme.api.eu01.stackit.cloud<td></tr>
+<tr><td>QA</td><td>https://logme.api.eu01.qa.stackit.cloud<td></tr>
+<tr><td>Dev</td><td>https://logme.api.eu01.dev.stackit.cloud<td></tr>
+</table>
+<br />
+<small>By default, <a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">production</a> is used.<br />To set a custom URL, set an environment variable STACKIT_LOGME_BASEURL</small>
+</p>
+</span>
+</div>
 
 ## Example Usage
 

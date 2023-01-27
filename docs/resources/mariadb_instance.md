@@ -14,7 +14,7 @@ description: |-
   Devhttps://mariadb.api.eu01.dev.stackit.cloud
   
   
-  By default, production is used.To set a custom URL, set an environment variable STACKITmariadbBASEURL
+  By default, production is used.To set a custom URL, set an environment variable STACKITMARIADBBASEURL
 ---
 
 # stackit_mariadb_instance (Resource)
@@ -30,7 +30,7 @@ Manages MariaDB instances
 <tr><td>Dev</td><td>https://mariadb.api.eu01.dev.stackit.cloud<td></tr>
 </table>
 <br />
-<small>By default, <a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">production</a> is used.<br />To set a custom URL, set an environment variable STACKIT_mariadb_BASEURL</small>
+<small>By default, <a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">production</a> is used.<br />To set a custom URL, set an environment variable STACKIT_MARIADB_BASEURL</small>
 </p>
 </span>
 </div>

@@ -14,7 +14,7 @@ description: |-
   Devhttps://logme.api.eu01.dev.stackit.cloud
   
   
-  By default, production is used.To set a custom URL, set an environment variable STACKITlogmeBASEURL
+  By default, production is used.To set a custom URL, set an environment variable STACKITLOGMEBASEURL
 ---
 
 # stackit_logme_instance (Resource)
@@ -30,7 +30,7 @@ Manages LogMe instances
 <tr><td>Dev</td><td>https://logme.api.eu01.dev.stackit.cloud<td></tr>
 </table>
 <br />
-<small>By default, <a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">production</a> is used.<br />To set a custom URL, set an environment variable STACKIT_logme_BASEURL</small>
+<small>By default, <a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">production</a> is used.<br />To set a custom URL, set an environment variable STACKIT_LOGME_BASEURL</small>
 </p>
 </span>
 </div>

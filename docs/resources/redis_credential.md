@@ -14,7 +14,7 @@ description: |-
   Devhttps://redis.api.eu01.dev.stackit.cloud
   
   
-  By default, production is used.To set a custom URL, set an environment variable STACKITredisBASEURL
+  By default, production is used.To set a custom URL, set an environment variable STACKITREDISBASEURL
 ---
 
 # stackit_redis_credential (Resource)
@@ -30,7 +30,7 @@ Manages Redis credentials
 <tr><td>Dev</td><td>https://redis.api.eu01.dev.stackit.cloud<td></tr>
 </table>
 <br />
-<small>By default, <a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">production</a> is used.<br />To set a custom URL, set an environment variable STACKIT_redis_BASEURL</small>
+<small>By default, <a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">production</a> is used.<br />To set a custom URL, set an environment variable STACKIT_REDIS_BASEURL</small>
 </p>
 </span>
 </div>

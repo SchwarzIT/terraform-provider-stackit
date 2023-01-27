@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/Masterminds/semver v1.5.0
-	github.com/SchwarzIT/community-stackit-go-client v1.12.8-0.20230126211926-27c2d32e2f98
+	github.com/SchwarzIT/community-stackit-go-client v1.12.8-0.20230127080250-6e75ce04c4d7
 	github.com/hashicorp/terraform-plugin-framework v1.0.1
 	github.com/hashicorp/terraform-plugin-framework-validators v0.9.0
 	github.com/hashicorp/terraform-plugin-go v0.14.2

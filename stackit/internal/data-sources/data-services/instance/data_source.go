@@ -6,6 +6,7 @@ import (
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
 	dataservices "github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/generated"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 )
 
@@ -40,38 +41,57 @@ func (s DataSourceService) Display() string {
 
 // NewElasticSearch returns a new configured resource
 func NewElasticSearch() datasource.DataSource {
-	return &DataSource{service: ElasticSearch}
+	return &DataSource{
+		service: ElasticSearch,
+		urls:    dataservices.GetBaseURLs(dataservices.ElasticSearch),
+	}
 }
 
 // NewLogMe returns a new configured resource
 func NewLogMe() datasource.DataSource {
-	return &DataSource{service: LogMe}
+	return &DataSource{
+		service: LogMe,
+		urls:    dataservices.GetBaseURLs(dataservices.LogMe),
+	}
 }
 
 // NewMariaDB returns a new configured resource
 func NewMariaDB() datasource.DataSource {
-	return &DataSource{service: MariaDB}
+	return &DataSource{
+		service: MariaDB,
+		urls:    dataservices.GetBaseURLs(dataservices.MariaDB),
+	}
 }
 
 // NewPostgres returns a new configured resource
 func NewPostgres() datasource.DataSource {
-	return &DataSource{service: Postgres}
+	return &DataSource{
+		service: Postgres,
+		urls:    dataservices.GetBaseURLs(dataservices.PostgresDB),
+	}
 }
 
 // NewRedis returns a new configured resource
 func NewRedis() datasource.DataSource {
-	return &DataSource{service: Redis}
+	return &DataSource{
+		service: Redis,
+		urls:    dataservices.GetBaseURLs(dataservices.Redis),
+	}
 }
 
 // NewRabbitMQ returns a new configured resource
 func NewRabbitMQ() datasource.DataSource {
-	return &DataSource{service: RabbitMQ}
+	return &DataSource{
+		service: RabbitMQ,
+		urls:    dataservices.GetBaseURLs(dataservices.RabbitMQ),
+	}
 }
 
 // DataSource is the exported data source
 type DataSource struct {
 	client  *dataservices.ClientWithResponses
 	service DataSourceService
+	urls    urls.ByEnvs
 }
 
 var _ = datasource.DataSource(&DataSource{})
