@@ -4,22 +4,27 @@ page_title: "stackit_postgres_instance Resource - stackit"
 subcategory: ""
 description: |-
   Manages Postgres instances
-  
-  
-  
-  Environment support
-  
-  Productionhttps://postgresql.api.eu01.stackit.cloud
-  QAhttps://postgresql.api.eu01.qa.stackit.cloud
-  Devhttps://postgresql.api.eu01.dev.stackit.cloud
-  
-  
-  By default, production is used.To set a custom URL, set an environment variable STACKITPOSTGRESQLBASEURL
+  <div class="warning" style='color: #69337A; border: solid #E9D8FD 1px; border-radius: 4px; padding-left:0.7em;margin-top:5px;'>
+  <span>
+  <p style='margin-top:1em;'>
+  <b>Environment support</b>
+  <table style='border-collapse: separate; margin:0;'>
+  <tr><td style='width: 100px'>Production</td><td>https://postgresql.api.eu01.stackit.cloud<td></tr>
+  <tr><td>QA</td><td>https://postgresql.api.eu01.qa.stackit.cloud<td></tr>
+  <tr><td>Dev</td><td>https://postgresql.api.eu01.dev.stackit.cloud<td></tr>
+  </table>
+  <br />
+  <small><a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">By default</a>, production is used.<br />To set a custom URL, set an environment variable STACKIT_POSTGRESQL_BASEURL</small>
+  </p>
+  </span>
+  </div>
 ---
 
 # stackit_postgres_instance (Resource)
 
 Manages Postgres instances
+
+
 <div class="warning" style='color: #69337A; border: solid #E9D8FD 1px; border-radius: 4px; padding-left:0.7em;margin-top:5px;'>
 <span>
 <p style='margin-top:1em;'>

@@ -4,22 +4,27 @@ page_title: "stackit_rabbitmq_credential Data Source - stackit"
 subcategory: ""
 description: |-
   Manages RabbitMQ credentials
-  
-  
-  
-  Environment support
-  
-  Productionhttps://rabbitmq.api.eu01.stackit.cloud
-  QAhttps://rabbitmq.api.eu01.qa.stackit.cloud
-  Devhttps://rabbitmq.api.eu01.dev.stackit.cloud
-  
-  
-  By default, production is used.To set a custom URL, set an environment variable STACKITRABBITMQBASEURL
+  <div class="warning" style='color: #69337A; border: solid #E9D8FD 1px; border-radius: 4px; padding-left:0.7em;margin-top:5px;'>
+  <span>
+  <p style='margin-top:1em;'>
+  <b>Environment support</b>
+  <table style='border-collapse: separate; margin:0;'>
+  <tr><td style='width: 100px'>Production</td><td>https://rabbitmq.api.eu01.stackit.cloud<td></tr>
+  <tr><td>QA</td><td>https://rabbitmq.api.eu01.qa.stackit.cloud<td></tr>
+  <tr><td>Dev</td><td>https://rabbitmq.api.eu01.dev.stackit.cloud<td></tr>
+  </table>
+  <br />
+  <small><a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">By default</a>, production is used.<br />To set a custom URL, set an environment variable STACKIT_RABBITMQ_BASEURL</small>
+  </p>
+  </span>
+  </div>
 ---
 
 # stackit_rabbitmq_credential (Data Source)
 
 Manages RabbitMQ credentials
+
+
 <div class="warning" style='color: #69337A; border: solid #E9D8FD 1px; border-radius: 4px; padding-left:0.7em;margin-top:5px;'>
 <span>
 <p style='margin-top:1em;'>

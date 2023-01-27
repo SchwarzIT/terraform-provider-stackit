@@ -12,7 +12,9 @@ import (
 
 // New returns a new configured resource
 func New() resource.Resource {
-	return &Resource{}
+	return &Resource{
+		urls: mongodbflex.BaseURLs,
+	}
 }
 
 // Resource is the exported resource
@@ -47,5 +49,4 @@ func (r *Resource) Configure(ctx context.Context, req resource.ConfigureRequest,
 	}
 
 	r.client = c
-	r.urls = mongodbflex.BaseURLs
 }

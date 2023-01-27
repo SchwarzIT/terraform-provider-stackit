@@ -12,7 +12,9 @@ import (
 
 // New returns a new configured data source
 func New() datasource.DataSource {
-	return &DataSource{}
+	return &DataSource{
+		urls: postgresflex.BaseURLs,
+	}
 }
 
 // DataSource is the exported data source
@@ -47,5 +49,4 @@ func (d *DataSource) Configure(ctx context.Context, req datasource.ConfigureRequ
 	}
 
 	d.client = client
-	d.urls = postgresflex.BaseURLs
 }

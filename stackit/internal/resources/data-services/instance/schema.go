@@ -64,9 +64,9 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"plan": schema.StringAttribute{
-				Description: fmt.Sprintf("The %s Plan. Default is `%s`", r.service.Display(), r.getDefaultPlan()),
-				Optional:    true,
-				Computed:    true,
+				MarkdownDescription: fmt.Sprintf("The %s Plan. Default is `%s`", r.service.Display(), r.getDefaultPlan()),
+				Optional:            true,
+				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					modifiers.StringDefault(r.getDefaultPlan()),
 				},
@@ -76,9 +76,9 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Computed:    true,
 			},
 			"version": schema.StringAttribute{
-				Description: fmt.Sprintf("%s version. Default is %s", r.service.Display(), r.getDefaultVersion()),
-				Optional:    true,
-				Computed:    true,
+				MarkdownDescription: fmt.Sprintf("%s version. Default is %s", r.service.Display(), r.getDefaultVersion()),
+				Optional:            true,
+				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 					modifiers.StringDefault(r.getDefaultVersion()),

@@ -48,7 +48,9 @@ func GetAcceptanceTestsProjectID() string {
 }
 
 func EnvironmentInfo(u urls.ByEnvs) string {
-	return fmt.Sprintf(`<div class="warning" style='color: #69337A; border: solid #E9D8FD 1px; border-radius: 4px; padding-left:0.7em;margin-top:5px;'>
+	return fmt.Sprintf(`
+
+<div class="warning" style='color: #69337A; border: solid #E9D8FD 1px; border-radius: 4px; padding-left:0.7em;margin-top:5px;'>
 <span>
 <p style='margin-top:1em;'>
 <b>Environment support</b>

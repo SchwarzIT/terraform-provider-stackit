@@ -5,13 +5,16 @@ import (
 	"fmt"
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
+	argus "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/generated"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 )
 
 // New returns a new configured resource
 func New() resource.Resource {
-	return &Resource{}
+	return &Resource{
+		urls: argus.BaseURLs,
+	}
 }
 
 // Resource is the exported resource
