@@ -4,11 +4,27 @@ page_title: "stackit_object_storage_credentials_group Resource - stackit"
 subcategory: ""
 description: |-
   Manages Object Storage credential groups
+  
+  -> Environment support
+  Productionhttps://api.stackit.cloud/object-storage-api/
+  QAhttps://api-qa.stackit.cloud/object-storage-api/
+  Devhttps://api-dev.stackit.cloud/object-storage-api/
+  
+  By default, production is used.To set a custom URL, set an environment variable STACKITOBJECTSTORAGE_BASEURL
 ---
 
 # stackit_object_storage_credentials_group (Resource)
 
 Manages Object Storage credential groups
+
+<br />
+
+-> __Environment support__<br /><table style='border-collapse: separate; border-spacing: 5px; margin-top:-20px; margin-left: 24px; font-size: smaller;'>
+<tr><td style='width: 100px'>Production</td><td>https://api.stackit.cloud/object-storage-api/<td></tr>
+<tr><td>QA</td><td>https://api-qa.stackit.cloud/object-storage-api/<td></tr>
+<tr><td>Dev</td><td>https://api-dev.stackit.cloud/object-storage-api/<td></tr>
+</table><br />
+<small style='margin-left: 24px; margin-top: -5px; display: inline-block;'><a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">By default</a>, production is used.<br />To set a custom URL, set an environment variable <code>STACKIT_OBJECT_STORAGE_BASEURL</code></small>
 
 ## Example Usage
 

@@ -4,11 +4,27 @@ page_title: "stackit_mariadb_credential Resource - stackit"
 subcategory: ""
 description: |-
   Manages MariaDB credentials
+  
+  -> Environment support
+  Productionhttps://mariadb.api.eu01.stackit.cloud
+  QAhttps://mariadb.api.eu01.qa.stackit.cloud
+  Devhttps://mariadb.api.eu01.dev.stackit.cloud
+  
+  By default, production is used.To set a custom URL, set an environment variable STACKITMARIADBBASEURL
 ---
 
 # stackit_mariadb_credential (Resource)
 
 Manages MariaDB credentials
+
+<br />
+
+-> __Environment support__<br /><table style='border-collapse: separate; border-spacing: 5px; margin-top:-20px; margin-left: 24px; font-size: smaller;'>
+<tr><td style='width: 100px'>Production</td><td>https://mariadb.api.eu01.stackit.cloud<td></tr>
+<tr><td>QA</td><td>https://mariadb.api.eu01.qa.stackit.cloud<td></tr>
+<tr><td>Dev</td><td>https://mariadb.api.eu01.dev.stackit.cloud<td></tr>
+</table><br />
+<small style='margin-left: 24px; margin-top: -5px; display: inline-block;'><a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">By default</a>, production is used.<br />To set a custom URL, set an environment variable <code>STACKIT_MARIADB_BASEURL</code></small>
 
 ## Example Usage
 
@@ -34,6 +50,7 @@ resource "stackit_mariadb_credential" "example" {
 
 ### Read-Only
 
+- `database_name` (String) Database name
 - `host` (String) Credential host
 - `hosts` (List of String) Credential hosts
 - `id` (String) Specifies the resource ID

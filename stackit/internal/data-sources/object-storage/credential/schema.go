@@ -2,7 +2,9 @@ package credential
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -21,7 +23,9 @@ type Credential struct {
 // Schema returns the terraform schema structure
 func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "Data source for Object Storage credentials",
+		MarkdownDescription: fmt.Sprintf("Data source for Object Storage credentials\n%s",
+			common.EnvironmentInfo(d.urls),
+		),
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "the credential ID",

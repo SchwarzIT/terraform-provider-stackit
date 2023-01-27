@@ -4,14 +4,27 @@ page_title: "stackit_postgres_flex_instance Resource - stackit"
 subcategory: ""
 description: |-
   Manages Postgres Flex instances
-  ~> Note: Postgres Flex is in 'alpha' stage in STACKIT
+  
+  -> Environment support
+  Productionhttps://postgres-flex-service.api.eu01.stackit.cloud
+  QAhttps://postgres-flex-service.api.eu01.qa.stackit.cloud
+  Devhttps://postgres-flex-service.api.eu01.dev.stackit.cloud
+  
+  By default, production is used.To set a custom URL, set an environment variable STACKITPOSTGRESFLEX_BASEURL
 ---
 
 # stackit_postgres_flex_instance (Resource)
 
 Manages Postgres Flex instances
-		
-~> **Note:** Postgres Flex is in 'alpha' stage in STACKIT
+
+<br />
+
+-> __Environment support__<br /><table style='border-collapse: separate; border-spacing: 5px; margin-top:-20px; margin-left: 24px; font-size: smaller;'>
+<tr><td style='width: 100px'>Production</td><td>https://postgres-flex-service.api.eu01.stackit.cloud<td></tr>
+<tr><td>QA</td><td>https://postgres-flex-service.api.eu01.qa.stackit.cloud<td></tr>
+<tr><td>Dev</td><td>https://postgres-flex-service.api.eu01.dev.stackit.cloud<td></tr>
+</table><br />
+<small style='margin-left: 24px; margin-top: -5px; display: inline-block;'><a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">By default</a>, production is used.<br />To set a custom URL, set an environment variable <code>STACKIT_POSTGRES_FLEX_BASEURL</code></small>
 
 ## Example Usage
 

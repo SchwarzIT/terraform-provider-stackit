@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -31,10 +32,10 @@ type Instance struct {
 // Schema returns the terraform schema structure
 func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: fmt.Sprintf(`Data source for %s instances
-
-~> **Note:** %s API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this data source is not ready for production usage.		
-		`, d.service.Display(), d.service.Display()),
+		MarkdownDescription: fmt.Sprintf("Data source for %s instances\n%s",
+			d.service.Display(),
+			common.EnvironmentInfo(d.urls),
+		),
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "Specifies the resource ID",

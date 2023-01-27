@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -33,10 +34,10 @@ type Instance struct {
 // Schema returns the terraform schema structure
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: fmt.Sprintf(`Manages %s instances
-
-~> **Note:** %s API (Part of DSA APIs) currently has issues reflecting updates & configuration correctly. Therefore, this resource is not ready for production usage.
-		`, r.service.Display(), r.service.Display()),
+		MarkdownDescription: fmt.Sprintf("Manages %s instances\n%s",
+			r.service.Display(),
+			common.EnvironmentInfo(r.urls),
+		),
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "Specifies the resource ID",
@@ -63,9 +64,9 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"plan": schema.StringAttribute{
-				Description: fmt.Sprintf("The %s Plan. Default is `%s`", r.service.Display(), r.getDefaultPlan()),
-				Optional:    true,
-				Computed:    true,
+				MarkdownDescription: fmt.Sprintf("The %s Plan. Default is `%s`", r.service.Display(), r.getDefaultPlan()),
+				Optional:            true,
+				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					modifiers.StringDefault(r.getDefaultPlan()),
 				},
@@ -75,9 +76,9 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Computed:    true,
 			},
 			"version": schema.StringAttribute{
-				Description: fmt.Sprintf("%s version. Default is %s", r.service.Display(), r.getDefaultVersion()),
-				Optional:    true,
-				Computed:    true,
+				MarkdownDescription: fmt.Sprintf("%s version. Default is %s", r.service.Display(), r.getDefaultVersion()),
+				Optional:            true,
+				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 					modifiers.StringDefault(r.getDefaultVersion()),

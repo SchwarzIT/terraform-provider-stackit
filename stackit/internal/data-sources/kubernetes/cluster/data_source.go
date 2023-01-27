@@ -5,17 +5,22 @@ import (
 	"fmt"
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
+	kubernetes "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 )
 
 // New returns a new configured data source
 func New() datasource.DataSource {
-	return &DataSource{}
+	return &DataSource{
+		urls: kubernetes.BaseURLs,
+	}
 }
 
 // DataSource is the exported data source
 type DataSource struct {
 	client *client.Client
+	urls   urls.ByEnvs
 }
 
 var _ = datasource.DataSource(&DataSource{})

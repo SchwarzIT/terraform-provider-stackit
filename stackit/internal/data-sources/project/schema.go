@@ -2,7 +2,9 @@ package project
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -20,7 +22,9 @@ type Project struct {
 // Schema returns the terraform schema structure
 func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "Data source for STACKIT projects",
+		MarkdownDescription: fmt.Sprintf("Data source for STACKIT projects\n%s",
+			common.EnvironmentInfo(d.urls),
+		),
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "the project UUID",

@@ -4,14 +4,27 @@ page_title: "stackit_mongodb_flex_instance Data Source - stackit"
 subcategory: ""
 description: |-
   Data source for MongoDB Flex instance
-  ~> Note: MongoDB Flex is in 'beta' stage in STACKIT
+  
+  -> Environment support
+  Productionhttps://api.stackit.cloud/mongodb/v1/
+  QAhttps://api-qa.stackit.cloud/mongodb/v1/
+  Devhttps://api-dev.stackit.cloud/mongodb/v1/
+  
+  By default, production is used.To set a custom URL, set an environment variable STACKITMONGODBFLEX_BASEURL
 ---
 
 # stackit_mongodb_flex_instance (Data Source)
 
 Data source for MongoDB Flex instance
-		
-~> **Note:** MongoDB Flex is in 'beta' stage in STACKIT
+
+<br />
+
+-> __Environment support__<br /><table style='border-collapse: separate; border-spacing: 5px; margin-top:-20px; margin-left: 24px; font-size: smaller;'>
+<tr><td style='width: 100px'>Production</td><td>https://api.stackit.cloud/mongodb/v1/<td></tr>
+<tr><td>QA</td><td>https://api-qa.stackit.cloud/mongodb/v1/<td></tr>
+<tr><td>Dev</td><td>https://api-dev.stackit.cloud/mongodb/v1/<td></tr>
+</table><br />
+<small style='margin-left: 24px; margin-top: -5px; display: inline-block;'><a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">By default</a>, production is used.<br />To set a custom URL, set an environment variable <code>STACKIT_MONGODB_FLEX_BASEURL</code></small>
 
 ## Example Usage
 

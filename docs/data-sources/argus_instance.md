@@ -4,11 +4,27 @@ page_title: "stackit_argus_instance Data Source - stackit"
 subcategory: ""
 description: |-
   Data source for Argus Instances
+  
+  -> Environment support
+  Productionhttps://argus.api.stackit.cloud
+  QAhttps://argus.api.stg.stackit.cloud
+  Devhttps://argus.api.dev.stackit.cloud
+  
+  By default, production is used.To set a custom URL, set an environment variable STACKITARGUSBASEURL
 ---
 
 # stackit_argus_instance (Data Source)
 
 Data source for Argus Instances
+
+<br />
+
+-> __Environment support__<br /><table style='border-collapse: separate; border-spacing: 5px; margin-top:-20px; margin-left: 24px; font-size: smaller;'>
+<tr><td style='width: 100px'>Production</td><td>https://argus.api.stackit.cloud<td></tr>
+<tr><td>QA</td><td>https://argus.api.stg.stackit.cloud<td></tr>
+<tr><td>Dev</td><td>https://argus.api.dev.stackit.cloud<td></tr>
+</table><br />
+<small style='margin-left: 24px; margin-top: -5px; display: inline-block;'><a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">By default</a>, production is used.<br />To set a custom URL, set an environment variable <code>STACKIT_ARGUS_BASEURL</code></small>
 
 ## Example Usage
 

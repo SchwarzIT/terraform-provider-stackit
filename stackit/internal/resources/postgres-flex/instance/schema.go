@@ -2,7 +2,9 @@ package postgresinstance
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -51,10 +53,9 @@ type User struct {
 // Schema returns the terraform schema structure
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: `Manages Postgres Flex instances
-		
-~> **Note:** Postgres Flex is in 'alpha' stage in STACKIT
-`,
+		MarkdownDescription: fmt.Sprintf("Manages Postgres Flex instances\n%s",
+			common.EnvironmentInfo(r.urls),
+		),
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "Specifies the resource ID",

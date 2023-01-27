@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -32,7 +33,10 @@ type Credential struct {
 // Schema returns the terraform schema structure
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: fmt.Sprintf("Manages %s credentials", r.service.Display()),
+		MarkdownDescription: fmt.Sprintf("Manages %s credentials\n%s",
+			r.service.Display(),
+			common.EnvironmentInfo(r.urls),
+		),
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "Specifies the resource ID",

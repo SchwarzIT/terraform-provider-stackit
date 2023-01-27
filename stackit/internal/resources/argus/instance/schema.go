@@ -2,8 +2,10 @@ package instance
 
 import (
 	"context"
+	"fmt"
 	"regexp"
 
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -54,7 +56,9 @@ type Metrics struct {
 // Schema returns the terraform schema structure
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "Manages Argus Instances",
+		MarkdownDescription: fmt.Sprintf("Manages Argus Instances\n%s",
+			common.EnvironmentInfo(r.urls),
+		),
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "Specifies the Argus instance ID",
