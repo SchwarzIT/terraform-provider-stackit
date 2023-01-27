@@ -58,7 +58,7 @@ func EnvironmentInfo(u urls.ByEnvs) string {
 <tr><td>Dev</td><td>%s<td></tr>
 </table>
 <br />
-<small>By default, <a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">production</a> is used.<br />To set a custom URL, set an environment variable %s</small>
+<small><a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">By default</a>, production is used.<br />To set a custom URL, set an environment variable %s</small>
 </p>
 </span>
 </div>`,

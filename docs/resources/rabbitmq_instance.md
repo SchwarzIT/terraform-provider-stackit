@@ -30,7 +30,7 @@ Manages RabbitMQ instances
 <tr><td>Dev</td><td>https://rabbitmq.api.eu01.dev.stackit.cloud<td></tr>
 </table>
 <br />
-<small>By default, <a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">production</a> is used.<br />To set a custom URL, set an environment variable STACKIT_RABBITMQ_BASEURL</small>
+<small><a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">By default</a>, production is used.<br />To set a custom URL, set an environment variable STACKIT_RABBITMQ_BASEURL</small>
 </p>
 </span>
 </div>
