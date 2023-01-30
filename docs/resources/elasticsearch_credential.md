@@ -19,7 +19,7 @@ Manages ElasticSearch credentials
 
 <br />
 
--> __Environment support__<br /><table style='border-collapse: separate; border-spacing: 5px; margin-top:-20px; margin-left: 24px; font-size: smaller;'>
+-> __Environment support__<br /><table style='border-collapse: separate; border-spacing: 0px; margin-top:-20px; margin-left: 24px; font-size: smaller;'>
 <tr><td style='width: 100px; background: #fbfcff; border: none;'>Production</td><td style='background: #fbfcff; border: none;'>https://elasticsearch.api.eu01.stackit.cloud</td></tr>
 <tr><td style='background: #fbfcff; border: none;'>QA</td><td style='background: #fbfcff; border: none;'>https://elasticsearch.api.eu01.qa.stackit.cloud</td></tr>
 <tr><td style='background: #fbfcff; border: none;'>Dev</td><td style='background: #fbfcff; border: none;'>https://elasticsearch.api.eu01.dev.stackit.cloud</td></tr>
