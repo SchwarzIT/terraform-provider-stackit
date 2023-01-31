@@ -208,9 +208,9 @@ func (r Resource) createUser(ctx context.Context, plan *Instance, d *diag.Diagno
 		db := ""
 		if item.Database != nil {
 			db = *item.Database
-			if db == "" {
-				db = database // bypass API issue
-			}
+		}
+		if db == "" {
+			db = database // bypass API issue
 		}
 		pw := ""
 		if item.Password != nil {
