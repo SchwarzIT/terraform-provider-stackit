@@ -17,7 +17,7 @@ const (
 	default_version               = "6.0"
 	default_replicas        int64 = 1
 	default_username              = "stackit"
-	default_backup_schedule       = "0 0/24 * * *"
+	default_backup_schedule       = "0 0 * * *"
 	default_storage_class         = "premium-perf2-mongodb"
 	default_storage_size    int64 = 10
 )
