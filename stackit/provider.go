@@ -17,6 +17,7 @@ import (
 	dataPostgresFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/postgres-flex/instance"
 	dataProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/project"
 
+	resourceArgusCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/credential"
 	resourceArgusInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/instance"
 	resourceArgusJob "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/job"
 	resourceDataServicesCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/data-services/credential"
@@ -99,6 +100,7 @@ func (p *StackitProvider) Metadata(_ context.Context, _ provider.MetadataRequest
 // GetResources - Defines provider resources
 func (p *StackitProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
+		resourceArgusCredential.New,
 		resourceArgusInstance.New,
 		resourceArgusJob.New,
 		resourceDataServicesCredential.NewElasticSearch,

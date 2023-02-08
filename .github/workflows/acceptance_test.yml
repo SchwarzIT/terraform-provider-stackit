@@ -232,8 +232,11 @@ jobs:
       fail-fast: false
       max-parallel: 1
       matrix:
-        name: [argus instance,argus job]
+        name: [argus credential,argus instance,argus job]
         include:
+
+        - name: argus credential
+          path: stackit/internal/resources/argus/credential
 
         - name: argus instance
           path: stackit/internal/resources/argus/instance
