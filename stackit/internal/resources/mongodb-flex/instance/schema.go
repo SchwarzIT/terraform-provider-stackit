@@ -7,6 +7,7 @@ import (
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
@@ -21,6 +22,7 @@ type Instance struct {
 	ID             types.String      `tfsdk:"id"`
 	Name           types.String      `tfsdk:"name"`
 	ProjectID      types.String      `tfsdk:"project_id"`
+	Type           types.String      `tfsdk:"type"`
 	MachineType    types.String      `tfsdk:"machine_type"` // aka FlavorID
 	Version        types.String      `tfsdk:"version"`
 	Replicas       types.Int64       `tfsdk:"replicas"`
@@ -82,8 +84,20 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"machine_type": schema.StringAttribute{
-				Description: "The Machine Type. Available options: `T1.2`, `C1.1`, `G1.1`, `M1.1`, `C1.2`, `G1.2`, `M1.2`, `C1.3`, `G1.3`, `M1.3`, `C1.4`, `G1.4`, `M1.4`, `C1.5`, `G1.5`",
+				Description: "The Machine Type. Available options: `1.1`, `1.2`, `1.4`, `1.8`, `2.4`, `2.8`, `2.16`, `4.8`, `4.16`, `4.32`, `8.16`, `8.32`, `8.64`, `16.32`, `16.64`",
 				Required:    true,
+			},
+			"type": schema.StringAttribute{
+				Description: "The service type. Available options: `Single`, `Replica`, `Sharded`",
+				Optional:    true,
+				Computed:    true,
+				Validators: []validator.String{
+					stringvalidator.OneOf("Single", "Replica", "Sharded"),
+				},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+					modifiers.StringDefault("Single"),
+				},
 			},
 			"version": schema.StringAttribute{
 				Description: "MongoDB version. Version `5.0` and `6.0` are supported. Changing this value requires the resource to be recreated.",

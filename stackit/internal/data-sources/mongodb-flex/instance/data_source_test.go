@@ -21,7 +21,6 @@ func TestAcc_MongoDBFlexInstance(t *testing.T) {
 	}
 
 	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
-	version := "5.0"
 
 	resource.ParallelTest(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){
@@ -30,12 +29,11 @@ func TestAcc_MongoDBFlexInstance(t *testing.T) {
 		Steps: []resource.TestStep{
 			// check minimal configuration
 			{
-				Config: config(name, version),
+				Config: config(name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.stackit_mongodb_flex_instance.example", "name", name),
 					resource.TestCheckResourceAttr("data.stackit_mongodb_flex_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
-					resource.TestCheckResourceAttr("data.stackit_mongodb_flex_instance.example", "version", version),
-					resource.TestCheckResourceAttr("data.stackit_mongodb_flex_instance.example", "machine_type", "C1.1"),
+					resource.TestCheckResourceAttr("data.stackit_mongodb_flex_instance.example", "machine_type", "1.1"),
 					resource.TestCheckResourceAttr("data.stackit_mongodb_flex_instance.example", "replicas", "1"),
 					resource.TestCheckResourceAttr("data.stackit_mongodb_flex_instance.example", "storage.class", "premium-perf2-mongodb"),
 					resource.TestCheckResourceAttr("data.stackit_mongodb_flex_instance.example", "storage.size", "10"),
@@ -51,16 +49,15 @@ func TestAcc_MongoDBFlexInstance(t *testing.T) {
 	})
 }
 
-func config(name, version string) string {
+func config(name string) string {
 	return fmt.Sprintf(`
 	resource "stackit_mongodb_flex_instance" "example" {
 		name         = "%s"
 		project_id   = "%s"
-		machine_type = "C1.1"
-		version 	 = "%s"
-	}
+		machine_type = "1.1"
+	} 
 
-	  data "stackit_mongodb_flex_instance" "example" {
+	data "stackit_mongodb_flex_instance" "example" {
 		depends_on = [stackit_mongodb_flex_instance.example]
 		name       = "%s"
 		project_id = "%s"
@@ -69,7 +66,6 @@ func config(name, version string) string {
 	`,
 		name,
 		common.GetAcceptanceTestsProjectID(),
-		version,
 		name,
 		common.GetAcceptanceTestsProjectID(),
 	)
