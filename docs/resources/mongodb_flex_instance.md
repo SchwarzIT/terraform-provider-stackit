@@ -50,7 +50,6 @@ resource "stackit_mongodb_flex_instance" "example" {
 - `acl` (List of String) Access Control rules to whitelist IP addresses
 - `backup_schedule` (String) Specifies the backup schedule (cron style)
 - `labels` (Map of String) Instance Labels
-- `options` (Map of String) Specifies mongodb instance options
 - `replicas` (Number) Number of replicas (Default is `1`)
 - `storage` (Attributes) A signle `storage` block as defined below. (see [below for nested schema](#nestedatt--storage))
 - `type` (String) The service type. Available options: `Single`, `Replica`, `Sharded`

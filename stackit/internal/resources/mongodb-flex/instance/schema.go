@@ -27,7 +27,6 @@ type Instance struct {
 	Version        types.String      `tfsdk:"version"`
 	Replicas       types.Int64       `tfsdk:"replicas"`
 	BackupSchedule types.String      `tfsdk:"backup_schedule"`
-	Options        map[string]string `tfsdk:"options"`
 	Labels         map[string]string `tfsdk:"labels"`
 	ACL            types.List        `tfsdk:"acl"`
 	Storage        types.Object      `tfsdk:"storage"`
@@ -190,11 +189,6 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 						Computed:    true,
 					},
 				},
-			},
-			"options": schema.MapAttribute{
-				Description: "Specifies mongodb instance options",
-				ElementType: types.StringType,
-				Optional:    true,
 			},
 			"labels": schema.MapAttribute{
 				Description: "Instance Labels",

@@ -284,9 +284,11 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		FlavorID:       &fid,
 		Labels:         &plan.Labels,
 		Name:           &name,
-		Options:        &plan.Options,
-		Replicas:       &rpl,
-		Version:        &ver,
+		Options: &map[string]string{
+			"type": plan.Type.ValueString(),
+		},
+		Replicas: &rpl,
+		Version:  &ver,
 	}
 
 	// handle update
