@@ -40,7 +40,7 @@ func (r Resource) validate(ctx context.Context, data Instance) error {
 	if err := r.validateVersion(ctx, data.ProjectID.ValueString(), data.Version.ValueString()); err != nil {
 		return err
 	}
-	if err := r.validateMachineType(ctx, data.ProjectID.ValueString(), data.MachineType.ValueString()); err != nil {
+	if err := r.validateMachineType(ctx, data.ProjectID.ValueString(), data.MachineType.ValueString(), data.Type.ValueString()); err != nil {
 		return err
 	}
 
@@ -76,7 +76,7 @@ func (r Resource) validateVersion(ctx context.Context, projectID, version string
 	return fmt.Errorf("couldn't find version '%s'. Available options are:%s\n", version, opts)
 }
 
-func (r Resource) validateMachineType(ctx context.Context, projectID, flavorID string) error {
+func (r Resource) validateMachineType(ctx context.Context, projectID, flavorID, serviceType string) error {
 	res, err := r.client.MongoDBFlex.Flavors.GetFlavorsWithResponse(ctx, projectID)
 	if agg := validate.Response(res, err, "JSON200.Flavors"); agg != nil {
 		return errors.Wrap(agg, "failed validating machine type (flavors)")
@@ -87,16 +87,35 @@ func (r Resource) validateMachineType(ctx context.Context, projectID, flavorID s
 		if v.ID == nil {
 			continue
 		}
-		opts = fmt.Sprintf("%s\n - ID: %s (CPU: %d, Mem: %d)", opts, *v.ID, v.CPU, v.Memory)
+		cpu := 0
+		if v.CPU != nil {
+			cpu = *v.CPU
+		}
+		mem := 0
+		if v.Memory != nil {
+			mem = *v.Memory
+		}
+		st := []string{}
+		if v.Categories != nil {
+			st = *v.Categories
+		}
+		opts = fmt.Sprintf("%s\n - ID: %s (CPU: %d, Mem: %d, Categories: %s)", opts, *v.ID, cpu, mem, strings.Join(st, " / "))
 		if strings.ToLower(*v.ID) == strings.ToLower(flavorID) {
-			return nil
+			if v.Categories == nil {
+				return nil
+			}
+			for _, sc := range *v.Categories {
+				if strings.EqualFold(sc, serviceType) {
+					return nil
+				}
+			}
 		}
 	}
 	return fmt.Errorf("couldn't find machine type '%s'. Available options are:%s\n", flavorID, opts)
 }
 
 func (r Resource) validateStorage(ctx context.Context, projectID, machineType string, storage Storage) error {
-	res, err := r.client.MongoDBFlex.Storage.GetStoragesFlavorWithResponse(ctx, projectID, machineType)
+	res, err := r.client.MongoDBFlex.Flavors.GetStoragesFlavorWithResponse(ctx, projectID, machineType)
 	if agg := validate.Response(res, err, "JSON200.StorageRange"); agg != nil {
 		return errors.Wrap(agg, "failed validating storage range")
 	}

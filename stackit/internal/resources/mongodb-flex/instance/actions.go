@@ -67,6 +67,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	name := plan.Name.ValueString()
 	rpl := int(plan.Replicas.ValueInt64())
 	ver := plan.Version.ValueString()
+	optType := "Single"
 	body := instance.InstanceCreateInstanceRequest{
 		ACL: &instance.InstanceACL{Items: &acl},
 		Storage: &instance.InstanceStorage{
@@ -77,9 +78,13 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		FlavorID:       &fid,
 		Labels:         &plan.Labels,
 		Name:           &name,
-		Options:        &plan.Options,
-		Replicas:       &rpl,
-		Version:        &ver,
+		Options: &struct {
+			Type *string `json:"type,omitempty"`
+		}{
+			Type: &optType,
+		},
+		Replicas: &rpl,
+		Version:  &ver,
 	}
 
 	res, err := r.client.MongoDBFlex.Instance.CreateWithResponse(ctx, plan.ProjectID.ValueString(), body)
@@ -100,7 +105,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	// The API currently has a bug that causes the instance to initially get a FAILED status
 	// To overcome the bug, we'll wait an initial 30 sec
-	time.Sleep(30 * time.Second)
+	time.Sleep(60 * time.Second)
 
 	process := res.WaitHandler(ctx, r.client.MongoDBFlex.Instance, plan.ProjectID.ValueString(), instanceID)
 	if _, err := process.WaitWithContext(ctx); err != nil {
