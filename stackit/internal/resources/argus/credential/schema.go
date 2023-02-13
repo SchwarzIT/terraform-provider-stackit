@@ -62,6 +62,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			"password": schema.StringAttribute{
 				Description: "Credential password",
 				Computed:    true,
+				Sensitive:   true,
 			},
 		},
 	}
