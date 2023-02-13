@@ -52,7 +52,7 @@ resource "stackit_argus_credential" "example" {
 ### Read-Only
 
 - `id` (String) Specifies the resource ID
-- `password` (String) Credential password
+- `password` (String, Sensitive) Credential password
 - `username` (String) Credential username
 
 
