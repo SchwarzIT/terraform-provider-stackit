@@ -30,25 +30,12 @@ type Instance struct {
 	Labels         map[string]string `tfsdk:"labels"`
 	ACL            types.List        `tfsdk:"acl"`
 	Storage        types.Object      `tfsdk:"storage"`
-	User           types.Object      `tfsdk:"user"`
 }
 
 // Storage represent instance storage
 type Storage struct {
 	Class types.String `tfsdk:"class"`
 	Size  types.Int64  `tfsdk:"size"`
-}
-
-// User represent database user
-type User struct {
-	ID       types.String `tfsdk:"id"`
-	Password types.String `tfsdk:"password"`
-	Username types.String `tfsdk:"username"`
-	Database types.String `tfsdk:"database"`
-	Host     types.String `tfsdk:"host"`
-	Port     types.Int64  `tfsdk:"port"`
-	URI      types.String `tfsdk:"uri"`
-	Roles    types.List   `tfsdk:"roles"`
 }
 
 // Schema returns the terraform schema structure
@@ -142,47 +129,6 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 						PlanModifiers: []planmodifier.Int64{
 							modifiers.Int64Default(default_storage_size),
 						},
-					},
-				},
-			},
-			"user": schema.SingleNestedAttribute{
-				Description: "The databse admin user",
-				Computed:    true,
-				Attributes: map[string]schema.Attribute{
-					"id": schema.StringAttribute{
-						Description: "Specifies the user id",
-						Computed:    true,
-					},
-					"username": schema.StringAttribute{
-						Description: "Specifies the user's username",
-						Computed:    true,
-					},
-					"password": schema.StringAttribute{
-						Description: "Specifies the user's password",
-						Computed:    true,
-						Sensitive:   true,
-					},
-					"database": schema.StringAttribute{
-						Description: "Specifies the database the user can access",
-						Computed:    true,
-					},
-					"host": schema.StringAttribute{
-						Description: "Specifies the allowed user hostname",
-						Computed:    true,
-					},
-					"port": schema.Int64Attribute{
-						Description: "Specifies the port",
-						Computed:    true,
-					},
-					"uri": schema.StringAttribute{
-						Description: "Specifies connection URI",
-						Computed:    true,
-						Sensitive:   true,
-					},
-					"roles": schema.ListAttribute{
-						Description: "Specifies the roles assigned to the user",
-						ElementType: types.StringType,
-						Computed:    true,
 					},
 				},
 			},

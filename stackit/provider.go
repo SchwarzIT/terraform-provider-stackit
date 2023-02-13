@@ -25,6 +25,7 @@ import (
 	resourceKubernetesCluster "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/kubernetes/cluster"
 	resourceKubernetesProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/kubernetes/project"
 	resourceMongoDBFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mongodb-flex/instance"
+	resourceMongoDBFlexUser "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mongodb-flex/user"
 	resourceObjectStorageBucket "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/bucket"
 	resourceObjectStorageCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/credential"
 	resourceObjectStorageCredentialsGroup "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/credentials-group"
@@ -118,6 +119,7 @@ func (p *StackitProvider) Resources(_ context.Context) []func() resource.Resourc
 		resourceKubernetesCluster.New,
 		resourceKubernetesProject.New,
 		resourceMongoDBFlexInstance.New,
+		resourceMongoDBFlexUser.New,
 		resourceObjectStorageBucket.New,
 		resourceObjectStorageCredential.New,
 		resourceObjectStorageCredentialsGroup.New,
