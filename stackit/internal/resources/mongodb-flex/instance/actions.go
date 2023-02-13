@@ -8,12 +8,9 @@ import (
 	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/generated/instance"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/generated/user"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
-	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -67,7 +64,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	name := plan.Name.ValueString()
 	rpl := int(plan.Replicas.ValueInt64())
 	ver := plan.Version.ValueString()
-	optType := "Single"
+	optType := plan.Type.ValueString()
 	body := instance.InstanceCreateInstanceRequest{
 		ACL: &instance.InstanceACL{Items: &acl},
 		Storage: &instance.InstanceStorage{
@@ -125,70 +122,12 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	r.createUser(ctx, &plan, &resp.Diagnostics)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
 	// update state with user
 	diags = resp.State.Set(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
-}
-
-func (r Resource) createUser(ctx context.Context, plan *Instance, d *diag.Diagnostics) {
-	// these are the default user values
-	// the current API doesn't read them yet, but in later releases
-	// this will be the way to get the default user and database credentials
-	// the default user credentials won't change
-	username := "stackit"
-	database := "stackit"
-	roles := []string{"readWrite"}
-
-	body := user.InstanceCreateUserRequest{
-		Database: database,
-		Roles:    roles,
-		Username: &username,
-	}
-	res, err := r.client.MongoDBFlex.User.CreateWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
-	if agg := validate.Response(res, err, "JSON202.Item"); agg != nil {
-		d.AddError("failed creating mongodb flex db user", agg.Error())
-		return
-	}
-
-	item := *res.JSON202.Item
-	elems := []attr.Value{}
-	if *res.JSON202.Item.Roles != nil {
-		for _, v := range *res.JSON202.Item.Roles {
-			elems = append(elems, types.StringValue(v))
-		}
-	}
-	u, diags := types.ObjectValue(
-		map[string]attr.Type{
-			"id":       types.StringType,
-			"username": types.StringType,
-			"database": types.StringType,
-			"password": types.StringType,
-			"host":     types.StringType,
-			"port":     types.Int64Type,
-			"uri":      types.StringType,
-			"roles":    types.ListType{ElemType: types.StringType},
-		},
-		map[string]attr.Value{
-			"id":       nullOrValStr(item.ID),
-			"username": nullOrValStr(&username),
-			"database": nullOrValStr(&database),
-			"password": nullOrValStr(item.Password),
-			"host":     nullOrValStr(item.Host),
-			"port":     nullOrValInt64(item.Port),
-			"uri":      nullOrValStr(item.Uri),
-			"roles":    types.ListValueMust(types.StringType, elems),
-		},
-	)
-	plan.User = u
-	d.Append(diags...)
 }
 
 // Read - lifecycle function

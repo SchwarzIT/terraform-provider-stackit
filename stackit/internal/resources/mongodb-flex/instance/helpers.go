@@ -170,6 +170,13 @@ func applyClientResponse(pi *Instance, i *instance.InstancesSingleInstance) erro
 		v := pi.Version.ValueString()
 		pi.Version = types.StringValue(v[0:3])
 	}
+	pi.Type = types.StringNull()
+	if i.Options != nil {
+		opts := *i.Options
+		if v, ok := opts["type"]; ok {
+			pi.Type = types.StringValue(v)
+		}
+	}
 	return nil
 }
 
