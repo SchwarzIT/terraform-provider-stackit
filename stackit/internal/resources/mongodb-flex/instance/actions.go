@@ -145,7 +145,7 @@ func (r Resource) createUser(ctx context.Context, plan *Instance, d *diag.Diagno
 	// the default user credentials won't change
 	username := "stackit"
 	database := "stackit"
-	roles := []string{}
+	roles := []string{"readWrite"}
 
 	body := user.InstanceCreateUserRequest{
 		Database: database,
@@ -178,8 +178,8 @@ func (r Resource) createUser(ctx context.Context, plan *Instance, d *diag.Diagno
 		},
 		map[string]attr.Value{
 			"id":       nullOrValStr(item.ID),
-			"username": nullOrValStr(item.Username),
-			"database": nullOrValStr(item.Database),
+			"username": nullOrValStr(&username),
+			"database": nullOrValStr(&database),
 			"password": nullOrValStr(item.Password),
 			"host":     nullOrValStr(item.Host),
 			"port":     nullOrValInt64(item.Port),

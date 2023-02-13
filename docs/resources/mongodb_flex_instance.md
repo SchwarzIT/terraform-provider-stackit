@@ -42,7 +42,7 @@ resource "stackit_mongodb_flex_instance" "example" {
 ### Required
 
 - `machine_type` (String) The Machine Type. Available options: `1.1`, `1.2`, `1.4`, `1.8`, `2.4`, `2.8`, `2.16`, `4.8`, `4.16`, `4.32`, `8.16`, `8.32`, `8.64`, `16.32`, `16.64`
-- `name` (String) Specifies the instance name. Changing this value requires the resource to be recreated.
+- `name` (String) Specifies the instance name.
 - `project_id` (String) The project ID the instance runs in. Changing this value requires the resource to be recreated.
 
 ### Optional
@@ -53,7 +53,7 @@ resource "stackit_mongodb_flex_instance" "example" {
 - `replicas` (Number) Number of replicas (Default is `1`)
 - `storage` (Attributes) A signle `storage` block as defined below. (see [below for nested schema](#nestedatt--storage))
 - `type` (String) The service type. Available options: `Single`, `Replica`, `Sharded`
-- `version` (String) MongoDB version. Version `5.0` and `6.0` are supported. Changing this value requires the resource to be recreated.
+- `version` (String) MongoDB version. Version `5.0` and `6.0` are supported.
 
 ### Read-Only
 
