@@ -157,7 +157,9 @@ func (r Resource) createUser(ctx context.Context, plan *Instance, d *diag.Diagno
 			return
 		}
 		if (res.StatusCode() == http.StatusNotFound ||
-			res.StatusCode() == http.StatusBadRequest) &&
+			res.StatusCode() == http.StatusBadRequest ||
+			res.StatusCode() == http.StatusBadGateway ||
+			res.StatusCode() == http.StatusGatewayTimeout) &&
 			maxTries > 0 {
 			time.Sleep(time.Second * 30)
 			continue
