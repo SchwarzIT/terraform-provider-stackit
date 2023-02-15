@@ -142,14 +142,13 @@ func (r Resource) createUser(ctx context.Context, plan *Instance, d *diag.Diagno
 	// the current API doesn't read them yet, but in later releases
 	// this will be the way to get the default user and database credentials
 	// the default user credentials won't change
-	username := "stackit"
-	database := "stackit"
-
+	username := "psqluser"
+	roles := []string{"login", "createdb"}
 	for maxTries := 10; maxTries >= 0; maxTries-- {
 		c := r.client.PostgresFlex
 		body := users.CreateUserJSONRequestBody{
-			Database: &database,
 			Username: &username,
+			Roles:    &roles,
 		}
 		res, err := c.Users.CreateUserWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
 		if err != nil {
@@ -210,9 +209,6 @@ func (r Resource) createUser(ctx context.Context, plan *Instance, d *diag.Diagno
 		db := ""
 		if item.Database != nil {
 			db = *item.Database
-		}
-		if db == "" {
-			db = database // bypass API issue
 		}
 		pw := ""
 		if item.Password != nil {
