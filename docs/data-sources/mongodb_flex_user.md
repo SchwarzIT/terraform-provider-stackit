@@ -61,7 +61,7 @@ data "stackit_mongodb_flex_user" "example" {
 - `database` (String) Specifies the database the user can access
 - `host` (String) Specifies the allowed user hostname
 - `port` (Number) Specifies the port
-- `role` (String) Specifies the role assigned to the user, either `readWrite` or `read`
+- `roles` (List of String) Specifies the roles assigned to the user
 - `username` (String) Specifies the user's username
 
 

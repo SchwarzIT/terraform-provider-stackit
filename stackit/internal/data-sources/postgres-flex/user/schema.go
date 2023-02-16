@@ -18,7 +18,6 @@ type User struct {
 	InstanceID types.String `tfsdk:"instance_id"`
 	ProjectID  types.String `tfsdk:"project_id"`
 	Username   types.String `tfsdk:"username"`
-	Database   types.String `tfsdk:"database"`
 	Host       types.String `tfsdk:"host"`
 	Port       types.Int64  `tfsdk:"port"`
 	Roles      types.List   `tfsdk:"roles"`
@@ -27,7 +26,7 @@ type User struct {
 // Schema returns the terraform schema structure
 func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: fmt.Sprintf("Data source for MongoDB Flex user\n%s",
+		MarkdownDescription: fmt.Sprintf("Data source for Postgres Flex user\n%s",
 			common.EnvironmentInfo(d.urls),
 		),
 		Attributes: map[string]schema.Attribute{
@@ -36,7 +35,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Required:    true,
 			},
 			"instance_id": schema.StringAttribute{
-				Description: "the mongo db flex instance id.",
+				Description: "the postgres db flex instance id.",
 				Required:    true,
 			},
 			"project_id": schema.StringAttribute{
@@ -48,10 +47,6 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 			},
 			"username": schema.StringAttribute{
 				Description: "Specifies the user's username",
-				Computed:    true,
-			},
-			"database": schema.StringAttribute{
-				Description: "Specifies the database the user can access",
 				Computed:    true,
 			},
 			"host": schema.StringAttribute{

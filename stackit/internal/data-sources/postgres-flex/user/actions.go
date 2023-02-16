@@ -12,7 +12,7 @@ import (
 
 // Read - lifecycle function
 func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	c := r.client.MongoDBFlex
+	c := r.client.PostgresFlex
 	var config User
 	diags := req.Config.Get(ctx, &config)
 
@@ -21,9 +21,9 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	res, err := c.User.GetWithResponse(ctx, config.ProjectID.ValueString(), config.InstanceID.ValueString(), config.ID.ValueString())
+	res, err := c.Users.GetUserWithResponse(ctx, config.ProjectID.ValueString(), config.InstanceID.ValueString(), config.ID.ValueString())
 	if agg := validate.Response(res, err, "JSON200.Item"); agg != nil {
-		diags.AddError("failed to list mongodb instances", agg.Error())
+		diags.AddError("failed to list postgres instances", agg.Error())
 		return
 	}
 
@@ -31,7 +31,6 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	config.Username = nullOrValStr(item.Username)
 	config.Host = nullOrValStr(item.Host)
 	config.Port = nullOrValInt64(item.Port)
-	config.Database = nullOrValStr(item.Database)
 	roles := []attr.Value{}
 	if r := item.Roles; r != nil {
 		for _, v := range *r {

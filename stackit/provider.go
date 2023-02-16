@@ -16,6 +16,7 @@ import (
 	dataObjectStorageCredentialsGroup "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/object-storage/credentials-group"
 	dataObjectStorageProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/object-storage/project"
 	dataPostgresFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/postgres-flex/instance"
+	dataPostgresFlexUser "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/postgres-flex/user"
 	dataProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/project"
 
 	resourceArgusCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/credential"
@@ -32,6 +33,7 @@ import (
 	resourceObjectStorageCredentialsGroup "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/credentials-group"
 	resourceObjectStorageProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/project"
 	resourcePostgresFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/postgres-flex/instance"
+	resourcePostgresFlexUser "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/postgres-flex/user"
 	resourceProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/project"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -125,8 +127,9 @@ func (p *StackitProvider) Resources(_ context.Context) []func() resource.Resourc
 		resourceObjectStorageCredential.New,
 		resourceObjectStorageCredentialsGroup.New,
 		resourceObjectStorageProject.New,
-		resourceProject.New,
 		resourcePostgresFlexInstance.New,
+		resourcePostgresFlexUser.New,
+		resourceProject.New,
 	}
 }
 
@@ -156,6 +159,7 @@ func (p *StackitProvider) DataSources(context.Context) []func() datasource.DataS
 		dataObjectStorageCredentialsGroup.New,
 		dataObjectStorageProject.New,
 		dataPostgresFlexInstance.New,
+		dataPostgresFlexUser.New,
 		dataProject.New,
 	}
 }

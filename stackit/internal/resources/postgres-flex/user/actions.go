@@ -2,11 +2,12 @@ package user
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/generated/user"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/generated/users"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -14,6 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+	"github.com/pkg/errors"
 )
 
 // Create - lifecycle function
@@ -26,39 +28,54 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	username := plan.Username.ValueString()
-	database := plan.Database.ValueString()
+	if username == "" {
+		username = "psqluser"
+	}
 
 	var roles []string
 	resp.Diagnostics.Append(plan.Roles.ElementsAs(ctx, &roles, true)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
+	if len(roles) == 0 {
+		roles = []string{"login"}
+	}
 
-	body := user.InstanceCreateUserRequest{
-		Database: database,
-		Roles:    roles,
+	body := users.InstanceCreateUserRequest{
+		Roles:    &roles,
 		Username: &username,
 	}
-	res, err := r.client.MongoDBFlex.User.CreateWithResponse(ctx, plan.ProjectID.ValueString(), plan.InstanceID.ValueString(), body)
-	if agg := validate.Response(res, err, "JSON202.Item"); agg != nil {
-		resp.Diagnostics.AddError("failed creating mongodb flex db user", agg.Error())
+
+	res, err := r.client.PostgresFlex.Users.CreateUserWithResponse(ctx, plan.ProjectID.ValueString(), plan.InstanceID.ValueString(), body)
+	if agg := validate.Response(res, err, "JSON200.Item"); agg != nil {
+		if res.StatusCode() == http.StatusBadRequest {
+			j := ""
+			if res.JSON400 != nil {
+				b, _ := json.Marshal(res.JSON400)
+				j = string(b)
+			}
+			resp.Diagnostics.AddError("failed creating postgres flex db user", errors.Wrapf(agg, j).Error())
+			return
+		}
+		resp.Diagnostics.AddError("failed creating postgres flex db user", agg.Error())
 		return
 	}
 
-	item := *res.JSON202.Item
+	item := *res.JSON200.Item
+
 	elems := []attr.Value{}
-	if *res.JSON202.Item.Roles != nil {
-		for _, v := range *res.JSON202.Item.Roles {
+	if *item.Roles != nil {
+		for _, v := range *item.Roles {
 			elems = append(elems, types.StringValue(v))
 		}
 	}
-	if res.JSON202.Item.Password == nil {
-		resp.Diagnostics.AddError("received an empty password", fmt.Sprintf("full response: %+v", res.JSON202))
+	if item.Password == nil {
+		resp.Diagnostics.AddError("received an empty password", fmt.Sprintf("full response: %+v", item))
 		return
 	}
 
 	if item.ID == nil {
-		resp.Diagnostics.AddError("received an empty ID", fmt.Sprintf("full response: %+v", res.JSON202))
+		resp.Diagnostics.AddError("received an empty ID", fmt.Sprintf("full response: %+v", item))
 		return
 	}
 	plan.ID = nullOrValStr(item.ID)
@@ -86,7 +103,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	// read cluster
-	res, err := r.client.MongoDBFlex.User.GetWithResponse(ctx, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString())
+	res, err := r.client.PostgresFlex.Users.GetUserWithResponse(ctx, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString())
 	if agg := validate.Response(res, err, "JSON200.Item"); agg != nil {
 		resp.Diagnostics.AddError("failed making read user request", err.Error())
 		return
@@ -96,7 +113,6 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	state.Username = nullOrValStr(item.Username)
 	state.Host = nullOrValStr(item.Host)
 	state.Port = nullOrValInt64(item.Port)
-	state.Database = nullOrValStr(item.Database)
 	roles := []attr.Value{}
 	if r := item.Roles; r != nil {
 		for _, v := range *r {
@@ -131,19 +147,6 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	res, err := r.client.MongoDBFlex.User.DeleteWithResponse(ctx, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed making MongoDB user deletion request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		if res.StatusCode() == http.StatusNotFound {
-			resp.State.RemoveResource(ctx)
-			return
-		}
-		resp.Diagnostics.AddError("user deletion response has an error", res.HasError.Error())
-		return
-	}
 	resp.State.RemoveResource(ctx)
 }
 
@@ -154,7 +157,7 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 	if len(idParts) != 3 || idParts[0] == "" || idParts[1] == "" {
 		resp.Diagnostics.AddError(
 			"Unexpected Import Identifier",
-			fmt.Sprintf("Expected import identifier with format: `project_id,mongodb_instance_id,user_id`.\nInstead got: %q", req.ID),
+			fmt.Sprintf("Expected import identifier with format: `project_id,postgres_flex_instance_id,user_id`.\nInstead got: %q", req.ID),
 		)
 		return
 	}

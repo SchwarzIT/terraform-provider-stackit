@@ -5,15 +5,11 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/generated/instance"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/generated/users"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
-	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -96,11 +92,10 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	// set state
 	plan.ID = types.StringValue(*res.JSON200.ID)
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), *res.JSON200.ID)...)
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project_id"), plan.ProjectID.ValueString())...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
+	defer func() {
+		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), *res.JSON200.ID)...)
+		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project_id"), plan.ProjectID.ValueString())...)
+	}()
 
 	process := res.WaitHandler(ctx, c.Instance, plan.ProjectID.ValueString(), *res.JSON200.ID)
 	ins, err := process.WaitWithContext(ctx)
@@ -120,137 +115,11 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	r.createUser(ctx, &plan, &resp.Diagnostics)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
 	// update state with user
 	diags = resp.State.Set(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
-	}
-}
-
-func (r Resource) createUser(ctx context.Context, plan *Instance, d *diag.Diagnostics) {
-	// TODO: remove this code hack when the API returns
-	// a proper instance status
-	time.Sleep(time.Minute * 2)
-
-	// these are the default user values
-	// the current API doesn't read them yet, but in later releases
-	// this will be the way to get the default user and database credentials
-	// the default user credentials won't change
-	username := "psqluser"
-	roles := []string{"login", "createdb"}
-	for maxTries := 10; maxTries >= 0; maxTries-- {
-		c := r.client.PostgresFlex
-		body := users.CreateUserJSONRequestBody{
-			Username: &username,
-			Roles:    &roles,
-		}
-		res, err := c.Users.CreateUserWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
-		if err != nil {
-			d.AddError("failed prepare create user request", err.Error())
-			return
-		}
-		if (res.StatusCode() == http.StatusNotFound ||
-			res.StatusCode() == http.StatusBadRequest ||
-			res.StatusCode() == http.StatusBadGateway ||
-			res.StatusCode() == http.StatusGatewayTimeout) &&
-			maxTries > 0 {
-			time.Sleep(time.Second * 30)
-			continue
-		}
-		if res.JSON400 != nil {
-			e := ""
-			if res.JSON400.Message != nil {
-				e = "message: " + *res.JSON400.Message
-			}
-			if res.JSON400.Fields != nil {
-				for k, v := range *res.JSON400.Fields {
-					e = e + "\n" + k + ": " + strings.Join(v, ", ")
-
-				}
-			}
-			d.AddError("response is 400", e)
-			return
-		}
-		if res.HasError != nil {
-			d.AddError("failed create user request", res.HasError.Error())
-		}
-		if res.JSON200 == nil {
-			d.AddError("response is nil", "api returned nil response")
-			return
-		}
-
-		item := users.InstanceUser{}
-		if res.JSON200.Item != nil {
-			item = *res.JSON200.Item
-		}
-		roles := []string{}
-		if item.Roles != nil {
-			roles = *item.Roles
-		}
-		elems := []attr.Value{}
-		for _, v := range roles {
-			elems = append(elems, types.StringValue(v))
-		}
-
-		id := ""
-		if item.ID != nil {
-			id = *item.ID
-		}
-		un := ""
-		if item.Username != nil {
-			un = *item.Username
-		}
-		db := ""
-		if item.Database != nil {
-			db = *item.Database
-		}
-		pw := ""
-		if item.Password != nil {
-			pw = *item.Password
-		}
-		ho := ""
-		if item.Host != nil {
-			ho = *item.Host
-		}
-		var po int
-		if item.Port != nil {
-			po = *item.Port
-		}
-		uri := ""
-		if item.Uri != nil {
-			uri = *item.Uri
-		}
-		u, diags := types.ObjectValue(
-			map[string]attr.Type{
-				"id":       types.StringType,
-				"username": types.StringType,
-				"database": types.StringType,
-				"password": types.StringType,
-				"hostname": types.StringType,
-				"port":     types.Int64Type,
-				"uri":      types.StringType,
-				"roles":    types.ListType{ElemType: types.StringType},
-			},
-			map[string]attr.Value{
-				"id":       types.StringValue(id),
-				"username": types.StringValue(un),
-				"database": types.StringValue(db),
-				"password": types.StringValue(pw),
-				"hostname": types.StringValue(ho),
-				"port":     types.Int64Value(int64(po)),
-				"uri":      types.StringValue(uri),
-				"roles":    types.ListValueMust(types.StringType, elems),
-			},
-		)
-		plan.User = u
-		d.Append(diags...)
-		break
 	}
 }
 
@@ -289,13 +158,6 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	if err := applyClientResponse(&state, res.JSON200.Item); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
-	}
-
-	if state.User.IsNull() || state.User.IsUnknown() {
-		r.createUser(ctx, &state, &resp.Diagnostics)
-		if resp.Diagnostics.HasError() {
-			return
-		}
 	}
 
 	// update state

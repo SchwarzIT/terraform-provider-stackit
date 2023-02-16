@@ -1,4 +1,4 @@
-package instance_test
+package user_test
 
 import (
 	"fmt"
@@ -38,7 +38,7 @@ func TestAcc_MongoDBFlexUser(t *testing.T) {
 					resource.TestCheckTypeSetElemAttrPair("stackit_mongodb_flex_user.example", "database", "data.stackit_mongodb_flex_user.example", "database"),
 					// resource.TestCheckTypeSetElemAttrPair("stackit_mongodb_flex_user.example", "host", "data.stackit_mongodb_flex_user.example", "host"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_mongodb_flex_user.example", "port", "data.stackit_mongodb_flex_user.example", "port"),
-					resource.TestCheckTypeSetElemAttrPair("stackit_mongodb_flex_user.example", "role", "data.stackit_mongodb_flex_user.example", "role"),
+					resource.TestCheckTypeSetElemAttrPair("stackit_mongodb_flex_user.example", "roles.0", "data.stackit_mongodb_flex_user.example", "roles.0"),
 				),
 			},
 		},
