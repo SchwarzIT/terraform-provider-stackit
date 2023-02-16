@@ -1,4 +1,4 @@
-package instance_test
+package user_test
 
 import (
 	"fmt"
