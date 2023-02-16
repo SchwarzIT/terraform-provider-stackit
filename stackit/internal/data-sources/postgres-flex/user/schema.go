@@ -46,7 +46,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				},
 			},
 			"username": schema.StringAttribute{
-				Description: "Specifies the user's username",
+				Description: "Specifies the username",
 				Computed:    true,
 			},
 			"host": schema.StringAttribute{

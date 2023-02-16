@@ -32,7 +32,7 @@ Manages MongoDB Flex instances
 resource "stackit_mongodb_flex_instance" "example" {
   name         = "example"
   project_id   = "example"
-  machine_type = "C1.1"
+  machine_type = "1.1"
 }
 ```
 

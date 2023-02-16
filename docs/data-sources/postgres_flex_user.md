@@ -30,10 +30,8 @@ Data source for Postgres Flex user
 
 ```terraform
 resource "stackit_postgres_flex_instance" "example" {
-  name         = "example"
-  project_id   = var.project_id
-  machine_type = "c1.2"
-  version      = "14"
+  name       = "example"
+  project_id = var.project_id
 }
 
 resource "stackit_postgres_flex_user" "example" {
@@ -62,6 +60,6 @@ data "stackit_postgres_flex_user" "example" {
 - `host` (String) Specifies the allowed user hostname
 - `port` (Number) Specifies the port
 - `roles` (List of String) Specifies the roles assigned to the user
-- `username` (String) Specifies the user's username
+- `username` (String) Specifies the username
 
 

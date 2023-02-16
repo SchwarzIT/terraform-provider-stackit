@@ -1,8 +1,6 @@
 resource "stackit_postgres_flex_instance" "example" {
-  name         = "example"
-  project_id   = var.project_id
-  machine_type = "c1.2"
-  version      = "14"
+  name       = "example"
+  project_id = var.project_id
 }
 
 resource "stackit_postgres_flex_user" "example" {
