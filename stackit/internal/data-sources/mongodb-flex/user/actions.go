@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -31,11 +32,13 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	config.Host = nullOrValStr(item.Host)
 	config.Port = nullOrValInt64(item.Port)
 	config.Database = nullOrValStr(item.Database)
-	if roles := item.Roles; roles != nil && len(*roles) > 0 {
-		r := *roles
-		config.Role = types.StringValue(r[0])
+	roles := []attr.Value{}
+	if r := item.Roles; r != nil {
+		for _, v := range *r {
+			roles = append(roles, types.StringValue(v))
+		}
 	}
-
+	config.Roles = types.ListValueMust(types.StringType, roles)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &config)...)
 	if resp.Diagnostics.HasError() {
 		return

@@ -27,7 +27,12 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	username := plan.Username.ValueString()
 	database := plan.Database.ValueString()
-	roles := []string{plan.Role.ValueString()}
+
+	var roles []string
+	resp.Diagnostics.Append(plan.Roles.ElementsAs(ctx, &roles, true)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	body := user.InstanceCreateUserRequest{
 		Database: database,
@@ -92,10 +97,13 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	state.Host = nullOrValStr(item.Host)
 	state.Port = nullOrValInt64(item.Port)
 	state.Database = nullOrValStr(item.Database)
-	if roles := item.Roles; roles != nil && len(*roles) > 0 {
-		r := *roles
-		state.Role = types.StringValue(r[0])
+	roles := []attr.Value{}
+	if r := item.Roles; r != nil {
+		for _, v := range *r {
+			roles = append(roles, types.StringValue(v))
+		}
 	}
+	state.Roles = types.ListValueMust(types.StringType, roles)
 	if state.URI.IsUnknown() {
 		state.URI = types.StringNull()
 	}

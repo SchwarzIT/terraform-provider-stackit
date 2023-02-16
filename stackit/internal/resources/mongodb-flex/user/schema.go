@@ -7,7 +7,9 @@ import (
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -27,7 +29,7 @@ type User struct {
 	Host       types.String `tfsdk:"host"`
 	Port       types.Int64  `tfsdk:"port"`
 	URI        types.String `tfsdk:"uri"`
-	Role       types.String `tfsdk:"role"`
+	Roles      types.List   `tfsdk:"roles"`
 }
 
 // Schema returns the terraform schema structure
@@ -94,15 +96,20 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Computed:    true,
 				Sensitive:   true,
 			},
-			"role": schema.StringAttribute{
+			"roles": schema.ListAttribute{
 				Description: "Specifies the role assigned to the user, either `readWrite` or `read`",
 				Optional:    true,
 				Computed:    true,
-				Validators: []validator.String{
-					stringvalidator.OneOf("readWrite", "read"),
+				ElementType: types.StringType,
+				Validators: []validator.List{
+					listvalidator.ValueStringsAre(
+						stringvalidator.OneOf("readWrite", "read"),
+					),
 				},
-				PlanModifiers: []planmodifier.String{
-					modifiers.StringDefault("readWrite"),
+				PlanModifiers: []planmodifier.List{
+					modifiers.ListDefault(types.ListValueMust(types.StringType, []attr.Value{
+						types.StringValue("readWrite"),
+					})),
 				},
 			},
 		},

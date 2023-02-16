@@ -21,7 +21,7 @@ type User struct {
 	Database   types.String `tfsdk:"database"`
 	Host       types.String `tfsdk:"host"`
 	Port       types.Int64  `tfsdk:"port"`
-	Role       types.String `tfsdk:"role"`
+	Roles      types.List   `tfsdk:"roles"`
 }
 
 // Schema returns the terraform schema structure
@@ -62,9 +62,10 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Description: "Specifies the port",
 				Computed:    true,
 			},
-			"role": schema.StringAttribute{
+			"roles": schema.ListAttribute{
 				Description: "Specifies the role assigned to the user, either `readWrite` or `read`",
 				Computed:    true,
+				ElementType: types.StringType,
 			},
 		},
 	}
