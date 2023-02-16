@@ -25,7 +25,6 @@ type User struct {
 	ProjectID  types.String `tfsdk:"project_id"`
 	Password   types.String `tfsdk:"password"`
 	Username   types.String `tfsdk:"username"`
-	Database   types.String `tfsdk:"database"`
 	Host       types.String `tfsdk:"host"`
 	Port       types.Int64  `tfsdk:"port"`
 	URI        types.String `tfsdk:"uri"`
@@ -35,7 +34,7 @@ type User struct {
 // Schema returns the terraform schema structure
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: fmt.Sprintf("Manages MongoDB Flex instance users\n%s",
+		MarkdownDescription: fmt.Sprintf("Manages Postgres Flex instance users\n%s",
 			common.EnvironmentInfo(r.urls),
 		),
 		Attributes: map[string]schema.Attribute{
@@ -47,7 +46,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"instance_id": schema.StringAttribute{
-				Description: "the mongo db flex instance id.",
+				Description: "the postgres db flex instance id.",
 				Required:    true,
 			},
 			"project_id": schema.StringAttribute{
@@ -61,27 +60,21 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"username": schema.StringAttribute{
-				Description: "Specifies the user's username",
+				Description: "Specifies the username. Defaults to `psqluser`",
 				Optional:    true,
 				Computed:    true,
+				Validators: []validator.String{
+					stringvalidator.NoneOfCaseInsensitive("stackit"),
+				},
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
-					modifiers.StringDefault("stackit"),
+					modifiers.StringDefault("psqluser"),
 				},
 			},
 			"password": schema.StringAttribute{
 				Description: "Specifies the user's password",
 				Computed:    true,
 				Sensitive:   true,
-			},
-			"database": schema.StringAttribute{
-				Description: "Specifies the database the user can access",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
-					modifiers.StringDefault("stackit"),
-				},
 			},
 			"host": schema.StringAttribute{
 				Description: "Specifies the allowed user hostname",
@@ -97,18 +90,18 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Sensitive:   true,
 			},
 			"roles": schema.ListAttribute{
-				Description: "Specifies the role assigned to the user, valid options are: `readWrite`, `read`",
+				Description: "Specifies the roles assigned to the user, valid options are: `login`, `createdb`",
 				Optional:    true,
 				Computed:    true,
 				ElementType: types.StringType,
 				Validators: []validator.List{
 					listvalidator.ValueStringsAre(
-						stringvalidator.OneOf("readWrite", "read"),
+						stringvalidator.OneOf("login", "createdb"),
 					),
 				},
 				PlanModifiers: []planmodifier.List{
 					modifiers.ListDefault(types.ListValueMust(types.StringType, []attr.Value{
-						types.StringValue("readWrite"),
+						types.StringValue("login"),
 					})),
 				},
 			},
