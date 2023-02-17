@@ -29,7 +29,7 @@ var _ = resource.Resource(&Resource{})
 
 // Metadata returns data resource metadata
 func (r *Resource) Metadata(_ context.Context, req resource.MetadataRequest, res *resource.MetadataResponse) {
-	res.TypeName = fmt.Sprintf("stackit_argus_credential")
+	res.TypeName = "stackit_argus_credential"
 }
 
 // Configure the resource client

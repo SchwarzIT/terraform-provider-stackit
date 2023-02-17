@@ -66,6 +66,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	plan.Host = nullOrValStr(item.Host)
 	plan.Port = nullOrValInt64(item.Port)
 	plan.URI = nullOrValStr(item.Uri)
+	plan.Roles = types.ListValueMust(types.StringType, elems)
 
 	// update state with user
 	diags = resp.State.Set(ctx, &plan)

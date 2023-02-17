@@ -75,7 +75,7 @@ func (r Resource) validateVersion(ctx context.Context, projectID, version string
 	opts := ""
 	for _, v := range *res.JSON200.Versions {
 		opts = opts + "\n- " + v
-		if strings.ToLower(v) == strings.ToLower(version) {
+		if strings.EqualFold(v, version) {
 			return nil
 		}
 	}
@@ -100,7 +100,7 @@ func (r Resource) validateMachineType(ctx context.Context, projectID, flavorID s
 			continue
 		}
 		opts = fmt.Sprintf("%s\n - ID: %s (CPU: %d, Mem: %d)", opts, *v.ID, *v.Cpu, *v.Memory)
-		if strings.ToLower(*v.ID) == strings.ToLower(flavorID) {
+		if strings.EqualFold(*v.ID, flavorID) {
 			return nil
 		}
 	}
@@ -130,7 +130,7 @@ func (r Resource) validateStorage(ctx context.Context, projectID, machineType st
 	if res.JSON200.StorageClasses != nil {
 		for _, v := range *res.JSON200.StorageClasses {
 			opts = opts + "\n- " + v
-			if strings.ToLower(v) == strings.ToLower(storage.Class.ValueString()) {
+			if strings.EqualFold(v, storage.Class.ValueString()) {
 				return nil
 			}
 		}

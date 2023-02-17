@@ -63,7 +63,11 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	ApplyClientResponse(&config, ires.JSON200.Item)
+	if err := ApplyClientResponse(&config, ires.JSON200.Item); err != nil {
+		resp.Diagnostics.AddError("error during apply", err.Error())
+		return
+	}
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &config)...)
 	if resp.Diagnostics.HasError() {
 		return

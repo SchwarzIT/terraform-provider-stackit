@@ -35,7 +35,7 @@ func TestAcc_kubernetesProject(t *testing.T) {
 			// test import
 			{
 				ResourceName:            "stackit_kubernetes_project.example",
-				ImportStateId:           fmt.Sprintf("%s", common.GetAcceptanceTestsProjectID()),
+				ImportStateId:           common.GetAcceptanceTestsProjectID(),
 				ImportState:             true,
 				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{},

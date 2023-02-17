@@ -35,7 +35,7 @@ func TestAcc_object_storageProject(t *testing.T) {
 			// test import
 			{
 				ResourceName:            "stackit_object_storage_project.example",
-				ImportStateId:           fmt.Sprintf("%s", common.GetAcceptanceTestsProjectID()),
+				ImportStateId:           common.GetAcceptanceTestsProjectID(),
 				ImportState:             true,
 				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{},
