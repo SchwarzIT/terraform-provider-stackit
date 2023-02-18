@@ -94,6 +94,10 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	instanceID := *res.JSON202.ID
 	plan.ID = types.StringValue(instanceID)
+	if instanceID == "" {
+		resp.Diagnostics.AddError("received an empty instance ID", fmt.Sprintf("invalid instance id: %+v", *res.JSON202))
+		return
+	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), instanceID)...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project_id"), plan.ProjectID.ValueString())...)
 	if resp.Diagnostics.HasError() {
