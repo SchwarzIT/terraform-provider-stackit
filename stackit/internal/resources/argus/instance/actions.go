@@ -140,10 +140,14 @@ func (r Resource) setMetricsConfig(ctx context.Context, diags *diag.Diagnostics,
 	}
 
 	c := r.client
-	cfg := metricsStorageRetention.UpdateJSONRequestBody{
-		MetricsRetentionTimeRaw: fmt.Sprintf("%dd", s.Metrics.RetentionDays.ValueInt64()),
-		MetricsRetentionTime5m:  fmt.Sprintf("%dd", s.Metrics.RetentionDays5mDownsampling.ValueInt64()),
-		MetricsRetentionTime1h:  fmt.Sprintf("%dd", s.Metrics.RetentionDays1hDownsampling.ValueInt64()),
+	cfg := metricsStorageRetention.UpdateJSONRequestBody{}
+
+	if s.Metrics != nil {
+		cfg = metricsStorageRetention.UpdateJSONRequestBody{
+			MetricsRetentionTimeRaw: fmt.Sprintf("%dd", s.Metrics.RetentionDays.ValueInt64()),
+			MetricsRetentionTime5m:  fmt.Sprintf("%dd", s.Metrics.RetentionDays5mDownsampling.ValueInt64()),
+			MetricsRetentionTime1h:  fmt.Sprintf("%dd", s.Metrics.RetentionDays1hDownsampling.ValueInt64()),
+		}
 	}
 
 	res, err := c.Argus.MetricsStorageRetention.UpdateWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString(), cfg)
