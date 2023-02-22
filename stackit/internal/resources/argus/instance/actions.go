@@ -124,33 +124,26 @@ func (r Resource) setMetricsConfig(ctx context.Context, diags *diag.Diagnostics,
 	if s.Metrics == nil && ref == nil {
 		return
 	}
-
+	if s.Metrics == nil {
+		s.Metrics = &Metrics{
+			RetentionDays:               types.Int64Value(default_metrics_retention_days),
+			RetentionDays5mDownsampling: types.Int64Value(default_metrics_retention_days_5m_downsampling),
+			RetentionDays1hDownsampling: types.Int64Value(default_metrics_retention_days_1h_downsampling),
+		}
+	}
 	if ref != nil && ref.Metrics != nil {
-		if s.Metrics == nil {
-			s.Metrics = &Metrics{
-				RetentionDays:               types.Int64Value(default_metrics_retention_days),
-				RetentionDays5mDownsampling: types.Int64Value(default_metrics_retention_days_5m_downsampling),
-				RetentionDays1hDownsampling: types.Int64Value(default_metrics_retention_days_1h_downsampling),
-			}
-		} else if ref.Metrics.RetentionDays.Equal(s.Metrics.RetentionDays) &&
+		if ref.Metrics.RetentionDays.Equal(s.Metrics.RetentionDays) &&
 			ref.Metrics.RetentionDays5mDownsampling.Equal(s.Metrics.RetentionDays5mDownsampling) &&
 			ref.Metrics.RetentionDays1hDownsampling.Equal(s.Metrics.RetentionDays1hDownsampling) {
 			return
 		}
 	}
-
-	c := r.client
-	cfg := metricsStorageRetention.UpdateJSONRequestBody{}
-
-	if s.Metrics != nil {
-		cfg = metricsStorageRetention.UpdateJSONRequestBody{
-			MetricsRetentionTimeRaw: fmt.Sprintf("%dd", s.Metrics.RetentionDays.ValueInt64()),
-			MetricsRetentionTime5m:  fmt.Sprintf("%dd", s.Metrics.RetentionDays5mDownsampling.ValueInt64()),
-			MetricsRetentionTime1h:  fmt.Sprintf("%dd", s.Metrics.RetentionDays1hDownsampling.ValueInt64()),
-		}
+	cfg := metricsStorageRetention.UpdateJSONRequestBody{
+		MetricsRetentionTimeRaw: fmt.Sprintf("%dd", s.Metrics.RetentionDays.ValueInt64()),
+		MetricsRetentionTime5m:  fmt.Sprintf("%dd", s.Metrics.RetentionDays5mDownsampling.ValueInt64()),
+		MetricsRetentionTime1h:  fmt.Sprintf("%dd", s.Metrics.RetentionDays1hDownsampling.ValueInt64()),
 	}
-
-	res, err := c.Argus.MetricsStorageRetention.UpdateWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString(), cfg)
+	res, err := r.client.Argus.MetricsStorageRetention.UpdateWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString(), cfg)
 	if err != nil {
 		diags.AddError("failed to prepare metrics config request", err.Error())
 		return
