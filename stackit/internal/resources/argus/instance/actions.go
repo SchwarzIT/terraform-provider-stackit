@@ -103,9 +103,10 @@ func (r Resource) setGrafanaConfig(ctx context.Context, diags *diag.Diagnostics,
 	}
 
 	c := r.client
-	epa := s.Grafana.EnablePublicAccess.ValueBool()
-	cfg := grafanaConfigs.UpdateJSONRequestBody{
-		PublicReadAccess: &epa,
+	cfg := grafanaConfigs.UpdateJSONRequestBody{}
+	if s.Grafana != nil {
+		epa := s.Grafana.EnablePublicAccess.ValueBool()
+		cfg.PublicReadAccess = &epa
 	}
 
 	res, err := c.Argus.GrafanaConfigs.UpdateWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString(), cfg)
