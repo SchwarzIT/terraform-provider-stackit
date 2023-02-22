@@ -124,24 +124,25 @@ func (r Resource) setMetricsConfig(ctx context.Context, diags *diag.Diagnostics,
 	if s.Metrics == nil && ref == nil {
 		return
 	}
-	if s.Metrics == nil {
-		s.Metrics = &Metrics{
+	m := s.Metrics
+	if m == nil {
+		m = &Metrics{
 			RetentionDays:               types.Int64Value(default_metrics_retention_days),
 			RetentionDays5mDownsampling: types.Int64Value(default_metrics_retention_days_5m_downsampling),
 			RetentionDays1hDownsampling: types.Int64Value(default_metrics_retention_days_1h_downsampling),
 		}
 	}
 	if ref != nil && ref.Metrics != nil {
-		if ref.Metrics.RetentionDays.Equal(s.Metrics.RetentionDays) &&
-			ref.Metrics.RetentionDays5mDownsampling.Equal(s.Metrics.RetentionDays5mDownsampling) &&
-			ref.Metrics.RetentionDays1hDownsampling.Equal(s.Metrics.RetentionDays1hDownsampling) {
+		if ref.Metrics.RetentionDays.Equal(m.RetentionDays) &&
+			ref.Metrics.RetentionDays5mDownsampling.Equal(m.RetentionDays5mDownsampling) &&
+			ref.Metrics.RetentionDays1hDownsampling.Equal(m.RetentionDays1hDownsampling) {
 			return
 		}
 	}
 	cfg := metricsStorageRetention.UpdateJSONRequestBody{
-		MetricsRetentionTimeRaw: fmt.Sprintf("%dd", s.Metrics.RetentionDays.ValueInt64()),
-		MetricsRetentionTime5m:  fmt.Sprintf("%dd", s.Metrics.RetentionDays5mDownsampling.ValueInt64()),
-		MetricsRetentionTime1h:  fmt.Sprintf("%dd", s.Metrics.RetentionDays1hDownsampling.ValueInt64()),
+		MetricsRetentionTimeRaw: fmt.Sprintf("%dd", m.RetentionDays.ValueInt64()),
+		MetricsRetentionTime5m:  fmt.Sprintf("%dd", m.RetentionDays5mDownsampling.ValueInt64()),
+		MetricsRetentionTime1h:  fmt.Sprintf("%dd", m.RetentionDays1hDownsampling.ValueInt64()),
 	}
 	res, err := r.client.Argus.MetricsStorageRetention.UpdateWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString(), cfg)
 	if err != nil {
