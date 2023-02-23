@@ -50,7 +50,7 @@ data "stackit_mongodb_flex_instance" "example" {
 - `id` (String) Specifies the resource ID
 - `machine_type` (String) The Machine Type.
 - `replicas` (Number) Number of replicas
-- `storage` (Attributes) A signle `storage` block as defined below. (see [below for nested schema](#nestedatt--storage))
+- `storage` (Attributes) A single `storage` block as defined below. (see [below for nested schema](#nestedatt--storage))
 - `version` (String) MongoDB version.
 
 <a id="nestedatt--storage"></a>
