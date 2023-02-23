@@ -64,7 +64,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Computed:    true,
 			},
 			"storage": schema.SingleNestedAttribute{
-				Description: "A signle `storage` block as defined below",
+				Description: "A single `storage` block as defined below",
 				Computed:    true,
 				Attributes: map[string]schema.Attribute{
 					"class": schema.StringAttribute{
