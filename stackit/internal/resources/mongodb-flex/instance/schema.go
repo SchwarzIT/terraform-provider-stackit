@@ -6,6 +6,7 @@ import (
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mongodb-flex/instance/defaults"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -87,7 +88,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []planmodifier.String{
-					modifiers.StringDefault(default_version),
+					modifiers.StringDefault(defaults.Version),
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
@@ -96,7 +97,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []planmodifier.Int64{
-					modifiers.Int64Default(default_replicas),
+					modifiers.Int64Default(defaults.Replicas),
 					int64planmodifier.UseStateForUnknown(),
 				},
 			},
@@ -105,7 +106,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []planmodifier.String{
-					modifiers.StringDefault(default_backup_schedule),
+					modifiers.StringDefault(defaults.Backup_schedule),
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
@@ -119,7 +120,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 						Optional:    true,
 						Computed:    true,
 						PlanModifiers: []planmodifier.String{
-							modifiers.StringDefault(default_storage_class),
+							modifiers.StringDefault(defaults.Storage_class),
 						},
 					},
 					"size": schema.Int64Attribute{
@@ -127,7 +128,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 						Optional:    true,
 						Computed:    true,
 						PlanModifiers: []planmodifier.Int64{
-							modifiers.Int64Default(default_storage_size),
+							modifiers.Int64Default(defaults.Storage_size),
 						},
 					},
 				},

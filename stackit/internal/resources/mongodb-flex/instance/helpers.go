@@ -7,32 +7,24 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/generated/instance"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mongodb-flex/instance/defaults"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/pkg/errors"
 )
 
-const (
-	default_version               = "6.0"
-	default_replicas        int64 = 1
-	default_username              = "stackit"
-	default_backup_schedule       = "0 0/6 * * *"
-	default_storage_class         = "premium-perf2-mongodb"
-	default_storage_size    int64 = 10
-)
-
 func (i *Instance) setDefaults() {
 	if i.Version.IsNull() || i.Version.IsUnknown() {
-		i.Version = types.StringValue(default_version)
+		i.Version = types.StringValue(defaults.Version)
 	}
 
 	if i.Replicas.IsNull() || i.Replicas.IsUnknown() {
-		i.Replicas = types.Int64Value(default_replicas)
+		i.Replicas = types.Int64Value(defaults.Replicas)
 	}
 
 	if i.BackupSchedule.IsNull() || i.BackupSchedule.IsUnknown() {
-		i.BackupSchedule = types.StringValue(default_backup_schedule)
+		i.BackupSchedule = types.StringValue(defaults.Backup_schedule)
 	}
 }
 
