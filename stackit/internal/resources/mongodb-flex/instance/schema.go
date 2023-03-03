@@ -6,7 +6,6 @@ import (
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mongodb-flex/instance/defaults"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -47,7 +46,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 		),
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				Description: "Specifies the resource ID",
+				Description: "Specifies the resource ID.",
 				Computed:    true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
@@ -68,11 +67,11 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"machine_type": schema.StringAttribute{
-				Description: "The Machine Type. Available options: `1.1`, `1.2`, `1.4`, `1.8`, `2.4`, `2.8`, `2.16`, `4.8`, `4.16`, `4.32`, `8.16`, `8.32`, `8.64`, `16.32`, `16.64`",
+				Description: "The Machine Type. Available options: `1.1`, `1.2`, `1.4`, `1.8`, `2.4`, `2.8`, `2.16`, `4.8`, `4.16`, `4.32`, `8.16`, `8.32`, `8.64`, `16.32`, `16.64`.",
 				Required:    true,
 			},
 			"type": schema.StringAttribute{
-				Description: "The service type. Available options: `Single`, `Replica`, `Sharded`",
+				Description: "The service type. Available options: `Single`, `Replica`, `Sharded`.",
 				Optional:    true,
 				Computed:    true,
 				Validators: []validator.String{
@@ -102,7 +101,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"backup_schedule": schema.StringAttribute{
-				Description: "Specifies the backup schedule (cron style)",
+				Description: "Specifies the backup schedule (cron style).",
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []planmodifier.String{
