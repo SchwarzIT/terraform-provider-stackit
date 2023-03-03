@@ -33,7 +33,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 		),
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				Description: "Specifies the resource ID",
+				Description: "Specifies the resource ID.",
 				Computed:    true,
 			},
 			"name": schema.StringAttribute{
@@ -56,11 +56,11 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Computed:    true,
 			},
 			"replicas": schema.Int64Attribute{
-				Description: "Number of replicas",
+				Description: "Number of replicas.",
 				Computed:    true,
 			},
 			"backup_schedule": schema.StringAttribute{
-				Description: "Specifies the backup schedule (cron style)",
+				Description: "Specifies the backup schedule (cron style).",
 				Computed:    true,
 			},
 			"storage": schema.SingleNestedAttribute{
@@ -68,7 +68,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Computed:    true,
 				Attributes: map[string]schema.Attribute{
 					"class": schema.StringAttribute{
-						Description: "Specifies the storage class. Available option: `premium-perf2-mongodb`",
+						Description: "Specifies the storage class. Available option: `premium-perf2-mongodb`.",
 						Computed:    true,
 					},
 					"size": schema.Int64Attribute{
@@ -78,7 +78,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				},
 			},
 			"acl": schema.ListAttribute{
-				Description: "Access Control rules to whitelist IP addresses",
+				Description: "Access Control rules to whitelist IP addresses.",
 				ElementType: types.StringType,
 				Computed:    true,
 			},

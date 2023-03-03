@@ -3,6 +3,7 @@ package instance_test
 import (
 	"errors"
 	"fmt"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mongodb-flex/instance"
 	"testing"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit"
@@ -15,7 +16,6 @@ import (
 )
 
 const run_this_test = false
-const default_version = "6.0"
 
 func TestAcc_MongoDBFlexInstance(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
@@ -37,11 +37,11 @@ func TestAcc_MongoDBFlexInstance(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "name", name1),
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
-					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "version", default_version),
-					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "machine_type", "1.1"),
-					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "replicas", "1"),
-					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "storage.class", "premium-perf2-mongodb"),
-					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "storage.size", "10"),
+					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "version", instance.DefaultVersion),
+					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "machine_type", instance.DefaultMachineType),
+					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "replicas", fmt.Sprint(instance.DefaultReplicas)),
+					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "storage.class", instance.DefaultStorageClass),
+					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "storage.size", fmt.Sprint(instance.DefaultStorageSize)),
 					resource.TestCheckResourceAttrSet("stackit_mongodb_flex_instance.example", "id"),
 					// resource.TestCheckResourceAttrSet("stackit_mongodb_flex_instance.example", "user.id"),
 					// resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "user.username", "stackit"),
@@ -57,11 +57,11 @@ func TestAcc_MongoDBFlexInstance(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "name", name2),
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
-					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "version", default_version),
-					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "machine_type", "1.1"),
-					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "replicas", "1"),
-					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "storage.class", "premium-perf2-mongodb"),
-					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "storage.size", "10"),
+					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "version", instance.DefaultVersion),
+					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "machine_type", instance.DefaultMachineType),
+					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "replicas", fmt.Sprint(instance.DefaultReplicas)),
+					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "storage.class", instance.DefaultStorageClass),
+					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "storage.size", fmt.Sprint(instance.DefaultStorageSize)),
 					resource.TestCheckResourceAttrSet("stackit_mongodb_flex_instance.example", "id"),
 					// resource.TestCheckResourceAttrSet("stackit_mongodb_flex_instance.example", "user.id"),
 					// resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "user.username", "stackit"),
@@ -100,10 +100,11 @@ func config(name string) string {
 	resource "stackit_mongodb_flex_instance" "example" {
 		name         = "%s"
 		project_id   = "%s"
-		machine_type = "1.1"
+		machine_type = "%s"
 	}  
 	  `,
 		name,
 		common.GetAcceptanceTestsProjectID(),
+		instance.DefaultMachineType,
 	)
 }

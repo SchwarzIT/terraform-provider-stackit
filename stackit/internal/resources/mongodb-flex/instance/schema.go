@@ -46,7 +46,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 		),
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				Description: "Specifies the resource ID",
+				Description: "Specifies the resource ID.",
 				Computed:    true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
@@ -67,11 +67,11 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"machine_type": schema.StringAttribute{
-				Description: "The Machine Type. Available options: `1.1`, `1.2`, `1.4`, `1.8`, `2.4`, `2.8`, `2.16`, `4.8`, `4.16`, `4.32`, `8.16`, `8.32`, `8.64`, `16.32`, `16.64`",
+				Description: "The Machine Type. Available options: `1.1`, `1.2`, `1.4`, `1.8`, `2.4`, `2.8`, `2.16`, `4.8`, `4.16`, `4.32`, `8.16`, `8.32`, `8.64`, `16.32`, `16.64`.",
 				Required:    true,
 			},
 			"type": schema.StringAttribute{
-				Description: "The service type. Available options: `Single`, `Replica`, `Sharded`",
+				Description: "The service type. Available options: `Single`, `Replica`, `Sharded`.",
 				Optional:    true,
 				Computed:    true,
 				Validators: []validator.String{
@@ -87,25 +87,25 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []planmodifier.String{
-					modifiers.StringDefault(default_version),
+					modifiers.StringDefault(DefaultVersion),
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"replicas": schema.Int64Attribute{
-				Description: "Number of replicas (Default is `1`)",
+				Description: fmt.Sprintf("Number of replicas (Default is `%d`).", DefaultReplicas),
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []planmodifier.Int64{
-					modifiers.Int64Default(default_replicas),
+					modifiers.Int64Default(DefaultReplicas),
 					int64planmodifier.UseStateForUnknown(),
 				},
 			},
 			"backup_schedule": schema.StringAttribute{
-				Description: "Specifies the backup schedule (cron style)",
+				Description: "Specifies the backup schedule (cron style).",
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []planmodifier.String{
-					modifiers.StringDefault(default_backup_schedule),
+					modifiers.StringDefault(DefaultBackupSchedule),
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
@@ -119,15 +119,15 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 						Optional:    true,
 						Computed:    true,
 						PlanModifiers: []planmodifier.String{
-							modifiers.StringDefault(default_storage_class),
+							modifiers.StringDefault(DefaultStorageClass),
 						},
 					},
 					"size": schema.Int64Attribute{
-						Description: "The storage size in GB. Default is `10`.",
+						Description: fmt.Sprintf("The storage size in GB (Default is `%d`).", DefaultStorageSize),
 						Optional:    true,
 						Computed:    true,
 						PlanModifiers: []planmodifier.Int64{
-							modifiers.Int64Default(default_storage_size),
+							modifiers.Int64Default(DefaultStorageSize),
 						},
 					},
 				},

@@ -46,8 +46,8 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	storage := Storage{}
 	if plan.Storage.IsUnknown() {
 		storage = Storage{
-			Class: types.StringValue(default_storage_class),
-			Size:  types.Int64Value(default_storage_size),
+			Class: types.StringValue(DefaultStorageClass),
+			Size:  types.Int64Value(DefaultStorageSize),
 		}
 	} else {
 		resp.Diagnostics.Append(plan.Storage.As(ctx, &storage, basetypes.ObjectAsOptions{})...)
@@ -199,8 +199,8 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	storage := Storage{}
 	if plan.Storage.IsUnknown() {
 		storage = Storage{
-			Class: types.StringValue(default_storage_class),
-			Size:  types.Int64Value(default_storage_size),
+			Class: types.StringValue(DefaultStorageClass),
+			Size:  types.Int64Value(DefaultStorageSize),
 		}
 	} else {
 		resp.Diagnostics.Append(plan.Storage.As(ctx, &storage, basetypes.ObjectAsOptions{})...)

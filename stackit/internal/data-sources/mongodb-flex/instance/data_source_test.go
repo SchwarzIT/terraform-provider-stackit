@@ -2,6 +2,7 @@ package instance_test
 
 import (
 	"fmt"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mongodb-flex/instance"
 	"testing"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit"
@@ -33,10 +34,10 @@ func TestAcc_MongoDBFlexInstance(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.stackit_mongodb_flex_instance.example", "name", name),
 					resource.TestCheckResourceAttr("data.stackit_mongodb_flex_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
-					resource.TestCheckResourceAttr("data.stackit_mongodb_flex_instance.example", "machine_type", "1.1"),
-					resource.TestCheckResourceAttr("data.stackit_mongodb_flex_instance.example", "replicas", "1"),
-					resource.TestCheckResourceAttr("data.stackit_mongodb_flex_instance.example", "storage.class", "premium-perf2-mongodb"),
-					resource.TestCheckResourceAttr("data.stackit_mongodb_flex_instance.example", "storage.size", "10"),
+					resource.TestCheckResourceAttr("data.stackit_mongodb_flex_instance.example", "machine_type", instance.DefaultMachineType),
+					resource.TestCheckResourceAttr("data.stackit_mongodb_flex_instance.example", "replicas", fmt.Sprint(instance.DefaultReplicas)),
+					resource.TestCheckResourceAttr("data.stackit_mongodb_flex_instance.example", "storage.class", instance.DefaultStorageClass),
+					resource.TestCheckResourceAttr("data.stackit_mongodb_flex_instance.example", "storage.size", fmt.Sprint(instance.DefaultStorageSize)),
 					resource.TestCheckResourceAttrSet("data.stackit_mongodb_flex_instance.example", "id"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_mongodb_flex_instance.example", "id", "data.stackit_mongodb_flex_instance.example", "id"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_mongodb_flex_instance.example", "machine_type", "data.stackit_mongodb_flex_instance.example", "machine_type"),
@@ -54,7 +55,7 @@ func config(name string) string {
 	resource "stackit_mongodb_flex_instance" "example" {
 		name         = "%s"
 		project_id   = "%s"
-		machine_type = "1.1"
+		machine_type = "%s"
 	} 
 
 	data "stackit_mongodb_flex_instance" "example" {
@@ -66,6 +67,7 @@ func config(name string) string {
 	`,
 		name,
 		common.GetAcceptanceTestsProjectID(),
+		instance.DefaultMachineType,
 		name,
 		common.GetAcceptanceTestsProjectID(),
 	)
