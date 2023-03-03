@@ -41,23 +41,23 @@ resource "stackit_mongodb_flex_instance" "example" {
 
 ### Required
 
-- `machine_type` (String) The Machine Type. Available options: `1.1`, `1.2`, `1.4`, `1.8`, `2.4`, `2.8`, `2.16`, `4.8`, `4.16`, `4.32`, `8.16`, `8.32`, `8.64`, `16.32`, `16.64`
+- `machine_type` (String) The Machine Type. Available options: `1.1`, `1.2`, `1.4`, `1.8`, `2.4`, `2.8`, `2.16`, `4.8`, `4.16`, `4.32`, `8.16`, `8.32`, `8.64`, `16.32`, `16.64`.
 - `name` (String) Specifies the instance name.
 - `project_id` (String) The project ID the instance runs in. Changing this value requires the resource to be recreated.
 
 ### Optional
 
 - `acl` (List of String) Access Control rules to whitelist IP addresses
-- `backup_schedule` (String) Specifies the backup schedule (cron style)
+- `backup_schedule` (String) Specifies the backup schedule (cron style).
 - `labels` (Map of String) Instance Labels
-- `replicas` (Number) Number of replicas (Default is `1`)
+- `replicas` (Number) Number of replicas (Default is `1`).
 - `storage` (Attributes) A single `storage` block as defined below. (see [below for nested schema](#nestedatt--storage))
-- `type` (String) The service type. Available options: `Single`, `Replica`, `Sharded`
+- `type` (String) The service type. Available options: `Single`, `Replica`, `Sharded`.
 - `version` (String) MongoDB version. Version `5.0` and `6.0` are supported.
 
 ### Read-Only
 
-- `id` (String) Specifies the resource ID
+- `id` (String) Specifies the resource ID.
 
 <a id="nestedatt--storage"></a>
 ### Nested Schema for `storage`
@@ -65,6 +65,6 @@ resource "stackit_mongodb_flex_instance" "example" {
 Optional:
 
 - `class` (String) Specifies the storage class. Available option: `premium-perf2-mongodb`
-- `size` (Number) The storage size in GB. Default is `10`.
+- `size` (Number) The storage size in GB (Default is `10`).
 
 

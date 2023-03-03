@@ -45,11 +45,11 @@ data "stackit_mongodb_flex_instance" "example" {
 
 ### Read-Only
 
-- `acl` (List of String) Access Control rules to whitelist IP addresses
-- `backup_schedule` (String) Specifies the backup schedule (cron style)
-- `id` (String) Specifies the resource ID
+- `acl` (List of String) Access Control rules to whitelist IP addresses.
+- `backup_schedule` (String) Specifies the backup schedule (cron style).
+- `id` (String) Specifies the resource ID.
 - `machine_type` (String) The Machine Type.
-- `replicas` (Number) Number of replicas
+- `replicas` (Number) Number of replicas.
 - `storage` (Attributes) A single `storage` block as defined below. (see [below for nested schema](#nestedatt--storage))
 - `version` (String) MongoDB version.
 
@@ -58,7 +58,7 @@ data "stackit_mongodb_flex_instance" "example" {
 
 Read-Only:
 
-- `class` (String) Specifies the storage class. Available option: `premium-perf2-mongodb`
+- `class` (String) Specifies the storage class. Available option: `premium-perf2-mongodb`.
 - `size` (Number) The storage size in GB.
 
 
