@@ -11,7 +11,6 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mongodb-flex/instance/defaults"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -47,8 +46,8 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	storage := Storage{}
 	if plan.Storage.IsUnknown() {
 		storage = Storage{
-			Class: types.StringValue(defaults.Storage_class),
-			Size:  types.Int64Value(defaults.Storage_size),
+			Class: types.StringValue(DefaultStorageClass),
+			Size:  types.Int64Value(DefaultStorageSize),
 		}
 	} else {
 		resp.Diagnostics.Append(plan.Storage.As(ctx, &storage, basetypes.ObjectAsOptions{})...)
@@ -200,8 +199,8 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	storage := Storage{}
 	if plan.Storage.IsUnknown() {
 		storage = Storage{
-			Class: types.StringValue(defaults.Storage_class),
-			Size:  types.Int64Value(defaults.Storage_size),
+			Class: types.StringValue(DefaultStorageClass),
+			Size:  types.Int64Value(DefaultStorageSize),
 		}
 	} else {
 		resp.Diagnostics.Append(plan.Storage.As(ctx, &storage, basetypes.ObjectAsOptions{})...)

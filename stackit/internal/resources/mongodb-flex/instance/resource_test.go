@@ -3,11 +3,11 @@ package instance_test
 import (
 	"errors"
 	"fmt"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mongodb-flex/instance"
 	"testing"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mongodb-flex/instance/defaults"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -16,7 +16,6 @@ import (
 )
 
 const run_this_test = false
-const default_machine_type = "1.1"
 
 func TestAcc_MongoDBFlexInstance(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
@@ -38,11 +37,11 @@ func TestAcc_MongoDBFlexInstance(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "name", name1),
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
-					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "version", defaults.Version),
-					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "machine_type", default_machine_type),
-					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "replicas", fmt.Sprint(defaults.Replicas)),
-					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "storage.class", defaults.Storage_class),
-					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "storage.size", fmt.Sprint(defaults.Storage_size)),
+					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "version", instance.DefaultVersion),
+					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "machine_type", instance.DefaultMachineType),
+					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "replicas", fmt.Sprint(instance.DefaultReplicas)),
+					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "storage.class", instance.DefaultStorageClass),
+					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "storage.size", fmt.Sprint(instance.DefaultStorageSize)),
 					resource.TestCheckResourceAttrSet("stackit_mongodb_flex_instance.example", "id"),
 					// resource.TestCheckResourceAttrSet("stackit_mongodb_flex_instance.example", "user.id"),
 					// resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "user.username", "stackit"),
@@ -58,11 +57,11 @@ func TestAcc_MongoDBFlexInstance(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "name", name2),
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
-					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "version", defaults.Version),
-					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "machine_type", default_machine_type),
-					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "replicas", fmt.Sprint(defaults.Replicas)),
-					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "storage.class", defaults.Storage_class),
-					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "storage.size", fmt.Sprint(defaults.Storage_size)),
+					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "version", instance.DefaultVersion),
+					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "machine_type", instance.DefaultMachineType),
+					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "replicas", fmt.Sprint(instance.DefaultReplicas)),
+					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "storage.class", instance.DefaultStorageClass),
+					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "storage.size", fmt.Sprint(instance.DefaultStorageSize)),
 					resource.TestCheckResourceAttrSet("stackit_mongodb_flex_instance.example", "id"),
 					// resource.TestCheckResourceAttrSet("stackit_mongodb_flex_instance.example", "user.id"),
 					// resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "user.username", "stackit"),
@@ -106,6 +105,6 @@ func config(name string) string {
 	  `,
 		name,
 		common.GetAcceptanceTestsProjectID(),
-		default_machine_type,
+		instance.DefaultMachineType,
 	)
 }

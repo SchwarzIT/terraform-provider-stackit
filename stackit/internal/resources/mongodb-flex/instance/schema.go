@@ -88,16 +88,16 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []planmodifier.String{
-					modifiers.StringDefault(defaults.Version),
+					modifiers.StringDefault(DefaultVersion),
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"replicas": schema.Int64Attribute{
-				Description: "Number of replicas (Default is `1`)",
+				Description: fmt.Sprintf("Number of replicas (Default is `%d`).", DefaultReplicas),
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []planmodifier.Int64{
-					modifiers.Int64Default(defaults.Replicas),
+					modifiers.Int64Default(DefaultReplicas),
 					int64planmodifier.UseStateForUnknown(),
 				},
 			},
@@ -106,7 +106,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []planmodifier.String{
-					modifiers.StringDefault(defaults.Backup_schedule),
+					modifiers.StringDefault(DefaultBackupSchedule),
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
@@ -120,15 +120,15 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 						Optional:    true,
 						Computed:    true,
 						PlanModifiers: []planmodifier.String{
-							modifiers.StringDefault(defaults.Storage_class),
+							modifiers.StringDefault(DefaultStorageClass),
 						},
 					},
 					"size": schema.Int64Attribute{
-						Description: "The storage size in GB. Default is `10`.",
+						Description: fmt.Sprintf("The storage size in GB (Default is `%d`).", DefaultStorageSize),
 						Optional:    true,
 						Computed:    true,
 						PlanModifiers: []planmodifier.Int64{
-							modifiers.Int64Default(defaults.Storage_size),
+							modifiers.Int64Default(DefaultStorageSize),
 						},
 					},
 				},
