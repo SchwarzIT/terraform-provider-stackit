@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-const run_this_test = false
+const run_this_test = true
 
 func TestAcc_MongoDBFlexInstance(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
@@ -24,7 +24,6 @@ func TestAcc_MongoDBFlexInstance(t *testing.T) {
 	}
 
 	name1 := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
-	name2 := "odjtest2-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
 
 	resource.ParallelTest(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){
@@ -33,7 +32,7 @@ func TestAcc_MongoDBFlexInstance(t *testing.T) {
 		Steps: []resource.TestStep{
 			// check minimal configuration
 			{
-				Config: config(name1),
+				Config: config(name1, instance.DefaultMachineType),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "name", name1),
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
@@ -53,9 +52,9 @@ func TestAcc_MongoDBFlexInstance(t *testing.T) {
 				),
 			},
 			{
-				Config: config(name2),
+				Config: config(name1, "1.2"),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "name", name2),
+					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "name", name1),
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "version", instance.DefaultVersion),
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "machine_type", instance.DefaultMachineType),
@@ -95,7 +94,7 @@ func TestAcc_MongoDBFlexInstance(t *testing.T) {
 	})
 }
 
-func config(name string) string {
+func config(name string, machine string) string {
 	return fmt.Sprintf(`
 	resource "stackit_mongodb_flex_instance" "example" {
 		name         = "%s"
@@ -105,6 +104,6 @@ func config(name string) string {
 	  `,
 		name,
 		common.GetAcceptanceTestsProjectID(),
-		instance.DefaultMachineType,
+		machine,
 	)
 }
