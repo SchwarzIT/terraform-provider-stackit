@@ -57,7 +57,7 @@ func TestAcc_MongoDBFlexInstance(t *testing.T) {
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "name", name1),
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "version", instance.DefaultVersion),
-					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "machine_type", instance.DefaultMachineType),
+					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "machine_type", "1.2"),
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "replicas", fmt.Sprint(instance.DefaultReplicas)),
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "storage.class", instance.DefaultStorageClass),
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "storage.size", fmt.Sprint(instance.DefaultStorageSize)),
