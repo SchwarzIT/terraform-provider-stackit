@@ -77,7 +77,7 @@ jobs:
           path: stackit/internal/data-sources/argus/job
 
     name: ${{ matrix.name }} data source
-    needs:  createproject
+    needs: createproject
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -112,7 +112,7 @@ jobs:
           path: stackit/internal/data-sources/data-services/instance
 
     name: ${{ matrix.name }} data source
-    needs:  createproject
+    needs: createproject
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -147,7 +147,7 @@ jobs:
           path: stackit/internal/data-sources/kubernetes/project
 
     name: ${{ matrix.name }} data source
-    needs:  createproject
+    needs: createproject
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -182,7 +182,7 @@ jobs:
           path: stackit/internal/data-sources/mongodb-flex/user
 
     name: ${{ matrix.name }} data source
-    needs:  createproject
+    needs: createproject
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -223,7 +223,7 @@ jobs:
           path: stackit/internal/data-sources/object-storage/project
 
     name: ${{ matrix.name }} data source
-    needs:  createproject
+    needs: createproject
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -258,7 +258,7 @@ jobs:
           path: stackit/internal/data-sources/postgres-flex/user
 
     name: ${{ matrix.name }} data source
-    needs:  createproject
+    needs: createproject
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -289,7 +289,7 @@ jobs:
           path: stackit/internal/data-sources/project
 
     name: ${{ matrix.name }} data source
-    needs:  createproject
+    needs: createproject
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -569,7 +569,7 @@ jobs:
         id: delete_project
         if: always()
         shell: bash
-        run:   |
+        run: |
           [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]] && exit 0
           echo "Deleting project ID: ${ACC_TEST_PROJECT_ID}"
           curl --location --request DELETE 'https://api.stackit.cloud/resource-management/v2/projects/${{ env.ACC_TEST_PROJECT_ID }}' \
