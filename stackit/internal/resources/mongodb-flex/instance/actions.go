@@ -235,7 +235,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	// handle update
-	res, err := r.client.MongoDBFlex.Instance.PutWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
+	res, err := r.client.MongoDBFlex.Instance.PatchWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
 	if agg := validate.Response(res, err, "JSON202.Item"); agg != nil {
 		resp.Diagnostics.AddError("failed updating mongodb flex instance", agg.Error())
 		return
