@@ -140,7 +140,9 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version-file: 'go.mod'
+          check-latest: true
+          cache: true
       - name: Test ${{ matrix.name }} Data Source
         run: |
           echo $path
@@ -185,7 +187,9 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version-file: 'go.mod'
+          check-latest: true
+          cache: true
       - name: Test ${{ matrix.name }} Data Source
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
@@ -247,7 +251,9 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version-file: 'go.mod'
+          check-latest: true
+          cache: true
       - name: Test ${{ matrix.name }} resource
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
@@ -292,7 +298,9 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version-file: 'go.mod'
+          check-latest: true
+          cache: true
       - name: Test ${{ matrix.name }} resource
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
