@@ -52,6 +52,7 @@ func TestAcc_MongoDBFlexInstance(t *testing.T) {
 				),
 			},
 			{
+				// check update machine
 				Config: config(name1, "1.2"),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "name", name1),

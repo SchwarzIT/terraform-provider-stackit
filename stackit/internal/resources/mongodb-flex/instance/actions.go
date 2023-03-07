@@ -241,11 +241,13 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		return
 	}
 
-	process := res.WaitHandler(ctx, r.client.MongoDBFlex.Instance, plan.ProjectID.ValueString(), plan.ID.ValueString())
-	if _, err := process.WaitWithContext(ctx); err != nil {
-		resp.Diagnostics.AddError("failed MongoDB instance update validation", err.Error())
-		return
-	}
+	// artificial wait for queued update
+	time.Sleep(time.Second * 30)
+	// process := res.WaitHandler(ctx, r.client.MongoDBFlex.Instance, plan.ProjectID.ValueString(), plan.ID.ValueString())
+	// if _, err := process.WaitWithContext(ctx); err != nil {
+	// 	resp.Diagnostics.AddError("failed MongoDB instance update validation", err.Error())
+	// 	return
+	// }
 
 	// read cluster
 	get, err := r.client.MongoDBFlex.Instance.GetWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString())
