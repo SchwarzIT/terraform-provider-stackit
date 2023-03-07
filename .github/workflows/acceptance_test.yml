@@ -10,8 +10,22 @@ env:
   ACC_TEST_CI: 1
 
 jobs:
+  vars:
+    name: Get the current version of Go from project
+    runs-on: ubuntu-latest
+    outputs:
+      goVersion: ${{ steps.get_go_version.outputs.GO_VERSION }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Get Go version from project
+        id: get_go_version
+        run: echo "GO_VERSION=$(grep 'go \d\.' go.mod | cut -d ' ' -f 2)" >> $GITHUB_OUTPUT
+
   createproject:
     name: Create Project
+    needs: vars
     runs-on: ubuntu-latest
     outputs:
       projectID: ${{ steps.create_project.outputs.ACC_TEST_PROJECT_ID }}
@@ -62,7 +76,6 @@ jobs:
           expected-response-field: 'lifecycleState'
           expected-response-field-value: 'ACTIVE'
 
-
   datasource-argus:
     strategy:
       fail-fast: false
@@ -78,7 +91,7 @@ jobs:
           path: stackit/internal/data-sources/argus/job
 
     name: ${{ matrix.name }} data source
-    needs: createproject
+    needs:  createproject
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -87,7 +100,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: ${{needs.vars.outputs.goVersion}}
       - name: Test ${{ matrix.name }} Data Source
         run: |
           echo $path
@@ -109,7 +122,7 @@ jobs:
           path: stackit/internal/data-sources/data-services/instance
 
     name: ${{ matrix.name }} data source
-    needs: createproject
+    needs:  createproject
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -118,7 +131,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: ${{needs.vars.outputs.goVersion}}
       - name: Test ${{ matrix.name }} Data Source
         run: |
           echo $path
@@ -140,7 +153,7 @@ jobs:
           path: stackit/internal/data-sources/kubernetes/project
 
     name: ${{ matrix.name }} data source
-    needs: createproject
+    needs:  createproject
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -149,7 +162,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: ${{needs.vars.outputs.goVersion}}
       - name: Test ${{ matrix.name }} Data Source
         run: |
           echo $path
@@ -171,7 +184,7 @@ jobs:
           path: stackit/internal/data-sources/mongodb-flex/user
 
     name: ${{ matrix.name }} data source
-    needs: createproject
+    needs:  createproject
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -180,7 +193,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: ${{needs.vars.outputs.goVersion}}
       - name: Test ${{ matrix.name }} Data Source
         run: |
           echo $path
@@ -208,7 +221,7 @@ jobs:
           path: stackit/internal/data-sources/object-storage/project
 
     name: ${{ matrix.name }} data source
-    needs: createproject
+    needs:  createproject
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -217,7 +230,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: ${{needs.vars.outputs.goVersion}}
       - name: Test ${{ matrix.name }} Data Source
         run: |
           echo $path
@@ -239,7 +252,7 @@ jobs:
           path: stackit/internal/data-sources/postgres-flex/user
 
     name: ${{ matrix.name }} data source
-    needs: createproject
+    needs:  createproject
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -248,7 +261,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: ${{needs.vars.outputs.goVersion}}
       - name: Test ${{ matrix.name }} Data Source
         run: |
           echo $path
@@ -266,7 +279,7 @@ jobs:
           path: stackit/internal/data-sources/project
 
     name: ${{ matrix.name }} data source
-    needs: createproject
+    needs:  createproject
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -275,7 +288,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: ${{needs.vars.outputs.goVersion}}
       - name: Test ${{ matrix.name }} Data Source
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
@@ -310,7 +323,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: ${{needs.vars.outputs.goVersion}}
       - name: Test ${{ matrix.name }} resource
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
@@ -340,7 +353,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: ${{needs.vars.outputs.goVersion}}
       - name: Test ${{ matrix.name }} resource
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
@@ -370,7 +383,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: ${{needs.vars.outputs.goVersion}}
       - name: Test ${{ matrix.name }} resource
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
@@ -400,7 +413,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: ${{needs.vars.outputs.goVersion}}
       - name: Test ${{ matrix.name }} resource
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
@@ -436,7 +449,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: ${{needs.vars.outputs.goVersion}}
       - name: Test ${{ matrix.name }} resource
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
@@ -466,7 +479,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: ${{needs.vars.outputs.goVersion}}
       - name: Test ${{ matrix.name }} resource
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
@@ -492,12 +505,11 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: ${{needs.vars.outputs.goVersion}}
       - name: Test ${{ matrix.name }} resource
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
           make testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
-
 
 
   deleteproject:
