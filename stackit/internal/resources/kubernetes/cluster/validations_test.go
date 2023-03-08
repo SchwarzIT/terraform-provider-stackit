@@ -4,9 +4,15 @@ import (
 	"testing"
 
 	"github.com/Masterminds/semver"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 )
 
 func Test_maxVersionOption(t *testing.T) {
+	// don't run during acceptance tests
+	if common.ShouldAccTestRun(false) {
+		t.Skip()
+		return
+	}
 	type args struct {
 		version        *semver.Version
 		versionOptions []*semver.Version

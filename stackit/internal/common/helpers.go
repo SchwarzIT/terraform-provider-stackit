@@ -32,9 +32,10 @@ func ToString(ctx context.Context, v attr.Value) (string, error) {
 // ShouldAccTestRun returns true of the provided flag is true or if
 // an env variable ACC_TEST_CI has any value
 func ShouldAccTestRun(runFlag bool) bool {
-	if v, ok := os.LookupEnv("ACC_TEST_CI"); (ok && v != "") || runFlag {
-		return true
-	}
+	// @TODO : undo comment out
+	// if v, ok := os.LookupEnv("ACC_TEST_CI"); (ok && v != "") || runFlag {
+	// 	return true
+	// }
 	return false
 }
 
