@@ -148,7 +148,7 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
           echo $path
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
           if [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]]; then
-		    exit 1;
+            exit 1;
           fi;
           make ci-testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
       - name: Save results
@@ -201,7 +201,7 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
           if [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]]; then
-		    exit 1;
+            exit 1;
           fi;
           make ci-testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
       - name: Save results
@@ -272,7 +272,7 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
           if [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]]; then
-		    exit 1;
+            exit 1;
           fi;
           make ci-testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
       - name: Save results
@@ -326,7 +326,7 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
           if [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]]; then
-		    exit 1;
+            exit 1;
           fi;
           make ci-testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
       - name: Save results
