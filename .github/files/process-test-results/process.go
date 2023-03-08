@@ -20,7 +20,7 @@ type Summary struct {
 }
 
 func main() {
-	dirname := ".github/files/process-test-results/test"
+	dirname := ".github/files/process-test-results/artifacts"
 	agg := TestsSummary{
 		Packages: map[string]Summary{},
 	}
