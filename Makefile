@@ -57,9 +57,6 @@ testacc:
 		go test -p 1 -timeout 99999s -v $(TEST)
 
 ci-testacc:
-	@if cmp -s "${ACC_TEST_PROJECT_ID}" ""; then \
-		exit 1; \
-    fi
 	@TF_ACC=1 TF_ACC_LOG=INFO TF_LOG=INFO \
 		ACC_TEST_BILLING_REF="$(ACC_TEST_BILLING_REF)" \
 		ACC_TEST_USER_EMAIL="$(ACC_TEST_USER_EMAIL)" \
