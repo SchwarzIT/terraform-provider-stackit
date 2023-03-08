@@ -56,6 +56,16 @@ testacc:
 		STACKIT_CUSTOMER_ACCOUNT_ID="$(STACKIT_CUSTOMER_ACCOUNT_ID)" \
 		go test -p 1 -timeout 99999s -v $(TEST)
 
+ci-testacc:
+	@TF_ACC=1 TF_ACC_LOG=INFO TF_LOG=INFO \
+		ACC_TEST_BILLING_REF="$(ACC_TEST_BILLING_REF)" \
+		ACC_TEST_USER_EMAIL="$(ACC_TEST_USER_EMAIL)" \
+		STACKIT_SERVICE_ACCOUNT_EMAIL="$(STACKIT_SERVICE_ACCOUNT_EMAIL)" \
+		STACKIT_SERVICE_ACCOUNT_TOKEN="$(STACKIT_SERVICE_ACCOUNT_TOKEN)" \
+		STACKIT_CUSTOMER_ACCOUNT_ID="$(STACKIT_CUSTOMER_ACCOUNT_ID)" \
+		go test -json -p 1 -timeout 99999s -v $(TEST) > .github/files/analyze-test-output/testoutput; \
+		cd .github/files/analyze-test-output && go run analyze.go
+
 dummy:
 	@echo $(TEST)
 
@@ -84,4 +94,8 @@ ci-verify: ci-docs
 		exit 1; \
 	fi
 
-.PHONY: all docs testacc ci-verify pre-commit dummy test ci-docs quality preview-docs install build
+ci-process-results:
+		go run .github/files/process-test-results/process.go
+
+
+.PHONY: all docs testacc ci-testacc ci-verify pre-commit dummy test ci-docs quality preview-docs install build ci-process-results

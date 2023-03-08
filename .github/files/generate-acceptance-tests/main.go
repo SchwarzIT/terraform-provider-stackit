@@ -81,7 +81,7 @@ func main() {
 	resstr, deleteNeeds := printResourceOutcome(sortedGlobalKeysRes, rk, sr, "resource-", "datasource-")
 	sData = strings.Replace(sData, "__data_sources__", dsstr, 1)
 	sData = strings.Replace(sData, "__resources__", resstr, 1)
-	sData = strings.Replace(sData, "__delete_needs__", deleteNeeds, 1)
+	sData = strings.Replace(sData, "__delete_needs__", deleteNeeds, 2)
 
 	err = ioutil.WriteFile(".github/workflows/acceptance_test.yml", []byte(s+sData), 0644)
 	if err != nil {
@@ -147,7 +147,14 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
         run: |
           echo $path
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
-          make testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+          if [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]]; then
+            exit 1;
+          fi;
+          make ci-testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+      - name: Save results
+        uses: actions/upload-artifact@v3
+        with:
+          path: .github/files/analyze-test-output/result/*.json
 `, prefix, id, strings.Join(names, ","), incl)
 	}
 
@@ -193,7 +200,14 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
       - name: Test ${{ matrix.name }} Data Source
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
-          make testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+          if [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]]; then
+            exit 1;
+          fi;
+          make ci-testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+      - name: Save results
+        uses: actions/upload-artifact@v3
+        with:
+          path: .github/files/analyze-test-output/result/*.json
 `, strings.Join(collectedNames, ","), incl)
 
 	return s
@@ -257,7 +271,14 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
       - name: Test ${{ matrix.name }} resource
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
-          make testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+          if [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]]; then
+            exit 1;
+          fi;
+          make ci-testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+      - name: Save results
+        uses: actions/upload-artifact@v3
+        with:
+          path: .github/files/analyze-test-output/result/*.json
 `, prefix, id, strings.Join(names, ","), incl, previousPrefix, id)
 	}
 
@@ -304,7 +325,14 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
       - name: Test ${{ matrix.name }} resource
         run: |
           export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
-          make testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+          if [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]]; then
+            exit 1;
+          fi;
+          make ci-testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+      - name: Save results
+        uses: actions/upload-artifact@v3
+        with:
+          path: .github/files/analyze-test-output/result/*.json
 `, strings.Join(collectedNames, ","), incl)
 
 	return s, "[createproject," + strings.Join(nextNeeds, ",") + "]"

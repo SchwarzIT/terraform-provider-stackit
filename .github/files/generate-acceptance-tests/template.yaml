@@ -22,19 +22,21 @@ jobs:
         run: |
           JSON_DATA=$(cat << EOF
           { 
-          "name": "${{ github.event.repository.name }}_${{ github.run_id }}", 
-          "containerParentId": "${{ secrets.ACC_TEST_PARENT_CONTAINER_ID }}", 
-          "members": [{ 
-          "role": "project.owner", 
-          "subject": "${{ secrets.ACC_TEST_USER_EMAIL }}" 
-          },{ 
-          "role": "project.owner", 
-          "subject": "${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}" 
-          }], 
-          "labels": { 
-          "billingReference": "${{ secrets.ACC_TEST_BILLING_REF }}", 
-          "scope": "PUBLIC" 
-          }
+            "name": "${{ github.event.repository.name }}_${{ github.run_id }}", 
+            "containerParentId": "${{ secrets.ACC_TEST_PARENT_CONTAINER_ID }}", 
+            "members": [
+              { 
+                "role": "project.owner", 
+                "subject": "${{ secrets.ACC_TEST_USER_EMAIL }}" 
+              },{ 
+                "role": "project.owner", 
+                "subject": "${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}" 
+              }
+            ], 
+            "labels": { 
+              "billingReference": "${{ secrets.ACC_TEST_BILLING_REF }}", 
+              "scope": "PUBLIC" 
+            }
           }
           EOF
           )
@@ -43,12 +45,15 @@ jobs:
             --header 'Content-Type: application/json' \
             --header 'Accept: application/json' \
             --header 'Authorization: Bearer ${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}' \
-            --data-raw "${JSON_DATA}" > $HOME/pr.json
+            --data-raw "${JSON_DATA}" > pr.json
           
-          ACC_TEST_PROJECT_ID="$(jq -r '.projectId' $HOME/pr.json)"
+          ACC_TEST_PROJECT_ID="$(jq -r '.projectId' pr.json)"
           echo "ACC_TEST_PROJECT_ID=${ACC_TEST_PROJECT_ID}" >> $GITHUB_ENV
           echo "ACC_TEST_PROJECT_ID=${ACC_TEST_PROJECT_ID}" >> $GITHUB_OUTPUT
-          [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]] && exit 1 || exit 0
+          if [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]]; then
+            cat pr.json;
+            exit 1;
+          fi;
 
       - name: Wait project created
         id: wait_project_active
@@ -83,9 +88,31 @@ __resources__
         id: delete_project
         if: always()
         shell: bash
-        run:   |
+        run: |
           [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]] && exit 0
           echo "Deleting project ID: ${ACC_TEST_PROJECT_ID}"
           curl --location --request DELETE 'https://api.stackit.cloud/resource-management/v2/projects/${{ env.ACC_TEST_PROJECT_ID }}' \
             --header 'Accept: application/json' \
             --header 'Authorization: Bearer ${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}'
+
+  processresult:
+    name: Process Test Results
+    runs-on: ubuntu-latest
+    needs: __delete_needs__
+    if: ${{ always() }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: .github/files/process-test-results
+      - name: Run process
+        run: make ci-process-results
+      - name: Commit result
+        run: |
+          git config --global user.name 'Dean'
+          git config --global user.email 'do87@users.noreply.github.com'
+          git add README.md
+          git commit -m "Automated readme update"
+          git pull -r
+          git push
