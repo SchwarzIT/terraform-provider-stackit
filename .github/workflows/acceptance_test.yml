@@ -668,4 +668,5 @@ jobs:
           git config --global user.email 'do87@users.noreply.github.com'
           git add README.md
           git commit -m "Automated readme update"
+          git pull -r
           git push
