@@ -99,7 +99,8 @@ __resources__
       - uses: actions/checkout@v2
       - name: Download all artifacts
         uses: actions/download-artifact@v3
-        path: .github/files/process-test-results/artifacts
+        with:
+          path: .github/files/process-test-results/artifacts
       - name: Run process
         run: make ci-process-results
       - name: Commit result
