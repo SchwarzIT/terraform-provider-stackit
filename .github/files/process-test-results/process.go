@@ -24,10 +24,7 @@ func main() {
 	agg := TestsSummary{
 		Packages: map[string]Summary{},
 	}
-	dir, err := os.ReadDir(dirname)
-	if err != nil {
-		panic(err)
-	}
+	dir, _ := os.ReadDir(dirname)
 	for _, file := range dir {
 		var f TestsSummary
 		b, err := os.ReadFile(path.Join(dirname, file.Name()))
