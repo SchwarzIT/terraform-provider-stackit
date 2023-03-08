@@ -20,7 +20,7 @@ type Summary struct {
 }
 
 func main() {
-	dirname := ".github/files/process-test-results/artifacts"
+	dirname := ".github/files/process-test-results/artifact"
 	agg := TestsSummary{
 		Packages: map[string]Summary{},
 	}
@@ -67,12 +67,10 @@ func main() {
 func getBadge(s Summary) string {
 	badgeText := "All failed"
 	switch true {
+	case s.Fail == 0 && s.Pass > 0:
+		badgeText = "All passed"
 	case s.Fail > 0 && s.Pass > 0:
 		badgeText = fmt.Sprintf("%d passed, %d failed", s.Pass, s.Fail)
-	case s.Pass > 0:
-		badgeText = fmt.Sprintf("%d passed", s.Pass)
-	case s.Fail > 0:
-		badgeText = fmt.Sprintf("%d failed", s.Fail)
 	}
 
 	color := "red"

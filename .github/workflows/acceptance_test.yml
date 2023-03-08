@@ -664,7 +664,7 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v3
         with:
-          path: .github/files/process-test-results/artifacts
+          path: .github/files/process-test-results
       - name: Run process
         run: make ci-process-results
       - name: Commit result
