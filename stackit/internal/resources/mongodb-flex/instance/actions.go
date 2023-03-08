@@ -91,7 +91,6 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	// set state
-
 	instanceID := *res.JSON202.ID
 	plan.ID = types.StringValue(instanceID)
 	if instanceID == "" {
@@ -105,7 +104,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	// The API currently has a bug that causes the instance to initially get a FAILED status
-	// To overcome the bug, we'll wait an initial 30 sec
+	// To overcome the bug, we'll wait an initial 60 sec
 	time.Sleep(60 * time.Second)
 
 	process := res.WaitHandler(ctx, r.client.MongoDBFlex.Instance, plan.ProjectID.ValueString(), instanceID)
@@ -241,13 +240,14 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		return
 	}
 
-	// artificial wait for queued update
+	// The API currently has a bug that causes the instance to initially get a FAILED status
+	// To overcome the bug, we'll wait an initial 60 sec
 	time.Sleep(time.Second * 30)
-	// process := res.WaitHandler(ctx, r.client.MongoDBFlex.Instance, plan.ProjectID.ValueString(), plan.ID.ValueString())
-	// if _, err := process.WaitWithContext(ctx); err != nil {
-	// 	resp.Diagnostics.AddError("failed MongoDB instance update validation", err.Error())
-	// 	return
-	// }
+	process := res.WaitHandler(ctx, r.client.MongoDBFlex.Instance, plan.ProjectID.ValueString(), plan.ID.ValueString())
+	if _, err := process.WaitWithContext(ctx); err != nil {
+		resp.Diagnostics.AddError("failed MongoDB instance update validation", err.Error())
+		return
+	}
 
 	// read cluster
 	get, err := r.client.MongoDBFlex.Instance.GetWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString())
