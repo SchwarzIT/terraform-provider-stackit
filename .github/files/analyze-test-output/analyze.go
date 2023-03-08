@@ -80,6 +80,9 @@ func main() {
 	if err := os.WriteFile("result/"+uuid.New().String()+".json", b, 0644); err != nil {
 		panic(err)
 	}
+	if ts.Overall.Fail > 0 {
+		panic("test failed.")
+	}
 }
 
 func getDataServiceName(testName string) string {
