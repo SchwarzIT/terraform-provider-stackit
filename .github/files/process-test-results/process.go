@@ -65,7 +65,7 @@ func main() {
 }
 
 func getBadge(s Summary) string {
-	badgeText := ""
+	badgeText := "All failed"
 	switch true {
 	case s.Fail > 0 && s.Pass > 0:
 		badgeText = fmt.Sprintf("%d passed, %d failed", s.Pass, s.Fail)
@@ -77,7 +77,11 @@ func getBadge(s Summary) string {
 
 	color := "red"
 	var colorIndicator float32
-	colorIndicator = float32(s.Pass) / float32(s.Pass+s.Fail)
+	sum := float32(s.Pass + s.Fail)
+	if sum == 0 {
+		sum = 1
+	}
+	colorIndicator = float32(s.Pass) / sum
 	if colorIndicator > 0.5 {
 		color = "orange"
 	}

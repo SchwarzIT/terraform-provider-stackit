@@ -600,7 +600,7 @@ jobs:
         id: delete_project
         if: always()
         shell: bash
-        run:   |
+        run: |
           [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]] && exit 0
           echo "Deleting project ID: ${ACC_TEST_PROJECT_ID}"
           curl --location --request DELETE 'https://api.stackit.cloud/resource-management/v2/projects/${{ env.ACC_TEST_PROJECT_ID }}' \
