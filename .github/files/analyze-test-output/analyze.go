@@ -8,6 +8,8 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type TestsSummary struct {
@@ -33,7 +35,7 @@ func main() {
 	var ts TestsSummary
 	ts.Packages = map[string]Summary{}
 
-	file, err := os.Open("output")
+	file, err := os.Open("testoutput")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -75,7 +77,7 @@ func main() {
 	}
 
 	b, _ := json.Marshal(ts)
-	if err := os.WriteFile("result", b, 0644); err != nil {
+	if err := os.WriteFile("result/"+uuid.New().String()+".json", b, 0644); err != nil {
 		panic(err)
 	}
 }
