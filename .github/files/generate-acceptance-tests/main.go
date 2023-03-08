@@ -81,7 +81,7 @@ func main() {
 	resstr, deleteNeeds := printResourceOutcome(sortedGlobalKeysRes, rk, sr, "resource-", "datasource-")
 	sData = strings.Replace(sData, "__data_sources__", dsstr, 1)
 	sData = strings.Replace(sData, "__resources__", resstr, 1)
-	sData = strings.Replace(sData, "__delete_needs__", deleteNeeds, 1)
+	sData = strings.Replace(sData, "__delete_needs__", deleteNeeds, 2)
 
 	err = ioutil.WriteFile(".github/workflows/acceptance_test.yml", []byte(s+sData), 0644)
 	if err != nil {

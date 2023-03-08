@@ -610,7 +610,7 @@ jobs:
   processresult:
     name: Process Test Results
     runs-on: ubuntu-latest
-    needs: __delete_needs__
+    needs: [createproject,resources,resource-argus,resource-data-services,resource-kubernetes,resource-mongodb-flex,resource-object-storage,resource-postgres-flex]
     if: ${{ always() }}
     steps:
       - uses: actions/checkout@v2
