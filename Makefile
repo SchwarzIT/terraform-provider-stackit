@@ -94,4 +94,8 @@ ci-verify: ci-docs
 		exit 1; \
 	fi
 
-.PHONY: all docs testacc ci-testacc ci-verify pre-commit dummy test ci-docs quality preview-docs install build
+ci-process-results:
+		go run .github/files/process-test-results/process.go
+
+
+.PHONY: all docs testacc ci-testacc ci-verify pre-commit dummy test ci-docs quality preview-docs install build ci-process-results

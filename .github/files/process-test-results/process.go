@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"strings"
 )
 
 type TestsSummary struct {
@@ -19,7 +20,7 @@ type Summary struct {
 }
 
 func main() {
-	dirname := "test"
+	dirname := ".github/files/process-test-results/test"
 	agg := TestsSummary{
 		Packages: map[string]Summary{},
 	}
@@ -35,7 +36,7 @@ func main() {
 		}
 		fmt.Println("processing: " + file.Name())
 		if err := json.Unmarshal(b, &f); err != nil {
-			panic(err)
+			continue
 		}
 		agg.Overall.Fail += f.Overall.Fail
 		agg.Overall.Pass += f.Overall.Pass
@@ -50,6 +51,17 @@ func main() {
 		}
 	}
 
+	readme := "README.md"
+	b, err := os.ReadFile(readme)
+	if err != nil {
+		panic(err)
+	}
+	rslice := strings.Split(string(b), "<!--workflow-badge-->")
+	if len(rslice) == 3 {
+		rslice[1] = getBadge(agg.Overall)
+	}
+	os.WriteFile(readme, []byte(strings.Join(rslice, "<!--workflow-badge-->")), 644)
+	fmt.Println(getBadge(agg.Overall))
 }
 
 func getBadge(s Summary) string {
@@ -64,7 +76,8 @@ func getBadge(s Summary) string {
 	}
 
 	color := "red"
-	colorIndicator := s.Pass / (s.Pass + s.Fail)
+	var colorIndicator float32
+	colorIndicator = float32(s.Pass) / float32(s.Pass+s.Fail)
 	if colorIndicator > 0.5 {
 		color = "orange"
 	}
@@ -77,5 +90,6 @@ func getBadge(s Summary) string {
 	if colorIndicator > 0.9 {
 		color = "success"
 	}
-	return fmt.Sprintf("https://img.shields.io/badge/Acceptance%%20Tests-%s-%s", url.QueryEscape(badgeText), color)
+
+	return fmt.Sprintf(`[![GitHub Workflow Status](https://img.shields.io/badge/Acceptance%%20Tests-%s-%s)](https://github.com/SchwarzIT/terraform-provider-stackit/actions/workflows/acceptance_test.yml)`, url.PathEscape(badgeText), color)
 }
