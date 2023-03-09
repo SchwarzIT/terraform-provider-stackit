@@ -114,6 +114,7 @@ __resources__
           make ci-process-results
           git config --global user.name 'do87'
           git config --global user.email 'do87@users.noreply.github.com'
-          git commit -am "Automated update"
+          git add README.md
+          git commit -m "Automated readme update"
           git pull -r
           git push
