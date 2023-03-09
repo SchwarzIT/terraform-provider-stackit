@@ -9,10 +9,6 @@ github.com/Microsoft/go-winio v0.4.16/go.mod h1:XB6nPKklQyQ7GC9LdcBEcBl8PF76WugX
 github.com/ProtonMail/go-crypto v0.0.0-20210428141323-04723f9f07d7 h1:YoJbenK9C67SkzkDfmQuVln04ygHj3vjZfd9FL+GmQQ=
 github.com/ProtonMail/go-crypto v0.0.0-20210428141323-04723f9f07d7/go.mod h1:z4/9nQmJSSwwds7ejkxaJwO37dru3geImFUdJlaLzQo=
 github.com/RaveNoX/go-jsoncommentstrip v1.0.0/go.mod h1:78ihd09MekBnJnxpICcwzCMzGrKSKYe4AqU6PDYYpjk=
-github.com/SchwarzIT/community-stackit-go-client v1.14.8 h1:Pg9Nb84MmiJJYSse4e+jecR9OVhWIfTNfkNRVFjncAY=
-github.com/SchwarzIT/community-stackit-go-client v1.14.8/go.mod h1:USK3VKbvPZtqo7X9LJ2oz+haONOnYARye3OaNycS7ow=
-github.com/SchwarzIT/community-stackit-go-client v1.14.9 h1:4NwHIgo7M974+8h4aa7+F+I1frXdP2s12W5nzNjdjCY=
-github.com/SchwarzIT/community-stackit-go-client v1.14.9/go.mod h1:USK3VKbvPZtqo7X9LJ2oz+haONOnYARye3OaNycS7ow=
 github.com/SchwarzIT/community-stackit-go-client v1.14.10 h1:p6Acc4poCSLZzumpi3wDy3Y7JE1yaUI46DHTZhu1TI4=
 github.com/SchwarzIT/community-stackit-go-client v1.14.10/go.mod h1:USK3VKbvPZtqo7X9LJ2oz+haONOnYARye3OaNycS7ow=
 github.com/acomagu/bufpipe v1.0.3 h1:fxAGrHZTgQ9w5QqVItgzwj235/uYZYgbXitB+dLupOk=
