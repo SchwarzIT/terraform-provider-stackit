@@ -24,6 +24,7 @@ func TestAcc_MongoDBFlexInstance(t *testing.T) {
 	}
 
 	name1 := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
+	name2 := "odjtest-2-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
 
 	resource.ParallelTest(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){
@@ -52,13 +53,13 @@ func TestAcc_MongoDBFlexInstance(t *testing.T) {
 				),
 			},
 			{
-				// check update machine
-				Config: config(name1, "1.2"),
+				// check update
+				Config: config(name2, instance.DefaultMachineType),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "name", name1),
+					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "name", name2),
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "version", instance.DefaultVersion),
-					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "machine_type", "1.2"),
+					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "machine_type", instance.DefaultMachineType),
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "replicas", fmt.Sprint(instance.DefaultReplicas)),
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "storage.class", instance.DefaultStorageClass),
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "storage.size", fmt.Sprint(instance.DefaultStorageSize)),
