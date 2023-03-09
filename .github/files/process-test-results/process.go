@@ -62,6 +62,7 @@ func main() {
 	if err := os.WriteFile(readme, []byte(strings.Join(rslice, "<!--workflow-badge-->")), 644); err != nil {
 		panic(err)
 	}
+	fmt.Printf("%+v\n", agg.Overall)
 	fmt.Println(getBadge(agg.Overall))
 }
 

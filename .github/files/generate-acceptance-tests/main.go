@@ -152,6 +152,7 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
           fi;
           make ci-testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
       - name: Save results
+        if: always()
         uses: actions/upload-artifact@v3
         with:
           path: .github/files/analyze-test-output/result/*.json
@@ -205,6 +206,7 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
           fi;
           make ci-testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
       - name: Save results
+        if: always()
         uses: actions/upload-artifact@v3
         with:
           path: .github/files/analyze-test-output/result/*.json
@@ -276,6 +278,7 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
           fi;
           make ci-testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
       - name: Save results
+        if: always()
         uses: actions/upload-artifact@v3
         with:
           path: .github/files/analyze-test-output/result/*.json
@@ -330,6 +333,7 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
           fi;
           make ci-testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
       - name: Save results
+        if: always()
         uses: actions/upload-artifact@v3
         with:
           path: .github/files/analyze-test-output/result/*.json
