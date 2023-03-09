@@ -660,7 +660,10 @@ jobs:
     needs: [createproject,resources,resource-argus,resource-data-services,resource-kubernetes,resource-mongodb-flex,resource-object-storage,resource-postgres-flex]
     if: ${{ always() }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          ref: main
+          token: ${{ secrets.WORKFLOW_GIT_ACCESS_TOKEN }}
       - name: Download all artifacts
         uses: actions/download-artifact@v3
         with:
@@ -669,7 +672,7 @@ jobs:
         run: make ci-process-results
       - name: Commit result
         run: |
-          git config --global user.name 'Dean'
+          git config --global user.name 'do87'
           git config --global user.email 'do87@users.noreply.github.com'
           git add README.md
           git commit -m "Automated readme update"
