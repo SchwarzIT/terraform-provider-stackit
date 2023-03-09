@@ -57,9 +57,11 @@ func main() {
 	}
 	rslice := strings.Split(string(b), "<!--workflow-badge-->")
 	if len(rslice) == 3 {
-		rslice[1] = getBadge(agg.Overall)
+		rslice[1] = getBadge(agg.Overall) + fmt.Sprintf("<!--revision-%s-->", uuid.New().String())
 	}
-	os.WriteFile(readme, []byte(strings.Join(rslice, "<!--workflow-badge-->")), 644)
+	if err := os.WriteFile(readme, []byte(strings.Join(rslice, "<!--workflow-badge-->")), 644); err != nil {
+		panic(err)
+	}
 	fmt.Println(getBadge(agg.Overall))
 }
 
@@ -92,5 +94,5 @@ func getBadge(s Summary) string {
 		color = "success"
 	}
 
-	return fmt.Sprintf(`[![GitHub Workflow Status](https://img.shields.io/badge/Acceptance%%20Tests-%s-%s)](https://github.com/SchwarzIT/terraform-provider-stackit/actions/workflows/acceptance_test.yml)<!--revision-%s-->`, url.PathEscape(badgeText), color, uuid.New().String())
+	return fmt.Sprintf(`[![GitHub Workflow Status](https://img.shields.io/badge/Acceptance%%20Tests-%s-%s)](https://github.com/SchwarzIT/terraform-provider-stackit/actions/workflows/acceptance_test.yml)`, url.PathEscape(badgeText), color)
 }
