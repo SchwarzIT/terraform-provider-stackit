@@ -7,6 +7,8 @@ import (
 	"os"
 	"path"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
 type TestsSummary struct {
@@ -55,9 +57,11 @@ func main() {
 	}
 	rslice := strings.Split(string(b), "<!--workflow-badge-->")
 	if len(rslice) == 3 {
-		rslice[1] = getBadge(agg.Overall)
+		rslice[1] = getBadge(agg.Overall) + fmt.Sprintf("<!--revision-%s-->", uuid.New().String())
 	}
-	os.WriteFile(readme, []byte(strings.Join(rslice, "<!--workflow-badge-->")), 644)
+	if err := os.WriteFile(readme, []byte(strings.Join(rslice, "<!--workflow-badge-->")), 644); err != nil {
+		panic(err)
+	}
 	fmt.Println(getBadge(agg.Overall))
 }
 
