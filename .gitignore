@@ -1,3 +1,5 @@
 .local
 bin
 .idea
+.github/files/process-test-results/artifact
+.github/files/process-test-results/artifact/*
