@@ -7,6 +7,10 @@
 
 This provider is built and maintained by the STACKIT community in Schwarz IT and is not an official STACKIT provider
 
+For more information, check out our [provider docs](https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs)
+
+<br />
+
 ## Usage Example
 
 ```hcl
