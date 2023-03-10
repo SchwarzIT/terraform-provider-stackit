@@ -7,6 +7,8 @@ This provider is built and maintained by the STACKIT community in Schwarz IT and
 
 > The provider is built using Terraform's plugin framework, therefore we recommend using [Terraform v1.x](https://www.terraform.io/downloads) which supports Protocol v6
 
+<br />
+
 ## Usage Example
 
 ```hcl
