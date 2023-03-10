@@ -7,8 +7,10 @@
 
 The provider is built and maintained by the STACKIT community in Schwarz IT and is not an official STACKIT provider
 
+##### Useful Links
 
 📖 [Provider Documentation](https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs)
+
 🚀 [STACKIT Community Go Client](https://github.com/SchwarzIT/community-stackit-go-client)
 
 
