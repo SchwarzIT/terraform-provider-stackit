@@ -7,8 +7,6 @@
 
 This provider is built and maintained by the STACKIT community in Schwarz IT and is not an official STACKIT provider
 
-<br />
-
 ## Usage Example
 
 ```hcl
