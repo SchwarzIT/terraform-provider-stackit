@@ -133,7 +133,7 @@ func generateImage(v TestsSummary) string {
 }
 
 const css = `<style type="text/css">
-.tg  {border-collapse:collapse;border: none;}
+.tg  {border-collapse:collapse;border: none;margin-bottom:20px;}
 .tg td { padding: 2px 5px; border: none; font-size: 12px; font-family: 'courier' }
 </style>`
 
@@ -174,7 +174,7 @@ func getIcon(sum Summary) string {
 		color = "⚠️"
 	}
 	if pc == 1 {
-		color = "✅"
+		color = "🟢"
 	}
 	return color
 }
