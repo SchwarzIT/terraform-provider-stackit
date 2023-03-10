@@ -1,12 +1,17 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"net/url"
 	"os"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -51,19 +56,35 @@ func main() {
 	}
 
 	readme := "README.md"
-	b, err := os.ReadFile(readme)
+	var es error = nil
+	if err := injectToMarkdownFile(readme, "<!--workflow-badge-->", getBadge(agg.Overall)); err != nil {
+		es = err
+	}
+	if err := injectToMarkdownFile(readme, "<!--summary-image-->", generateImage(agg)); err != nil {
+		es = errors.Join(es, err)
+	}
+
+	b, _ := json.MarshalIndent(agg, "", "  ")
+	fmt.Println(string(b))
+
+	if es != nil {
+		panic(es)
+	}
+}
+
+func injectToMarkdownFile(name, separator, injected string) error {
+	b, err := os.ReadFile(name)
 	if err != nil {
-		panic(err)
+		return err
 	}
-	rslice := strings.Split(string(b), "<!--workflow-badge-->")
+	rslice := strings.Split(string(b), separator)
 	if len(rslice) == 3 {
-		rslice[1] = getBadge(agg.Overall) + fmt.Sprintf("<!--revision-%s-->", uuid.New().String())
+		rslice[1] = injected + fmt.Sprintf("<!--revision-%s-->", uuid.New().String())
 	}
-	if err := os.WriteFile(readme, []byte(strings.Join(rslice, "<!--workflow-badge-->")), 644); err != nil {
-		panic(err)
+	if err := os.WriteFile(name, []byte(strings.Join(rslice, separator)), 644); err != nil {
+		return err
 	}
-	fmt.Printf("%+v\n", agg.Overall)
-	fmt.Println(getBadge(agg.Overall))
+	return nil
 }
 
 func getBadge(s Summary) string {
@@ -96,4 +117,100 @@ func getBadge(s Summary) string {
 	}
 
 	return fmt.Sprintf(`[![GitHub Workflow Status](https://img.shields.io/badge/Acceptance%%20Tests-%s-%s)](https://github.com/SchwarzIT/terraform-provider-stackit/actions/workflows/acceptance_test.yml)`, url.PathEscape(badgeText), color)
+}
+
+func generateImage(v TestsSummary) string {
+	img, err := callAPI(generateHTML(v))
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	if img != "" {
+		img = fmt.Sprintf(`
+<img src="%s" align="right" />
+`, img)
+	}
+	return img
+}
+
+const css = `<style type="text/css">
+.tg  {border-collapse:collapse;border: none;}
+.tg td { padding: 2px 5px; border: none; font-size: 12px; font-family: 'courier' }
+</style>`
+
+const table = `<table class="tg">
+<tbody><tr>
+%s
+</tr></tbody>
+</table>
+`
+
+const td = `<td class="tg-0lax">%s</td><td class="tg-0lax">%s</td>`
+
+func generateHTML(v TestsSummary) string {
+	md := ""
+	i := 0
+	for pkg, sum := range v.Packages {
+		md += generateRow(pkg, sum)
+		if i++; i%2 == 0 {
+			md += "<tr></tr>"
+		}
+	}
+	return fmt.Sprintf(table, md)
+}
+
+func generateRow(pkg string, sum Summary) string {
+	return fmt.Sprintf(td, getIcon(sum), pkg)
+}
+
+func getIcon(sum Summary) string {
+	color := "🔥"
+	var pc float32
+	s := float32(sum.Pass + sum.Fail)
+	if s == 0 {
+		s = 1
+	}
+	pc = float32(sum.Pass) / s
+	if pc > 0.7 {
+		color = "⚠️"
+	}
+	if pc == 1 {
+		color = "✅"
+	}
+	return color
+}
+
+func callAPI(html string) (string, error) {
+	data := map[string]string{
+		"html": html,
+		"css":  css,
+	}
+	reqBody, err := json.Marshal(data)
+	if err != nil {
+		return "", err
+	}
+	req, err := http.NewRequest("POST", "https://hcti.io/v1/image", bytes.NewReader(reqBody))
+	if err != nil {
+		return "", err
+	}
+	userID := os.Getenv("HCTI_USER_ID")
+	apiKey := os.Getenv("HCTI_API_KEY")
+	req.SetBasicAuth(userID, apiKey)
+	client := &http.Client{Timeout: time.Second * 10}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	var v struct {
+		URL string `json:"url"`
+	}
+	if err := json.Unmarshal(body, &v); err != nil {
+		return "", err
+	}
+	return v.URL, nil
 }
