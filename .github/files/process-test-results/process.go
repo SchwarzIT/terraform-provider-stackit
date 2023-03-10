@@ -126,13 +126,14 @@ func generateImage(v TestsSummary) string {
 	}
 	if img != "" {
 		img = fmt.Sprintf(`
-<img src="%s" align="right" />
+<img src="%s" width="250" align="right" />
 `, img)
 	}
 	return img
 }
 
 const css = `<style type="text/css">
+body { border-radius: 5px; }
 .tg  {border-collapse:collapse;border: none;}
 .tg td { padding: 2px 5px; border: none; font-size: 12px; font-family: 'courier' }
 </style>`
