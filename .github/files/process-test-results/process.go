@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -56,19 +55,21 @@ func main() {
 	}
 
 	readme := "README.md"
-	var es error = nil
+	errored := false
 	if err := injectToMarkdownFile(readme, "<!--workflow-badge-->", getBadge(agg.Overall)); err != nil {
-		es = err
+		errored = true
+		fmt.Println(err)
 	}
 	if err := injectToMarkdownFile(readme, "<!--summary-image-->", generateImage(agg)); err != nil {
-		es = errors.Join(es, err)
+		errored = true
+		fmt.Println(err)
 	}
 
 	b, _ := json.MarshalIndent(agg, "", "  ")
 	fmt.Println(string(b))
 
-	if es != nil {
-		panic(es)
+	if errored {
+		panic()
 	}
 }
 
