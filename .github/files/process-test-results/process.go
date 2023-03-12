@@ -69,7 +69,7 @@ func main() {
 	fmt.Println(string(b))
 
 	if errored {
-		panic()
+		panic("an error occured")
 	}
 }
 
