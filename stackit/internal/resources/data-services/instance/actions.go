@@ -200,9 +200,16 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		return
 	}
 
+	name := plan.Name
 	if err := r.applyClientResponse(ctx, &plan, newRes.JSON200); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
+	}
+
+	// @TODO: remove once name update is supported
+	if !plan.Name.Equal(name) {
+		resp.Diagnostics.AddWarning("Name update isn't supported yet", "Instance name update isn't supported yet for DSA APIs")
+		plan.Name = name
 	}
 
 	// update state
