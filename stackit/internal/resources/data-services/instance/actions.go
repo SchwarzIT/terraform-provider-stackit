@@ -58,7 +58,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	// set state
 	plan.ID = types.StringValue(res.JSON202.InstanceID)
-	if plan.ID.ValueString() == "" {
+	if res.JSON202.InstanceID == "" {
 		resp.Diagnostics.AddError("received an empty instance ID", fmt.Sprintf("invalid instance id: %+v", *res.JSON202))
 		return
 	}
@@ -107,7 +107,10 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	if resp.Diagnostics.HasError() {
 		return
 	}
-
+	if state.ID.IsUnknown() || state.ID.IsNull() || state.ID.ValueString() == "" {
+		resp.State.RemoveResource(ctx)
+		return
+	}
 	// read instance
 	res, err := r.client.Instances.GetWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if err != nil {
