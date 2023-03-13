@@ -41,13 +41,13 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		roles = []string{"login"}
 	}
 
-	body := users.InstanceCreateUserRequest{
+	body := users.CreateUserJSONRequestBody{
 		Roles:    &roles,
 		Username: &username,
 	}
 
 	res, err := r.client.PostgresFlex.Users.CreateUserWithResponse(ctx, plan.ProjectID.ValueString(), plan.InstanceID.ValueString(), body)
-	if agg := validate.Response(res, err, "JSON200.Item"); agg != nil {
+	if agg := validate.Response(res, err, "JSON201.Item"); agg != nil {
 		if res.StatusCode() == http.StatusBadRequest {
 			j := ""
 			if res.JSON400 != nil {
@@ -61,7 +61,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	item := *res.JSON200.Item
+	item := *res.JSON201.Item
 
 	elems := []attr.Value{}
 	if *item.Roles != nil {
@@ -82,7 +82,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	plan.Password = nullOrValStr(item.Password)
 	plan.Host = nullOrValStr(item.Host)
 	plan.Port = nullOrValInt64(item.Port)
-	plan.URI = nullOrValStr(item.Uri)
+	plan.URI = nullOrValStr(item.URI)
 	plan.Roles = types.ListValueMust(types.StringType, elems)
 
 	// update state with user

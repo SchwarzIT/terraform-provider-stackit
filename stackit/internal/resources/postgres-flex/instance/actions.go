@@ -85,19 +85,20 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		Version: &v,
 	}
 	res, err := c.Instance.CreateWithResponse(ctx, plan.ProjectID.ValueString(), body)
-	if agg := validate.Response(res, err, "JSON200.ID"); agg != nil {
+	if agg := validate.Response(res, err, "JSON201.ID"); agg != nil {
 		resp.Diagnostics.AddError("failed creating Postgres flex instance", agg.Error())
 		return
 	}
 
 	// set state
-	plan.ID = types.StringValue(*res.JSON200.ID)
-	defer func() {
-		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), *res.JSON200.ID)...)
-		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project_id"), plan.ProjectID.ValueString())...)
-	}()
+	plan.ID = types.StringValue(*res.JSON201.ID)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), *res.JSON201.ID)...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project_id"), plan.ProjectID.ValueString())...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
-	process := res.WaitHandler(ctx, c.Instance, plan.ProjectID.ValueString(), *res.JSON200.ID)
+	process := res.WaitHandler(ctx, c.Instance, plan.ProjectID.ValueString(), *res.JSON201.ID)
 	ins, err := process.WaitWithContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("failed Postgres instance creation validation", err.Error())
@@ -146,7 +147,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 			resp.State.RemoveResource(ctx)
 			return
 		}
-		resp.Diagnostics.AddError("failed to read postgres instance", err.Error())
+		resp.Diagnostics.AddError("failed to read postgres instance", res.HasError.Error())
 		return
 	}
 
@@ -235,7 +236,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 
 	// handle update
 	c := r.client.PostgresFlex.Instance
-	res, err := c.UpdateWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
+	res, err := c.PatchUpdateWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
 	if err != nil {
 		resp.Diagnostics.AddError("failed prepare Postgres instance update request", err.Error())
 		return
@@ -245,7 +246,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 			resp.State.RemoveResource(ctx)
 			return
 		}
-		resp.Diagnostics.AddError("failed to update postgres instance", err.Error())
+		resp.Diagnostics.AddError("failed to update postgres instance", res.HasError.Error())
 		return
 	}
 
