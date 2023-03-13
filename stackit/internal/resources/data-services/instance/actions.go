@@ -20,9 +20,9 @@ import (
 func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// load plan
 	var plan Instance
-	diags := req.Plan.Get(ctx, &plan)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 	if resp.Diagnostics.HasError() {
+		resp.Diagnostics.AddError("failed to process plan", "failed during plan processing")
 		return
 	}
 
@@ -52,7 +52,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 	res, err := r.client.Instances.ProvisionWithResponse(ctx, plan.ProjectID.ValueString(), body)
 	if agg := validate.Response(res, err, "JSON202"); agg != nil {
-		diags.AddError("failed instance provisioning", agg.Error())
+		resp.Diagnostics.AddError("failed instance provisioning", agg.Error())
 		return
 	}
 
@@ -92,8 +92,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	// update state
-	diags = resp.State.Set(ctx, &plan)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}

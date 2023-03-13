@@ -67,7 +67,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 			resp.State.RemoveResource(ctx)
 			return
 		}
-		diags.AddError("failed requesting SKE project read", err.Error())
+		resp.Diagnostics.AddError("failed requesting SKE project read", err.Error())
 		return
 	}
 	if res.HasError != nil {
@@ -75,7 +75,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 			resp.State.RemoveResource(ctx)
 			return
 		}
-		diags.AddError("failed during SKE project read", res.HasError.Error())
+		resp.Diagnostics.AddError("failed during SKE project read", res.HasError.Error())
 		return
 	}
 

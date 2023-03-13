@@ -59,7 +59,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	instance := list[found]
 	ires, err := c.Instance.GetWithResponse(ctx, config.ProjectID.ValueString(), *instance.ID)
 	if agg := validate.Response(ires, err, "JSON200.Item"); agg != nil {
-		diags.AddError("failed to get mongodb instance", agg.Error())
+		resp.Diagnostics.AddError("failed to get mongodb instance", agg.Error())
 		return
 	}
 
