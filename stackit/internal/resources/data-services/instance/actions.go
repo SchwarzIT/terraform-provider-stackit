@@ -234,12 +234,12 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
+	resp.State.RemoveResource(ctx)
 	process := res.WaitHandler(ctx, r.client.Instances, state.ProjectID.ValueString(), state.ID.ValueString())
 	if _, err := process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed to verify instance deprovision", err.Error())
 	}
 
-	resp.State.RemoveResource(ctx)
 }
 
 // ImportState handles terraform import

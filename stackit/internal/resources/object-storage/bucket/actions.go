@@ -120,14 +120,14 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		resp.Diagnostics.AddError("failed to delete bucket", agg.Error())
 		return
 	}
+	resp.State.RemoveResource(ctx)
+
 	process := res.WaitHandler(ctx, c.ObjectStorage.Bucket, state.ObjectStorageProjectID.ValueString(), state.Name.ValueString())
 	process.SetTimeout(10 * time.Minute)
 	if _, err = process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed to verify bucket deletion", err.Error())
 		return
 	}
-
-	resp.State.RemoveResource(ctx)
 }
 
 // ImportState handles terraform import
