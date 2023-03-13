@@ -48,6 +48,9 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			"instance_id": schema.StringAttribute{
 				Description: "the postgres db flex instance id.",
 				Required:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"project_id": schema.StringAttribute{
 				Description: "The project ID the instance runs in. Changing this value requires the resource to be recreated.",

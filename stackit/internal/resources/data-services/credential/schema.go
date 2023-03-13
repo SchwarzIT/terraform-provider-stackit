@@ -61,6 +61,9 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			"instance_id": schema.StringAttribute{
 				Description: "Instance ID the credential belongs to",
 				Required:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 
 			"host": schema.StringAttribute{
