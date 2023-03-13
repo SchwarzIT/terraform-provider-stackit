@@ -44,13 +44,13 @@ func (r Resource) createCredentialGroup(ctx context.Context, data *CredentialsGr
 	}
 	cres, err := c.ObjectStorage.CredentialsGroup.CreateWithResponse(ctx, data.ObjectStorageProjectID.ValueString(), body)
 	if agg := validate.Response(cres, err); agg != nil {
-		return diag.NewErrorDiagnostic("failed to create credential group", err.Error())
+		return diag.NewErrorDiagnostic("failed to create credential group", agg.Error())
 
 	}
 
 	res, err := c.ObjectStorage.CredentialsGroup.GetWithResponse(ctx, data.ObjectStorageProjectID.ValueString())
 	if agg := validate.Response(res, err, "JSON200.CredentialsGroups"); agg != nil {
-		return diag.NewErrorDiagnostic("failed to list credential groups", err.Error())
+		return diag.NewErrorDiagnostic("failed to list credential groups", agg.Error())
 	}
 
 	for _, group := range res.JSON200.CredentialsGroups {
@@ -75,7 +75,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 	res, err := c.ObjectStorage.CredentialsGroup.GetWithResponse(ctx, state.ObjectStorageProjectID.ValueString())
 	if agg := validate.Response(res, err, "JSON200.CredentialsGroups"); agg != nil {
-		resp.Diagnostics.AddError("failed to read credential groups", err.Error())
+		resp.Diagnostics.AddError("failed to read credential groups", agg.Error())
 		return
 	}
 
@@ -115,7 +115,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	c := r.client.ObjectStorage.CredentialsGroup
 	res, err := c.DeleteWithResponse(ctx, state.ObjectStorageProjectID.ValueString(), state.ID.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
-		resp.Diagnostics.AddError("failed to delete credential groups", err.Error())
+		resp.Diagnostics.AddError("failed to delete credential groups", agg.Error())
 		return
 	}
 

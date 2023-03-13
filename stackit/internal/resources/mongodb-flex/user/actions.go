@@ -89,7 +89,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	// read cluster
 	res, err := r.client.MongoDBFlex.User.GetWithResponse(ctx, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString())
 	if agg := validate.Response(res, err, "JSON200.Item"); agg != nil {
-		resp.Diagnostics.AddError("failed making read user request", err.Error())
+		resp.Diagnostics.AddError("failed making read user request", agg.Error())
 		return
 	}
 

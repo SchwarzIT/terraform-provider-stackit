@@ -21,7 +21,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 
 	res, err := c.ObjectStorage.CredentialsGroup.GetWithResponse(ctx, data.ObjectStorageProjectID.ValueString())
 	if agg := validate.Response(res, err, "JSON200.CredentialsGroups"); agg != nil {
-		resp.Diagnostics.AddError("failed to read credential groups", err.Error())
+		resp.Diagnostics.AddError("failed to read credential groups", agg.Error())
 		return
 	}
 

@@ -86,7 +86,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	res, err := r.client.Instances.InstanceCredentialsDeleteWithResponse(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString(), cred.ID.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
 		if !strings.Contains(agg.Error(), "EOF") {
-			resp.Diagnostics.AddError("failed to delete credential", res.HasError.Error())
+			resp.Diagnostics.AddError("failed to delete credential", agg.Error())
 			return
 		}
 	}

@@ -25,7 +25,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	res, err := c.CreateWithResponse(ctx, plan.ProjectID.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
 		if !strings.Contains(agg.Error(), common.ERR_UNEXPECTED_EOF) {
-			resp.Diagnostics.AddError("failed ObjectStorage project creation", err.Error())
+			resp.Diagnostics.AddError("failed ObjectStorage project creation", agg.Error())
 			return
 		}
 	}
@@ -52,7 +52,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	c := r.client.ObjectStorage.Project
 	res, err := c.GetWithResponse(ctx, state.ID.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
-		resp.Diagnostics.AddError("failed ObjectStorage project read", err.Error())
+		resp.Diagnostics.AddError("failed ObjectStorage project read", agg.Error())
 		return
 	}
 	if res.StatusCode() == http.StatusNotFound {
@@ -77,7 +77,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	c := r.client.ObjectStorage.Project
 	res, err := c.DeleteWithResponse(ctx, state.ID.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
-		resp.Diagnostics.AddError("failed ObjectStorage project deletion", err.Error())
+		resp.Diagnostics.AddError("failed ObjectStorage project deletion", agg.Error())
 		return
 	}
 	resp.State.RemoveResource(ctx)
