@@ -14,7 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-const logme_inst_run_this_test = false
+const logme_inst_run_this_test = true
 
 func TestAcc_ResourceLogMeInstanceJob(t *testing.T) {
 	if !common.ShouldAccTestRun(logme_inst_run_this_test) {

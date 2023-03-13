@@ -23,7 +23,7 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 
 	res, err := d.client.Instances.ListWithResponse(ctx, config.ProjectID.ValueString())
 	if agg := validate.Response(res, err, "JSON200"); agg != nil {
-		diags.AddError("failed to list instances", agg.Error())
+		resp.Diagnostics.AddError("failed to list instances", agg.Error())
 		return
 	}
 
@@ -53,7 +53,7 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 
 	ores, err := d.client.Offerings.GetWithResponse(ctx, config.ProjectID.ValueString())
 	if agg := validate.Response(ores, err, "JSON200"); agg != nil {
-		diags.AddError("failed to get offerings", agg.Error())
+		resp.Diagnostics.AddError("failed to get offerings", agg.Error())
 		return
 	}
 
@@ -68,7 +68,7 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 	}
 
 	if instance.InstanceID == nil {
-		diags.AddError("received an empty instance ID", "InstanceID == nil")
+		resp.Diagnostics.AddError("received an empty instance ID", "InstanceID == nil")
 		return
 	}
 	config.ID = types.StringValue(*instance.InstanceID)
@@ -85,7 +85,7 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 	if acl, ok := instance.Parameters["sgw_acl"]; ok {
 		aclString, ok := acl.(string)
 		if !ok {
-			diags.AddError("couldn't parse ACL as string", "ACL interface isn't a string")
+			resp.Diagnostics.AddError("couldn't parse ACL as string", "ACL interface isn't a string")
 			return
 		}
 		items := strings.Split(aclString, ",")

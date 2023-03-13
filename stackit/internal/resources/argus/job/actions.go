@@ -25,7 +25,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	job := scrapeconfig.CreateJSONRequestBody(plan.ToClientJob())
 	res, err := c.Argus.ScrapeConfig.CreateWithResponse(ctx, plan.ProjectID.ValueString(), plan.ArgusInstanceID.ValueString(), job)
 	if agg := validate.Response(res, err, "JSON202"); agg != nil {
-		diags.AddError("failed to create argus job", agg.Error())
+		resp.Diagnostics.AddError("failed to create argus job", agg.Error())
 		return
 	}
 
@@ -89,14 +89,14 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	job := scrapeconfig.UpdateJSONRequestBody(plan.ToClientUpdateJob())
 	ures, err := c.Argus.ScrapeConfig.UpdateWithResponse(ctx, plan.ProjectID.ValueString(), plan.ArgusInstanceID.ValueString(), plan.Name.ValueString(), job)
 	if agg := validate.Response(ures, err); agg != nil {
-		diags.AddError("failed to update argus job", agg.Error())
+		resp.Diagnostics.AddError("failed to update argus job", agg.Error())
 		return
 	}
 
 	// read job to verify update
 	res, err := c.Argus.ScrapeConfig.ReadWithResponse(ctx, plan.ProjectID.ValueString(), plan.ArgusInstanceID.ValueString(), plan.Name.ValueString())
 	if agg := validate.Response(res, err, "JSON200"); agg != nil {
-		diags.AddError("failed to read argus job", agg.Error())
+		resp.Diagnostics.AddError("failed to read argus job", agg.Error())
 		return
 	}
 	plan.FromClientJob(res.JSON200.Data)

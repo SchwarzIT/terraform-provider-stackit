@@ -20,7 +20,7 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 
 	res, err := d.client.Argus.Instances.InstanceReadWithResponse(ctx, config.ProjectID.ValueString(), config.ID.ValueString())
 	if agg := validate.Response(res, err, "JSON200"); agg != nil {
-		diags.AddError("failed instance read", agg.Error())
+		resp.Diagnostics.AddError("failed instance read", agg.Error())
 		return
 	}
 	b := res.JSON200

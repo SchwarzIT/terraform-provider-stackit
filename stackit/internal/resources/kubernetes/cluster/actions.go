@@ -146,7 +146,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	// read cluster
 	res, err := c.Kubernetes.Cluster.GetClusterWithResponse(ctx, state.KubernetesProjectID.ValueString(), state.Name.ValueString())
 	if agg := validate.Response(res, err, "JSON200"); agg != nil {
-		diags.AddError("failed fetching cluster", agg.Error())
+		resp.Diagnostics.AddError("failed fetching cluster", agg.Error())
 		return
 	}
 

@@ -20,7 +20,7 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 
 	res, err := d.client.Argus.ScrapeConfig.ReadWithResponse(ctx, config.ProjectID.ValueString(), config.ArgusInstanceID.ValueString(), config.Name.ValueString())
 	if agg := validate.Response(res, err, "JSON200"); agg != nil {
-		diags.AddError("failed to read job", agg.Error())
+		resp.Diagnostics.AddError("failed to read job", agg.Error())
 		return
 	}
 
