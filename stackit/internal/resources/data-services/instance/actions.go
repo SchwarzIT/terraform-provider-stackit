@@ -117,7 +117,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 	if res.HasError != nil {
-		if res.StatusCode() == http.StatusNotFound {
+		if res.StatusCode() == http.StatusNotFound || res.StatusCode() == http.StatusGone {
 			resp.State.RemoveResource(ctx)
 			return
 		}
