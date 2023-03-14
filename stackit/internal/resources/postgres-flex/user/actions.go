@@ -96,9 +96,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 // Read - lifecycle function
 func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var state User
-
-	diags := req.State.Get(ctx, &state)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -106,6 +104,24 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	// read cluster
 	res, err := r.client.PostgresFlex.Users.GetUserWithResponse(ctx, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString())
 	if agg := validate.Response(res, err, "JSON200.Item"); agg != nil {
+		if res.JSON400 != nil {
+			// verify the instance exists
+			res, err := r.client.PostgresFlex.Instance.ListWithResponse(ctx, state.ProjectID.ValueString())
+			if agg2 := validate.Response(res, err, "JSON200.Items"); agg2 != nil {
+				resp.Diagnostics.AddError("failed making read user request", agg.Error())
+				resp.Diagnostics.AddError("failed verifying instance status", agg2.Error())
+				return
+			}
+			for _, item := range *res.JSON200.Items {
+				if item.ID != nil && *item.ID == state.InstanceID.ValueString() {
+					resp.Diagnostics.AddError("failed making read user request", agg.Error())
+					return
+				}
+			}
+			// instance doesn't exists:
+			resp.State.RemoveResource(ctx)
+			return
+		}
 		resp.Diagnostics.AddError("failed making read user request", agg.Error())
 		return
 	}
@@ -129,8 +145,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	// update state
-	diags = resp.State.Set(ctx, &state)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
