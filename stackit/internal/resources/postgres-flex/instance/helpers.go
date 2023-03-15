@@ -8,6 +8,7 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/generated/instance"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/generated/versions"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -62,14 +63,8 @@ func (r Resource) validate(ctx context.Context, data Instance) error {
 
 func (r Resource) validateVersion(ctx context.Context, projectID, version string) error {
 	res, err := r.client.PostgresFlex.Versions.GetVersionsWithResponse(ctx, projectID, &versions.GetVersionsParams{})
-	if err != nil {
-		return err
-	}
-	if res.HasError != nil {
-		return res.HasError
-	}
-	if res.JSON200 == nil {
-		return errors.New("received an empty response for versions")
+	if agg := validate.Response(res, err, "JSON200.Versions"); agg != nil {
+		return agg
 	}
 
 	opts := ""
@@ -84,14 +79,8 @@ func (r Resource) validateVersion(ctx context.Context, projectID, version string
 
 func (r Resource) validateMachineType(ctx context.Context, projectID, flavorID string) error {
 	res, err := r.client.PostgresFlex.Flavors.GetFlavorsWithResponse(ctx, projectID)
-	if err != nil {
-		return err
-	}
-	if res.HasError != nil {
-		return res.HasError
-	}
-	if res.JSON200 == nil {
-		return errors.New("received an empty response for versions")
+	if agg := validate.Response(res, err, "JSON200.Flavors"); agg != nil {
+		return agg
 	}
 
 	opts := ""
@@ -109,14 +98,8 @@ func (r Resource) validateMachineType(ctx context.Context, projectID, flavorID s
 
 func (r Resource) validateStorage(ctx context.Context, projectID, machineType string, storage Storage) error {
 	res, err := r.client.PostgresFlex.Storage.GetFlavorWithResponse(ctx, projectID, machineType)
-	if err != nil {
-		return err
-	}
-	if res.HasError != nil {
-		return res.HasError
-	}
-	if res.JSON200 == nil {
-		return errors.New("received an empty response for versions")
+	if agg := validate.Response(res, err, "JSON200.StorageClasses"); agg != nil {
+		return agg
 	}
 
 	size := storage.Size.ValueInt64()
@@ -127,12 +110,10 @@ func (r Resource) validateStorage(ctx context.Context, projectID, machineType st
 	}
 
 	opts := ""
-	if res.JSON200.StorageClasses != nil {
-		for _, v := range *res.JSON200.StorageClasses {
-			opts = opts + "\n- " + v
-			if strings.EqualFold(v, storage.Class.ValueString()) {
-				return nil
-			}
+	for _, v := range *res.JSON200.StorageClasses {
+		opts = opts + "\n- " + v
+		if strings.EqualFold(v, storage.Class.ValueString()) {
+			return nil
 		}
 	}
 	return fmt.Errorf("couldn't find version '%s'. Available options are:%s\n", storage.Class.ValueString(), opts)

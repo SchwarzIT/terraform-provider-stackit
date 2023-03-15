@@ -88,29 +88,19 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 			Nodepools:   nodePools,
 		},
 	)
-	if err != nil {
-		diags.AddError("failed initiating Create/Update call", err.Error())
-		return
-	}
-	if resp.HasError != nil {
-		diags.AddError("failed during Create/Update", resp.HasError.Error())
-		return
+	if agg := validate.Response(resp, err); agg != nil {
+		diags.AddError("failed during SKE create/update", agg.Error())
 	}
 
 	process := resp.WaitHandler(ctx, c.Kubernetes.Cluster, projectID, clusterName)
 	res, err := process.WaitWithContext(ctx)
-	if err != nil {
-		diags.AddError("failed to validate SKE Create/Update", err.Error())
+	if agg := validate.Response(res, err, "JSON200.Status.Aggregated"); agg != nil {
+		diags.AddError("failed to validate SKE create/update", agg.Error())
 		return
 	}
-
 	result, ok := res.(*cluster.GetClusterResponse)
 	if !ok {
 		diags.AddError("failed to parse Wait() response", "response is not *cluster.GetClusterResponse")
-		return
-	}
-	if result.HasError != nil {
-		diags.AddError("response has an error", result.HasError.Error())
 		return
 	}
 	cl.Status = types.StringValue(string(*result.JSON200.Status.Aggregated))
@@ -120,12 +110,8 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 func (r Resource) getCredential(ctx context.Context, diags *diag.Diagnostics, cl *Cluster) {
 	c := r.client
 	res, err := c.Kubernetes.Credentials.GetClusterCredentialsWithResponse(ctx, cl.KubernetesProjectID.ValueString(), cl.Name.ValueString())
-	if err != nil {
-		diags.AddError("failed to initiate request for cluster credentials", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		diags.AddError("failed fetching cluster credentials", res.HasError.Error())
+	if agg := validate.Response(res, err, "JSON200.Kubeconfig"); agg != nil {
+		diags.AddError("failed fetching cluster credentials", agg.Error())
 		return
 	}
 

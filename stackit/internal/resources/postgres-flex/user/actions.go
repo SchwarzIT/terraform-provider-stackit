@@ -163,6 +163,15 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
+	res, err := r.client.PostgresFlex.Users.DeleteUserWithResponse(ctx, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString())
+	if agg := validate.Response(res, err); agg != nil {
+		if validate.StatusEquals(res, http.StatusNotFound) {
+			resp.State.RemoveResource(ctx)
+			return
+		}
+		resp.Diagnostics.AddError("failed to delete user", agg.Error())
+		return
+	}
 	resp.State.RemoveResource(ctx)
 }
 

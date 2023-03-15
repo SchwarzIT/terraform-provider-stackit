@@ -34,18 +34,12 @@ const (
 func (r Resource) loadAvaiableVersions(ctx context.Context) ([]*semver.Version, error) {
 	c := r.client
 	var versionOptions []*semver.Version
-	resp, err := c.Kubernetes.ProviderOptions.GetProviderOptionsWithResponse(ctx)
-	if err != nil {
-		return nil, errors.Wrap(err, "Failed making options request")
-	}
-	if resp.HasError != nil {
-		return nil, errors.Wrap(resp.HasError, "Couldn't fetch options")
-	}
-	if agg := validate.Response(resp, err, "JSON200"); agg != nil {
-		return nil, agg
+	res, err := c.Kubernetes.ProviderOptions.GetProviderOptionsWithResponse(ctx)
+	if agg := validate.Response(res, err, "JSON200.KubernetesVersions"); agg != nil {
+		return nil, errors.Wrap(agg, "failed fetching cluster versions")
 	}
 
-	opts := resp.JSON200
+	opts := res.JSON200
 	versionOptions = []*semver.Version{}
 	for _, v := range *opts.KubernetesVersions {
 		if v.State == nil || v.Version == nil {

@@ -146,19 +146,10 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 	// read cluster
 	res, err := r.client.MongoDBFlex.Instance.GetWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed making read instance request", err.Error())
+	if agg := validate.Response(res, err, "JSON200.Item"); agg != nil {
+		resp.Diagnostics.AddError("failed to read instance", agg.Error())
 		return
 	}
-	if res.HasError != nil {
-		resp.Diagnostics.AddError("instance read response has an error", res.HasError.Error())
-		return
-	}
-	if res.JSON200 == nil || res.JSON200.Item == nil {
-		resp.Diagnostics.AddError("failed to process response", "JSON200 == nil or Item == nil")
-		return
-	}
-
 	if err := applyClientResponse(&state, res.JSON200.Item); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
@@ -276,16 +267,12 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	res, err := r.client.MongoDBFlex.Instance.DeleteWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed making MongoDB instance deletion request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		if res.StatusCode() == http.StatusNotFound {
+	if agg := validate.Response(res, err); agg != nil {
+		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
 			return
 		}
-		resp.Diagnostics.AddError("instance deletion response has an error", res.HasError.Error())
+		resp.Diagnostics.AddError("failed to delete instance", agg.Error())
 		return
 	}
 

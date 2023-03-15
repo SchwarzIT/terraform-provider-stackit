@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -19,19 +20,11 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	// handle creation
-	eof := false
 	c := r.client.Kubernetes.Project
 	res, err := c.CreateProjectWithResponse(ctx, plan.ProjectID.ValueString())
-	if err != nil {
-		if !strings.Contains(err.Error(), common.ERR_UNEXPECTED_EOF) {
-			resp.Diagnostics.AddError("failed initiating SKE project creation", err.Error())
-			return
-		}
-		eof = true
-	}
-	if res.HasError != nil && !eof {
-		if !strings.Contains(res.HasError.Error(), common.ERR_UNEXPECTED_EOF) {
-			resp.Diagnostics.AddError("failed during SKE project creation", res.HasError.Error())
+	if agg := validate.Response(res, err); agg != nil {
+		if !strings.Contains(agg.Error(), common.ERR_UNEXPECTED_EOF) {
+			resp.Diagnostics.AddError("failed during SKE project creation", agg.Error())
 			return
 		}
 	}
@@ -62,20 +55,12 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	// read
 	c := r.client.Kubernetes.Project
 	res, err := c.GetProjectWithResponse(ctx, state.ID.ValueString())
-	if err != nil {
-		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+	if agg := validate.Response(res, err); agg != nil {
+		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
 			return
 		}
-		resp.Diagnostics.AddError("failed requesting SKE project read", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		if strings.Contains(res.HasError.Error(), http.StatusText(http.StatusNotFound)) {
-			resp.State.RemoveResource(ctx)
-			return
-		}
-		resp.Diagnostics.AddError("failed during SKE project read", res.HasError.Error())
+		resp.Diagnostics.AddError("failed during SKE project read", agg.Error())
 		return
 	}
 
@@ -93,27 +78,18 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	// handle creation
+	// handle deletion
 	c := r.client.Kubernetes.Project
 	res, err := c.DeleteProjectWithResponse(ctx, state.ID.ValueString())
-	if err != nil {
-		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+	if agg := validate.Response(res, err); agg != nil {
+		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
 			return
 		}
-		resp.Diagnostics.AddError("failed initiating SKE project deletion", err.Error())
+		resp.Diagnostics.AddError("failed during SKE project deletion", agg.Error())
 		return
-
 	}
-	if res.HasError != nil {
-		if strings.Contains(res.HasError.Error(), http.StatusText(http.StatusNotFound)) {
-			resp.State.RemoveResource(ctx)
-			return
-		}
-		resp.Diagnostics.AddError("failed during SKE project deletion", res.HasError.Error())
-		return
 
-	}
 	process := res.WaitHandler(ctx, c, state.ID.ValueString())
 	if _, err := process.WaitWithContext(ctx); err != nil {
 		if !strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {

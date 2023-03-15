@@ -133,16 +133,12 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	res, err := r.client.MongoDBFlex.User.DeleteWithResponse(ctx, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed making MongoDB user deletion request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		if res.StatusCode() == http.StatusNotFound {
+	if agg := validate.Response(res, err); agg != nil {
+		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
 			return
 		}
-		resp.Diagnostics.AddError("user deletion response has an error", res.HasError.Error())
+		resp.Diagnostics.AddError("failed to delete user", agg.Error())
 		return
 	}
 	resp.State.RemoveResource(ctx)

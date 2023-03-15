@@ -134,25 +134,15 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	// read cluster
-
+	// read instance
 	c := r.client.PostgresFlex
 	res, err := c.Instance.GetWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed to prepare read postgres instance request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		if res.StatusCode() == http.StatusNotFound {
+	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
 			return
 		}
-		resp.Diagnostics.AddError("failed to read postgres instance", res.HasError.Error())
-		return
-	}
-
-	if res.JSON200 == nil {
-		resp.Diagnostics.AddError("instance response is nil", "JSON200 is nil")
+		resp.Diagnostics.AddError("failed to read instance", agg.Error())
 		return
 	}
 
@@ -237,16 +227,12 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	// handle update
 	c := r.client.PostgresFlex.Instance
 	res, err := c.PatchUpdateWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
-	if err != nil {
-		resp.Diagnostics.AddError("failed prepare Postgres instance update request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		if res.StatusCode() == http.StatusNotFound {
+	if agg := validate.Response(res, err); agg != nil {
+		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
 			return
 		}
-		resp.Diagnostics.AddError("failed to update postgres instance", res.HasError.Error())
+		resp.Diagnostics.AddError("failed to update instance", agg.Error())
 		return
 	}
 
@@ -286,16 +272,12 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 
 	c := r.client.PostgresFlex.Instance
 	res, err := c.DeleteWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed to prepare delete postgres instance request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		if res.StatusCode() == http.StatusNotFound {
+	if agg := validate.Response(res, err); agg != nil {
+		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
 			return
 		}
-		resp.Diagnostics.AddError("failed to make delete postgres instance request", res.HasError.Error())
+		resp.Diagnostics.AddError("failed to delete instance", agg.Error())
 		return
 	}
 
