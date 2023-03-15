@@ -110,12 +110,8 @@ func (r Resource) setGrafanaConfig(ctx context.Context, diags *diag.Diagnostics,
 	}
 
 	res, err := c.Argus.GrafanaConfigs.UpdateWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString(), cfg)
-	if err != nil {
-		diags.AddError("failed to prepare grafana config request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		diags.AddError("failed to make grafana config request", res.HasError.Error())
+	if agg := validate.Response(res, err); agg != nil {
+		diags.AddError("failed to make grafana config request", agg.Error())
 		return
 	}
 }
@@ -145,12 +141,8 @@ func (r Resource) setMetricsConfig(ctx context.Context, diags *diag.Diagnostics,
 		MetricsRetentionTime1h:  fmt.Sprintf("%dd", m.RetentionDays1hDownsampling.ValueInt64()),
 	}
 	res, err := r.client.Argus.MetricsStorageRetention.UpdateWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString(), cfg)
-	if err != nil {
-		diags.AddError("failed to prepare metrics config request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		diags.AddWarning("failed to make metrics config request", res.HasError.Error())
+	if agg := validate.Response(res, err); agg != nil {
+		diags.AddError("failed to make metrics config request", agg.Error())
 		return
 	}
 }
@@ -195,20 +187,12 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 func (r Resource) readInstance(ctx context.Context, diags *diag.Diagnostics, s *Instance) {
 	c := r.client
 	res, err := c.Argus.Instances.InstanceReadWithResponse(ctx, s.ProjectID.ValueString(), s.ID.ValueString())
-	if err != nil {
-		diags.AddError(fmt.Sprintf("failed to prepare read instance request (ctx.Err() is: %+v)", ctx.Err()), err.Error())
-		return
-	}
-	if res.HasError != nil {
-		if res.StatusCode() == http.StatusNotFound {
+	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+		if validate.StatusEquals(res, http.StatusNotFound) {
 			s.ID = types.StringValue("")
 			return
 		}
-		diags.AddError("failed to read instance", res.HasError.Error())
-		return
-	}
-	if res.JSON200 == nil {
-		diags.AddError("read instance returned an empty response", "JSON200 == nil")
+		diags.AddError("failed to read instance", agg.Error())
 		return
 	}
 	updateByAPIResult(s, res.JSON200)

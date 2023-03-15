@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -23,35 +24,16 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	// handle creation
 	res, err := r.client.Credentials.PostWithResponse(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed preparing credential creation request", err.Error())
-		return
-	}
-	if res == nil {
-		resp.Diagnostics.AddError("empty response", "received an empty response during credential creation. res == nil")
-		return
-	}
-	if res.HasError != nil {
-		if strings.Contains(res.HasError.Error(), "service bind failed") {
+	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+		if res.Error != nil && strings.Contains(res.Error.Error(), "service bind failed") {
 			time.Sleep(30 * time.Second)
 			res, err = r.client.Credentials.PostWithResponse(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString())
-			if err != nil {
-				resp.Diagnostics.AddError("failed preparing 2nd credential creation request", err.Error())
-				return
-			}
-			if res == nil {
-				resp.Diagnostics.AddError("failed credential creation", "received an empty response during credential creation. res == nil")
-				return
-			}
-			if res.HasError != nil {
-				resp.Diagnostics.AddError("failed credential creation", res.HasError.Error())
-				return
-			}
+			agg = validate.Response(res, err, "JSON200")
 		}
-	}
-	if res.JSON200 == nil {
-		resp.Diagnostics.AddError("failed parsing credential creation response", "JSON200 == nil")
-		return
+		if agg != nil {
+			diags.AddError("failed credential creation", agg.Error())
+			return
+		}
 	}
 
 	if err := r.applyClientResponse(ctx, &cred, res.JSON200); err != nil {
@@ -78,19 +60,12 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 	// read instance credential
 	res, err := r.client.Credentials.GetWithResponse(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString(), cred.ID.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed preparing get credential request", err.Error())
-	}
-	if res.HasError != nil {
-		if res.StatusCode() == http.StatusNotFound {
+	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
 			return
 		}
-		resp.Diagnostics.AddError("failed to read credential", res.HasError.Error())
-		return
-	}
-	if res.JSON200 == nil {
-		resp.Diagnostics.AddError("failed parsing get credential response", "JSON200 == nil")
+		resp.Diagnostics.AddError("failed to read credential", agg.Error())
 	}
 
 	if err := r.applyClientResponse(ctx, &cred, res.JSON200); err != nil {
@@ -118,12 +93,9 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	res, err := r.client.Credentials.DeleteWithResponse(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString(), cred.ID.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed preparing delete credential request", err.Error())
-	}
-	if res.HasError != nil {
-		if !strings.Contains(err.Error(), "EOF") {
-			resp.Diagnostics.AddError("failed to delete credential", res.HasError.Error())
+	if agg := validate.Response(res, err); agg != nil {
+		if !strings.Contains(agg.Error(), "EOF") {
+			resp.Diagnostics.AddError("failed to delete credential", agg.Error())
 			return
 		}
 	}

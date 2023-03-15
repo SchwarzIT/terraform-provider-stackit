@@ -22,12 +22,8 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	}
 
 	cl, err := c.Kubernetes.Cluster.GetClusterWithResponse(ctx, config.KubernetesProjectID.ValueString(), config.Name.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed to prepare read request for cluster", err.Error())
-		return
-	}
-	if cl.HasError != nil {
-		resp.Diagnostics.AddError("failed to read cluster", cl.HasError.Error())
+	if agg := validate.Response(cl, err, "JSON200"); agg != nil {
+		resp.Diagnostics.AddError("failed to read cluster", agg.Error())
 		return
 	}
 	transform(&config, cl.JSON200)

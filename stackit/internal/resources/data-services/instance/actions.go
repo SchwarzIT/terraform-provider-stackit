@@ -112,20 +112,8 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 	// read instance
 	res, err := r.client.Instances.GetWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed preparing get instance request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		if res.StatusCode() == http.StatusNotFound || res.StatusCode() == http.StatusGone {
-			resp.State.RemoveResource(ctx)
-			return
-		}
-		resp.Diagnostics.AddError("failed making get instance request", res.HasError.Error())
-		return
-	}
-	if res.JSON200 == nil {
-		resp.Diagnostics.AddError("received an empty response", "JSON200 == nil")
+	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+		resp.Diagnostics.AddError("failed to get instance", agg.Error())
 		return
 	}
 
@@ -221,16 +209,12 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 
 	// handle deletion
 	res, err := r.client.Instances.DeprovisionWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed making deprovision request", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		if res.StatusCode() == http.StatusNotFound {
+	if agg := validate.Response(res, err); agg != nil {
+		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
 			return
 		}
-		resp.Diagnostics.AddError("failed making deprovision instance request", res.HasError.Error())
+		resp.Diagnostics.AddError("failed to deprovision instance", agg.Error())
 		return
 	}
 

@@ -51,16 +51,12 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 	// read instance credential
 	res, err := r.client.Instances.InstanceCredentialsReadWithResponse(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString(), cred.ID.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("failed to read argus instance credentials", err.Error())
-		return
-	}
-	if res.HasError != nil {
-		if res.StatusCode() == http.StatusNotFound {
+	if agg := validate.Response(res, err); agg != nil {
+		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
 			return
 		}
-		resp.Diagnostics.AddError("failed to read credential", res.HasError.Error())
+		resp.Diagnostics.AddError("failed to read credential", agg.Error())
 		return
 	}
 
