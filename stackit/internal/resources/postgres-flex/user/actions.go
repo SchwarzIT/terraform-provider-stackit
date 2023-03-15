@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/generated/users"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
@@ -163,7 +164,11 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
+	hc := r.client.GetHTTPClient()
+	to := hc.Timeout
+	hc.Timeout = 5 * time.Minute
 	res, err := r.client.PostgresFlex.Users.DeleteUserWithResponse(ctx, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString())
+	hc.Timeout = to
 	if agg := validate.Response(res, err); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
