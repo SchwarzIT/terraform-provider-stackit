@@ -175,11 +175,17 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		}
 	}
 
-	process := res.WaitHandler(ctx, r.client.PostgresFlex.Users, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString())
-	if _, err := process.WaitWithContext(ctx); err != nil {
-		resp.Diagnostics.AddError("failed to verify user deletion", err.Error())
-		return
-	}
+	// @TODO: for the time being, verification code is commented out due to 500 errors from the API, revert once fixed.
+
+	// if res == nil {
+	// 	res = &users.DeleteUserResponse{}
+	// }
+	// process := res.WaitHandler(ctx, r.client.PostgresFlex.Users, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString())
+	// if _, err := process.WaitWithContext(ctx); err != nil {
+	// 	resp.Diagnostics.AddError("failed to verify user deletion", err.Error())
+	// 	return
+	// }
+
 	resp.State.RemoveResource(ctx)
 }
 
