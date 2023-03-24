@@ -73,7 +73,7 @@ func (r Resource) createInstance(ctx context.Context, diags *diag.Diagnostics, p
 		return
 	}
 
-	process := res.WaitHandler(ctx, c.Instances, plan.ProjectID.ValueString(), res.JSON202.InstanceID)
+	process := res.WaitHandler(ctx, c.Instances, plan.ProjectID.ValueString(), res.JSON202.InstanceID).SetTimeout(1 * time.Hour)
 	wr, err := process.WaitWithContext(ctx)
 	if err != nil {
 		diags.AddError("failed validating instance creation", err.Error())
