@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated/cluster"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
@@ -92,7 +93,7 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 		diags.AddError("failed during SKE create/update", agg.Error())
 	}
 
-	process := resp.WaitHandler(ctx, c.Kubernetes.Cluster, projectID, clusterName)
+	process := resp.WaitHandler(ctx, c.Kubernetes.Cluster, projectID, clusterName).SetTimeout(time.Hour)
 	res, err := process.WaitWithContext(ctx)
 	if agg := validate.Response(res, err, "JSON200.Status.Aggregated"); agg != nil {
 		diags.AddError("failed to validate SKE create/update", agg.Error())
