@@ -89,7 +89,7 @@ func NewRabbitMQ() datasource.DataSource {
 
 // DataSource is the exported data source
 type DataSource struct {
-	client  *dataservices.Clients
+	client  *dataservices.ClientWithResponses
 	service DataSourceService
 	urls    env.EnvironmentURLs
 }
