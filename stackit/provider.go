@@ -218,14 +218,14 @@ After the service account has been created, you can authenticate to the client u
 
 1. Follow instructions in the [community client](https://github.com/SchwarzIT/community-stackit-go-client#key-flow)
 
-2. You can configure the Key flow by providing paths using environment variables or by configuring the paths in the provider block (` + "`Key flow (1)" + ` example below)
+2. You can configure the Key flow by providing paths using environment variables or by configuring the paths in the provider block (` + "`Key flow (1)`" + ` example below)
 
    ` + "```bash" + `
    export STACKIT_SERVICE_ACCOUNT_KEY_PATH="sa_key.json"
    export STACKIT_PRIVATE_KEY_PATH="private_key.pem"
    ` + "```" + `
 
-3. Another way is to provide the contents directly, either with environment variables or by configuring the provider directly (` + "`Key flow (2)" + ` example below)
+3. Another way is to provide the contents directly, either with environment variables or by configuring the provider directly (` + "`Key flow (2)`" + ` example below)
 
    ` + "```bash" + `
    export STACKIT_SERVICE_ACCOUNT_KEY_="..."
