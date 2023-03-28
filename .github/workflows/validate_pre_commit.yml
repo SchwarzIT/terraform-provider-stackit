@@ -75,7 +75,7 @@ jobs:
             echo "Files added successfully."
           else
             echo "No files added. Exiting."
-            exit 1
+            exit 0
           fi
           git commit -m "Automated docs update"
           git push || true
