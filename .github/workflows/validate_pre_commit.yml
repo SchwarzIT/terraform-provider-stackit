@@ -44,7 +44,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          token: ${{ secrets.WORKFLOW_GIT_ACCESS_TOKEN }}
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
@@ -64,11 +65,13 @@ jobs:
           unzip -o tfplugindocs_0.13.0_linux_amd64.zip -d .
       - name: Run pre commit
         run: |
-          export HCTI_USER_ID="${{ secrets.HCTI_USER_ID }}"
-          export HCTI_API_KEY="${{ secrets.HCTI_API_KEY }}"
           make ci-pre-commit
           git config --global user.name 'do87'
           git config --global user.email 'do87@users.noreply.github.com'
-          git add docs/** || exit 0
-          git commit -m "Automated docs update" || exit 0
-          git push  || exit 0
+          git add docs/** 
+          git commit -m "Automated docs update" 
+      - name: Push changes
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
