@@ -7,14 +7,14 @@ description: |-
   ~> Note: The provider is built using Terraform's plugin framework, therefore we recommend using Terraform CLI v1.x which supports Protocol v6
   Authentication
   Before you can start using the client, you will need to create a STACKIT Service Account in your project and assign it the appropriate permissions (i.e. project.owner).
-  After the service account has been created, you can authenticate to the client using the Key authentication flow (recommended) or with the static `Token flow (less secure as the token is long-lived).
+  After the service account has been created, you can authenticate to the client using the Key flow  (recommended) or with the static Token flow (less secure as the token is long-lived).
   Key flow
-  Follow instructions in the community client https://github.com/SchwarzIT/community-stackit-go-client#key-flowYou can configure the Key flow by providing paths using environment variables or by configuring the paths in the provider block (example below)
+  Follow instructions in the community client https://github.com/SchwarzIT/community-stackit-go-client#key-flowYou can configure the Key flow by providing paths using environment variables or by configuring the paths in the provider block (`Key flow (1) example below)
   bash
      export STACKIT_SERVICE_ACCOUNT_KEY_PATH="sa_key.json"
      export STACKIT_PRIVATE_KEY_PATH="private_key.pem"
   
-  Another way is to provide the contents directly, either with environment variables or by configuring the provider directly (example below)
+  Another way is to provide the contents directly, either with environment variables or by configuring the provider directly (`Key flow (2) example below)
   bash
      export STACKIT_SERVICE_ACCOUNT_KEY_="..."
      export STACKIT_PRIVATE_KEY="..."
@@ -37,20 +37,20 @@ The STACKIT provider is a project developed and maintained by the STACKIT commun
 ## Authentication
 
 Before you can start using the client, you will need to create a STACKIT Service Account in your project and assign it the appropriate permissions (i.e. `project.owner`).
-After the service account has been created, you can authenticate to the client using the `Key` authentication flow (recommended) or with the static ``Token` flow (less secure as the token is long-lived).
+After the service account has been created, you can authenticate to the client using the `Key flow`  (recommended) or with the static `Token flow` (less secure as the token is long-lived).
 
 ### Key flow
 
 1. Follow instructions in the [community client](https://github.com/SchwarzIT/community-stackit-go-client#key-flow)
 
-2. You can configure the Key flow by providing paths using environment variables or by configuring the paths in the provider block (example below)
+2. You can configure the Key flow by providing paths using environment variables or by configuring the paths in the provider block (`Key flow (1) example below)
 
    ```bash
    export STACKIT_SERVICE_ACCOUNT_KEY_PATH="sa_key.json"
    export STACKIT_PRIVATE_KEY_PATH="private_key.pem"
    ```
 
-3. Another way is to provide the contents directly, either with environment variables or by configuring the provider directly (example below)
+3. Another way is to provide the contents directly, either with environment variables or by configuring the provider directly (`Key flow (2) example below)
 
    ```bash
    export STACKIT_SERVICE_ACCOUNT_KEY_="..."
@@ -99,8 +99,8 @@ provider "stackit" {
 
 - `environment` (String) The API environment that the provider interacts with. Options are `dev`, `qa`, `prod`.<br />This attribute can also be loaded from `STACKIT_ENV` environment variable instead.
 - `private_key` (String, Sensitive) Service Account Key.<br />This attribute can also be loaded from `STACKIT_PRIVATE_KEY` environment variable instead.
-- `private_key_path` (String, Sensitive) Service Account Key.<br />This attribute can also be loaded from `STACKIT_PRIVATE_KEY_PATH` environment variable instead.
+- `private_key_path` (String) Service Account Key.<br />This attribute can also be loaded from `STACKIT_PRIVATE_KEY_PATH` environment variable instead.
 - `service_account_email` (String) Service Account Email.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_EMAIL` environment variable instead.
 - `service_account_key` (String, Sensitive) Service Account Key.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_KEY` environment variable instead.
-- `service_account_key_path` (String, Sensitive) Service Account Key.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_KEY_PATH` environment variable instead.
+- `service_account_key_path` (String) Service Account Key.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_KEY_PATH` environment variable instead.
 - `service_account_token` (String, Sensitive) Service Account Token.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_TOKEN` environment variable instead.
