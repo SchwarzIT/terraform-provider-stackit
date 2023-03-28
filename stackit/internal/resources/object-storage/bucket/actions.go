@@ -117,8 +117,10 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	c := r.client
 	res, err := c.ObjectStorage.Bucket.Delete(ctx, state.ObjectStorageProjectID.ValueString(), state.Name.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
-		resp.Diagnostics.AddError("failed to delete bucket", agg.Error())
-		return
+		if !validate.StatusEquals(res, http.StatusNotFound) {
+			resp.Diagnostics.AddError("failed to delete bucket", agg.Error())
+			return
+		}
 	}
 	resp.State.RemoveResource(ctx)
 

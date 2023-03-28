@@ -53,6 +53,9 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	res, err := r.client.Instances.Provision(ctx, plan.ProjectID.ValueString(), body)
 	if agg := validate.Response(res, err, "JSON202"); agg != nil {
 		resp.Diagnostics.AddError("failed instance provisioning", agg.Error())
+		if res != nil && res.JSON400 != nil {
+			resp.Diagnostics.AddError("bad request", fmt.Sprintf("%+v", *res.JSON400))
+		}
 		return
 	}
 

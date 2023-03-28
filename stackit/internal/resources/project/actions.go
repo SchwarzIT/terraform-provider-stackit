@@ -74,7 +74,7 @@ func (r Resource) createProject(ctx context.Context, resp *resource.CreateRespon
 	res, err := r.client.ResourceManagement.Create(ctx, body)
 	if agg := validate.Response(res, err, "JSON201"); agg != nil {
 		resp.Diagnostics.AddError("failed creating project", agg.Error())
-		if res.JSON400 != nil {
+		if res != nil && res.JSON400 != nil {
 			resp.Diagnostics.AddError("bad request", fmt.Sprintf("%+v", *res.JSON400))
 		}
 		return plan
