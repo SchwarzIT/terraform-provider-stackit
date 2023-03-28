@@ -13,10 +13,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-const (
-	run_this_test        = false
-	schwarz_container_id = "schwarz-it-kg-WJACUK1"
-)
+const run_this_test = false
+
+const schwarz_container_id = "schwarz-it-kg-WJACUK1"
 
 func TestAcc_ProjectDataSource(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
