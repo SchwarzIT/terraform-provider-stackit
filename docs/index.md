@@ -24,7 +24,7 @@ description: |-
   bash
      export STACKIT_SERVICE_ACCOUNT_EMAIL=email
      export STACKIT_SERVICE_ACCOUNT_TOKEN=token
-  bash
+  
   &nbsp;
 ---
 
@@ -64,7 +64,7 @@ After the service account has been created, you can authenticate to the client u
    ```bash
    export STACKIT_SERVICE_ACCOUNT_EMAIL=email
    export STACKIT_SERVICE_ACCOUNT_TOKEN=token
-   ```bash
+   ```
 
 &nbsp;
 
