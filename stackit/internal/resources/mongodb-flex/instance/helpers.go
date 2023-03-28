@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/generated/instance"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/instance"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -62,7 +62,7 @@ func (r Resource) validate(ctx context.Context, data Instance) error {
 }
 
 func (r Resource) validateVersion(ctx context.Context, projectID, version string) error {
-	res, err := r.client.MongoDBFlex.Versions.GetVersionsWithResponse(ctx, projectID)
+	res, err := r.client.MongoDBFlex.Versions.List(ctx, projectID)
 	if agg := validate.Response(res, err, "JSON200.Versions"); agg != nil {
 		return errors.Wrap(agg, "failed validating version")
 	}
@@ -78,7 +78,7 @@ func (r Resource) validateVersion(ctx context.Context, projectID, version string
 }
 
 func (r Resource) validateMachineType(ctx context.Context, projectID, flavorID, serviceType string) error {
-	res, err := r.client.MongoDBFlex.Flavors.GetFlavorsWithResponse(ctx, projectID)
+	res, err := r.client.MongoDBFlex.Flavors.List(ctx, projectID)
 	if agg := validate.Response(res, err, "JSON200.Flavors"); agg != nil {
 		return errors.Wrap(agg, "failed validating machine type (flavors)")
 	}
@@ -116,7 +116,7 @@ func (r Resource) validateMachineType(ctx context.Context, projectID, flavorID, 
 }
 
 func (r Resource) validateStorage(ctx context.Context, projectID, machineType string, storage Storage) error {
-	res, err := r.client.MongoDBFlex.Flavors.GetStoragesFlavorWithResponse(ctx, projectID, machineType)
+	res, err := r.client.MongoDBFlex.Flavors.GetStorageOptions(ctx, projectID, machineType)
 	if agg := validate.Response(res, err, "JSON200.StorageRange"); agg != nil {
 		return errors.Wrap(agg, "failed validating storage range")
 	}

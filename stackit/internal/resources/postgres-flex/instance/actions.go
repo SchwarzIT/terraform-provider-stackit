@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/generated/instance"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/instance"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
@@ -84,7 +84,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		},
 		Version: &v,
 	}
-	res, err := c.Instance.CreateWithResponse(ctx, plan.ProjectID.ValueString(), body)
+	res, err := c.Instance.Create(ctx, plan.ProjectID.ValueString(), body)
 	if agg := validate.Response(res, err, "JSON201.ID"); agg != nil {
 		resp.Diagnostics.AddError("failed creating Postgres flex instance", agg.Error())
 		return
@@ -136,7 +136,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 	// read instance
 	c := r.client.PostgresFlex
-	res, err := c.Instance.GetWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
+	res, err := c.Instance.Get(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if agg := validate.Response(res, err, "JSON200"); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
@@ -226,7 +226,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 
 	// handle update
 	c := r.client.PostgresFlex.Instance
-	res, err := c.PatchUpdateWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
+	res, err := c.Patch(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
 	if agg := validate.Response(res, err); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
@@ -271,7 +271,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	c := r.client.PostgresFlex.Instance
-	res, err := c.DeleteWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
+	res, err := c.Delete(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)

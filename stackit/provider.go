@@ -45,6 +45,20 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
+const (
+	// Token Flow
+	ServiceAccountEmail = "STACKIT_SERVICE_ACCOUNT_EMAIL"
+	ServiceAccountToken = "STACKIT_SERVICE_ACCOUNT_TOKEN"
+
+	// Key Flow optional env variable (1)
+	ServiceAccountKey = "STACKIT_SERVICE_ACCOUNT_KEY"
+	PrivateKey        = "STACKIT_PRIVATE_KEY"
+
+	// Key Flow optional env variable (2) using file paths
+	ServiceAccountKeyPath = "STACKIT_SERVICE_ACCOUNT_KEY_PATH"
+	PrivateKeyPath        = "STACKIT_PRIVATE_KEY_PATH"
+)
+
 // New returns a new STACKIT provider function
 func New(version string) func() provider.Provider {
 	return func() provider.Provider {
@@ -62,9 +76,21 @@ var _ = provider.Provider(&StackitProvider{})
 
 // Provider schema struct
 type providerSchema struct {
+	// Token Flow
 	ServiceAccountEmail types.String `tfsdk:"service_account_email"`
 	ServiceAccountToken types.String `tfsdk:"service_account_token"`
-	Environment         types.String `tfsdk:"environment"`
+
+	// Key Flow optional env variable (1)
+	ServiceAccountKey types.String `tfsdk:"service_account_key"`
+	PrivateKey        types.String `tfsdk:"private_key"`
+
+	// Key Flow optional env variable (2) using file paths
+	ServiceAccountKeyPath types.String `tfsdk:"service_account_key_path"`
+	PrivateKeyPath        types.String `tfsdk:"private_key_path"`
+
+	// Key Flow
+
+	Environment types.String `tfsdk:"environment"`
 }
 
 // Schema returns the provider's schema

@@ -21,7 +21,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 	c := r.client.ObjectStorage.Project
-	res, err := c.GetWithResponse(ctx, config.ProjectID.ValueString())
+	res, err := c.Get(ctx, config.ProjectID.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
 		resp.Diagnostics.AddError("failed ObjectStorage project read", agg.Error())
 		return

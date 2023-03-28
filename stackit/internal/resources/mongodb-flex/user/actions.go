@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/generated/user"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/user"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -39,7 +39,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		Roles:    roles,
 		Username: &username,
 	}
-	res, err := r.client.MongoDBFlex.User.CreateWithResponse(ctx, plan.ProjectID.ValueString(), plan.InstanceID.ValueString(), body)
+	res, err := r.client.MongoDBFlex.User.Create(ctx, plan.ProjectID.ValueString(), plan.InstanceID.ValueString(), body)
 	if agg := validate.Response(res, err, "JSON202.Item"); agg != nil {
 		resp.Diagnostics.AddError("failed creating mongodb flex db user", agg.Error())
 		return
@@ -87,7 +87,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	// read cluster
-	res, err := r.client.MongoDBFlex.User.GetWithResponse(ctx, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString())
+	res, err := r.client.MongoDBFlex.User.Get(ctx, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString())
 	if agg := validate.Response(res, err, "JSON200.Item"); agg != nil {
 		resp.Diagnostics.AddError("failed making read user request", agg.Error())
 		return
@@ -132,7 +132,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	res, err := r.client.MongoDBFlex.User.DeleteWithResponse(ctx, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString())
+	res, err := r.client.MongoDBFlex.User.Delete(ctx, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)

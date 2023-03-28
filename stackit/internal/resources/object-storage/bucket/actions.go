@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1.0.1/generated/bucket"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1.0.1/bucket"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -51,7 +51,7 @@ func (r Resource) createBucket(ctx context.Context, resp *resource.CreateRespons
 	b := &bucket.GetResponse{}
 
 	// Create bucket
-	res, err := c.ObjectStorage.Bucket.CreateWithResponse(ctx, plan.ObjectStorageProjectID.ValueString(), plan.Name.ValueString())
+	res, err := c.ObjectStorage.Bucket.Create(ctx, plan.ObjectStorageProjectID.ValueString(), plan.Name.ValueString())
 	if agg := validate.Response(res, err, "JSON201"); agg != nil {
 		resp.Diagnostics.AddError("failed to create bucket", agg.Error())
 		return b
@@ -82,7 +82,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	res, err := c.ObjectStorage.Bucket.GetWithResponse(ctx, state.ObjectStorageProjectID.ValueString(), state.Name.ValueString())
+	res, err := c.ObjectStorage.Bucket.Get(ctx, state.ObjectStorageProjectID.ValueString(), state.Name.ValueString())
 	if agg := validate.Response(res, err, "JSON200.Bucket"); agg != nil {
 		resp.Diagnostics.AddError("failed to read bucket", agg.Error())
 		return
@@ -115,7 +115,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	c := r.client
-	res, err := c.ObjectStorage.Bucket.DeleteWithResponse(ctx, state.ObjectStorageProjectID.ValueString(), state.Name.ValueString())
+	res, err := c.ObjectStorage.Bucket.Delete(ctx, state.ObjectStorageProjectID.ValueString(), state.Name.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
 		resp.Diagnostics.AddError("failed to delete bucket", agg.Error())
 		return

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/resource-management/v2.0/generated/projects"
+	rmv2 "github.com/SchwarzIT/community-stackit-go-client/pkg/services/resource-management/v2.0"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -46,15 +46,15 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 }
 
 func (r Resource) createProject(ctx context.Context, resp *resource.CreateResponse, plan Project) Project {
-	labels := projects.ResourceLabels{
+	labels := rmv2.ResourceLabels{
 		"billingReference": plan.BillingRef.ValueString(),
 		"scope":            "PUBLIC",
 	}
 
-	owner := projects.PROJECT_OWNER
-	subj1 := r.client.GetConfig().ServiceAccountEmail
+	owner := rmv2.PROJECT_OWNER
+	subj1 := r.client.Client.GetServiceAccountEmail()
 	subj2 := plan.OwnerEmail.ValueString()
-	members := []projects.ProjectMember{
+	members := []rmv2.ProjectMember{
 		{
 			Subject: &subj1,
 			Role:    &owner,
@@ -65,13 +65,13 @@ func (r Resource) createProject(ctx context.Context, resp *resource.CreateRespon
 		},
 	}
 
-	body := projects.CreateJSONRequestBody{
+	body := rmv2.ProjectRequestBody{
 		ContainerParentID: plan.ParentContainerID.ValueString(),
 		Labels:            &labels,
 		Members:           members,
 		Name:              plan.Name.ValueString(),
 	}
-	res, err := r.client.ResourceManagement.Projects.CreateWithResponse(ctx, body)
+	res, err := r.client.ResourceManagement.Create(ctx, body)
 	if agg := validate.Response(res, err, "JSON201"); agg != nil {
 		resp.Diagnostics.AddError("failed creating project", agg.Error())
 		if res.JSON400 != nil {
@@ -82,7 +82,7 @@ func (r Resource) createProject(ctx context.Context, resp *resource.CreateRespon
 
 	// give API a bit of time to process request
 	time.Sleep(30 * time.Second)
-	process := res.WaitHandler(ctx, r.client.ResourceManagement.Projects, res.JSON201.ContainerID)
+	process := res.WaitHandler(ctx, r.client.ResourceManagement, res.JSON201.ContainerID)
 	if _, err := process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError(fmt.Sprintf("failed validating project %s creation", res.JSON201.ProjectID), err.Error())
 		return plan
@@ -104,7 +104,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	res, err := c.ResourceManagement.Projects.GetWithResponse(ctx, p.ID.ValueString(), &projects.GetParams{})
+	res, err := c.ResourceManagement.Get(ctx, p.ID.ValueString(), &rmv2.GetParams{})
 	if agg := validate.Response(res, err, "JSON200"); agg != nil {
 		resp.Diagnostics.AddError("failed reading project", agg.Error())
 		return
@@ -169,19 +169,19 @@ func (r Resource) updateProject(ctx context.Context, plan, state Project, resp *
 		return
 	}
 
-	labels := projects.ResourceLabels{
+	labels := rmv2.ResourceLabels{
 		"billingReference": plan.BillingRef.ValueString(),
 		"scope":            "PUBLIC",
 	}
 
 	name := plan.Name.ValueString()
 	parent := plan.ParentContainerID.ValueString()
-	body := projects.UpdateJSONRequestBody{
+	body := rmv2.UpdateJSONRequestBody{
 		ContainerParentID: &parent,
 		Labels:            &labels,
 		Name:              &name,
 	}
-	res, err := r.client.ResourceManagement.Projects.UpdateWithResponse(ctx, plan.ContainerID.ValueString(), body)
+	res, err := r.client.ResourceManagement.Update(ctx, plan.ContainerID.ValueString(), body)
 	if agg := validate.Response(res, err, "JSON200"); agg != nil {
 		resp.Diagnostics.AddError("failed updating project", agg.Error())
 		return
@@ -197,13 +197,13 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	c := r.client
-	res, err := c.ResourceManagement.Projects.DeleteWithResponse(ctx, state.ContainerID.ValueString())
+	res, err := c.ResourceManagement.Delete(ctx, state.ContainerID.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
 		resp.Diagnostics.AddError("failed deleting project", agg.Error())
 		return
 	}
 
-	process := res.WaitHandler(ctx, c.ResourceManagement.Projects, state.ContainerID.ValueString())
+	process := res.WaitHandler(ctx, c.ResourceManagement, state.ContainerID.ValueString())
 	if _, err := process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed to verify project deletion", err.Error())
 	}

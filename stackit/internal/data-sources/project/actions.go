@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/resource-management/v2.0/generated/projects"
+	rmv2 "github.com/SchwarzIT/community-stackit-go-client/pkg/services/resource-management/v2.0"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -21,13 +21,25 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	res, err := c.ResourceManagement.Projects.GetWithResponse(ctx, p.ContainerID.ValueString(), &projects.GetParams{})
+	projectType := rmv2.PROJECT
+	res, err := c.ResourceManagement.GetContainersOfAnOrganization(ctx, p.ContainerID.ValueString(), &rmv2.GetContainersOfAnOrganizationParams{Type: &projectType})
 	if agg := validate.Response(res, err, "JSON200"); agg != nil {
 		resp.Diagnostics.AddError(fmt.Sprintf("failed reading project with container ID: %s", p.ContainerID.ValueString()), agg.Error())
 		return
 	}
 
-	project := *res.JSON200
+	containers := *res.JSON200
+	id := -1
+	for i, project := range containers.Items {
+		if project.Item.ContainerID != p.ContainerID.ValueString() {
+			continue
+		}
+		id = i
+	}
+	if id == -1 {
+		resp.Diagnostics.AddError("not found", "project container ID not found")
+	}
+	project := containers.Items[id].Item
 	p.ID = types.StringValue(project.ProjectID.String())
 	p.Name = types.StringValue(project.Name)
 	p.ParentContainerID = types.StringValue(project.Parent.ContainerID)

@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	client "github.com/SchwarzIT/community-stackit-go-client"
-	dataservices "github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/generated"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services"
+	dataservices "github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 )
 
@@ -91,7 +91,7 @@ func NewRabbitMQ() resource.Resource {
 type Resource struct {
 	client  *dataservices.ClientWithResponses
 	service ResourceService
-	urls    urls.ByEnvs
+	urls    env.EnvironmentURLs
 }
 
 var _ = resource.Resource(&Resource{})
@@ -108,12 +108,12 @@ func (r *Resource) Configure(ctx context.Context, req resource.ConfigureRequest,
 		return
 	}
 
-	c, ok := req.ProviderData.(*client.Client)
+	c, ok := req.ProviderData.(*services.Services)
 
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected *client.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *services.Services, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -122,7 +122,7 @@ func (r *Resource) Configure(ctx context.Context, req resource.ConfigureRequest,
 	r.setClient(c)
 }
 
-func (r *Resource) setClient(c *client.Client) {
+func (r *Resource) setClient(c *services.Services) {
 	switch r.service {
 	case ElasticSearch:
 		r.client = c.ElasticSearch

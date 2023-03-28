@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated/cluster"
-	provideroptions "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated/provider-options"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/cluster"
+	provideroptions "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/provider-options"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
 
@@ -29,7 +29,7 @@ func (r Resource) validate(
 
 	// Validate against real options
 	c := r.client
-	opts, err := c.Kubernetes.ProviderOptions.GetProviderOptionsWithResponse(ctx)
+	opts, err := c.Kubernetes.ProviderOptions.List(ctx)
 
 	if agg := validate.Response(opts, err, "JSON200.KubernetesVersions"); agg != nil {
 		// if options cannot be fetched, skip validation

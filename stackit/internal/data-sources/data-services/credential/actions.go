@@ -19,7 +19,7 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 		return
 	}
 
-	res, err := d.client.Credentials.GetWithResponse(ctx, config.ProjectID.ValueString(), config.InstanceID.ValueString(), config.ID.ValueString())
+	res, err := d.client.Credentials.Get(ctx, config.ProjectID.ValueString(), config.InstanceID.ValueString(), config.ID.ValueString())
 	if agg := validate.Response(res, err, "JSON200.Raw"); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)

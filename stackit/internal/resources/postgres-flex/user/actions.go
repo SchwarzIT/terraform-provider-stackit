@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/generated/users"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/users"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -41,12 +41,12 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		roles = []string{"login"}
 	}
 
-	body := users.CreateUserJSONRequestBody{
+	body := users.UserCreateUserRequest{
 		Roles:    &roles,
 		Username: &username,
 	}
 
-	res, err := r.client.PostgresFlex.Users.CreateUserWithResponse(ctx, plan.ProjectID.ValueString(), plan.InstanceID.ValueString(), body)
+	res, err := r.client.PostgresFlex.Users.Create(ctx, plan.ProjectID.ValueString(), plan.InstanceID.ValueString(), body)
 	if agg := validate.Response(res, err, "JSON201.Item"); agg != nil {
 		if res.StatusCode() == http.StatusBadRequest {
 			j := ""
@@ -102,11 +102,11 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	// read cluster
-	res, err := r.client.PostgresFlex.Users.GetUserWithResponse(ctx, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString())
+	res, err := r.client.PostgresFlex.Users.Get(ctx, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString())
 	if agg := validate.Response(res, err, "JSON200.Item"); agg != nil {
 		if res.JSON400 != nil {
 			// verify the instance exists
-			res, err := r.client.PostgresFlex.Instance.ListWithResponse(ctx, state.ProjectID.ValueString())
+			res, err := r.client.PostgresFlex.Instance.List(ctx, state.ProjectID.ValueString())
 			if agg2 := validate.Response(res, err, "JSON200.Items"); agg2 != nil {
 				resp.Diagnostics.AddError("failed making read user request", agg.Error())
 				resp.Diagnostics.AddError("failed verifying instance status", agg2.Error())
@@ -163,7 +163,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	res, err := r.client.PostgresFlex.Users.DeleteUserWithResponse(ctx, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString())
+	res, err := r.client.PostgresFlex.Users.Delete(ctx, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)

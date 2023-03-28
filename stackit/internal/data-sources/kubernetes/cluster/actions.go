@@ -21,7 +21,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	cl, err := c.Kubernetes.Cluster.GetClusterWithResponse(ctx, config.KubernetesProjectID.ValueString(), config.Name.ValueString())
+	cl, err := c.Kubernetes.Cluster.Get(ctx, config.KubernetesProjectID.ValueString(), config.Name.ValueString())
 	if agg := validate.Response(cl, err, "JSON200"); agg != nil {
 		resp.Diagnostics.AddError("failed to read cluster", agg.Error())
 		return
@@ -44,7 +44,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 
 func (r DataSource) getCredential(ctx context.Context, diags *diag.Diagnostics, cl *cluster.Cluster) {
 	c := r.client
-	res, err := c.Kubernetes.Credentials.GetClusterCredentialsWithResponse(ctx, cl.KubernetesProjectID.ValueString(), cl.Name.ValueString())
+	res, err := c.Kubernetes.Credentials.List(ctx, cl.KubernetesProjectID.ValueString(), cl.Name.ValueString())
 	if agg := validate.Response(res, err, "JSON200"); agg != nil {
 		diags.AddError("failed to get cluster credentials", agg.Error())
 		return

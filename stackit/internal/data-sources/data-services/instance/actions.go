@@ -21,7 +21,7 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 		return
 	}
 
-	res, err := d.client.Instances.ListWithResponse(ctx, config.ProjectID.ValueString())
+	res, err := d.client.Instances.List(ctx, config.ProjectID.ValueString())
 	if agg := validate.Response(res, err, "JSON200"); agg != nil {
 		resp.Diagnostics.AddError("failed to list instances", agg.Error())
 		return
@@ -51,7 +51,7 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 	// set found instance
 	instance := list.Instances[found]
 
-	ores, err := d.client.Offerings.GetWithResponse(ctx, config.ProjectID.ValueString())
+	ores, err := d.client.Offerings.Get(ctx, config.ProjectID.ValueString())
 	if agg := validate.Response(ores, err, "JSON200"); agg != nil {
 		resp.Diagnostics.AddError("failed to get offerings", agg.Error())
 		return

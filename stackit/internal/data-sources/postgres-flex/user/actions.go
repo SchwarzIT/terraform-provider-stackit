@@ -21,7 +21,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	res, err := c.Users.GetUserWithResponse(ctx, config.ProjectID.ValueString(), config.InstanceID.ValueString(), config.ID.ValueString())
+	res, err := c.Users.Get(ctx, config.ProjectID.ValueString(), config.InstanceID.ValueString(), config.ID.ValueString())
 	if agg := validate.Response(res, err, "JSON200.Item"); agg != nil {
 		resp.Diagnostics.AddError("failed to list postgres instances", agg.Error())
 		return

@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/Masterminds/semver"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated/cluster"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/cluster"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/pkg/errors"
 
@@ -34,7 +34,7 @@ const (
 func (r Resource) loadAvaiableVersions(ctx context.Context) ([]*semver.Version, error) {
 	c := r.client
 	var versionOptions []*semver.Version
-	res, err := c.Kubernetes.ProviderOptions.GetProviderOptionsWithResponse(ctx)
+	res, err := c.Kubernetes.ProviderOptions.List(ctx)
 	if agg := validate.Response(res, err, "JSON200.KubernetesVersions"); agg != nil {
 		return nil, errors.Wrap(agg, "failed fetching cluster versions")
 	}

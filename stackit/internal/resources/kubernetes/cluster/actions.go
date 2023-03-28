@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated/cluster"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/cluster"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -79,7 +79,7 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 		return
 	}
 
-	resp, err := c.Kubernetes.Cluster.CreateOrUpdateClusterWithResponse(ctx,
+	resp, err := c.Kubernetes.Cluster.CreateOrUpdate(ctx,
 		projectID,
 		clusterName, cluster.SkeServiceCreateOrUpdateClusterRequest{
 			Extensions:  extensions,
@@ -99,7 +99,7 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 		diags.AddError("failed to validate SKE create/update", agg.Error())
 		return
 	}
-	result, ok := res.(*cluster.GetClusterResponse)
+	result, ok := res.(*cluster.GetResponse)
 	if !ok {
 		diags.AddError("failed to parse Wait() response", "response is not *cluster.GetClusterResponse")
 		return
@@ -110,7 +110,7 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 
 func (r Resource) getCredential(ctx context.Context, diags *diag.Diagnostics, cl *Cluster) {
 	c := r.client
-	res, err := c.Kubernetes.Credentials.GetClusterCredentialsWithResponse(ctx, cl.KubernetesProjectID.ValueString(), cl.Name.ValueString())
+	res, err := c.Kubernetes.Credentials.List(ctx, cl.KubernetesProjectID.ValueString(), cl.Name.ValueString())
 	if agg := validate.Response(res, err, "JSON200.Kubeconfig"); agg != nil {
 		diags.AddError("failed fetching cluster credentials", agg.Error())
 		return
@@ -131,7 +131,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	// read cluster
-	res, err := c.Kubernetes.Cluster.GetClusterWithResponse(ctx, state.KubernetesProjectID.ValueString(), state.Name.ValueString())
+	res, err := c.Kubernetes.Cluster.Get(ctx, state.KubernetesProjectID.ValueString(), state.Name.ValueString())
 	if agg := validate.Response(res, err, "JSON200"); agg != nil {
 		resp.Diagnostics.AddError("failed fetching cluster", agg.Error())
 		return
@@ -191,7 +191,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	c := r.client
-	res, err := c.Kubernetes.Cluster.DeleteClusterWithResponse(ctx, state.KubernetesProjectID.ValueString(), state.Name.ValueString())
+	res, err := c.Kubernetes.Cluster.Delete(ctx, state.KubernetesProjectID.ValueString(), state.Name.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
 		resp.Diagnostics.AddError("failed deleting cluster", agg.Error())
 		return
@@ -248,7 +248,7 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 
 	// pre-read imports
 	c := r.client
-	res, err := c.Kubernetes.Cluster.GetClusterWithResponse(ctx, idParts[0], idParts[1])
+	res, err := c.Kubernetes.Cluster.Get(ctx, idParts[0], idParts[1])
 	if agg := validate.Response(res, err, "JSON200"); agg != nil {
 		resp.Diagnostics.AddError("failed import pre-read", agg.Error())
 		return

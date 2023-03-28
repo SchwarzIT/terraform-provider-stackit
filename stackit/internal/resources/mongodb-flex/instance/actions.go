@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/generated/instance"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/instance"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
@@ -84,7 +84,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		Version:  &ver,
 	}
 
-	res, err := r.client.MongoDBFlex.Instance.CreateWithResponse(ctx, plan.ProjectID.ValueString(), body)
+	res, err := r.client.MongoDBFlex.Instance.Create(ctx, plan.ProjectID.ValueString(), body)
 	if agg := validate.Response(res, err, "JSON202.ID"); agg != nil {
 		resp.Diagnostics.AddError("failed MongoDB flex instance creation", agg.Error())
 		return
@@ -115,7 +115,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	// read cluster
-	get, err := r.client.MongoDBFlex.Instance.GetWithResponse(ctx, plan.ProjectID.ValueString(), instanceID)
+	get, err := r.client.MongoDBFlex.Instance.Get(ctx, plan.ProjectID.ValueString(), instanceID)
 	if agg := validate.Response(get, err, "JSON200.Item"); agg != nil {
 		resp.Diagnostics.AddError("failed to get instance after create", agg.Error())
 		return
@@ -145,7 +145,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	// read cluster
-	res, err := r.client.MongoDBFlex.Instance.GetWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
+	res, err := r.client.MongoDBFlex.Instance.Get(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if agg := validate.Response(res, err, "JSON200.Item"); agg != nil {
 		resp.Diagnostics.AddError("failed to read instance", agg.Error())
 		return
@@ -226,7 +226,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	// handle update
-	res, err := r.client.MongoDBFlex.Instance.PatchWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
+	res, err := r.client.MongoDBFlex.Instance.Patch(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
 	if agg := validate.Response(res, err, "JSON202.Item"); agg != nil {
 		resp.Diagnostics.AddError("failed updating mongodb flex instance", agg.Error())
 		return
@@ -239,7 +239,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	// read cluster
-	get, err := r.client.MongoDBFlex.Instance.GetWithResponse(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString())
+	get, err := r.client.MongoDBFlex.Instance.Get(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString())
 	if agg := validate.Response(get, err, "JSON200.Item"); agg != nil {
 		resp.Diagnostics.AddError("failed to get instance after create", agg.Error())
 		return
@@ -266,7 +266,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	res, err := r.client.MongoDBFlex.Instance.DeleteWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
+	res, err := r.client.MongoDBFlex.Instance.Delete(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
