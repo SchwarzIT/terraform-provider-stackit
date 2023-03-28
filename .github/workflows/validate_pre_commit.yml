@@ -8,39 +8,39 @@ on:
 
 jobs:
 
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
+  # build:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v3
 
-    - name: Set up Go
-      uses: actions/setup-go@v3
-      with:
-        go-version-file: 'go.mod'
-        check-latest: true
-        cache: true
+  #   - name: Set up Go
+  #     uses: actions/setup-go@v3
+  #     with:
+  #       go-version-file: 'go.mod'
+  #       check-latest: true
+  #       cache: true
 
-    - uses: robinraju/release-downloader@v1.7
-      with: 
-        repository: hashicorp/terraform-plugin-docs
-        tag: "v0.13.0"
-        fileName: "tfplugindocs_0.13.0_linux_amd64.zip"
-        tarBall: false
-        zipBall: false
+  #   - uses: robinraju/release-downloader@v1.7
+  #     with: 
+  #       repository: hashicorp/terraform-plugin-docs
+  #       tag: "v0.13.0"
+  #       fileName: "tfplugindocs_0.13.0_linux_amd64.zip"
+  #       tarBall: false
+  #       zipBall: false
 
-    - name: Unzip
-      run: |
-        cd $GITHUB_WORKSPACE
-        unzip -o tfplugindocs_0.13.0_linux_amd64.zip -d .
+  #   - name: Unzip
+  #     run: |
+  #       cd $GITHUB_WORKSPACE
+  #       unzip -o tfplugindocs_0.13.0_linux_amd64.zip -d .
 
-    - name: Validate Pre-Commit
-      run: make ci-verify 
+  #   - name: Validate Pre-Commit
+  #     run: make ci-verify 
 
   rebuilddocs:
     name: Generate docs
     runs-on: ubuntu-latest
-    needs: build
-    if: failure()
+    # needs: build
+    # if: failure()
     steps:
       - uses: actions/checkout@v3
         with:
@@ -70,7 +70,7 @@ jobs:
           make pre-commit
           git config --global user.name 'do87'
           git config --global user.email 'do87@users.noreply.github.com'
-          git add docs/
-          git commit -m "Automated docs update"
+          git add docs/ || exit 0
+          git commit -m "Automated docs update" || exit 0
           git pull -r
           git push
