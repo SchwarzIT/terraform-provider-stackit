@@ -87,7 +87,7 @@ pre-commit: docs quality
 	@cat .github/workflows/acceptance_test.yml | md5 >> .github/files/pre-commit-check/checksum
 
 ci-pre-commit: ci-docs
-	@find docs -type f | sort | cat | md5 > .github/files/pre-commit-check/checksum
+	@find docs -type f | sort | cat | md5sum  | cut -d' ' -f1 > .github/files/pre-commit-check/checksum
 
 ci-verify: ci-docs
 	@find docs -type f | sort | cat | md5sum  | cut -d' ' -f1 > .github/files/pre-commit-check/checksum-check
