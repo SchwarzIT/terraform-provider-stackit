@@ -110,4 +110,4 @@ ci-process-results:
 	@go run .github/files/process-test-results/process.go
 
 
-.PHONY: all docs testacc ci-testacc ci-verify pre-commit dummy test ci-docs quality preview-docs install build ci-process-results ci-pre-commit
+.PHONY: all ci-docs docs testacc ci-testacc ci-verify pre-commit dummy test quality preview-docs install build ci-process-results ci-pre-commit

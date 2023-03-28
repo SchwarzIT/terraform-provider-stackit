@@ -51,7 +51,6 @@ jobs:
           go-version-file: 'go.mod'
           check-latest: true
           cache: true
-
       - uses: robinraju/release-downloader@v1.7
         with: 
           repository: hashicorp/terraform-plugin-docs
