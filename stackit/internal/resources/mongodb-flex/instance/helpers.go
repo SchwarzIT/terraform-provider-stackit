@@ -149,7 +149,9 @@ func applyClientResponse(pi *Instance, i *instance.InstancesSingleInstance) erro
 		}
 	}
 	pi.ACL = types.ListValueMust(types.StringType, elems)
-	pi.BackupSchedule = nullOrValStr(i.BackupSchedule)
+	if i.BackupSchedule != nil {
+		pi.BackupSchedule = nullOrValStr(i.BackupSchedule)
+	}
 	pi.MachineType = nullOrValStr(i.Flavor.ID)
 	pi.Name = nullOrValStr(i.Name)
 	pi.Replicas = nullOrValInt64(i.Replicas)

@@ -106,7 +106,6 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Computed:    true,
 				PlanModifiers: []planmodifier.String{
 					modifiers.StringDefault(DefaultBackupSchedule),
-					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"storage": schema.SingleNestedAttribute{

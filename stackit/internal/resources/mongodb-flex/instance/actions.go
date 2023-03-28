@@ -202,7 +202,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	cl := storage.Class.ValueString()
 	sz := int(storage.Size.ValueInt64())
 
-	// handle creation
+	// handle update
 	bus := plan.BackupSchedule.ValueString()
 	fid := plan.MachineType.ValueString()
 	name := plan.Name.ValueString()
