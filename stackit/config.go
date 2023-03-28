@@ -14,8 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-var warned = false
-
 func (p *StackitProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
 	// Retrieve provider data from configuration
 	var config providerSchema
@@ -56,10 +54,6 @@ func (p *StackitProvider) Configure(ctx context.Context, req provider.ConfigureR
 
 	tfcl, err2 := tokenFlow(ctx, config)
 	if err2 == nil {
-		if !warned {
-			resp.Diagnostics.AddWarning("Using token flow authentication", "It is recommended to use `Key flow` authentication, as it is more secure. Please consider modifying your setup.")
-			warned = true
-		}
 		resp.DataSourceData = tfcl
 		resp.ResourceData = tfcl
 		return
