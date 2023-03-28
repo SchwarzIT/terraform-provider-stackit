@@ -86,6 +86,9 @@ pre-commit: docs quality
 	@find docs -type f | sort | cat | md5 > .github/files/pre-commit-check/checksum
 	@cat .github/workflows/acceptance_test.yml | md5 >> .github/files/pre-commit-check/checksum
 
+ci-pre-commit: ci-docs
+	@find docs -type f | sort | cat | md5 > .github/files/pre-commit-check/checksum
+
 ci-verify: ci-docs
 	@find docs -type f | sort | cat | md5sum  | cut -d' ' -f1 > .github/files/pre-commit-check/checksum-check
 	@cat .github/workflows/acceptance_test.yml | md5sum  | cut -d' ' -f1 >> .github/files/pre-commit-check/checksum-check
@@ -107,4 +110,4 @@ ci-process-results:
 	@go run .github/files/process-test-results/process.go
 
 
-.PHONY: all docs testacc ci-testacc ci-verify pre-commit dummy test ci-docs quality preview-docs install build ci-process-results
+.PHONY: all docs testacc ci-testacc ci-verify pre-commit dummy test ci-docs quality preview-docs install build ci-process-results ci-pre-commit
