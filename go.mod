@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/Masterminds/semver v1.5.0
-	github.com/SchwarzIT/community-stackit-go-client v1.19.0-pre-8
+	github.com/SchwarzIT/community-stackit-go-client v1.19.0-pre-9
 	github.com/hashicorp/terraform-plugin-framework v1.2.0
 	github.com/hashicorp/terraform-plugin-framework-validators v0.9.0
 	github.com/hashicorp/terraform-plugin-go v0.14.3
@@ -13,6 +13,7 @@ require (
 )
 
 require (
+	github.com/MicahParks/keyfunc v1.9.0 // indirect
 	github.com/agext/levenshtein v1.2.2 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/apparentlymart/go-cidr v1.1.0 // indirect

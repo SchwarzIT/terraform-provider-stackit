@@ -6,6 +6,8 @@ github.com/Masterminds/semver v1.5.0 h1:H65muMkzWKEuNDnfl9d70GUjFniHKHRbFPGBuZ3Q
 github.com/Masterminds/semver v1.5.0/go.mod h1:MB6lktGJrhw8PrUyiEoblNEGEQ+RzHPF078ddwwvV3Y=
 github.com/Masterminds/semver/v3 v3.1.1/go.mod h1:VPu/7SZ7ePZ3QOrcuXROw5FAcLl4a0cBrbBpGY/8hQs=
 github.com/Masterminds/sprig/v3 v3.2.1/go.mod h1:UoaO7Yp8KlPnJIYWTFkMaqPUYKTfGFPhxNuwnnxkKlk=
+github.com/MicahParks/keyfunc v1.9.0 h1:lhKd5xrFHLNOWrDc4Tyb/Q1AJ4LCzQ48GVJyVIID3+o=
+github.com/MicahParks/keyfunc v1.9.0/go.mod h1:IdnCilugA0O/99dW+/MkvlyrsX8+L8+x95xuVNtM5jw=
 github.com/Microsoft/go-winio v0.4.14/go.mod h1:qXqCSQ3Xa7+6tgxaGTIe4Kpcdsi+P8jBhyzoq1bpyYA=
 github.com/Microsoft/go-winio v0.4.16 h1:FtSW/jqD+l4ba5iPBj9CODVtgfYAD8w2wS923g/cFDk=
 github.com/Microsoft/go-winio v0.4.16/go.mod h1:XB6nPKklQyQ7GC9LdcBEcBl8PF76WugXOPRXwdLnMv0=
@@ -14,6 +16,14 @@ github.com/ProtonMail/go-crypto v0.0.0-20210428141323-04723f9f07d7/go.mod h1:z4/
 github.com/RaveNoX/go-jsoncommentstrip v1.0.0/go.mod h1:78ihd09MekBnJnxpICcwzCMzGrKSKYe4AqU6PDYYpjk=
 github.com/SchwarzIT/community-stackit-go-client v1.19.0-pre-8 h1:WSoZLo2XK2Zn/ZXUsvRbqwJl8fLWeDubLmbmPhCU96c=
 github.com/SchwarzIT/community-stackit-go-client v1.19.0-pre-8/go.mod h1:Umc2UrzBjAww1ys2VS5oz0XiFMym0jbGDDfT2k/fa2Y=
+github.com/SchwarzIT/community-stackit-go-client v1.19.0-pre-8.0.20230328120204-6b19742fec4d h1:hiC8NwjgasjfZGz+h2cGrS9tN9qlxBTdPdHiBNf6kIU=
+github.com/SchwarzIT/community-stackit-go-client v1.19.0-pre-8.0.20230328120204-6b19742fec4d/go.mod h1:Umc2UrzBjAww1ys2VS5oz0XiFMym0jbGDDfT2k/fa2Y=
+github.com/SchwarzIT/community-stackit-go-client v1.19.0-pre-8.0.20230328121118-1a613e747761 h1:DEAUT4xleNU9sUURZ4wwtdnaJ4TlA7/UDzUEYf4a9vM=
+github.com/SchwarzIT/community-stackit-go-client v1.19.0-pre-8.0.20230328121118-1a613e747761/go.mod h1:Umc2UrzBjAww1ys2VS5oz0XiFMym0jbGDDfT2k/fa2Y=
+github.com/SchwarzIT/community-stackit-go-client v1.19.0-pre-8.0.20230328125117-773595e0ca10 h1:y/MGJXMzE0MYhutGIz0Yka9D9iYQAFeiyWho5rPygWM=
+github.com/SchwarzIT/community-stackit-go-client v1.19.0-pre-8.0.20230328125117-773595e0ca10/go.mod h1:Kd6qbLgCdebHPcN2FGsNb/xmmnlUopIScCwuRQect+w=
+github.com/SchwarzIT/community-stackit-go-client v1.19.0-pre-9 h1:ujhiaYAz1JPkBjsgWAeRuq38wkxVgWL22GSdRE0yI6U=
+github.com/SchwarzIT/community-stackit-go-client v1.19.0-pre-9/go.mod h1:Kd6qbLgCdebHPcN2FGsNb/xmmnlUopIScCwuRQect+w=
 github.com/acomagu/bufpipe v1.0.3 h1:fxAGrHZTgQ9w5QqVItgzwj235/uYZYgbXitB+dLupOk=
 github.com/acomagu/bufpipe v1.0.3/go.mod h1:mxdxdup/WdsKVreO5GpW4+M/1CE2sMG4jeGJ2sYmHc4=
 github.com/agext/levenshtein v1.2.2 h1:0S/Yg6LYmFJ5stwQeRp6EeOcCbj7xiqQSdNelsXvaqE=
@@ -59,6 +69,7 @@ github.com/go-logr/logr v1.2.0/go.mod h1:jdQByPbusPIv2/zmleS9BjJVeZ6kBagPoEUsqbV
 github.com/go-logr/logr v1.2.3 h1:2DntVwHkVopvECVRSlL5PSo9eG+cAkDCuckLubN+rq0=
 github.com/go-logr/logr v1.2.3/go.mod h1:jdQByPbusPIv2/zmleS9BjJVeZ6kBagPoEUsqbVz/1A=
 github.com/go-test/deep v1.0.3 h1:ZrJSEWsXzPOxaZnFteGEfooLba+ju3FYIbOrS+rQd68=
+github.com/golang-jwt/jwt/v4 v4.4.2/go.mod h1:m21LjoU+eqJr34lmDMbreY2eSTRJ1cv77w39/MY0Ch0=
 github.com/golang-jwt/jwt/v4 v4.5.0 h1:7cYmW1XlMY7h7ii7UhUyChSgS5wUJEnm9uZVTGqOWzg=
 github.com/golang-jwt/jwt/v4 v4.5.0/go.mod h1:m21LjoU+eqJr34lmDMbreY2eSTRJ1cv77w39/MY0Ch0=
 github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b/go.mod h1:SBH7ygxi8pfUlaOkMMuAQtPIUF8ecWP5IEl/CR7VP2Q=

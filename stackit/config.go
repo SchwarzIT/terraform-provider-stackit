@@ -2,6 +2,7 @@ package stackit
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 
@@ -64,22 +65,37 @@ func (p *StackitProvider) Configure(ctx context.Context, req provider.ConfigureR
 		return
 	}
 
-	resp.Diagnostics.AddError("couldn't initialize client", fmt.Sprintf("key flow client auth:\n%s\n\ntoken flow client auth:\n%s", err.Error(), err2.Error()))
+	resp.Diagnostics.AddError("couldn't initialize client with an authentication flow", fmt.Sprintf("key flow client auth:\n%s\n\ntoken flow client auth:\n%s", err.Error(), err2.Error()))
 }
 
 func keyFlow(ctx context.Context, config providerSchema) (*services.Services, error) {
-	return client.NewClientWithKeyAuth(ctx, clients.KeyFlowConfig{
-		ServiceAccountKey:     []byte(config.ServiceAccountKey.ValueString()),
-		ServiceAccountKeyPath: config.ServiceAccountKeyPath.ValueString(),
-		PrivateKey:            []byte(config.PrivateKey.ValueString()),
-		PrivateKeyPath:        config.PrivateKeyPath.ValueString(),
-	})
+	if config.ServiceAccountKey.ValueString() != "" &&
+		config.PrivateKey.ValueString() != "" {
+		return client.NewClientWithKeyAuth(ctx, clients.KeyFlowConfig{
+			ServiceAccountKey: []byte(config.ServiceAccountKey.ValueString()),
+			PrivateKey:        []byte(config.PrivateKey.ValueString()),
+			Environment:       env.Environment(config.Environment.ValueString()),
+		})
+	}
+	if config.ServiceAccountKeyPath.ValueString() != "" &&
+		config.PrivateKeyPath.ValueString() != "" {
+		return client.NewClientWithKeyAuth(ctx, clients.KeyFlowConfig{
+			ServiceAccountKeyPath: config.ServiceAccountKeyPath.ValueString(),
+			PrivateKeyPath:        config.PrivateKeyPath.ValueString(),
+			Environment:           env.Environment(config.Environment.ValueString()),
+		})
+	}
+	return nil, errors.New("no proper settings found for key flow")
 }
 
 func tokenFlow(ctx context.Context, config providerSchema) (*services.Services, error) {
-	return client.NewClientWithTokenAuth(ctx, clients.TokenFlowConfig{
-		ServiceAccountEmail: config.ServiceAccountEmail.ValueString(),
-		ServiceAccountToken: config.ServiceAccountToken.ValueString(),
-		Environment:         env.Environment(config.Environment.ValueString()),
-	})
+	if config.ServiceAccountEmail.ValueString() != "" &&
+		config.ServiceAccountToken.ValueString() != "" {
+		return client.NewClientWithTokenAuth(ctx, clients.TokenFlowConfig{
+			ServiceAccountEmail: config.ServiceAccountEmail.ValueString(),
+			ServiceAccountToken: config.ServiceAccountToken.ValueString(),
+			Environment:         env.Environment(config.Environment.ValueString()),
+		})
+	}
+	return nil, errors.New("no proper settings found for token flow")
 }
