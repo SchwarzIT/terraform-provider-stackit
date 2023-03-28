@@ -111,6 +111,26 @@ This provider is built and maintained by the STACKIT community in Schwarz IT and
 				Sensitive:           true,
 				MarkdownDescription: "Service Account Token.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_TOKEN` environment variable instead.",
 			},
+			"service_account_key": schema.StringAttribute{
+				Optional:            true,
+				Sensitive:           true,
+				MarkdownDescription: "Service Account Key.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_KEY` environment variable instead.",
+			},
+			"private_key": schema.StringAttribute{
+				Optional:            true,
+				Sensitive:           true,
+				MarkdownDescription: "Service Account Key.<br />This attribute can also be loaded from `STACKIT_PRIVATE_KEY` environment variable instead.",
+			},
+			"service_account_key_path": schema.StringAttribute{
+				Optional:            true,
+				Sensitive:           true,
+				MarkdownDescription: "Service Account Key.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_KEY_PATH` environment variable instead.",
+			},
+			"private_key_path": schema.StringAttribute{
+				Optional:            true,
+				Sensitive:           true,
+				MarkdownDescription: "Service Account Key.<br />This attribute can also be loaded from `STACKIT_PRIVATE_KEY_PATH` environment variable instead.",
+			},
 			"environment": schema.StringAttribute{
 				Optional:            true,
 				MarkdownDescription: "The API environment that the provider interacts with. Options are `dev`, `qa`, `prod`.<br />This attribute can also be loaded from `STACKIT_ENV` environment variable instead.",
