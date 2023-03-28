@@ -96,11 +96,7 @@ type providerSchema struct {
 // Schema returns the provider's schema
 func (p *StackitProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: `
-This provider is built and maintained by the STACKIT community in Schwarz IT and is not an official STACKIT provider
-
-~> **Note:** The provider is built using Terraform's plugin framework, therefore we recommend using Terraform CLI v1.x which supports Protocol v6
-		`,
+		MarkdownDescription: md,
 		Attributes: map[string]schema.Attribute{
 			"service_account_email": schema.StringAttribute{
 				Optional:            true,
@@ -209,3 +205,43 @@ func (p *StackitProvider) DataSources(context.Context) []func() datasource.DataS
 		dataProject.New,
 	}
 }
+
+var md = `
+The STACKIT provider is a project developed and maintained by the STACKIT community within Schwarz IT. Please note that it is not an official provider endorsed or maintained by STACKIT.
+
+~> **Note:** The provider is built using Terraform's plugin framework, therefore we recommend using Terraform CLI v1.x which supports Protocol v6
+
+## Authentication
+
+Before you can start using the client, you will need to create a STACKIT Service Account in your project and assign it the appropriate permissions (i.e. ` + "`project.owner`)." + `
+After the service account has been created, you can authenticate to the client using the ` + "`Key`" + ` authentication flow (recommended) or with the static ` + "``Token`" + ` flow (less secure as the token is long-lived).
+
+### Key flow
+
+1. Follow instructions in the [community client](https://github.com/SchwarzIT/community-stackit-go-client#key-flow)
+
+2. You can configure the Key flow by providing paths using environment variables or by configuring the paths in the provider block (example below)
+
+   ` + "```bash" + `
+   export STACKIT_SERVICE_ACCOUNT_KEY_PATH="sa_key.json"
+   export STACKIT_PRIVATE_KEY_PATH="private_key.pem"
+   ` + "```" + `
+
+3. Another way is to provide the contents directly, either with environment variables or by configuring the provider directly (example below)
+
+   ` + "```bash" + `
+   export STACKIT_SERVICE_ACCOUNT_KEY_="..."
+   export STACKIT_PRIVATE_KEY="..."
+   ` + "```" + `
+
+### Token flow
+
+1. Set the following environment variables or configure the provider directly (example below)
+
+   ` + "```bash" + `
+   export STACKIT_SERVICE_ACCOUNT_EMAIL=email
+   export STACKIT_SERVICE_ACCOUNT_TOKEN=token
+   ` + "```bash" + `
+
+&nbsp;
+`
