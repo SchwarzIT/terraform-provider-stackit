@@ -119,12 +119,10 @@ func (p *StackitProvider) Schema(ctx context.Context, req provider.SchemaRequest
 			},
 			"service_account_key_path": schema.StringAttribute{
 				Optional:            true,
-				Sensitive:           true,
 				MarkdownDescription: "Service Account Key.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_KEY_PATH` environment variable instead.",
 			},
 			"private_key_path": schema.StringAttribute{
 				Optional:            true,
-				Sensitive:           true,
 				MarkdownDescription: "Service Account Key.<br />This attribute can also be loaded from `STACKIT_PRIVATE_KEY_PATH` environment variable instead.",
 			},
 			"environment": schema.StringAttribute{
@@ -214,20 +212,20 @@ The STACKIT provider is a project developed and maintained by the STACKIT commun
 ## Authentication
 
 Before you can start using the client, you will need to create a STACKIT Service Account in your project and assign it the appropriate permissions (i.e. ` + "`project.owner`)." + `
-After the service account has been created, you can authenticate to the client using the ` + "`Key`" + ` authentication flow (recommended) or with the static ` + "``Token`" + ` flow (less secure as the token is long-lived).
+After the service account has been created, you can authenticate to the client using the ` + "`Key flow`" + `  (recommended) or with the static ` + "`Token flow`" + ` (less secure as the token is long-lived).
 
 ### Key flow
 
 1. Follow instructions in the [community client](https://github.com/SchwarzIT/community-stackit-go-client#key-flow)
 
-2. You can configure the Key flow by providing paths using environment variables or by configuring the paths in the provider block (example below)
+2. You can configure the Key flow by providing paths using environment variables or by configuring the paths in the provider block (` + "`Key flow (1)" + ` example below)
 
    ` + "```bash" + `
    export STACKIT_SERVICE_ACCOUNT_KEY_PATH="sa_key.json"
    export STACKIT_PRIVATE_KEY_PATH="private_key.pem"
    ` + "```" + `
 
-3. Another way is to provide the contents directly, either with environment variables or by configuring the provider directly (example below)
+3. Another way is to provide the contents directly, either with environment variables or by configuring the provider directly (` + "`Key flow (2)" + ` example below)
 
    ` + "```bash" + `
    export STACKIT_SERVICE_ACCOUNT_KEY_="..."
