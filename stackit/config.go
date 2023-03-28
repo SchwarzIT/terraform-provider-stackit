@@ -53,6 +53,7 @@ func (p *StackitProvider) Configure(ctx context.Context, req provider.ConfigureR
 
 	tfcl, err2 := tokenFlow(ctx, config)
 	if err2 == nil {
+		resp.Diagnostics.AddWarning("Using token flow authentication", "It is recommended to use `Key flow` authentication, as it is more secure. Please consider modifying your setup.")
 		resp.DataSourceData = tfcl
 		resp.ResourceData = tfcl
 		return
