@@ -3,8 +3,9 @@ package instance_test
 import (
 	"errors"
 	"fmt"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mongodb-flex/instance"
 	"testing"
+
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mongodb-flex/instance"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
@@ -43,13 +44,6 @@ func TestAcc_MongoDBFlexInstance(t *testing.T) {
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "storage.class", instance.DefaultStorageClass),
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "storage.size", fmt.Sprint(instance.DefaultStorageSize)),
 					resource.TestCheckResourceAttrSet("stackit_mongodb_flex_instance.example", "id"),
-					// resource.TestCheckResourceAttrSet("stackit_mongodb_flex_instance.example", "user.id"),
-					// resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "user.username", "stackit"),
-					// resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "user.database", "stackit"),
-					// resource.TestCheckResourceAttrSet("stackit_mongodb_flex_instance.example", "user.password"),
-					// resource.TestCheckResourceAttrSet("stackit_mongodb_flex_instance.example", "user.host"),
-					// resource.TestCheckResourceAttrSet("stackit_mongodb_flex_instance.example", "user.port"),
-					// resource.TestCheckResourceAttrSet("stackit_mongodb_flex_instance.example", "user.uri"),
 				),
 			},
 			{
@@ -63,13 +57,6 @@ func TestAcc_MongoDBFlexInstance(t *testing.T) {
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "storage.class", instance.DefaultStorageClass),
 					resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "storage.size", fmt.Sprint(instance.DefaultStorageSize)),
 					resource.TestCheckResourceAttrSet("stackit_mongodb_flex_instance.example", "id"),
-					// resource.TestCheckResourceAttrSet("stackit_mongodb_flex_instance.example", "user.id"),
-					// resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "user.username", "stackit"),
-					// resource.TestCheckResourceAttr("stackit_mongodb_flex_instance.example", "user.database", "stackit"),
-					// resource.TestCheckResourceAttrSet("stackit_mongodb_flex_instance.example", "user.password"),
-					// resource.TestCheckResourceAttrSet("stackit_mongodb_flex_instance.example", "user.host"),
-					// resource.TestCheckResourceAttrSet("stackit_mongodb_flex_instance.example", "user.port"),
-					// resource.TestCheckResourceAttrSet("stackit_mongodb_flex_instance.example", "user.uri"),
 				),
 			},
 			// test import

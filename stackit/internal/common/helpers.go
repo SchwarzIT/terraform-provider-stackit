@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -47,7 +47,7 @@ func GetAcceptanceTestsProjectID() string {
 	return ACC_TEST_PROJECT_ID
 }
 
-func EnvironmentInfo(u urls.ByEnvs) string {
+func EnvironmentInfo(u env.EnvironmentURLs) string {
 	return fmt.Sprintf(`
 <br />
 

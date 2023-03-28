@@ -20,7 +20,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 	c := r.client.Kubernetes.Project
-	p, err := c.GetProjectWithResponse(ctx, config.ProjectID.ValueString())
+	p, err := c.Get(ctx, config.ProjectID.ValueString())
 	if agg := validate.Response(p, err); agg != nil {
 		resp.Diagnostics.AddError("failed to read SKE project", agg.Error())
 		return

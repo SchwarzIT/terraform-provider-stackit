@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	credentialsgroup "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1.0.1/generated/credentials-group"
+	credentialsgroup "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1.0.1/credentials-group"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -42,13 +42,13 @@ func (r Resource) createCredentialGroup(ctx context.Context, data *CredentialsGr
 	body := credentialsgroup.CreateJSONRequestBody{
 		DisplayName: data.Name.ValueString(),
 	}
-	cres, err := c.ObjectStorage.CredentialsGroup.CreateWithResponse(ctx, data.ObjectStorageProjectID.ValueString(), body)
+	cres, err := c.ObjectStorage.CredentialsGroup.Create(ctx, data.ObjectStorageProjectID.ValueString(), body)
 	if agg := validate.Response(cres, err); agg != nil {
 		return diag.NewErrorDiagnostic("failed to create credential group", agg.Error())
 
 	}
 
-	res, err := c.ObjectStorage.CredentialsGroup.GetWithResponse(ctx, data.ObjectStorageProjectID.ValueString())
+	res, err := c.ObjectStorage.CredentialsGroup.Get(ctx, data.ObjectStorageProjectID.ValueString())
 	if agg := validate.Response(res, err, "JSON200.CredentialsGroups"); agg != nil {
 		return diag.NewErrorDiagnostic("failed to list credential groups", agg.Error())
 	}
@@ -73,7 +73,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	res, err := c.ObjectStorage.CredentialsGroup.GetWithResponse(ctx, state.ObjectStorageProjectID.ValueString())
+	res, err := c.ObjectStorage.CredentialsGroup.Get(ctx, state.ObjectStorageProjectID.ValueString())
 	if agg := validate.Response(res, err, "JSON200.CredentialsGroups"); agg != nil {
 		resp.Diagnostics.AddError("failed to read credential groups", agg.Error())
 		return
@@ -113,7 +113,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	c := r.client.ObjectStorage.CredentialsGroup
-	res, err := c.DeleteWithResponse(ctx, state.ObjectStorageProjectID.ValueString(), state.ID.ValueString())
+	res, err := c.Delete(ctx, state.ObjectStorageProjectID.ValueString(), state.ID.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
 		resp.Diagnostics.AddError("failed to delete credential groups", agg.Error())
 		return

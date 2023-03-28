@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	client "github.com/SchwarzIT/community-stackit-go-client"
-	dataservices "github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/generated"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services"
+	dataservices "github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 )
 
@@ -91,7 +91,7 @@ func NewRabbitMQ() datasource.DataSource {
 type DataSource struct {
 	client  *dataservices.ClientWithResponses
 	service DataSourceService
-	urls    urls.ByEnvs
+	urls    env.EnvironmentURLs
 }
 
 var _ = datasource.DataSource(&DataSource{})
@@ -108,7 +108,7 @@ func (d *DataSource) Configure(ctx context.Context, req datasource.ConfigureRequ
 		return
 	}
 
-	c, ok := req.ProviderData.(*client.Client)
+	c, ok := req.ProviderData.(*services.Services)
 
 	if !ok {
 		resp.Diagnostics.AddError(

@@ -21,7 +21,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	res, err := r.client.Instances.InstanceCredentialsCreateWithResponse(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString())
+	res, err := r.client.Instances.CredentialsCreate(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString())
 	if agg := validate.Response(res, err, "JSON201"); agg != nil {
 		resp.Diagnostics.AddError("failed to create argus instance credentials", agg.Error())
 		return
@@ -50,7 +50,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	// read instance credential
-	res, err := r.client.Instances.InstanceCredentialsReadWithResponse(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString(), cred.ID.ValueString())
+	res, err := r.client.Instances.CredentialsRead(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString(), cred.ID.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
@@ -79,7 +79,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	res, err := r.client.Instances.InstanceCredentialsDeleteWithResponse(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString(), cred.ID.ValueString())
+	res, err := r.client.Instances.CredentialsDelete(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString(), cred.ID.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
 		if !strings.Contains(agg.Error(), "EOF") {
 			resp.Diagnostics.AddError("failed to delete credential", agg.Error())

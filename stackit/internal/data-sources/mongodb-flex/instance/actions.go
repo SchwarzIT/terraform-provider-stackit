@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/generated/instance"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/instance"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -25,7 +25,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	res, err := c.Instance.ListWithResponse(ctx, config.ProjectID.ValueString(), &instance.ListParams{})
+	res, err := c.Instance.List(ctx, config.ProjectID.ValueString(), &instance.ListParams{})
 	if agg := validate.Response(res, err, "JSON200.Items"); agg != nil {
 		diags.AddError("failed to list mongodb instances", agg.Error())
 		return
@@ -57,7 +57,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 
 	// set found instance
 	instance := list[found]
-	ires, err := c.Instance.GetWithResponse(ctx, config.ProjectID.ValueString(), *instance.ID)
+	ires, err := c.Instance.Get(ctx, config.ProjectID.ValueString(), *instance.ID)
 	if agg := validate.Response(ires, err, "JSON200.Item"); agg != nil {
 		resp.Diagnostics.AddError("failed to get mongodb instance", agg.Error())
 		return

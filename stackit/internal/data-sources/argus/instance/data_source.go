@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	client "github.com/SchwarzIT/community-stackit-go-client"
-	argus "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/generated"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services"
+	argus "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 )
 
@@ -19,8 +19,8 @@ func New() datasource.DataSource {
 
 // DataSource is the exported data source
 type DataSource struct {
-	client *client.Client
-	urls   urls.ByEnvs
+	client *services.Services
+	urls   env.EnvironmentURLs
 }
 
 var _ = datasource.DataSource(&DataSource{})
@@ -37,8 +37,7 @@ func (d *DataSource) Configure(ctx context.Context, req datasource.ConfigureRequ
 		return
 	}
 
-	client, ok := req.ProviderData.(*client.Client)
-
+	c, ok := req.ProviderData.(*services.Services)
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected Data Source Configure Type",
@@ -48,5 +47,6 @@ func (d *DataSource) Configure(ctx context.Context, req datasource.ConfigureRequ
 		return
 	}
 
-	d.client = client
+	d.client = c
+
 }

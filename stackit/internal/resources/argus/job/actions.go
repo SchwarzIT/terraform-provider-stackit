@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	scrapeconfig "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/generated/scrape-config"
+	scrapeconfig "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/scrape-config"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -23,7 +23,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	c := r.client
 	job := scrapeconfig.CreateJSONRequestBody(plan.ToClientJob())
-	res, err := c.Argus.ScrapeConfig.CreateWithResponse(ctx, plan.ProjectID.ValueString(), plan.ArgusInstanceID.ValueString(), job)
+	res, err := c.Argus.ScrapeConfig.Create(ctx, plan.ProjectID.ValueString(), plan.ArgusInstanceID.ValueString(), job)
 	if agg := validate.Response(res, err, "JSON202"); agg != nil {
 		resp.Diagnostics.AddError("failed to create argus job", agg.Error())
 		return
@@ -62,7 +62,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 	c := r.client
 
-	res, err := c.Argus.ScrapeConfig.ReadWithResponse(ctx, state.ProjectID.ValueString(), state.ArgusInstanceID.ValueString(), state.Name.ValueString())
+	res, err := c.Argus.ScrapeConfig.Get(ctx, state.ProjectID.ValueString(), state.ArgusInstanceID.ValueString(), state.Name.ValueString())
 	if agg := validate.Response(res, err, "JSON200"); agg != nil {
 		diags.AddError("failed to read argus job", agg.Error())
 		return
@@ -87,14 +87,14 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 
 	c := r.client
 	job := scrapeconfig.UpdateJSONRequestBody(plan.ToClientUpdateJob())
-	ures, err := c.Argus.ScrapeConfig.UpdateWithResponse(ctx, plan.ProjectID.ValueString(), plan.ArgusInstanceID.ValueString(), plan.Name.ValueString(), job)
+	ures, err := c.Argus.ScrapeConfig.Update(ctx, plan.ProjectID.ValueString(), plan.ArgusInstanceID.ValueString(), plan.Name.ValueString(), job)
 	if agg := validate.Response(ures, err); agg != nil {
 		resp.Diagnostics.AddError("failed to update argus job", agg.Error())
 		return
 	}
 
 	// read job to verify update
-	res, err := c.Argus.ScrapeConfig.ReadWithResponse(ctx, plan.ProjectID.ValueString(), plan.ArgusInstanceID.ValueString(), plan.Name.ValueString())
+	res, err := c.Argus.ScrapeConfig.Get(ctx, plan.ProjectID.ValueString(), plan.ArgusInstanceID.ValueString(), plan.Name.ValueString())
 	if agg := validate.Response(res, err, "JSON200"); agg != nil {
 		resp.Diagnostics.AddError("failed to read argus job", agg.Error())
 		return
@@ -122,7 +122,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	params := &scrapeconfig.DeleteParams{
 		JobName: []string{job.JobName},
 	}
-	res, err := c.Argus.ScrapeConfig.DeleteWithResponse(ctx, state.ProjectID.ValueString(), state.ArgusInstanceID.ValueString(), params)
+	res, err := c.Argus.ScrapeConfig.Delete(ctx, state.ProjectID.ValueString(), state.ArgusInstanceID.ValueString(), params)
 	if agg := validate.Response(res, err); agg != nil {
 		resp.Diagnostics.AddError("failed to delete argus job", agg.Error())
 		return

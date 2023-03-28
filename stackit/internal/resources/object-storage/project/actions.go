@@ -22,7 +22,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	// handle creation
 	c := r.client.ObjectStorage.Project
-	res, err := c.CreateWithResponse(ctx, plan.ProjectID.ValueString())
+	res, err := c.Create(ctx, plan.ProjectID.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
 		if !strings.Contains(agg.Error(), common.ERR_UNEXPECTED_EOF) {
 			resp.Diagnostics.AddError("failed ObjectStorage project creation", agg.Error())
@@ -50,7 +50,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 	// read
 	c := r.client.ObjectStorage.Project
-	res, err := c.GetWithResponse(ctx, state.ID.ValueString())
+	res, err := c.Get(ctx, state.ID.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
 		resp.Diagnostics.AddError("failed ObjectStorage project read", agg.Error())
 		return
@@ -75,7 +75,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 
 	// handle creation
 	c := r.client.ObjectStorage.Project
-	res, err := c.DeleteWithResponse(ctx, state.ID.ValueString())
+	res, err := c.Delete(ctx, state.ID.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
 		resp.Diagnostics.AddError("failed ObjectStorage project deletion", agg.Error())
 		return

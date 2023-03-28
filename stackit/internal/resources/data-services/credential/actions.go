@@ -23,11 +23,11 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	// handle creation
-	res, err := r.client.Credentials.PostWithResponse(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString())
+	res, err := r.client.Credentials.Post(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString())
 	if agg := validate.Response(res, err, "JSON200"); agg != nil {
 		if res.Error != nil && strings.Contains(res.Error.Error(), "service bind failed") {
 			time.Sleep(30 * time.Second)
-			res, err = r.client.Credentials.PostWithResponse(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString())
+			res, err = r.client.Credentials.Post(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString())
 			agg = validate.Response(res, err, "JSON200")
 		}
 		if agg != nil {
@@ -59,7 +59,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	// read instance credential
-	res, err := r.client.Credentials.GetWithResponse(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString(), cred.ID.ValueString())
+	res, err := r.client.Credentials.Get(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString(), cred.ID.ValueString())
 	if agg := validate.Response(res, err, "JSON200"); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
@@ -92,7 +92,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	res, err := r.client.Credentials.DeleteWithResponse(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString(), cred.ID.ValueString())
+	res, err := r.client.Credentials.Delete(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString(), cred.ID.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
 		if !strings.Contains(agg.Error(), "EOF") {
 			resp.Diagnostics.AddError("failed to delete credential", agg.Error())

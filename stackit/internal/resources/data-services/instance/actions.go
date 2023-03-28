@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/generated/instances"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/instances"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
@@ -50,9 +50,12 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		PlanID:       plan.PlanID.ValueString(),
 		Parameters:   &params,
 	}
-	res, err := r.client.Instances.ProvisionWithResponse(ctx, plan.ProjectID.ValueString(), body)
+	res, err := r.client.Instances.Provision(ctx, plan.ProjectID.ValueString(), body)
 	if agg := validate.Response(res, err, "JSON202"); agg != nil {
 		resp.Diagnostics.AddError("failed instance provisioning", agg.Error())
+		if res != nil && res.JSON400 != nil {
+			resp.Diagnostics.AddError("bad request", fmt.Sprintf("%+v", *res.JSON400))
+		}
 		return
 	}
 
@@ -111,7 +114,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 	// read instance
-	res, err := r.client.Instances.GetWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
+	res, err := r.client.Instances.Get(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if agg := validate.Response(res, err, "JSON200"); agg != nil {
 		resp.Diagnostics.AddError("failed to get instance", agg.Error())
 		return
@@ -167,7 +170,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		PlanID:     plan.PlanID.ValueString(),
 		Parameters: &params,
 	}
-	res, err := r.client.Instances.UpdateWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString(), body)
+	res, err := r.client.Instances.Update(ctx, state.ProjectID.ValueString(), state.ID.ValueString(), body)
 	if agg := validate.Response(res, err); agg != nil {
 		resp.Diagnostics.AddError("failed instance update", agg.Error())
 		return
@@ -182,7 +185,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	// mitigate an API bug that returns old data after an update completed
 	time.Sleep(1 * time.Minute)
 
-	newRes, err := r.client.Instances.GetWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
+	newRes, err := r.client.Instances.Get(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if agg := validate.Response(newRes, err, "JSON200"); agg != nil {
 		resp.Diagnostics.AddError("failed to read after update", agg.Error())
 		return
@@ -208,7 +211,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	// handle deletion
-	res, err := r.client.Instances.DeprovisionWithResponse(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
+	res, err := r.client.Instances.Deprovision(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)

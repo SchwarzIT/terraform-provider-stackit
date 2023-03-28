@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/generated/instances"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/generated/offerings"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/instances"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/offerings"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -54,7 +54,7 @@ func (r Resource) validate(ctx context.Context, data *Instance) error {
 		return errors.New("at least 1 ip address must be specified for `acl`")
 	}
 
-	res, err := r.client.Offerings.GetWithResponse(ctx, data.ProjectID.ValueString())
+	res, err := r.client.Offerings.Get(ctx, data.ProjectID.ValueString())
 	if agg := validate.Response(res, err, "JSON200"); agg != nil {
 		return agg
 	}
@@ -126,12 +126,12 @@ func (r Resource) applyClientResponse(ctx context.Context, pi *Instance, i *inst
 }
 
 func (r Resource) getPlanAndVersion(ctx context.Context, projectID, instanceID string) (plan, version string, err error) {
-	i, err := r.client.Instances.GetWithResponse(ctx, projectID, instanceID)
+	i, err := r.client.Instances.Get(ctx, projectID, instanceID)
 	if agg := validate.Response(i, err, "JSON200"); agg != nil {
 		return "", "", agg
 	}
 
-	res, err := r.client.Offerings.GetWithResponse(ctx, projectID)
+	res, err := r.client.Offerings.Get(ctx, projectID)
 	if agg := validate.Response(res, err, "JSON200"); agg != nil {
 		return "", "", agg
 	}

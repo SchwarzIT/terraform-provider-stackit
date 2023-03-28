@@ -47,12 +47,21 @@ test:
 	@go test $(TEST) || exit 1                                                   
 	@echo $(TEST) | xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4
 	
-testacc:
+testacc-token-flow:
 	@TF_ACC=1 TF_ACC_LOG=INFO TF_LOG=INFO \
 		ACC_TEST_BILLING_REF="$(ACC_TEST_BILLING_REF)" \
 		ACC_TEST_USER_EMAIL="$(ACC_TEST_USER_EMAIL)" \
 		STACKIT_SERVICE_ACCOUNT_EMAIL="$(STACKIT_SERVICE_ACCOUNT_EMAIL)" \
 		STACKIT_SERVICE_ACCOUNT_TOKEN="$(STACKIT_SERVICE_ACCOUNT_TOKEN)" \
+		STACKIT_CUSTOMER_ACCOUNT_ID="$(STACKIT_CUSTOMER_ACCOUNT_ID)" \
+		go test -p 1 -timeout 99999s -v $(TEST)
+
+testacc-key-flow:
+	@TF_ACC=1 TF_ACC_LOG=INFO TF_LOG=INFO \
+		ACC_TEST_BILLING_REF="$(ACC_TEST_BILLING_REF)" \
+		ACC_TEST_USER_EMAIL="$(ACC_TEST_USER_EMAIL)" \
+		STACKIT_SERVICE_ACCOUNT_KEY_PATH="$(STACKIT_SERVICE_ACCOUNT_KEY_PATH)" \
+		STACKIT_PRIVATE_KEY_PATH="$(STACKIT_PRIVATE_KEY_PATH)" \
 		STACKIT_CUSTOMER_ACCOUNT_ID="$(STACKIT_CUSTOMER_ACCOUNT_ID)" \
 		go test -p 1 -timeout 99999s -v $(TEST)
 
@@ -77,6 +86,9 @@ pre-commit: docs quality
 	@find docs -type f | sort | cat | md5 > .github/files/pre-commit-check/checksum
 	@cat .github/workflows/acceptance_test.yml | md5 >> .github/files/pre-commit-check/checksum
 
+ci-pre-commit: ci-docs
+	@find docs -type f | sort | cat | md5sum  | cut -d' ' -f1 > .github/files/pre-commit-check/checksum
+
 ci-verify: ci-docs
 	@find docs -type f | sort | cat | md5sum  | cut -d' ' -f1 > .github/files/pre-commit-check/checksum-check
 	@cat .github/workflows/acceptance_test.yml | md5sum  | cut -d' ' -f1 >> .github/files/pre-commit-check/checksum-check
@@ -98,4 +110,4 @@ ci-process-results:
 	@go run .github/files/process-test-results/process.go
 
 
-.PHONY: all docs testacc ci-testacc ci-verify pre-commit dummy test ci-docs quality preview-docs install build ci-process-results
+.PHONY: all ci-docs docs testacc ci-testacc ci-verify pre-commit dummy test quality preview-docs install build ci-process-results ci-pre-commit

@@ -3,7 +3,7 @@ package credential
 import (
 	"context"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/generated/instances"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/instances"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 

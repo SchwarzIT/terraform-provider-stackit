@@ -21,7 +21,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	// handle creation
 	c := r.client.Kubernetes.Project
-	res, err := c.CreateProjectWithResponse(ctx, plan.ProjectID.ValueString())
+	res, err := c.Create(ctx, plan.ProjectID.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
 		if !strings.Contains(agg.Error(), common.ERR_UNEXPECTED_EOF) {
 			resp.Diagnostics.AddError("failed during SKE project creation", agg.Error())
@@ -54,7 +54,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 	// read
 	c := r.client.Kubernetes.Project
-	res, err := c.GetProjectWithResponse(ctx, state.ID.ValueString())
+	res, err := c.Get(ctx, state.ID.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
@@ -80,7 +80,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 
 	// handle deletion
 	c := r.client.Kubernetes.Project
-	res, err := c.DeleteProjectWithResponse(ctx, state.ID.ValueString())
+	res, err := c.Delete(ctx, state.ID.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)

@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	client "github.com/SchwarzIT/community-stackit-go-client"
-	argus "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/generated"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services"
+	argus "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 )
 
@@ -22,7 +22,7 @@ func New() resource.Resource {
 // Resource is the exported resource
 type Resource struct {
 	client *argus.ClientWithResponses
-	urls   urls.ByEnvs
+	urls   env.EnvironmentURLs
 }
 
 var _ = resource.Resource(&Resource{})
@@ -39,12 +39,12 @@ func (r *Resource) Configure(ctx context.Context, req resource.ConfigureRequest,
 		return
 	}
 
-	c, ok := req.ProviderData.(*client.Client)
+	c, ok := req.ProviderData.(*services.Services)
 
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected *client.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *services.Services, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
