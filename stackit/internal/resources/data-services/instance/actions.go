@@ -112,7 +112,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	// read instance
 	res, err := r.client.Instances.Get(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if agg := validate.Response(res, err, "JSON200"); agg != nil {
-		if validate.StatusEquals(res, http.StatusNotFound) {
+		if validate.StatusEquals(res, http.StatusNotFound, http.StatusGone) {
 			resp.State.RemoveResource(ctx)
 			return
 		}
