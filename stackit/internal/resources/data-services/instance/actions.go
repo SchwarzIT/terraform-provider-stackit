@@ -109,13 +109,13 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	if state.ID.IsUnknown() || state.ID.IsNull() || state.ID.ValueString() == "" {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	// read instance
 	res, err := r.client.Instances.Get(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+		if validate.StatusEquals(res, http.StatusNotFound) {
+			resp.State.RemoveResource(ctx)
+			return
+		}
 		resp.Diagnostics.AddError("failed to get instance", agg.Error())
 		return
 	}

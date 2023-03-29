@@ -14,7 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-const redis_inst_run_this_test = false
+const redis_inst_run_this_test = true
 
 func TestAcc_ResourceRedisInstanceJob(t *testing.T) {
 	if !common.ShouldAccTestRun(redis_inst_run_this_test) {
