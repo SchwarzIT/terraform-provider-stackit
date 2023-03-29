@@ -2,8 +2,9 @@ package instance_test
 
 import (
 	"fmt"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mongodb-flex/instance"
 	"testing"
+
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mongodb-flex/instance"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"

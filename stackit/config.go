@@ -63,23 +63,13 @@ func (p *StackitProvider) Configure(ctx context.Context, req provider.ConfigureR
 }
 
 func keyFlow(ctx context.Context, config providerSchema) (*services.Services, error) {
-	if config.ServiceAccountKey.ValueString() != "" &&
-		config.PrivateKey.ValueString() != "" {
-		return client.NewClientWithKeyAuth(ctx, clients.KeyFlowConfig{
-			ServiceAccountKey: []byte(config.ServiceAccountKey.ValueString()),
-			PrivateKey:        []byte(config.PrivateKey.ValueString()),
-			Environment:       env.Environment(config.Environment.ValueString()),
-		})
-	}
-	if config.ServiceAccountKeyPath.ValueString() != "" &&
-		config.PrivateKeyPath.ValueString() != "" {
-		return client.NewClientWithKeyAuth(ctx, clients.KeyFlowConfig{
-			ServiceAccountKeyPath: config.ServiceAccountKeyPath.ValueString(),
-			PrivateKeyPath:        config.PrivateKeyPath.ValueString(),
-			Environment:           env.Environment(config.Environment.ValueString()),
-		})
-	}
-	return nil, errors.New("no proper settings found for key flow")
+	return client.NewClientWithKeyAuth(ctx, clients.KeyFlowConfig{
+		ServiceAccountKey:     []byte(config.ServiceAccountKey.ValueString()),
+		PrivateKey:            []byte(config.PrivateKey.ValueString()),
+		ServiceAccountKeyPath: config.ServiceAccountKeyPath.ValueString(),
+		PrivateKeyPath:        config.PrivateKeyPath.ValueString(),
+		Environment:           env.Environment(config.Environment.ValueString()),
+	})
 }
 
 func tokenFlow(ctx context.Context, config providerSchema) (*services.Services, error) {

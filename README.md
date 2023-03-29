@@ -29,15 +29,17 @@ terraform {
   required_providers {
     stackit = {
       source  = "SchwarzIT/stackit"
-      version = ">= 1.16"
+      version = "~> 1.16"
     }
   }
 }
 
 # Configure the STACKIT Provider
 provider "stackit" {
-  service_account_email = var.service_account_email
-  service_account_token = var.service_account_token
+  service_account_key_path = var.service_account_key_path
+  private_key_path         = var.private_key_path
 }
 
 ```
+
+For further authentication methods, please refer to our [Provider Documentation](https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs)
