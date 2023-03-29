@@ -115,15 +115,15 @@ func (p *StackitProvider) Schema(ctx context.Context, req provider.SchemaRequest
 			"private_key": schema.StringAttribute{
 				Optional:            true,
 				Sensitive:           true,
-				MarkdownDescription: "Service Account Key.<br />This attribute can also be loaded from `STACKIT_PRIVATE_KEY` environment variable instead.",
+				MarkdownDescription: "Private RSA Key.<br />This attribute can also be loaded from `STACKIT_PRIVATE_KEY` environment variable instead.",
 			},
 			"service_account_key_path": schema.StringAttribute{
 				Optional:            true,
-				MarkdownDescription: "Service Account Key.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_KEY_PATH` environment variable instead.",
+				MarkdownDescription: "Path to the Service Account Key.<br />This attribute can also be loaded from `STACKIT_SERVICE_ACCOUNT_KEY_PATH` environment variable instead.",
 			},
 			"private_key_path": schema.StringAttribute{
 				Optional:            true,
-				MarkdownDescription: "Service Account Key.<br />This attribute can also be loaded from `STACKIT_PRIVATE_KEY_PATH` environment variable instead.",
+				MarkdownDescription: "Path to the Private RSA Key.<br />This attribute can also be loaded from `STACKIT_PRIVATE_KEY_PATH` environment variable instead.",
 			},
 			"environment": schema.StringAttribute{
 				Optional:            true,
