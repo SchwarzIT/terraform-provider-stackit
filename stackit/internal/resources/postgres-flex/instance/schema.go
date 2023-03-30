@@ -66,11 +66,11 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"machine_type": schema.StringAttribute{
-				Description: "The Machine Type. Available options: `1.1` (1 CPU, 1 Memory), `1.2` (1 CPU, 2 Memory), `1.4` (1 CPU, 4 Memory), `1.8` (1 CPU, 8 Memory), `2.4` (2 CPU, 4 Memory), `2.8` (2 CPU, 8 Memory), `2.16` (2 CPU, 16 Memory), `4.8` (4 CPU, 8 Memory), `4.16` (4 CPU, 16 Memory), `4.32` (4 CPU, 32 Memory), `8.16` (8 CPU, 16 Memory), `8.32` (8 CPU, 32 Memory), `8.64` (8 CPU, 64 Memory), `16.32` (16 CPU, 32 Memory), `16.64` (16 CPU, 64 Memory)",
+				Description: "The Machine Type. Available options: `c1.2` (2 CPU, 4 Memory), `m1.2` (2 CPU, 16 Memory), `c1.3` (4 CPU, 8 Memory), `m1.3` (4 CPU, 32 Memory), `c1.4` (8 CPU, 16 Memory), `c1.5` (16 CPU, 32 Memory), `m1.5` (16 CPU, 128 Memory)",
 				Required:    true,
 			},
 			"version": schema.StringAttribute{
-				Description: "Postgres version. Options: `13`, `14`. Changing this value requires the resource to be recreated.",
+				Description: "Postgres version. Options: `12`, `13`, `14`. Changing this value requires the resource to be recreated.",
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []planmodifier.String{
@@ -80,7 +80,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"replicas": schema.Int64Attribute{
-				Description: "Number of replicas (Default is `1`). Changing this value requires the resource to be recreated.",
+				Description: "Number of replicas (Default is `1`).",
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []planmodifier.Int64{
