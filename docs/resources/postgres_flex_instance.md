@@ -41,7 +41,7 @@ resource "stackit_postgres_flex_instance" "example" {
 
 ### Required
 
-- `machine_type` (String) The Machine Type. Available options: `c1.2` (2 CPU, 4 Memory), `m1.2` (2 CPU, 16 Memory), `c1.3` (4 CPU, 8 Memory), `m1.3` (4 CPU, 32 Memory), `c1.4` (8 CPU, 16 Memory), `c1.5` (16 CPU, 32 Memory), `m1.5` (16 CPU, 128 Memory)
+- `machine_type` (String) The Machine Type. Available options: `2.4` (2 CPU, 4 Memory), `2.16` (2 CPU, 16 Memory), `4.8` (4 CPU, 8 Memory), `4.32` (4 CPU, 32 Memory), `8.16` (8 CPU, 16 Memory), `16.32` (16 CPU, 32 Memory), `16.128` (16 CPU, 128 Memory)
 - `name` (String) Specifies the instance name.
 - `project_id` (String) The project ID the instance runs in. Changing this value requires the resource to be recreated.
 
