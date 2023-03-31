@@ -7,6 +7,7 @@ import (
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
+	postgresinstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/postgres-flex/instance"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -37,7 +38,7 @@ func TestAcc_PostgresFlexInstance(t *testing.T) {
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "name", name1),
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "version", "14"),
-					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "machine_type", "c1.2"),
+					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "machine_type", postgresinstance.DefaultMachineType),
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "replicas", "1"),
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "storage.class", "premium-perf6-stackit"),
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "storage.size", "20"),
@@ -51,7 +52,7 @@ func TestAcc_PostgresFlexInstance(t *testing.T) {
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "name", name2),
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "version", "14"),
-					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "machine_type", "c1.2"),
+					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "machine_type", postgresinstance.DefaultMachineType),
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "replicas", "1"),
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "storage.class", "premium-perf6-stackit"),
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "storage.size", "20"),
@@ -84,7 +85,7 @@ func config(name string) string {
 	resource "stackit_postgres_flex_instance" "example" {
 		name         = "%s"
 		project_id   = "%s"
-		machine_type = "c1.2"
+		machine_type = "%s"
 		version      = "14"
 		replicas     = 1
 		storage 	 = {
@@ -95,5 +96,6 @@ func config(name string) string {
 	  `,
 		name,
 		common.GetAcceptanceTestsProjectID(),
+		postgresinstance.DefaultMachineType,
 	)
 }

@@ -15,25 +15,25 @@ import (
 )
 
 const (
-	default_version               = "14"
-	default_replicas        int64 = 1
-	default_username              = "stackit"
-	default_backup_schedule       = "0 2 * * *"
-	default_storage_class         = "premium-perf6-stackit"
-	default_storage_size    int64 = 20
+	DefaultVersion              = "14"
+	DefaultReplicas       int64 = 1
+	DefaultBackupSchedule       = "0 2 * * *"
+	DefaultStorageClass         = "premium-perf6-stackit"
+	DefaultStorageSize    int64 = 20
+	DefaultMachineType          = "2.4"
 )
 
 func (i *Instance) setDefaults() {
 	if i.Version.IsNull() || i.Version.IsUnknown() {
-		i.Version = types.StringValue(default_version)
+		i.Version = types.StringValue(DefaultVersion)
 	}
 
 	if i.Replicas.IsNull() || i.Replicas.IsUnknown() {
-		i.Replicas = types.Int64Value(default_replicas)
+		i.Replicas = types.Int64Value(DefaultReplicas)
 	}
 
 	if i.BackupSchedule.IsNull() || i.BackupSchedule.IsUnknown() {
-		i.BackupSchedule = types.StringValue(default_backup_schedule)
+		i.BackupSchedule = types.StringValue(DefaultBackupSchedule)
 	}
 }
 

@@ -66,7 +66,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"machine_type": schema.StringAttribute{
-				Description: "The Machine Type. Available options: `c1.2` (2 CPU, 4 Memory), `m1.2` (2 CPU, 16 Memory), `c1.3` (4 CPU, 8 Memory), `m1.3` (4 CPU, 32 Memory), `c1.4` (8 CPU, 16 Memory), `c1.5` (16 CPU, 32 Memory), `m1.5` (16 CPU, 128 Memory)",
+				Description: "The Machine Type. Available options: `2.4` (2 CPU, 4 Memory), `2.16` (2 CPU, 16 Memory), `4.8` (4 CPU, 8 Memory), `4.32` (4 CPU, 32 Memory), `8.16` (8 CPU, 16 Memory), `16.32` (16 CPU, 32 Memory), `16.128` (16 CPU, 128 Memory)",
 				Required:    true,
 			},
 			"version": schema.StringAttribute{
@@ -75,7 +75,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Computed:    true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
-					modifiers.StringDefault(default_version),
+					modifiers.StringDefault(DefaultVersion),
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
@@ -84,7 +84,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []planmodifier.Int64{
-					modifiers.Int64Default(default_replicas),
+					modifiers.Int64Default(DefaultReplicas),
 					int64planmodifier.UseStateForUnknown(),
 				},
 			},
@@ -93,7 +93,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []planmodifier.String{
-					modifiers.StringDefault(default_backup_schedule),
+					modifiers.StringDefault(DefaultBackupSchedule),
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
@@ -107,7 +107,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 						Optional:    true,
 						Computed:    true,
 						PlanModifiers: []planmodifier.String{
-							modifiers.StringDefault(default_storage_class),
+							modifiers.StringDefault(DefaultStorageClass),
 						},
 					},
 					"size": schema.Int64Attribute{
@@ -115,7 +115,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 						Optional:    true,
 						Computed:    true,
 						PlanModifiers: []planmodifier.Int64{
-							modifiers.Int64Default(default_storage_size),
+							modifiers.Int64Default(DefaultStorageSize),
 						},
 					},
 				},
