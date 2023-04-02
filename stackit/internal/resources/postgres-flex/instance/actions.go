@@ -102,6 +102,13 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	ins, err := process.WaitWithContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("failed Postgres instance creation validation", err.Error())
+		res, err := c.Instance.Get(ctx, plan.ProjectID.ValueString(), *res.JSON201.ID)
+		if err = validate.Response(res, err, "JSON200.Item.Status"); err == nil {
+			status := *res.JSON200.Item.Status
+			if !strings.EqualFold(status, "READY") {
+				resp.Diagnostics.AddError("instance isn't ready", fmt.Sprintf("expected status READY, received status %s instead.", status))
+			}
+		}
 		return
 	}
 

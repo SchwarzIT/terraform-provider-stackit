@@ -7,6 +7,7 @@ import (
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
+	postgresinstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/postgres-flex/instance"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -77,7 +78,7 @@ func config(name string) string {
 	resource "stackit_postgres_flex_instance" "example" {
 	 	name         = "%s"
 	 	project_id   = "%s"
-		machine_type = "c1.2"
+		machine_type = "%s"
 		version      = "14"
 	}  
 	resource "stackit_postgres_flex_user" "example" {
@@ -87,6 +88,7 @@ func config(name string) string {
 	  `,
 		name,
 		common.GetAcceptanceTestsProjectID(),
+		postgresinstance.DefaultMachineType,
 		common.GetAcceptanceTestsProjectID(),
 	)
 }
