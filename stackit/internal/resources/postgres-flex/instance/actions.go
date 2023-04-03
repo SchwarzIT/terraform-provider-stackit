@@ -102,12 +102,8 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	ins, err := process.WaitWithContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("failed Postgres instance creation validation", err.Error())
-		res, err := c.Instance.Get(ctx, plan.ProjectID.ValueString(), *res.JSON201.ID)
-		if err = validate.Response(res, err, "JSON200.Item.Status"); err == nil {
-			status := *res.JSON200.Item.Status
-			if !strings.EqualFold(status, "READY") {
-				resp.Diagnostics.AddError("instance isn't ready", fmt.Sprintf("expected status READY, received status %s instead.", status))
-			}
+		if err := checkStatus(ctx, c.Instance, plan.ProjectID.ValueString(), *res.JSON201.ID, "READY"); err != nil {
+			resp.Diagnostics.AddError("instance isn't ready", err.Error())
 		}
 		return
 	}
@@ -129,6 +125,17 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	if resp.Diagnostics.HasError() {
 		return
 	}
+}
+
+func checkStatus(ctx context.Context, instance *instance.ClientWithResponses, projectID, instanceID, wantStatus string) error {
+	res, err := instance.Get(ctx, projectID, instanceID)
+	if err := validate.Response(res, err, "JSON200.Item.Status"); err == nil {
+		status := *res.JSON200.Item.Status
+		if !strings.EqualFold(status, wantStatus) {
+			return fmt.Errorf("expected status %s for instance ID %s in project %s, received status %s instead.", wantStatus, instanceID, projectID, status)
+		}
+	}
+	return nil
 }
 
 // Read - lifecycle function
@@ -247,6 +254,9 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	isi, err := process.WaitWithContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("failed Postgres instance update validation", err.Error())
+		if err := checkStatus(ctx, c, plan.ProjectID.ValueString(), plan.ID.ValueString(), "READY"); err != nil {
+			resp.Diagnostics.AddError("instance isn't ready", err.Error())
+		}
 		return
 	}
 

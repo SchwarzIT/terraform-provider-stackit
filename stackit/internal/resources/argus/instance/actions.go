@@ -80,6 +80,9 @@ func (r Resource) createInstance(ctx context.Context, diags *diag.Diagnostics, p
 	wr, err := process.WaitWithContext(ctx)
 	if err != nil {
 		diags.AddError("failed validating instance creation", err.Error())
+		if err := checkStatus(ctx, c.Instances, plan.ProjectID.ValueString(), res.JSON202.InstanceID, instances.PROJECT_INSTANCE_UI_STATUS_CREATE_SUCCEEDED); err != nil {
+			diags.AddError("instance isn't ready", err.Error())
+		}
 		return
 	}
 
@@ -90,6 +93,28 @@ func (r Resource) createInstance(ctx context.Context, diags *diag.Diagnostics, p
 	}
 
 	updateByAPIResult(plan, got)
+}
+
+func checkStatus(ctx context.Context, instance *instances.ClientWithResponses, projectID, instanceID string, wantStatus ...instances.ProjectInstanceUIStatus) error {
+	res, err := instance.Get(ctx, projectID, instanceID)
+	if err := validate.Response(res, err, "JSON200"); err == nil {
+		status := res.JSON200.Status
+		oneof := false
+		options := ""
+		for _, want := range wantStatus {
+			if status == want {
+				oneof = true
+			}
+			if options != "" {
+				options += " / "
+			}
+			options += string(want)
+		}
+		if !oneof {
+			return fmt.Errorf("expected status %s for instance ID %s in project %s, received status %s instead.", options, instanceID, projectID, status)
+		}
+	}
+	return nil
 }
 
 func (r Resource) setGrafanaConfig(ctx context.Context, diags *diag.Diagnostics, s *Instance, ref *Instance) {
@@ -324,7 +349,7 @@ func (r Resource) updateInstance(ctx context.Context, diags *diag.Diagnostics, p
 		diags.AddError("failed to update instance", agg.Error())
 		return
 	}
-	process := res.WaitHandler(ctx, c.Argus.Instances, plan.ProjectID.ValueString(), plan.ID.ValueString())
+	process := res.WaitHandler(ctx, c.Argus.Instances, plan.ProjectID.ValueString(), plan.ID.ValueString()).SetTimeout(1 * time.Hour)
 	process.SetTimeout(2 * time.Hour)
 	wr, err := process.WaitWithContext(ctx)
 	if err != nil {
@@ -335,6 +360,9 @@ func (r Resource) updateInstance(ctx context.Context, diags *diag.Diagnostics, p
 	got, ok := wr.(*instances.ProjectInstanceUI)
 	if !ok || got == nil {
 		diags.AddError("failed wait result conversion", "response is not of *instances.ProjectInstanceUI or nil")
+		if err := checkStatus(ctx, c.Argus.Instances, plan.ProjectID.ValueString(), plan.ID.ValueString(), instances.PROJECT_INSTANCE_UI_STATUS_UPDATE_SUCCEEDED); err != nil {
+			diags.AddError("instance isn't ready", err.Error())
+		}
 		return
 	}
 
