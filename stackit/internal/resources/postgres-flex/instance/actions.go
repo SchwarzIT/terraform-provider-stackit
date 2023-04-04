@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/instance"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
@@ -98,14 +99,14 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	process := res.WaitHandler(ctx, c.Instance, plan.ProjectID.ValueString(), *res.JSON201.ID)
+	process := res.WaitHandler(ctx, c.Instance, plan.ProjectID.ValueString(), *res.JSON201.ID).SetTimeout(1 * time.Hour)
 	ins, err := process.WaitWithContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError("failed Postgres instance creation validation", err.Error())
-		if err := checkStatus(ctx, c.Instance, plan.ProjectID.ValueString(), *res.JSON201.ID, "READY"); err != nil {
-			resp.Diagnostics.AddError("instance isn't ready", err.Error())
+		// last check
+		if err := checkStatus(ctx, c.Instance, plan.ProjectID.ValueString(), *res.JSON201.ID, instance.STATUS_READY); err != nil {
+			resp.Diagnostics.AddError("failed Postgres flex instance creation validation", err.Error())
+			return
 		}
-		return
 	}
 
 	i, ok := ins.(*instance.InstanceSingleInstance)
@@ -129,13 +130,13 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 func checkStatus(ctx context.Context, instance *instance.ClientWithResponses, projectID, instanceID, wantStatus string) error {
 	res, err := instance.Get(ctx, projectID, instanceID)
-	if err := validate.Response(res, err, "JSON200.Item.Status"); err == nil {
+	if err = validate.Response(res, err, "JSON200.Item.Status"); err == nil {
 		status := *res.JSON200.Item.Status
 		if !strings.EqualFold(status, wantStatus) {
 			return fmt.Errorf("expected status %s for instance ID %s in project %s, received status %s instead.", wantStatus, instanceID, projectID, status)
 		}
 	}
-	return nil
+	return err
 }
 
 // Read - lifecycle function
