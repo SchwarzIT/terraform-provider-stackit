@@ -41,7 +41,7 @@ func TestAcc_PostgresFlexInstance(t *testing.T) {
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "machine_type", postgresinstance.DefaultMachineType),
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "replicas", "1"),
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "storage.class", "premium-perf6-stackit"),
-					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "storage.size", "20"),
+					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "storage.size", fmt.Sprintf("%d", postgresinstance.DefaultStorageSize)),
 					resource.TestCheckResourceAttrSet("stackit_postgres_flex_instance.example", "id"),
 				),
 			},
@@ -55,7 +55,7 @@ func TestAcc_PostgresFlexInstance(t *testing.T) {
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "machine_type", postgresinstance.DefaultMachineType),
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "replicas", "1"),
 					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "storage.class", "premium-perf6-stackit"),
-					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "storage.size", "20"),
+					resource.TestCheckResourceAttr("stackit_postgres_flex_instance.example", "storage.size", fmt.Sprintf("%d", postgresinstance.DefaultStorageSize)),
 					resource.TestCheckResourceAttrSet("stackit_postgres_flex_instance.example", "id"),
 				),
 			},
@@ -90,12 +90,13 @@ func config(name string) string {
 		replicas     = 1
 		storage 	 = {
 			class = "premium-perf6-stackit"
-			size  = 20
+			size  = %d
 		}
 	}  
 	  `,
 		name,
 		common.GetAcceptanceTestsProjectID(),
 		postgresinstance.DefaultMachineType,
+		postgresinstance.DefaultStorageSize,
 	)
 }

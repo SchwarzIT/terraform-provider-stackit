@@ -19,7 +19,7 @@ const (
 	DefaultReplicas       int64 = 1
 	DefaultBackupSchedule       = "0 2 * * *"
 	DefaultStorageClass         = "premium-perf6-stackit"
-	DefaultStorageSize    int64 = 20
+	DefaultStorageSize    int64 = 5
 	DefaultMachineType          = "2.4"
 )
 
