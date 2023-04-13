@@ -81,7 +81,11 @@ func ApplyClientResponse(pi *Instance, i *instance.InstancesSingleInstance) erro
 	}
 	if i.ACL != nil && i.ACL.Items != nil {
 		for _, v := range *i.ACL.Items {
-			elems = append(elems, types.StringValue(v))
+			// only include correctly formatted CIDR range
+			// this is to overcome a current bug in the API
+			if strings.Contains(v, "/") {
+				elems = append(elems, types.StringValue(v))
+			}
 		}
 	}
 	if i.ID == nil {

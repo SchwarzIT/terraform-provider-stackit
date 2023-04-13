@@ -92,6 +92,7 @@ func config(name string) string {
 			class = "premium-perf6-stackit"
 			size  = %d
 		}
+		acl = ["193.148.160.0/19","45.129.40.1/21"]
 	}  
 	  `,
 		name,

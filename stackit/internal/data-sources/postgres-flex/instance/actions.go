@@ -3,6 +3,7 @@ package instance
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -69,7 +70,11 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 	elems := []attr.Value{}
 	if i.ACL != nil && i.ACL.Items != nil {
 		for _, v := range *i.ACL.Items {
-			elems = append(elems, types.StringValue(v))
+			// only include correctly formatted CIDR range
+			// this is to overcome a current bug in the API
+			if strings.Contains(v, "/") {
+				elems = append(elems, types.StringValue(v))
+			}
 		}
 	}
 	config.ACL = types.ListValueMust(types.StringType, elems)

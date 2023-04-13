@@ -123,7 +123,11 @@ func applyClientResponse(pi *Instance, i *instance.InstanceSingleInstance) error
 	elems := []attr.Value{}
 	if i.ACL != nil && i.ACL.Items != nil {
 		for _, v := range *i.ACL.Items {
-			elems = append(elems, types.StringValue(v))
+			// only include correctly formatted CIDR range
+			// this is to overcome a current bug in the API
+			if strings.Contains(v, "/") {
+				elems = append(elems, types.StringValue(v))
+			}
 		}
 	}
 	pi.ACL = types.ListValueMust(types.StringType, elems)
