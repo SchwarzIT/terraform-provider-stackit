@@ -5,12 +5,12 @@ import (
 	"fmt"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -67,9 +67,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				MarkdownDescription: fmt.Sprintf("The %s Plan. Default is `%s`", r.service.Display(), r.getDefaultPlan()),
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					modifiers.StringDefault(r.getDefaultPlan()),
-				},
+				Default:             stringdefault.StaticString(r.getDefaultPlan()),
 			},
 			"plan_id": schema.StringAttribute{
 				Description: "The selected plan ID",
@@ -79,10 +77,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				MarkdownDescription: fmt.Sprintf("%s version. Default is %s", r.service.Display(), r.getDefaultVersion()),
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
-					modifiers.StringDefault(r.getDefaultVersion()),
-				},
+				Default:             stringdefault.StaticString(r.getDefaultVersion()),
 			},
 			"acl": schema.ListAttribute{
 				Description: "Access Control rules to whitelist IP addresses",

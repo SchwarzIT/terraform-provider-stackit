@@ -6,11 +6,12 @@ import (
 	"regexp"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -104,9 +105,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 						Description: "If true, anyone can access Grafana dashboards without logging in. Default is set to `false`.",
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []planmodifier.Bool{
-							modifiers.BoolDefault(default_grafana_enable_public_access),
-						},
+						Default:     booldefault.StaticBool(DefaultGrafanaEnablePublicAccess),
 					},
 				},
 			},
@@ -119,25 +118,19 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 						Description: "Specifies for how many days the raw metrics are kept. Default is set to `90`",
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []planmodifier.Int64{
-							modifiers.Int64Default(default_metrics_retention_days),
-						},
+						Default:     int64default.StaticInt64(DefaultMetricsRetentionDays),
 					},
 					"retention_days_5m_downsampling": schema.Int64Attribute{
 						Description: "Specifies for how many days the 5m downsampled metrics are kept. must be less than the value of the general retention. Default is set to `0` (disabled).",
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []planmodifier.Int64{
-							modifiers.Int64Default(default_metrics_retention_days_5m_downsampling),
-						},
+						Default:     int64default.StaticInt64(DefaultMetricsRetentionDays5mDownsampling),
 					},
 					"retention_days_1h_downsampling": schema.Int64Attribute{
 						Description: "Specifies for how many days the 1h downsampled metrics are kept. must be less than the value of the 5m downsampling retention. Default is set to `0` (disabled).",
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []planmodifier.Int64{
-							modifiers.Int64Default(default_metrics_retention_days_1h_downsampling),
-						},
+						Default:     int64default.StaticInt64(DefaultMetricsRetentionDays1hDownsampling),
 					},
 				},
 			},

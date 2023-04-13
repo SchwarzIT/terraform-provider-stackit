@@ -5,12 +5,13 @@ import (
 	"fmt"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -75,27 +76,24 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Computed:    true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
-					modifiers.StringDefault(DefaultVersion),
 					stringplanmodifier.UseStateForUnknown(),
 				},
+				Default: stringdefault.StaticString(DefaultVersion),
 			},
 			"replicas": schema.Int64Attribute{
 				Description: "Number of replicas (Default is `1`).",
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []planmodifier.Int64{
-					modifiers.Int64Default(DefaultReplicas),
 					int64planmodifier.UseStateForUnknown(),
 				},
+				Default: int64default.StaticInt64(DefaultReplicas),
 			},
 			"backup_schedule": schema.StringAttribute{
 				Description: "Specifies the backup schedule (cron style)",
 				Optional:    true,
 				Computed:    true,
-				PlanModifiers: []planmodifier.String{
-					modifiers.StringDefault(DefaultBackupSchedule),
-					stringplanmodifier.UseStateForUnknown(),
-				},
+				Default:     stringdefault.StaticString(DefaultBackupSchedule),
 			},
 			"storage": schema.SingleNestedAttribute{
 				Description: "A single `storage` block as defined below.",
@@ -106,17 +104,13 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 						Description: "Specifies the storage class. Available option: `premium-perf6-stackit`",
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []planmodifier.String{
-							modifiers.StringDefault(DefaultStorageClass),
-						},
+						Default:     stringdefault.StaticString(DefaultStorageClass),
 					},
 					"size": schema.Int64Attribute{
-						Description: "The storage size in GB",
+						Description: "The storage size in GB (min of 5 is required)",
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []planmodifier.Int64{
-							modifiers.Int64Default(DefaultStorageSize),
-						},
+						Default:     int64default.StaticInt64(DefaultStorageSize),
 					},
 				},
 			},

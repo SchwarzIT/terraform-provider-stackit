@@ -17,18 +17,18 @@ import (
 )
 
 const (
-	timeFormat                             = "2006-01-02T15:04:05.999Z"
-	default_allow_privileged               = true
-	default_os_name                        = "flatcar"
-	default_nodepool_min             int64 = 1
-	default_nodepool_max             int64 = 2
-	default_nodepool_max_surge       int64 = 1
-	default_nodepool_max_unavailable int64 = 1
-	default_volume_type                    = "storage_premium_perf1"
-	default_volume_size_gb           int64 = 20
-	default_cri                            = "containerd"
-	default_zone                           = "eu01-m"
-	default_version                        = "1.24"
+	timeFormat                          = "2006-01-02T15:04:05.999Z"
+	DefaultAllowPrivileged              = true
+	DefaultOSName                       = "flatcar"
+	DefaultNodepoolMin            int64 = 1
+	DefaultNodepoolMax            int64 = 2
+	DefaultNodepoolMaxSurge       int64 = 1
+	DefaultNodepoolMaxUnavailable int64 = 1
+	DefaultVolumeType                   = "storage_premium_perf1"
+	DefaultVolumeSizeGB           int64 = 20
+	DefaultCRI                          = "containerd"
+	DefaultZone                         = "eu01-m"
+	DefaultVersion                      = "1.24"
 )
 
 func (r Resource) loadAvaiableVersions(ctx context.Context) ([]*semver.Version, error) {
@@ -59,7 +59,7 @@ func (r Resource) loadAvaiableVersions(ctx context.Context) ([]*semver.Version, 
 
 func (c *Cluster) clusterConfig(versionOptions []*semver.Version) (cluster.Kubernetes, error) {
 	if c.KubernetesVersion.IsNull() || c.KubernetesVersion.IsUnknown() {
-		c.KubernetesVersion = types.StringValue(default_version)
+		c.KubernetesVersion = types.StringValue(DefaultVersion)
 	}
 
 	clusterConfigVersion, err := semver.NewVersion(c.KubernetesVersion.ValueString())
@@ -82,7 +82,7 @@ func (c *Cluster) clusterConfig(versionOptions []*semver.Version) (cluster.Kuber
 	}
 
 	if c.AllowPrivilegedContainers.IsNull() || c.AllowPrivilegedContainers.IsUnknown() {
-		pvlg := default_allow_privileged
+		pvlg := DefaultAllowPrivileged
 		cfg.AllowPrivilegedContainers = &pvlg
 	}
 	return cfg, nil
@@ -188,36 +188,36 @@ func (c *Cluster) nodePools() []cluster.Nodepool {
 func setNodepoolDefaults(nps []cluster.Nodepool) []cluster.Nodepool {
 	for i, np := range nps {
 		if np.Machine.Image.Name == nil || *np.Machine.Image.Name == "" {
-			d := default_os_name
+			d := DefaultOSName
 			nps[i].Machine.Image.Name = &d
 		}
 		if np.Minimum == 0 {
-			nps[i].Minimum = int(default_nodepool_min)
+			nps[i].Minimum = int(DefaultNodepoolMin)
 		}
 		if np.Maximum == 0 {
-			nps[i].Maximum = int(default_nodepool_max)
+			nps[i].Maximum = int(DefaultNodepoolMax)
 		}
 		if np.MaxSurge == nil || *np.MaxSurge == 0 {
-			d := int(default_nodepool_max_surge)
+			d := int(DefaultNodepoolMaxSurge)
 			nps[i].MaxSurge = &d
 		}
 		if np.MaxUnavailable == nil || *np.MaxUnavailable == 0 {
-			d := int(default_nodepool_max_unavailable)
+			d := int(DefaultNodepoolMaxUnavailable)
 			nps[i].MaxUnavailable = &d
 		}
 		if np.Volume.Type == nil || *np.Volume.Type == "" {
-			s := default_volume_type
+			s := DefaultVolumeType
 			nps[i].Volume.Type = &s
 		}
 		if np.Volume.Size == 0 {
-			nps[i].Volume.Size = int(default_volume_size_gb)
+			nps[i].Volume.Size = int(DefaultVolumeSizeGB)
 		}
 		if np.CRI != nil && (np.CRI.Name == nil || *np.CRI.Name == "") {
-			s := cluster.CRIName(default_cri)
+			s := cluster.CRIName(DefaultCRI)
 			nps[i].CRI.Name = &s
 		}
 		if len(np.AvailabilityZones) == 0 {
-			nps[i].AvailabilityZones = []string{default_zone}
+			nps[i].AvailabilityZones = []string{DefaultZone}
 		}
 	}
 	return nps
