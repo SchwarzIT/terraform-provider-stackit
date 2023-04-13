@@ -10,11 +10,11 @@ import (
 )
 
 const (
-	default_metrics_path                = "/metrics"
-	default_scheme                      = "https"
-	default_scrape_interval             = "5m"
-	default_scrape_timeout              = "2m"
-	default_saml2_enable_url_parameters = true
+	DefaultMetricsPath              = "/metrics"
+	DefaultScheme                   = "https"
+	DefaultScrapeInterval           = "5m"
+	DefaultScrapeTimeout            = "2m"
+	DefaultSAML2EnableURLParameters = true
 )
 
 func (j *Job) setDefaults(job *scrapeconfig.CreateJSONBody) {
@@ -22,17 +22,17 @@ func (j *Job) setDefaults(job *scrapeconfig.CreateJSONBody) {
 		return
 	}
 	if j.MetricsPath.IsNull() || j.MetricsPath.IsUnknown() {
-		s := default_metrics_path
+		s := DefaultMetricsPath
 		job.MetricsPath = &s
 	}
 	if j.Scheme.IsNull() || j.Scheme.IsUnknown() {
-		job.Scheme = scrapeconfig.CreateJSONBodyScheme(default_scheme)
+		job.Scheme = scrapeconfig.CreateJSONBodyScheme(DefaultScheme)
 	}
 	if j.ScrapeInterval.IsNull() || j.ScrapeInterval.IsUnknown() {
-		job.ScrapeInterval = default_scrape_interval
+		job.ScrapeInterval = DefaultScrapeInterval
 	}
 	if j.ScrapeTimeout.IsNull() || j.ScrapeTimeout.IsUnknown() {
-		job.ScrapeTimeout = default_scrape_timeout
+		job.ScrapeTimeout = DefaultScrapeTimeout
 	}
 }
 
@@ -41,16 +41,16 @@ func (j *Job) setDefaultsUpdate(job *scrapeconfig.UpdateJSONBody) {
 		return
 	}
 	if j.MetricsPath.IsNull() || j.MetricsPath.IsUnknown() {
-		job.MetricsPath = default_metrics_path
+		job.MetricsPath = DefaultMetricsPath
 	}
 	if j.Scheme.IsNull() || j.Scheme.IsUnknown() {
-		job.Scheme = scrapeconfig.UpdateJSONBodyScheme(default_scheme)
+		job.Scheme = scrapeconfig.UpdateJSONBodyScheme(DefaultScheme)
 	}
 	if j.ScrapeInterval.IsNull() || j.ScrapeInterval.IsUnknown() {
-		job.ScrapeInterval = default_scrape_interval
+		job.ScrapeInterval = DefaultScrapeInterval
 	}
 	if j.ScrapeTimeout.IsNull() || j.ScrapeTimeout.IsUnknown() {
-		job.ScrapeTimeout = default_scrape_timeout
+		job.ScrapeTimeout = DefaultScrapeTimeout
 	}
 }
 

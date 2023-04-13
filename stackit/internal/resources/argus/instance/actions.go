@@ -124,7 +124,7 @@ func (r Resource) setGrafanaConfig(ctx context.Context, diags *diag.Diagnostics,
 
 	if ref != nil && ref.Grafana != nil {
 		if s.Grafana == nil {
-			s.Grafana = &Grafana{EnablePublicAccess: types.BoolValue(default_grafana_enable_public_access)}
+			s.Grafana = &Grafana{EnablePublicAccess: types.BoolValue(DefaultGrafanaEnablePublicAccess)}
 		} else if ref.Grafana.EnablePublicAccess.Equal(s.Grafana.EnablePublicAccess) {
 			return
 		}
@@ -151,9 +151,9 @@ func (r Resource) setMetricsConfig(ctx context.Context, diags *diag.Diagnostics,
 	m := s.Metrics
 	if m == nil {
 		m = &Metrics{
-			RetentionDays:               types.Int64Value(default_metrics_retention_days),
-			RetentionDays5mDownsampling: types.Int64Value(default_metrics_retention_days_5m_downsampling),
-			RetentionDays1hDownsampling: types.Int64Value(default_metrics_retention_days_1h_downsampling),
+			RetentionDays:               types.Int64Value(DefaultMetricsRetentionDays),
+			RetentionDays5mDownsampling: types.Int64Value(DefaultMetricsRetentionDays5mDownsampling),
+			RetentionDays1hDownsampling: types.Int64Value(DefaultMetricsRetentionDays1hDownsampling),
 		}
 	}
 	if ref != nil && ref.Metrics != nil {

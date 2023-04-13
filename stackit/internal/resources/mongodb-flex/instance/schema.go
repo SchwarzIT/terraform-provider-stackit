@@ -5,13 +5,14 @@ import (
 	"fmt"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -79,34 +80,32 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
-					modifiers.StringDefault("Single"),
 				},
+				Default: stringdefault.StaticString(DefaultType),
 			},
 			"version": schema.StringAttribute{
 				Description: "MongoDB version. Version `5.0` and `6.0` are supported. ",
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []planmodifier.String{
-					modifiers.StringDefault(DefaultVersion),
 					stringplanmodifier.UseStateForUnknown(),
 				},
+				Default: stringdefault.StaticString(DefaultVersion),
 			},
 			"replicas": schema.Int64Attribute{
 				Description: fmt.Sprintf("Number of replicas (Default is `%d`).", DefaultReplicas),
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []planmodifier.Int64{
-					modifiers.Int64Default(DefaultReplicas),
 					int64planmodifier.UseStateForUnknown(),
 				},
+				Default: int64default.StaticInt64(DefaultReplicas),
 			},
 			"backup_schedule": schema.StringAttribute{
 				Description: "Specifies the backup schedule (cron style).",
 				Optional:    true,
 				Computed:    true,
-				PlanModifiers: []planmodifier.String{
-					modifiers.StringDefault(DefaultBackupSchedule),
-				},
+				Default:     stringdefault.StaticString(DefaultBackupSchedule),
 			},
 			"storage": schema.SingleNestedAttribute{
 				Description: "A single `storage` block as defined below.",
@@ -117,17 +116,13 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 						Description: "Specifies the storage class. Available option: `premium-perf2-mongodb`",
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []planmodifier.String{
-							modifiers.StringDefault(DefaultStorageClass),
-						},
+						Default:     stringdefault.StaticString(DefaultStorageClass),
 					},
 					"size": schema.Int64Attribute{
 						Description: fmt.Sprintf("The storage size in GB (Default is `%d`).", DefaultStorageSize),
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []planmodifier.Int64{
-							modifiers.Int64Default(DefaultStorageSize),
-						},
+						Default:     int64default.StaticInt64(DefaultStorageSize),
 					},
 				},
 			},

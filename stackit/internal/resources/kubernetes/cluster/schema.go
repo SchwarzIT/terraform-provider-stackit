@@ -7,12 +7,14 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/cluster"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -149,9 +151,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Validators: []validator.String{
 					validate.StringWith(clientValidate.SemVer, "validate container runtime"),
 				},
-				PlanModifiers: []planmodifier.String{
-					modifiers.StringDefault(default_version),
-				},
+				Default: stringdefault.StaticString(DefaultVersion),
 			},
 			"kubernetes_version_used": schema.StringAttribute{
 				Description: "Full Kubernetes version used. For example, if `1.22` was selected, this value may result to `1.22.15`",
@@ -161,9 +161,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Description: "Should containers be allowed to run in privileged mode? Default is `true`",
 				Optional:    true,
 				Computed:    true,
-				PlanModifiers: []planmodifier.Bool{
-					modifiers.BoolDefault(default_allow_privileged),
-				},
+				Default:     booldefault.StaticBool(DefaultAllowPrivileged),
 			},
 
 			"node_pools": schema.ListNestedAttribute{
@@ -186,9 +184,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 							Description: "The name of the OS image. Only `flatcar` is supported",
 							Optional:    true,
 							Computed:    true,
-							PlanModifiers: []planmodifier.String{
-								modifiers.StringDefault(default_os_name),
-							},
+							Default:     stringdefault.StaticString(DefaultOSName),
 						},
 						"os_version": schema.StringAttribute{
 							Description: "The OS image version.",
@@ -199,51 +195,39 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 							Description: "Minimum nodes in the pool. Defaults to 1. (Value must be between 1-100)",
 							Optional:    true,
 							Computed:    true,
-							PlanModifiers: []planmodifier.Int64{
-								modifiers.Int64Default(default_nodepool_min),
-							},
+							Default:     int64default.StaticInt64(DefaultNodepoolMin),
 						},
 
 						"maximum": schema.Int64Attribute{
 							Description: "Maximum nodes in the pool. Defaults to 2. (Value must be between 1-100)",
 							Optional:    true,
 							Computed:    true,
-							PlanModifiers: []planmodifier.Int64{
-								modifiers.Int64Default(default_nodepool_max),
-							},
+							Default:     int64default.StaticInt64(DefaultNodepoolMax),
 						},
 
 						"max_surge": schema.Int64Attribute{
 							Description: "The maximum number of nodes upgraded simultaneously. Defaults to 1. (Value must be between 1-10)",
 							Optional:    true,
 							Computed:    true,
-							PlanModifiers: []planmodifier.Int64{
-								modifiers.Int64Default(default_nodepool_max_surge),
-							},
+							Default:     int64default.StaticInt64(DefaultNodepoolMaxSurge),
 						},
 						"max_unavailable": schema.Int64Attribute{
 							Description: "The maximum number of nodes unavailable during upgraded. Defaults to 1",
 							Optional:    true,
 							Computed:    true,
-							PlanModifiers: []planmodifier.Int64{
-								modifiers.Int64Default(default_nodepool_max_unavailable),
-							},
+							Default:     int64default.StaticInt64(DefaultNodepoolMaxUnavailable),
 						},
 						"volume_type": schema.StringAttribute{
 							Description: "Specifies the volume type. Defaults to `storage_premium_perf1`. Available options are `storage_premium_perf0`, `storage_premium_perf1`, `storage_premium_perf2`, `storage_premium_perf4`, `storage_premium_perf6`",
 							Optional:    true,
 							Computed:    true,
-							PlanModifiers: []planmodifier.String{
-								modifiers.StringDefault(default_volume_type),
-							},
+							Default:     stringdefault.StaticString(DefaultVolumeType),
 						},
 						"volume_size_gb": schema.Int64Attribute{
 							Description: "The volume size in GB. Default is set to `20`",
 							Optional:    true,
 							Computed:    true,
-							PlanModifiers: []planmodifier.Int64{
-								modifiers.Int64Default(default_volume_size_gb),
-							},
+							Default:     int64default.StaticInt64(DefaultVolumeSizeGB),
 						},
 						"labels": schema.MapAttribute{
 							Description: "Labels to add to each node",
@@ -282,9 +266,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 									return cluster.ValidateCRI(&cri)
 								}, "validate container runtime"),
 							},
-							PlanModifiers: []planmodifier.String{
-								modifiers.StringDefault(default_cri),
-							},
+							Default: stringdefault.StaticString(DefaultCRI),
 						},
 						"zones": schema.ListAttribute{
 							Description: "Specify a list of availability zones. Accepted options are `eu01-m` for metro, or `eu01-1`, `eu01-2`, `eu01-3`",
@@ -366,9 +348,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 								Description: "Is ACL enabled? Defaults to `false`",
 								Optional:    true,
 								Computed:    true,
-								PlanModifiers: []planmodifier.Bool{
-									modifiers.BoolDefault(false),
-								},
+								Default:     booldefault.StaticBool(false),
 							},
 							"allowed_cidrs": schema.ListAttribute{
 								Description: "Specify a list of CIDRs to whitelist",

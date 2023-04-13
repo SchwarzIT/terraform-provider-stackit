@@ -65,6 +65,6 @@ resource "stackit_postgres_flex_instance" "example" {
 Optional:
 
 - `class` (String) Specifies the storage class. Available option: `premium-perf6-stackit`
-- `size` (Number) The storage size in GB
+- `size` (Number) The storage size in GB (min of 5 is required)
 
 

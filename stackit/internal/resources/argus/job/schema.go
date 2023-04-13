@@ -5,12 +5,13 @@ import (
 	"fmt"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/modifiers"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -94,36 +95,28 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Description: "Specifies the job scraping path. Defaults to `/metrics`",
 				Optional:    true,
 				Computed:    true,
-				PlanModifiers: []planmodifier.String{
-					modifiers.StringDefault(default_metrics_path),
-				},
+				Default:     stringdefault.StaticString(DefaultMetricsPath),
 			},
 
 			"scheme": schema.StringAttribute{
 				Description: "Specifies the scheme. Default is `https`.",
 				Optional:    true,
 				Computed:    true,
-				PlanModifiers: []planmodifier.String{
-					modifiers.StringDefault(default_scheme),
-				},
+				Default:     stringdefault.StaticString(DefaultScheme),
 			},
 
 			"scrape_interval": schema.StringAttribute{
 				Description: "Specifies the scrape interval as duration string. Default is `5m`.",
 				Optional:    true,
 				Computed:    true,
-				PlanModifiers: []planmodifier.String{
-					modifiers.StringDefault(default_scrape_interval),
-				},
+				Default:     stringdefault.StaticString(DefaultScrapeInterval),
 			},
 
 			"scrape_timeout": schema.StringAttribute{
 				Description: "Specifies the scrape timeout as duration string. Default is `2m`.",
 				Optional:    true,
 				Computed:    true,
-				PlanModifiers: []planmodifier.String{
-					modifiers.StringDefault(default_scrape_timeout),
-				},
+				Default:     stringdefault.StaticString(DefaultScrapeTimeout),
 			},
 
 			"saml2": schema.SingleNestedAttribute{
@@ -134,9 +127,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 						Description: "Should URL parameters be enabled? Default is `true`",
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []planmodifier.Bool{
-							modifiers.BoolDefault(default_saml2_enable_url_parameters),
-						},
+						Default:     booldefault.StaticBool(DefaultSAML2EnableURLParameters),
 					},
 				},
 			},

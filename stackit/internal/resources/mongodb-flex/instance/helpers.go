@@ -15,6 +15,7 @@ import (
 
 const (
 	DefaultVersion              = "6.0"
+	DefaultType                 = "Single"
 	DefaultMachineType          = "1.1"
 	DefaultUsername             = "stackit"
 	DefaultBackupSchedule       = "0 0/6 * * *"
