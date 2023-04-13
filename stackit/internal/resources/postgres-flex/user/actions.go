@@ -169,6 +169,11 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 			resp.State.RemoveResource(ctx)
 			return
 		}
+		if validate.StatusEquals(res, http.StatusInternalServerError) {
+			resp.State.RemoveResource(ctx)
+			resp.Diagnostics.AddWarning("User only removed from terraform state", "There's currently a bug in STACKIT API that prevents user deletion. The user has been removed from terraform state but it wasn't deleted from the database.")
+			return
+		}
 		if !strings.Contains(agg.Error(), "timed out waiting for the condition") {
 			resp.Diagnostics.AddError("failed to delete user", agg.Error())
 			return
