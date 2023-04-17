@@ -24,8 +24,14 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
+	timeout, diags := bucket.Timeouts.Create(ctx, 10*time.Minute)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	// handle creation
-	res := r.createBucket(ctx, resp, bucket)
+	res := r.createBucket(ctx, resp, bucket, timeout)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -39,14 +45,16 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		Region:                 types.StringValue(b.Bucket.Region),
 		HostStyleURL:           types.StringValue(b.Bucket.UrlVirtualHostedStyle),
 		PathStyleURL:           types.StringValue(b.Bucket.UrlPathStyle),
+		Timeouts:               bucket.Timeouts,
 	})
+
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 }
 
-func (r Resource) createBucket(ctx context.Context, resp *resource.CreateResponse, plan Bucket) *bucket.GetResponse {
+func (r Resource) createBucket(ctx context.Context, resp *resource.CreateResponse, plan Bucket, timeout time.Duration) *bucket.GetResponse {
 	c := r.client
 	b := &bucket.GetResponse{}
 
@@ -57,7 +65,7 @@ func (r Resource) createBucket(ctx context.Context, resp *resource.CreateRespons
 		return b
 	}
 	process := res.WaitHandler(ctx, c.ObjectStorage.Bucket, plan.ObjectStorageProjectID.ValueString(), plan.Name.ValueString())
-	process.SetTimeout(10 * time.Minute)
+	process.SetTimeout(timeout)
 	tmp, err := process.WaitWithContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("failed to verify bucket creation", err.Error())
@@ -114,6 +122,13 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
+	// handle timeout
+	timeout, diags := state.Timeouts.Delete(ctx, 10*time.Minute)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	c := r.client
 	res, err := c.ObjectStorage.Bucket.Delete(ctx, state.ObjectStorageProjectID.ValueString(), state.Name.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
@@ -122,14 +137,15 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 			return
 		}
 	}
-	resp.State.RemoveResource(ctx)
 
 	process := res.WaitHandler(ctx, c.ObjectStorage.Bucket, state.ObjectStorageProjectID.ValueString(), state.Name.ValueString())
-	process.SetTimeout(10 * time.Minute)
+	process.SetTimeout(timeout)
 	if _, err = process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed to verify bucket deletion", err.Error())
 		return
 	}
+
+	resp.State.RemoveResource(ctx)
 }
 
 // ImportState handles terraform import

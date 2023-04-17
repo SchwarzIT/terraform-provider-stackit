@@ -87,6 +87,9 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	res, err := r.client.MongoDBFlex.Instance.Create(ctx, plan.ProjectID.ValueString(), body)
 	if agg := validate.Response(res, err, "JSON202.ID"); agg != nil {
 		resp.Diagnostics.AddError("failed MongoDB flex instance creation", agg.Error())
+		if res != nil {
+			common.Dump(&resp.Diagnostics, res.Body)
+		}
 		return
 	}
 
@@ -229,6 +232,9 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	res, err := r.client.MongoDBFlex.Instance.Patch(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
 	if agg := validate.Response(res, err, "JSON202.Item"); agg != nil {
 		resp.Diagnostics.AddError("failed updating mongodb flex instance", agg.Error())
+		if res != nil {
+			common.Dump(&resp.Diagnostics, res.Body)
+		}
 		return
 	}
 
@@ -273,6 +279,9 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 			return
 		}
 		resp.Diagnostics.AddError("failed to delete instance", agg.Error())
+		if res != nil {
+			common.Dump(&resp.Diagnostics, res.Body)
+		}
 		return
 	}
 
