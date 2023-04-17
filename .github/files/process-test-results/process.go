@@ -60,7 +60,12 @@ func main() {
 		errored = true
 		fmt.Println(err)
 	}
-	if err := injectToMarkdownFile(readme, "<!--summary-image-->", generateImage(agg)); err != nil {
+	url, imageTag := generateImage(agg)
+	if err := injectToMarkdownFile(readme, "<!--summary-image-->", imageTag); err != nil {
+		errored = true
+		fmt.Println(err)
+	}
+	if err := sendTeamsNotification(agg, url); err != nil {
 		errored = true
 		fmt.Println(err)
 	}
@@ -126,11 +131,11 @@ func generateImage(v TestsSummary) string {
 		fmt.Println(err.Error())
 	}
 	if img != "" {
-		img = fmt.Sprintf(`
+		return img, fmt.Sprintf(`
 <img src="%s" width="250" align="right" />
 `, img)
 	}
-	return img
+	return "", ""
 }
 
 const css = `<style type="text/css">
@@ -214,4 +219,90 @@ func callAPI(html string) (string, error) {
 		return "", err
 	}
 	return v.URL, nil
+}
+
+type TeamsMessage struct {
+	Type            string         `json:"@type"`
+	Context         string         `json:"@context"`
+	ThemeColor      string         `json:"themeColor,omitempty"`
+	Summary         string         `json:"summary,omitempty"`
+	Title           string         `json:"title,omitempty"`
+	Text            string         `json:"text,omitempty"`
+	Sections        []TeamsSection `json:"sections,omitempty"`
+	Markdown        bool           `json:"markdown"`
+	PotentialAction []TeamsAction  `json:"potentialAction,omitempty"`
+}
+
+type TeamsSection struct {
+	ActivityTitle    string      `json:"activityTitle,omitempty"`
+	ActivitySubtitle string      `json:"activitySubtitle,omitempty"`
+	ActivityImage    string      `json:"activityImage,omitempty"`
+	Facts            []TeamsFact `json:"facts,omitempty"`
+	Markdown         bool        `json:"markdown"`
+}
+
+type TeamsAction struct {
+	Type   string `json:"@type"`
+	Name   string `json:"name"`
+	Target string `json:"target,omitempty"`
+}
+
+func sendTeamsNotification(v TestsSummary, imgURL string) error {
+	if v.Overall.Fail == 0 {
+		return nil
+	}
+	webhookURL := os.Getenv("ODJ_STACKIT_GENERAL_CHANNEL_WEBHOOK_URL")
+	section := TeamsSection{
+		ActivityTitle: "Overview",
+		ActivityImage: imgURL,
+		Markdown:      false,
+	}
+
+	githubServerURL := os.Getenv("GITHUB_SERVER_URL")
+	githubRepository := os.Getenv("GITHUB_REPOSITORY")
+	githubRunID := os.Getenv("GITHUB_RUN_ID")
+	workflowRunURL := fmt.Sprintf("%s/%s/actions/runs/%s", githubServerURL, githubRepository, githubRunID)
+
+	action := TeamsAction{
+		Type:   "OpenUri",
+		Name:   "View Run",
+		Target: workflowRunURL,
+	}
+
+	text := ""
+	for k, v := range v.Packages {
+		if v.Fail == 0 {
+			continue
+		}
+		text += fmt.Sprintf("**%s**\n%d failed, %d succeeded\n\n", k, v.Fail, v.Pass)
+	}
+
+	msg := TeamsMessage{
+		Type:            "MessageCard",
+		Context:         "http://schema.org/extensions",
+		ThemeColor:      "0078D7",
+		Summary:         "Acceptance Tests failur summary",
+		Title:           "Acceptance Tests failures",
+		Text:            text,
+		Markdown:        true,
+		Sections:        []TeamsSection{section},
+		PotentialAction: []TeamsAction{action},
+	}
+
+	data, err := json.Marshal(msg)
+	if err != nil {
+		return fmt.Errorf("error marshaling message: %v", err)
+	}
+
+	resp, err := http.Post(webhookURL, "application/json", bytes.NewBuffer(data))
+	if err != nil {
+		return fmt.Errorf("error posting message: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected response status: %d", resp.StatusCode)
+	}
+
+	return nil
 }
