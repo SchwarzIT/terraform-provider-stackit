@@ -5,11 +5,39 @@ import (
 	"fmt"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/instance"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
+
+// Instance is the schema model
+type Instance struct {
+	ID                          types.String      `tfsdk:"id"`
+	Name                        types.String      `tfsdk:"name"`
+	ProjectID                   types.String      `tfsdk:"project_id"`
+	Plan                        types.String      `tfsdk:"plan"`
+	Grafana                     *instance.Grafana `tfsdk:"grafana"`
+	Metrics                     *instance.Metrics `tfsdk:"metrics"`
+	PlanID                      types.String      `tfsdk:"plan_id"`
+	DashboardURL                types.String      `tfsdk:"dashboard_url"`
+	IsUpdatable                 types.Bool        `tfsdk:"is_updatable"`
+	GrafanaURL                  types.String      `tfsdk:"grafana_url"`
+	GrafanaInitialAdminPassword types.String      `tfsdk:"grafana_initial_admin_password"`
+	GrafanaInitialAdminUser     types.String      `tfsdk:"grafana_initial_admin_user"`
+	MetricsURL                  types.String      `tfsdk:"metrics_url"`
+	MetricsPushURL              types.String      `tfsdk:"metrics_push_url"`
+	TargetsURL                  types.String      `tfsdk:"targets_url"`
+	AlertingURL                 types.String      `tfsdk:"alerting_url"`
+	LogsURL                     types.String      `tfsdk:"logs_url"`
+	LogsPushURL                 types.String      `tfsdk:"logs_push_url"`
+	JaegerTracesURL             types.String      `tfsdk:"jaeger_traces_url"`
+	JaegerUIURL                 types.String      `tfsdk:"jaeger_ui_url"`
+	OtlpTracesURL               types.String      `tfsdk:"otlp_traces_url"`
+	ZipkinSpansURL              types.String      `tfsdk:"zipkin_spans_url"`
+}
 
 // Schema returns the terraform schema structure
 func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {

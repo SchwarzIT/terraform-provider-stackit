@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/bucket"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -13,7 +12,7 @@ import (
 // Read - lifecycle function
 func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	c := r.client
-	var config bucket.Bucket
+	var config Bucket
 
 	diags := req.Config.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)

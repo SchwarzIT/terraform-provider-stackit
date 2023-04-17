@@ -35,6 +35,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		Name:              types.StringValue(plan.Name.ValueString()),
 		BillingRef:        types.StringValue(plan.BillingRef.ValueString()),
 		OwnerEmail:        types.StringValue(plan.OwnerEmail.ValueString()),
+		Timeouts:          plan.Timeouts,
 	}
 
 	// update state
