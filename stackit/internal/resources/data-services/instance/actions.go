@@ -71,7 +71,12 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	process := res.WaitHandler(ctx, r.client.Instances, plan.ProjectID.ValueString(), plan.ID.ValueString()).SetTimeout(40 * time.Minute)
+	timeout, d := plan.Timeouts.Create(ctx, 40*time.Minute)
+	if resp.Diagnostics.Append(d...); resp.Diagnostics.HasError() {
+		return
+	}
+
+	process := res.WaitHandler(ctx, r.client.Instances, plan.ProjectID.ValueString(), plan.ID.ValueString()).SetTimeout(timeout)
 	instance, err := process.WaitWithContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("failed instance `create` validation", err.Error())
@@ -176,7 +181,12 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		return
 	}
 
-	process := res.WaitHandler(ctx, r.client.Instances, state.ProjectID.ValueString(), state.ID.ValueString())
+	timeout, d := plan.Timeouts.Update(ctx, 40*time.Minute)
+	if resp.Diagnostics.Append(d...); resp.Diagnostics.HasError() {
+		return
+	}
+
+	process := res.WaitHandler(ctx, r.client.Instances, state.ProjectID.ValueString(), state.ID.ValueString()).SetTimeout(timeout)
 	if _, err := process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed instance update validation", err.Error())
 		return
@@ -221,8 +231,13 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
+	timeout, d := state.Timeouts.Delete(ctx, 40*time.Minute)
+	if resp.Diagnostics.Append(d...); resp.Diagnostics.HasError() {
+		return
+	}
+
 	resp.State.RemoveResource(ctx)
-	process := res.WaitHandler(ctx, r.client.Instances, state.ProjectID.ValueString(), state.ID.ValueString())
+	process := res.WaitHandler(ctx, r.client.Instances, state.ProjectID.ValueString(), state.ID.ValueString()).SetTimeout(timeout)
 	if _, err := process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed to verify instance deprovision", err.Error())
 	}

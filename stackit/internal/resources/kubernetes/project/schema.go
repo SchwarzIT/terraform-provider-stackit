@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
+	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -14,8 +15,9 @@ import (
 
 // KubernetesProject is the schema model
 type KubernetesProject struct {
-	ID        types.String `tfsdk:"id"`
-	ProjectID types.String `tfsdk:"project_id"`
+	ID        types.String   `tfsdk:"id"`
+	ProjectID types.String   `tfsdk:"project_id"`
+	Timeouts  timeouts.Value `tfsdk:"timeouts"`
 }
 
 // Schema returns the terraform schema structure
@@ -39,6 +41,11 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Description: "the project ID that SKE will be enabled in",
 				Required:    true,
 			},
+
+			"timeouts": common.Timeouts(ctx, timeouts.Opts{
+				Create: true,
+				Delete: true,
+			}),
 		},
 	}
 }

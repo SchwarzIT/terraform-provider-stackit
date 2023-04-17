@@ -98,8 +98,11 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	if resp.Diagnostics.HasError() {
 		return
 	}
-
-	process := res.WaitHandler(ctx, c.Instance, plan.ProjectID.ValueString(), *res.JSON201.ID).SetTimeout(1 * time.Hour)
+	timeout, d := plan.Timeouts.Create(ctx, 1*time.Hour)
+	if resp.Diagnostics.Append(d...); resp.Diagnostics.HasError() {
+		return
+	}
+	process := res.WaitHandler(ctx, c.Instance, plan.ProjectID.ValueString(), *res.JSON201.ID).SetTimeout(timeout)
 	ins, err := process.WaitWithContext(ctx)
 	if err != nil {
 		// last check
@@ -251,7 +254,11 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		return
 	}
 
-	process := res.WaitHandler(ctx, c, plan.ProjectID.ValueString(), plan.ID.ValueString())
+	timeout, d := plan.Timeouts.Update(ctx, 1*time.Hour)
+	if resp.Diagnostics.Append(d...); resp.Diagnostics.HasError() {
+		return
+	}
+	process := res.WaitHandler(ctx, c, plan.ProjectID.ValueString(), plan.ID.ValueString()).SetTimeout(timeout)
 	isi, err := process.WaitWithContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("failed Postgres instance update validation", err.Error())
@@ -299,7 +306,11 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	process := res.WaitHandler(ctx, c, state.ProjectID.ValueString(), state.ID.ValueString())
+	timeout, d := state.Timeouts.Delete(ctx, 1*time.Hour)
+	if resp.Diagnostics.Append(d...); resp.Diagnostics.HasError() {
+		return
+	}
+	process := res.WaitHandler(ctx, c, state.ProjectID.ValueString(), state.ID.ValueString()).SetTimeout(timeout)
 	if _, err := process.WaitWithContext(ctx); err != nil {
 		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.State.RemoveResource(ctx)

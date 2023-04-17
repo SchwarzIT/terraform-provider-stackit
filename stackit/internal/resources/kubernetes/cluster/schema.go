@@ -8,6 +8,7 @@ import (
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
+	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -22,19 +23,20 @@ import (
 
 // Cluster is the schema model
 type Cluster struct {
-	ID                        types.String  `tfsdk:"id"`
-	Name                      types.String  `tfsdk:"name"`
-	ProjectID                 types.String  `tfsdk:"project_id"`
-	KubernetesProjectID       types.String  `tfsdk:"kubernetes_project_id"`
-	KubernetesVersion         types.String  `tfsdk:"kubernetes_version"`
-	KubernetesVersionUsed     types.String  `tfsdk:"kubernetes_version_used"`
-	AllowPrivilegedContainers types.Bool    `tfsdk:"allow_privileged_containers"`
-	NodePools                 []NodePool    `tfsdk:"node_pools"`
-	Maintenance               *Maintenance  `tfsdk:"maintenance"`
-	Hibernations              []Hibernation `tfsdk:"hibernations"`
-	Extensions                *Extensions   `tfsdk:"extensions"`
-	Status                    types.String  `tfsdk:"status"`
-	KubeConfig                types.String  `tfsdk:"kube_config"`
+	ID                        types.String   `tfsdk:"id"`
+	Name                      types.String   `tfsdk:"name"`
+	ProjectID                 types.String   `tfsdk:"project_id"`
+	KubernetesProjectID       types.String   `tfsdk:"kubernetes_project_id"`
+	KubernetesVersion         types.String   `tfsdk:"kubernetes_version"`
+	KubernetesVersionUsed     types.String   `tfsdk:"kubernetes_version_used"`
+	AllowPrivilegedContainers types.Bool     `tfsdk:"allow_privileged_containers"`
+	NodePools                 []NodePool     `tfsdk:"node_pools"`
+	Maintenance               *Maintenance   `tfsdk:"maintenance"`
+	Hibernations              []Hibernation  `tfsdk:"hibernations"`
+	Extensions                *Extensions    `tfsdk:"extensions"`
+	Status                    types.String   `tfsdk:"status"`
+	KubeConfig                types.String   `tfsdk:"kube_config"`
+	Timeouts                  timeouts.Value `tfsdk:"timeouts"`
 }
 
 type NodePool struct {
@@ -375,6 +377,12 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Required:    false,
 				Optional:    false,
 			},
+
+			"timeouts": common.Timeouts(ctx, timeouts.Opts{
+				Create: true,
+				Update: true,
+				Delete: true,
+			}),
 		},
 	}
 }

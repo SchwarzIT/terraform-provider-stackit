@@ -111,7 +111,12 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	// To overcome the bug, we'll wait an initial 30 sec
 	time.Sleep(60 * time.Second)
 
-	process := res.WaitHandler(ctx, r.client.MongoDBFlex.Instance, plan.ProjectID.ValueString(), instanceID)
+	timeout, d := plan.Timeouts.Create(ctx, 30*time.Minute)
+	if resp.Diagnostics.Append(d...); resp.Diagnostics.HasError() {
+		return
+	}
+
+	process := res.WaitHandler(ctx, r.client.MongoDBFlex.Instance, plan.ProjectID.ValueString(), instanceID).SetTimeout(timeout)
 	if _, err := process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed MongoDB instance creation validation", err.Error())
 		return
@@ -238,7 +243,12 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		return
 	}
 
-	process := res.WaitHandler(ctx, r.client.MongoDBFlex.Instance, plan.ProjectID.ValueString(), plan.ID.ValueString())
+	timeout, d := plan.Timeouts.Update(ctx, 30*time.Minute)
+	if resp.Diagnostics.Append(d...); resp.Diagnostics.HasError() {
+		return
+	}
+
+	process := res.WaitHandler(ctx, r.client.MongoDBFlex.Instance, plan.ProjectID.ValueString(), plan.ID.ValueString()).SetTimeout(timeout)
 	if _, err := process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed MongoDB instance update validation", err.Error())
 		return
@@ -285,7 +295,12 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	process := res.WaitHandler(ctx, r.client.MongoDBFlex.Instance, state.ProjectID.ValueString(), state.ID.ValueString())
+	timeout, d := state.Timeouts.Delete(ctx, 30*time.Minute)
+	if resp.Diagnostics.Append(d...); resp.Diagnostics.HasError() {
+		return
+	}
+
+	process := res.WaitHandler(ctx, r.client.MongoDBFlex.Instance, state.ProjectID.ValueString(), state.ID.ValueString()).SetTimeout(timeout)
 	if _, err = process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed to verify mongodb instance deletion", err.Error())
 		return

@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
@@ -30,7 +31,12 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	plan.ID = plan.ProjectID
-	process := res.WaitHandler(ctx, c, plan.ID.ValueString())
+
+	timeout, d := plan.Timeouts.Create(ctx, 10*time.Minute)
+	if resp.Diagnostics.Append(d...); resp.Diagnostics.HasError() {
+		return
+	}
+	process := res.WaitHandler(ctx, c, plan.ID.ValueString()).SetTimeout(timeout)
 	if _, err := process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed verifying SKE project creation", err.Error())
 		return
@@ -90,7 +96,11 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	process := res.WaitHandler(ctx, c, state.ID.ValueString())
+	timeout, d := state.Timeouts.Create(ctx, 10*time.Minute)
+	if resp.Diagnostics.Append(d...); resp.Diagnostics.HasError() {
+		return
+	}
+	process := res.WaitHandler(ctx, c, state.ID.ValueString()).SetTimeout(timeout)
 	if _, err := process.WaitWithContext(ctx); err != nil {
 		if !strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.Diagnostics.AddError("failed to verify project deletion", err.Error())

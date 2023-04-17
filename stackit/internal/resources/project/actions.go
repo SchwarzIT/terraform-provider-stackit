@@ -82,7 +82,12 @@ func (r Resource) createProject(ctx context.Context, resp *resource.CreateRespon
 
 	// give API a bit of time to process request
 	time.Sleep(30 * time.Second)
-	process := res.WaitHandler(ctx, r.client.ResourceManagement, res.JSON201.ContainerID)
+
+	timeout, d := plan.Timeouts.Create(ctx, 30*time.Minute)
+	if resp.Diagnostics.Append(d...); resp.Diagnostics.HasError() {
+		return plan
+	}
+	process := res.WaitHandler(ctx, r.client.ResourceManagement, res.JSON201.ContainerID).SetTimeout(timeout)
 	if _, err := process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError(fmt.Sprintf("failed validating project %s creation", res.JSON201.ProjectID), err.Error())
 		return plan
@@ -203,7 +208,11 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	process := res.WaitHandler(ctx, c.ResourceManagement, state.ContainerID.ValueString())
+	timeout, d := state.Timeouts.Delete(ctx, 30*time.Minute)
+	if resp.Diagnostics.Append(d...); resp.Diagnostics.HasError() {
+		return
+	}
+	process := res.WaitHandler(ctx, c.ResourceManagement, state.ContainerID.ValueString()).SetTimeout(timeout)
 	if _, err := process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed to verify project deletion", err.Error())
 	}

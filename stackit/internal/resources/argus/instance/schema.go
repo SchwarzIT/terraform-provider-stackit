@@ -139,6 +139,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 
 			"timeouts": common.Timeouts(ctx, timeouts.Opts{
 				Create: true,
+				Update: true,
 				Delete: true,
 			}),
 

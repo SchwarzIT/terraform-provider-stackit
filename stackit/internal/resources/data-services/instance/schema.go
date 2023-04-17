@@ -6,6 +6,7 @@ import (
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
+	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
@@ -18,17 +19,18 @@ import (
 
 // Instance is the schema model
 type Instance struct {
-	ID                 types.String `tfsdk:"id"`
-	Name               types.String `tfsdk:"name"`
-	ProjectID          types.String `tfsdk:"project_id"`
-	Plan               types.String `tfsdk:"plan"`
-	PlanID             types.String `tfsdk:"plan_id"`
-	Version            types.String `tfsdk:"version"`
-	ACL                types.List   `tfsdk:"acl"`
-	DashboardURL       types.String `tfsdk:"dashboard_url"`
-	CFGUID             types.String `tfsdk:"cf_guid"`
-	CFSpaceGUID        types.String `tfsdk:"cf_space_guid"`
-	CFOrganizationGUID types.String `tfsdk:"cf_organization_guid"`
+	ID                 types.String   `tfsdk:"id"`
+	Name               types.String   `tfsdk:"name"`
+	ProjectID          types.String   `tfsdk:"project_id"`
+	Plan               types.String   `tfsdk:"plan"`
+	PlanID             types.String   `tfsdk:"plan_id"`
+	Version            types.String   `tfsdk:"version"`
+	ACL                types.List     `tfsdk:"acl"`
+	DashboardURL       types.String   `tfsdk:"dashboard_url"`
+	CFGUID             types.String   `tfsdk:"cf_guid"`
+	CFSpaceGUID        types.String   `tfsdk:"cf_space_guid"`
+	CFOrganizationGUID types.String   `tfsdk:"cf_organization_guid"`
+	Timeouts           timeouts.Value `tfsdk:"timeouts"`
 }
 
 // Schema returns the terraform schema structure
@@ -104,6 +106,11 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Description: "Cloud Foundry Organization GUID",
 				Computed:    true,
 			},
+			"timeouts": common.Timeouts(ctx, timeouts.Opts{
+				Create: true,
+				Update: true,
+				Delete: true,
+			}),
 		},
 	}
 }
