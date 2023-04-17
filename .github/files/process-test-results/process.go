@@ -125,7 +125,7 @@ func getBadge(s Summary) string {
 	return fmt.Sprintf(`[![GitHub Workflow Status](https://img.shields.io/badge/Acceptance%%20Tests-%s-%s)](https://github.com/SchwarzIT/terraform-provider-stackit/actions/workflows/acceptance_test.yml)`, url.PathEscape(badgeText), color)
 }
 
-func generateImage(v TestsSummary) string {
+func generateImage(v TestsSummary) (string, string) {
 	img, err := callAPI(generateHTML(v))
 	if err != nil {
 		fmt.Println(err.Error())
