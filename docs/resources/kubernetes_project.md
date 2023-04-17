@@ -41,8 +41,20 @@ resource "stackit_kubernetes_project" "example" {
 
 - `project_id` (String) the project ID that SKE will be enabled in
 
+### Optional
+
+- `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
+
 ### Read-Only
 
 - `id` (String) kubernetes project ID
+
+<a id="nestedatt--timeouts"></a>
+### Nested Schema for `timeouts`
+
+Optional:
+
+- `create` (String)
+- `delete` (String)
 
 

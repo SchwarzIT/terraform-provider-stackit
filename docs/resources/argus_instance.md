@@ -49,6 +49,7 @@ resource "stackit_argus_instance" "example" {
 
 - `grafana` (Attributes) A Grafana configuration block (see [below for nested schema](#nestedatt--grafana))
 - `metrics` (Attributes) Metrics configuration block (see [below for nested schema](#nestedatt--metrics))
+- `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
 
 ### Read-Only
 
@@ -86,5 +87,15 @@ Optional:
 - `retention_days` (Number) Specifies for how many days the raw metrics are kept. Default is set to `90`
 - `retention_days_1h_downsampling` (Number) Specifies for how many days the 1h downsampled metrics are kept. must be less than the value of the 5m downsampling retention. Default is set to `0` (disabled).
 - `retention_days_5m_downsampling` (Number) Specifies for how many days the 5m downsampled metrics are kept. must be less than the value of the general retention. Default is set to `0` (disabled).
+
+
+<a id="nestedatt--timeouts"></a>
+### Nested Schema for `timeouts`
+
+Optional:
+
+- `create` (String)
+- `delete` (String)
+- `update` (String)
 
 

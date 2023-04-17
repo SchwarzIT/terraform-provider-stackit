@@ -49,6 +49,7 @@ resource "stackit_postgres_instance" "example" {
 
 - `acl` (List of String) Access Control rules to whitelist IP addresses
 - `plan` (String) The Postgres Plan. Default is `stackit-postgresql-single-small`
+- `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
 - `version` (String) Postgres version. Default is 11
 
 ### Read-Only
@@ -59,5 +60,14 @@ resource "stackit_postgres_instance" "example" {
 - `dashboard_url` (String) Dashboard URL
 - `id` (String) Specifies the resource ID
 - `plan_id` (String) The selected plan ID
+
+<a id="nestedatt--timeouts"></a>
+### Nested Schema for `timeouts`
+
+Optional:
+
+- `create` (String)
+- `delete` (String)
+- `update` (String)
 
 

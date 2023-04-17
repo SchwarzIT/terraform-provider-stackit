@@ -49,6 +49,7 @@ resource "stackit_logme_instance" "example" {
 
 - `acl` (List of String) Access Control rules to whitelist IP addresses
 - `plan` (String) The LogMe Plan. Default is `stackit-logme-single-small-non-ssl`
+- `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
 - `version` (String) LogMe version. Default is LogMe
 
 ### Read-Only
@@ -59,5 +60,14 @@ resource "stackit_logme_instance" "example" {
 - `dashboard_url` (String) Dashboard URL
 - `id` (String) Specifies the resource ID
 - `plan_id` (String) The selected plan ID
+
+<a id="nestedatt--timeouts"></a>
+### Nested Schema for `timeouts`
+
+Optional:
+
+- `create` (String)
+- `delete` (String)
+- `update` (String)
 
 
