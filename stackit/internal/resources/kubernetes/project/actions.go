@@ -96,7 +96,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	timeout, d := state.Timeouts.Create(ctx, 10*time.Minute)
+	timeout, d := state.Timeouts.Delete(ctx, 10*time.Minute)
 	if resp.Diagnostics.Append(d...); resp.Diagnostics.HasError() {
 		return
 	}
