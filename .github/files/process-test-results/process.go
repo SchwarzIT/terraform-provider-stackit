@@ -247,6 +247,11 @@ type TeamsAction struct {
 	Target string `json:"target,omitempty"`
 }
 
+type TeamsFact struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
 func sendTeamsNotification(v TestsSummary, imgURL string) error {
 	if v.Overall.Fail == 0 {
 		return nil
