@@ -20,6 +20,7 @@ jobs:
         id: create_project
         shell: bash
         run: |
+          exit 1;
           JSON_DATA=$(cat << EOF
           { 
             "name": "${{ github.event.repository.name }}_${{ github.run_id }}", 
