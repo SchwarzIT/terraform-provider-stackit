@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -56,16 +57,18 @@ func main() {
 
 	readme := "README.md"
 	errored := false
-	if err := injectToMarkdownFile(readme, "<!--workflow-badge-->", getBadge(agg.Overall)); err != nil {
+	urlBadge, badge := getBadge(agg.Overall)
+	if err := injectToMarkdownFile(readme, "<!--workflow-badge-->", badge); err != nil {
 		errored = true
 		fmt.Println(err)
 	}
-	url, imageTag := generateImage(agg)
+
+	urlOverview, imageTag := generateImage(agg)
 	if err := injectToMarkdownFile(readme, "<!--summary-image-->", imageTag); err != nil {
 		errored = true
 		fmt.Println(err)
 	}
-	if err := sendTeamsNotification(agg, url); err != nil {
+	if err := sendTeamsNotification(agg, urlBadge, urlOverview); err != nil {
 		errored = true
 		fmt.Println(err)
 	}
@@ -93,7 +96,7 @@ func injectToMarkdownFile(name, separator, injected string) error {
 	return nil
 }
 
-func getBadge(s Summary) string {
+func getBadge(s Summary) (string, string) {
 	badgeText := "All failed"
 	switch true {
 	case s.Fail == 0 && s.Pass > 0:
@@ -122,7 +125,8 @@ func getBadge(s Summary) string {
 		color = "success"
 	}
 
-	return fmt.Sprintf(`[![GitHub Workflow Status](https://img.shields.io/badge/Acceptance%%20Tests-%s-%s)](https://github.com/SchwarzIT/terraform-provider-stackit/actions/workflows/acceptance_test.yml)`, url.PathEscape(badgeText), color)
+	return fmt.Sprintf(`https://img.shields.io/badge/Acceptance%%20Tests-%s-%s`, url.PathEscape(badgeText), color),
+		fmt.Sprintf(`[![GitHub Workflow Status](https://img.shields.io/badge/Acceptance%%20Tests-%s-%s)](https://github.com/SchwarzIT/terraform-provider-stackit/actions/workflows/acceptance_test.yml)`, url.PathEscape(badgeText), color)
 }
 
 func generateImage(v TestsSummary) (string, string) {
@@ -221,93 +225,192 @@ func callAPI(html string) (string, error) {
 	return v.URL, nil
 }
 
-type TeamsMessage struct {
-	Type            string         `json:"@type"`
-	Context         string         `json:"@context"`
-	ThemeColor      string         `json:"themeColor,omitempty"`
-	Summary         string         `json:"summary,omitempty"`
-	Title           string         `json:"title,omitempty"`
-	Text            string         `json:"text,omitempty"`
-	Sections        []TeamsSection `json:"sections,omitempty"`
-	Markdown        bool           `json:"markdown"`
-	PotentialAction []TeamsAction  `json:"potentialAction,omitempty"`
-}
-
-type TeamsSection struct {
-	ActivityTitle    string      `json:"activityTitle,omitempty"`
-	ActivitySubtitle string      `json:"activitySubtitle,omitempty"`
-	ActivityImage    string      `json:"activityImage,omitempty"`
-	Facts            []TeamsFact `json:"facts,omitempty"`
-	Markdown         bool        `json:"markdown"`
-}
-
-type TeamsAction struct {
-	Type   string `json:"@type"`
-	Name   string `json:"name"`
-	Target string `json:"target,omitempty"`
-}
-
-type TeamsFact struct {
-	Name  string `json:"name"`
-	Value string `json:"value"`
-}
-
-func sendTeamsNotification(v TestsSummary, imgURL string) error {
+func sendTeamsNotification(v TestsSummary, badgeImgURL, overviewImgURL string) error {
 	if v.Overall.Fail == 0 {
 		return nil
 	}
-	webhookURL := os.Getenv("ODJ_STACKIT_GENERAL_CHANNEL_WEBHOOK_URL")
-	section := TeamsSection{
-		ActivityTitle: "Overview",
-		ActivityImage: imgURL,
-		Markdown:      false,
+	webhookURL := os.Getenv("TEAMS_WEBHOOK_URL")
+	if webhookURL == "" {
+		return errors.New("webhookURL is empty. please set TEAMS_WEBHOOK_URL")
 	}
-
-	githubServerURL := os.Getenv("GITHUB_SERVER_URL")
-	githubRepository := os.Getenv("GITHUB_REPOSITORY")
 	githubRunID := os.Getenv("GITHUB_RUN_ID")
-	workflowRunURL := fmt.Sprintf("%s/%s/actions/runs/%s", githubServerURL, githubRepository, githubRunID)
-
-	action := TeamsAction{
-		Type:   "OpenUri",
-		Name:   "View Run",
-		Target: workflowRunURL,
-	}
 
 	text := ""
 	for k, v := range v.Packages {
 		if v.Fail == 0 {
 			continue
 		}
-		text += fmt.Sprintf("**%s**\n%d failed, %d succeeded\n\n", k, v.Fail, v.Pass)
+		text += fmt.Sprintf("• **%s**: %d failed, %d succeeded\\n\\n", k, v.Fail, v.Pass)
 	}
 
-	msg := TeamsMessage{
-		Type:            "MessageCard",
-		Context:         "http://schema.org/extensions",
-		ThemeColor:      "0078D7",
-		Summary:         "Acceptance Tests failur summary",
-		Title:           "Acceptance Tests failures",
-		Text:            text,
-		Markdown:        true,
-		Sections:        []TeamsSection{section},
-		PotentialAction: []TeamsAction{action},
-	}
-
-	data, err := json.Marshal(msg)
+	card := generateAdaptiveCard(githubRunID, badgeImgURL, overviewImgURL, text)
+	fmt.Println(card)
+	payload := strings.NewReader(card)
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodPost, webhookURL, payload)
 	if err != nil {
-		return fmt.Errorf("error marshaling message: %v", err)
+		return fmt.Errorf("error creating request: %v", err)
 	}
-
-	resp, err := http.Post(webhookURL, "application/json", bytes.NewBuffer(data))
+	req.Header.Add("Content-Type", "application/json")
+	res, err := client.Do(req)
 	if err != nil {
 		return fmt.Errorf("error posting message: %v", err)
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("unexpected response status: %d", resp.StatusCode)
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected response status: %d", res.StatusCode)
 	}
 
 	return nil
+}
+
+func generateAdaptiveCard(runID, badgeImageURL, overviewImageURL, resourceTestsText string) string {
+	return fmt.Sprintf(`{
+		"type": "message",
+		"attachments": [
+			{
+				"contentType": "application/vnd.microsoft.card.adaptive",
+				"contentUrl": null,
+				"content": {
+					"$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+					"type": "AdaptiveCard",
+					"msTeams": {
+						"width": "full"
+					},
+					"version": "1.0",
+					"body": [
+						{
+							"type": "Container",
+							"id": "1c2fc7ce-39c2-670b-e12a-6fff4159f487",
+							"padding": "None",
+							"style": "default",
+							"spacing": "Medium",
+							"verticalContentAlignment": "Center",
+							"width": "stretch",
+							"items": [
+								{
+									"type": "Container",
+									"id": "9c1b7408-2c73-5328-86b0-73fd57eb91a9",
+									"padding": "Medium",
+									"width": "stretch",
+									"items": [
+										{
+											"type": "ColumnSet",
+											"id": "21c3caa3-9b86-79e1-2fa3-3cc61351149d",
+											"columns": [
+												{
+													"type": "Column",
+													"id": "b05d4957-5e66-6185-b0ca-40a8f5da7b70",
+													"padding": "Small",
+													"width": "stretch",
+													"items": [
+														{
+															"type": "TextBlock",
+															"id": "4cc2f99c-131e-12e6-41a7-3934b95fc0ec",
+															"text": "Acceptance Tests Results",
+															"wrap": true,
+															"size": "Medium",
+															"weight": "Bolder"
+														}
+													]
+												},
+												{
+													"type": "Column",
+													"id": "c9b7d464-0c6f-45eb-e8bb-97cb0896640c",
+													"padding": "Small",
+													"height": "15px",
+													"items": [
+														{
+															"type": "Image",
+															"id": "b72abea5-26db-0795-e045-e6cc5009db97",
+															"url": "%s",
+															"selectAction": {
+																"type": "Action.OpenUrl",
+																"url": "https://github.com/SchwarzIT/terraform-provider-stackit/actions/runs/%s"
+															},
+															"height": "20px",
+															"spacing": "None",
+															"horizontalAlignment": "Right"
+														}
+													]
+												}
+											],
+											"padding": "None"
+										}
+									],
+									"style": "emphasis"
+								},
+								{
+									"type": "ColumnSet",
+									"id": "8486ba45-e628-45ef-df1f-7049dbe45046",
+									"columns": [
+										{
+											"type": "Column",
+											"id": "43c124d5-fe13-aed2-93d7-d647e8ba8252",
+											"padding": "None",
+											"width": "stretch",
+											"items": [
+												{
+													"type": "TextBlock",
+													"id": "32600619-df1a-0d14-5b61-79862b15f149",
+													"text": "%s",
+													"wrap": true,
+													"spacing": "None"
+												}
+											]
+										},
+										{
+											"type": "Column",
+											"items": [
+												{
+													"type": "Image",
+													"id": "5dee8083-3822-5a1d-e782-c21e6d9d7ba1",
+													"url": "%s",
+													"selectAction": {
+														"type": "Action.OpenUrl",
+														"url": "https://github.com/SchwarzIT/terraform-provider-stackit/actions/runs/%s"
+													},
+													"size": "Large",
+													"width": "250px",
+													"spacing": "None"
+												}
+											],
+											"padding": "None",
+											"width": "auto"
+										}
+									],
+									"padding": "Medium",
+									"spacing": "None"
+								},
+								{
+									"type": "Container",
+									"id": "4c0b33c7-8fb0-f7ff-3d5b-9a5181fb7edf",
+									"padding": "Default",
+									"items": [
+										{
+											"type": "ActionSet",
+											"actions": [
+												{
+													"type": "Action.OpenUrl",
+													"id": "4a0a75e4-b785-ad20-c61a-c18de7dfc6a9",
+													"title": "View run",
+													"url": "https://github.com/SchwarzIT/terraform-provider-stackit/actions/runs/%s",
+													"style": "positive",
+													"isPrimary": true
+												}
+											],
+											"spacing": "Small"
+										}
+									],
+									"spacing": "Medium",
+									"separator": true
+								}
+							]
+						}
+					],
+					"padding": "None"
+				}
+			}
+		]
+	}`, badgeImageURL, runID, resourceTestsText, overviewImageURL, runID, runID)
 }
