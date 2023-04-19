@@ -112,6 +112,7 @@ __resources__
         run: |
           export HCTI_USER_ID="${{ secrets.HCTI_USER_ID }}"
           export HCTI_API_KEY="${{ secrets.HCTI_API_KEY }}"
+          export TEAMS_WEBHOOK_URL="${{ secrets.TEAMS_WEBHOOK_URL }}"
           make ci-process-results
           git config --global user.name 'do87'
           git config --global user.email 'do87@users.noreply.github.com'
