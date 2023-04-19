@@ -25,8 +25,13 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
+	timeout, d := plan.Timeouts.Create(ctx, 1*time.Hour)
+	if resp.Diagnostics.Append(d...); resp.Diagnostics.HasError() {
+		return
+	}
+
 	// handle creation
-	r.createOrUpdateCluster(ctx, &resp.Diagnostics, &plan)
+	r.createOrUpdateCluster(ctx, &resp.Diagnostics, &plan, timeout)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -46,7 +51,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 }
 
-func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnostics, cl *Cluster) {
+func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnostics, cl *Cluster, timeout time.Duration) {
 	c := r.client
 	versions, err := r.loadAvaiableVersions(ctx)
 	if err != nil {
@@ -93,7 +98,7 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 		diags.AddError("failed during SKE create/update", agg.Error())
 	}
 
-	process := resp.WaitHandler(ctx, c.Kubernetes.Cluster, projectID, clusterName).SetTimeout(time.Hour)
+	process := resp.WaitHandler(ctx, c.Kubernetes.Cluster, projectID, clusterName).SetTimeout(timeout)
 	res, err := process.WaitWithContext(ctx)
 	if agg := validate.Response(res, err, "JSON200.Status.Aggregated"); agg != nil {
 		diags.AddError("failed to validate SKE create/update", agg.Error())
@@ -162,8 +167,13 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		return
 	}
 
+	timeout, d := plan.Timeouts.Update(ctx, 1*time.Hour)
+	if resp.Diagnostics.Append(d...); resp.Diagnostics.HasError() {
+		return
+	}
+
 	// handle creation
-	r.createOrUpdateCluster(ctx, &resp.Diagnostics, &plan)
+	r.createOrUpdateCluster(ctx, &resp.Diagnostics, &plan, timeout)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -197,7 +207,13 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	if _, err := res.WaitHandler(ctx, c.Kubernetes.Cluster, state.KubernetesProjectID.ValueString(), state.Name.ValueString()).WaitWithContext(ctx); err != nil {
+	timeout, d := state.Timeouts.Delete(ctx, 1*time.Hour)
+	if resp.Diagnostics.Append(d...); resp.Diagnostics.HasError() {
+		return
+	}
+
+	process := res.WaitHandler(ctx, c.Kubernetes.Cluster, state.KubernetesProjectID.ValueString(), state.Name.ValueString()).SetTimeout(timeout)
+	if _, err := process.WaitWithContext(ctx); err != nil {
 		if !strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.Diagnostics.AddError("failed to verify cluster deletion", err.Error())
 			return

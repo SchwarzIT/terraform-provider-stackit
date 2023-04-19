@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/users"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
@@ -169,30 +170,22 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 			resp.State.RemoveResource(ctx)
 			return
 		}
-		if validate.StatusEquals(res, http.StatusInternalServerError) {
-			resp.State.RemoveResource(ctx)
-			if res.Body == nil {
-				res.Body = []byte("")
-			}
-			resp.Diagnostics.AddWarning("User only removed from terraform state", string(res.Body))
-			return
-		}
 		if !strings.Contains(agg.Error(), "timed out waiting for the condition") {
 			resp.Diagnostics.AddError("failed to delete user", agg.Error())
 			return
 		}
 	}
 
-	// @TODO: for the time being, verification code is commented out due to 500 errors from the API, revert once fixed.
+	timeout, d := state.Timeouts.Delete(ctx, 10*time.Minute)
+	if resp.Diagnostics.Append(d...); resp.Diagnostics.HasError() {
+		return
+	}
 
-	// if res == nil {
-	// 	res = &users.DeleteUserResponse{}
-	// }
-	// process := res.WaitHandler(ctx, r.client.PostgresFlex.Users, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString())
-	// if _, err := process.WaitWithContext(ctx); err != nil {
-	// 	resp.Diagnostics.AddError("failed to verify user deletion", err.Error())
-	// 	return
-	// }
+	process := res.WaitHandler(ctx, r.client.PostgresFlex.Users, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString()).SetTimeout(timeout)
+	if _, err := process.WaitWithContext(ctx); err != nil {
+		resp.Diagnostics.AddError("failed to verify user deletion", err.Error())
+		return
+	}
 
 	resp.State.RemoveResource(ctx)
 }

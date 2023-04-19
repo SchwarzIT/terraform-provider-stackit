@@ -47,11 +47,23 @@ resource "stackit_object_storage_bucket" "example" {
 - `name` (String) Bucket name
 - `object_storage_project_id` (String) The ID returned from `stackit_object_storage_project`
 
+### Optional
+
+- `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
+
 ### Read-Only
 
 - `host_style_url` (String) url with dedicated host name
 - `id` (String) Specifies the resource ID
 - `path_style_url` (String) url with path to the bucket
 - `region` (String) the region where the bucket was created
+
+<a id="nestedatt--timeouts"></a>
+### Nested Schema for `timeouts`
+
+Optional:
+
+- `create` (String)
+- `delete` (String)
 
 

@@ -6,6 +6,7 @@ import (
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
+	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -16,12 +17,13 @@ import (
 
 // Project is the schema model
 type Project struct {
-	ID                types.String `tfsdk:"id"`
-	ContainerID       types.String `tfsdk:"container_id"`
-	ParentContainerID types.String `tfsdk:"parent_container_id"`
-	Name              types.String `tfsdk:"name"`
-	BillingRef        types.String `tfsdk:"billing_ref"`
-	OwnerEmail        types.String `tfsdk:"owner_email"`
+	ID                types.String   `tfsdk:"id"`
+	ContainerID       types.String   `tfsdk:"container_id"`
+	ParentContainerID types.String   `tfsdk:"parent_container_id"`
+	Name              types.String   `tfsdk:"name"`
+	BillingRef        types.String   `tfsdk:"billing_ref"`
+	OwnerEmail        types.String   `tfsdk:"owner_email"`
+	Timeouts          timeouts.Value `tfsdk:"timeouts"`
 }
 
 // Schema returns the terraform schema structure
@@ -79,6 +81,10 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Description: "Email address of owner of the project. This value is only considered during creation. changing it afterwards will have no effect.",
 				Required:    true,
 			},
+			"timeouts": common.Timeouts(ctx, timeouts.Opts{
+				Create: true,
+				Delete: true,
+			}),
 		},
 	}
 }

@@ -10,7 +10,7 @@ import (
 )
 
 func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var config instance.Instance
+	var config Instance
 
 	diags := req.Config.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)

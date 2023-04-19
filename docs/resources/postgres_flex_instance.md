@@ -53,6 +53,7 @@ resource "stackit_postgres_flex_instance" "example" {
 - `options` (Map of String) Specifies postgres instance options
 - `replicas` (Number) Number of replicas (Default is `1`).
 - `storage` (Attributes) A single `storage` block as defined below. (see [below for nested schema](#nestedatt--storage))
+- `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
 - `version` (String) Postgres version. Options: `12`, `13`, `14`. Changing this value requires the resource to be recreated.
 
 ### Read-Only
@@ -66,5 +67,15 @@ Optional:
 
 - `class` (String) Specifies the storage class. Available option: `premium-perf6-stackit`
 - `size` (Number) The storage size in GB (min of 5 is required)
+
+
+<a id="nestedatt--timeouts"></a>
+### Nested Schema for `timeouts`
+
+Optional:
+
+- `create` (String)
+- `delete` (String)
+- `update` (String)
 
 

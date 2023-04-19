@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/kubernetes/cluster"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -13,7 +12,7 @@ import (
 // Read - lifecycle function
 func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	c := r.client
-	var config cluster.Cluster
+	var config Cluster
 
 	diags := req.Config.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
@@ -42,7 +41,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	}
 }
 
-func (r DataSource) getCredential(ctx context.Context, diags *diag.Diagnostics, cl *cluster.Cluster) {
+func (r DataSource) getCredential(ctx context.Context, diags *diag.Diagnostics, cl *Cluster) {
 	c := r.client
 	res, err := c.Kubernetes.Credentials.List(ctx, cl.KubernetesProjectID.ValueString(), cl.Name.ValueString())
 	if agg := validate.Response(res, err, "JSON200"); agg != nil {

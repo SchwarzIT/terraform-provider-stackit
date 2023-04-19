@@ -8,7 +8,18 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services"
 	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1.0.1"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
+
+// Bucket is the schema model
+type Bucket struct {
+	ID                     types.String `tfsdk:"id"`
+	Name                   types.String `tfsdk:"name"`
+	ObjectStorageProjectID types.String `tfsdk:"object_storage_project_id"`
+	Region                 types.String `tfsdk:"region"`
+	HostStyleURL           types.String `tfsdk:"host_style_url"`
+	PathStyleURL           types.String `tfsdk:"path_style_url"`
+}
 
 // New returns a new configured data source
 func New() datasource.DataSource {

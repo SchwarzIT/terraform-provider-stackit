@@ -6,6 +6,7 @@ import (
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
+	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -16,12 +17,13 @@ import (
 
 // Bucket is the schema model
 type Bucket struct {
-	ID                     types.String `tfsdk:"id"`
-	Name                   types.String `tfsdk:"name"`
-	ObjectStorageProjectID types.String `tfsdk:"object_storage_project_id"`
-	Region                 types.String `tfsdk:"region"`
-	HostStyleURL           types.String `tfsdk:"host_style_url"`
-	PathStyleURL           types.String `tfsdk:"path_style_url"`
+	ID                     types.String   `tfsdk:"id"`
+	Name                   types.String   `tfsdk:"name"`
+	ObjectStorageProjectID types.String   `tfsdk:"object_storage_project_id"`
+	Region                 types.String   `tfsdk:"region"`
+	HostStyleURL           types.String   `tfsdk:"host_style_url"`
+	PathStyleURL           types.String   `tfsdk:"path_style_url"`
+	Timeouts               timeouts.Value `tfsdk:"timeouts"`
 }
 
 // Schema returns the terraform schema structure
@@ -35,6 +37,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Description: "Specifies the resource ID",
 				Computed:    true,
 			},
+
 			"name": schema.StringAttribute{
 				Description: "Bucket name",
 				Required:    true,
@@ -74,6 +77,11 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Required:    false,
 				Optional:    false,
 			},
+
+			"timeouts": common.Timeouts(ctx, timeouts.Opts{
+				Create: true,
+				Delete: true,
+			}),
 		},
 	}
 }

@@ -53,6 +53,7 @@ resource "stackit_postgres_flex_user" "example" {
 ### Optional
 
 - `roles` (List of String) Specifies the roles assigned to the user, valid options are: `login`, `createdb`
+- `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
 - `username` (String) Specifies the username. Defaults to `psqluser`
 
 ### Read-Only
@@ -62,5 +63,12 @@ resource "stackit_postgres_flex_user" "example" {
 - `password` (String, Sensitive) Specifies the user's password
 - `port` (Number) Specifies the port
 - `uri` (String, Sensitive) Specifies connection URI
+
+<a id="nestedatt--timeouts"></a>
+### Nested Schema for `timeouts`
+
+Optional:
+
+- `delete` (String)
 
 

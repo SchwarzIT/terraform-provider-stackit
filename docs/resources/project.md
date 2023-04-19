@@ -47,9 +47,21 @@ resource "stackit_project" "example" {
 - `owner_email` (String) Email address of owner of the project. This value is only considered during creation. changing it afterwards will have no effect.
 - `parent_container_id` (String) the container ID in which the project will be created
 
+### Optional
+
+- `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
+
 ### Read-Only
 
 - `container_id` (String) the project container ID
 - `id` (String) the project ID
+
+<a id="nestedatt--timeouts"></a>
+### Nested Schema for `timeouts`
+
+Optional:
+
+- `create` (String)
+- `delete` (String)
 
 

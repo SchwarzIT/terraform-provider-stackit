@@ -6,7 +6,11 @@ import (
 	"os"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
+	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -60,4 +64,30 @@ func EnvironmentInfo(u env.EnvironmentURLs) string {
 	`,
 		u.Prod, u.QA, u.Dev, u.OverrideWith,
 	)
+}
+
+func Dump(d *diag.Diagnostics, body []byte) {
+	d.AddWarning("request body", string(body))
+}
+
+func Timeouts(ctx context.Context, opts timeouts.Opts) schema.SingleNestedAttribute {
+	timeout := timeouts.Attributes(ctx, opts).(schema.SingleNestedAttribute)
+	attr := map[string]attr.Type{}
+	if opts.Create {
+		attr["create"] = types.StringType
+	}
+	if opts.Read {
+		attr["read"] = types.StringType
+	}
+	if opts.Update {
+		attr["update"] = types.StringType
+	}
+	if opts.Delete {
+		attr["delete"] = types.StringType
+	}
+	timeout.Computed = true
+	timeout.Default = objectdefault.StaticValue(
+		types.ObjectNull(attr),
+	)
+	return timeout
 }

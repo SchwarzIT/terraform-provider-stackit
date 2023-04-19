@@ -76,7 +76,12 @@ func (r Resource) createInstance(ctx context.Context, diags *diag.Diagnostics, p
 		return
 	}
 
-	process := res.WaitHandler(ctx, c.Instances, plan.ProjectID.ValueString(), res.JSON202.InstanceID).SetTimeout(1 * time.Hour)
+	timeout, d := plan.Timeouts.Create(ctx, 1*time.Hour)
+	if diags.Append(d...); diags.HasError() {
+		return
+	}
+
+	process := res.WaitHandler(ctx, c.Instances, plan.ProjectID.ValueString(), res.JSON202.InstanceID).SetTimeout(timeout)
 	wr, err := process.WaitWithContext(ctx)
 	if err != nil {
 		diags.AddError("failed validating instance creation", err.Error())
@@ -349,8 +354,13 @@ func (r Resource) updateInstance(ctx context.Context, diags *diag.Diagnostics, p
 		diags.AddError("failed to update instance", agg.Error())
 		return
 	}
-	process := res.WaitHandler(ctx, c.Argus.Instances, plan.ProjectID.ValueString(), plan.ID.ValueString()).SetTimeout(1 * time.Hour)
-	process.SetTimeout(2 * time.Hour)
+
+	timeout, d := plan.Timeouts.Update(ctx, 1*time.Hour)
+	if diags.Append(d...); diags.HasError() {
+		return
+	}
+
+	process := res.WaitHandler(ctx, c.Argus.Instances, plan.ProjectID.ValueString(), plan.ID.ValueString()).SetTimeout(timeout)
 	wr, err := process.WaitWithContext(ctx)
 	if err != nil {
 		diags.AddError("failed validating instance update", err.Error())
@@ -389,7 +399,13 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		resp.Diagnostics.AddError("failed to delete instance", agg.Error())
 		return
 	}
-	process := res.WaitHandler(ctx, r.client.Argus.Instances, state.ProjectID.ValueString(), state.ID.ValueString())
+
+	timeout, d := state.Timeouts.Delete(ctx, 1*time.Hour)
+	if resp.Diagnostics.Append(d...); resp.Diagnostics.HasError() {
+		return
+	}
+
+	process := res.WaitHandler(ctx, r.client.Argus.Instances, state.ProjectID.ValueString(), state.ID.ValueString()).SetTimeout(timeout)
 	if _, err := process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed verify instance deletion", err.Error())
 		return

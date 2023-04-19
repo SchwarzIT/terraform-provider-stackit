@@ -4,14 +4,31 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/cluster"
+	clientCluster "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/cluster"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/kubernetes/cluster"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
+
+type Cluster struct {
+	ID                        types.String          `tfsdk:"id"`
+	Name                      types.String          `tfsdk:"name"`
+	ProjectID                 types.String          `tfsdk:"project_id"`
+	KubernetesProjectID       types.String          `tfsdk:"kubernetes_project_id"`
+	KubernetesVersion         types.String          `tfsdk:"kubernetes_version"`
+	KubernetesVersionUsed     types.String          `tfsdk:"kubernetes_version_used"`
+	AllowPrivilegedContainers types.Bool            `tfsdk:"allow_privileged_containers"`
+	NodePools                 []cluster.NodePool    `tfsdk:"node_pools"`
+	Maintenance               *cluster.Maintenance  `tfsdk:"maintenance"`
+	Hibernations              []cluster.Hibernation `tfsdk:"hibernations"`
+	Extensions                *cluster.Extensions   `tfsdk:"extensions"`
+	Status                    types.String          `tfsdk:"status"`
+	KubeConfig                types.String          `tfsdk:"kube_config"`
+}
 
 // Schema returns the terraform schema structure
 func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
@@ -28,7 +45,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Description: "Specifies the cluster name (lower case, alphanumeric, hypens allowed, up to 11 chars)",
 				Required:    true,
 				Validators: []validator.String{
-					validate.StringWith(cluster.ValidateClusterName, "validate cluster name"),
+					validate.StringWith(clientCluster.ValidateClusterName, "validate cluster name"),
 				},
 			},
 			"kubernetes_project_id": schema.StringAttribute{

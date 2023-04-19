@@ -6,6 +6,7 @@ import (
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
+	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
@@ -30,6 +31,7 @@ type Instance struct {
 	Labels         map[string]string `tfsdk:"labels"`
 	ACL            types.List        `tfsdk:"acl"`
 	Storage        types.Object      `tfsdk:"storage"`
+	Timeouts       timeouts.Value    `tfsdk:"timeouts"`
 }
 
 // Storage represent instance storage
@@ -130,6 +132,11 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Optional:    true,
 				Computed:    true,
 			},
+			"timeouts": common.Timeouts(ctx, timeouts.Opts{
+				Create: true,
+				Update: true,
+				Delete: true,
+			}),
 		},
 	}
 }

@@ -6,6 +6,7 @@ import (
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
+	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -21,15 +22,16 @@ import (
 
 // User is the schema model
 type User struct {
-	ID         types.String `tfsdk:"id"`
-	InstanceID types.String `tfsdk:"instance_id"`
-	ProjectID  types.String `tfsdk:"project_id"`
-	Password   types.String `tfsdk:"password"`
-	Username   types.String `tfsdk:"username"`
-	Host       types.String `tfsdk:"host"`
-	Port       types.Int64  `tfsdk:"port"`
-	URI        types.String `tfsdk:"uri"`
-	Roles      types.List   `tfsdk:"roles"`
+	ID         types.String   `tfsdk:"id"`
+	InstanceID types.String   `tfsdk:"instance_id"`
+	ProjectID  types.String   `tfsdk:"project_id"`
+	Password   types.String   `tfsdk:"password"`
+	Username   types.String   `tfsdk:"username"`
+	Host       types.String   `tfsdk:"host"`
+	Port       types.Int64    `tfsdk:"port"`
+	URI        types.String   `tfsdk:"uri"`
+	Roles      types.List     `tfsdk:"roles"`
+	Timeouts   timeouts.Value `tfsdk:"timeouts"`
 }
 
 // Schema returns the terraform schema structure
@@ -107,6 +109,9 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 					types.StringValue(DefaultRole),
 				})),
 			},
+			"timeouts": common.Timeouts(ctx, timeouts.Opts{
+				Delete: true,
+			}),
 		},
 	}
 }

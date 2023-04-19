@@ -52,6 +52,7 @@ resource "stackit_mongodb_flex_instance" "example" {
 - `labels` (Map of String) Instance Labels
 - `replicas` (Number) Number of replicas (Default is `1`).
 - `storage` (Attributes) A single `storage` block as defined below. (see [below for nested schema](#nestedatt--storage))
+- `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
 - `type` (String) The service type. Available options: `Single`, `Replica`, `Sharded`.
 - `version` (String) MongoDB version. Version `5.0` and `6.0` are supported.
 
@@ -66,5 +67,15 @@ Optional:
 
 - `class` (String) Specifies the storage class. Available option: `premium-perf2-mongodb`
 - `size` (Number) The storage size in GB (Default is `10`).
+
+
+<a id="nestedatt--timeouts"></a>
+### Nested Schema for `timeouts`
+
+Optional:
+
+- `create` (String)
+- `delete` (String)
+- `update` (String)
 
 

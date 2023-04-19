@@ -8,7 +8,7 @@ import (
 )
 
 // Transform transforms cluster.Cluster structure to Cluster
-func transform(c *kubernetesCluster.Cluster, cl *cluster.Cluster) {
+func transform(c *Cluster, cl *cluster.Cluster) {
 	if cl.Name != nil {
 		c.ID = types.StringValue(*cl.Name)
 	}
@@ -26,7 +26,7 @@ func transform(c *kubernetesCluster.Cluster, cl *cluster.Cluster) {
 	transformExtensions(c, cl)
 }
 
-func transformNodepools(c *kubernetesCluster.Cluster, cl *cluster.Cluster) {
+func transformNodepools(c *Cluster, cl *cluster.Cluster) {
 	c.NodePools = []kubernetesCluster.NodePool{}
 	for _, np := range cl.Nodepools {
 		maimna := types.StringNull()
@@ -98,7 +98,7 @@ func transformNodepools(c *kubernetesCluster.Cluster, cl *cluster.Cluster) {
 	}
 }
 
-func transformHibernations(c *kubernetesCluster.Cluster, cl *cluster.Cluster) {
+func transformHibernations(c *Cluster, cl *cluster.Cluster) {
 	if cl.Hibernation == nil {
 		return
 	}
@@ -113,7 +113,7 @@ func transformHibernations(c *kubernetesCluster.Cluster, cl *cluster.Cluster) {
 	}
 }
 
-func transformMaintenance(c *kubernetesCluster.Cluster, cl *cluster.Cluster) {
+func transformMaintenance(c *Cluster, cl *cluster.Cluster) {
 	if cl.Maintenance == nil {
 		return
 	}
@@ -135,7 +135,7 @@ func transformMaintenance(c *kubernetesCluster.Cluster, cl *cluster.Cluster) {
 	}
 }
 
-func transformExtensions(c *kubernetesCluster.Cluster, cl *cluster.Cluster) {
+func transformExtensions(c *Cluster, cl *cluster.Cluster) {
 	if cl.Extensions == nil {
 		return
 	}

@@ -61,6 +61,7 @@ resource "stackit_kubernetes_cluster" "example" {
 - `maintenance` (Attributes) A single maintenance block as defined below (see [below for nested schema](#nestedatt--maintenance))
 - `node_pools` (Attributes List) One or more `node_pool` block as defined below (see [below for nested schema](#nestedatt--node_pools))
 - `project_id` (String, Deprecated) this attribure is deprecated. please remove it from your terraform config and use `kubernetes_project_id` instead
+- `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
 
 ### Read-Only
 
@@ -154,5 +155,16 @@ Required:
 Optional:
 
 - `value` (String) Taint value corresponding to the taint key
+
+
+
+<a id="nestedatt--timeouts"></a>
+### Nested Schema for `timeouts`
+
+Optional:
+
+- `create` (String)
+- `delete` (String)
+- `update` (String)
 
 
