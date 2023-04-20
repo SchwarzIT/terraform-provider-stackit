@@ -55,6 +55,14 @@ func main() {
 		}
 	}
 
+	// modify aggregation because every error is printed twice
+	agg.Overall.Fail = agg.Overall.Fail / 2
+	agg.Overall.Pass = agg.Overall.Pass / 2
+	for k, v := range agg.Packages {
+		agg.Packages[k].Fail = v.Fail / 2
+		agg.Packages[k].Pass = v.Pass / 2
+	}
+
 	readme := "README.md"
 	errored := false
 	urlBadge, badge := getBadge(agg.Overall)
