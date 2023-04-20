@@ -58,10 +58,14 @@ func main() {
 	// modify aggregation because every error is printed twice
 	agg.Overall.Fail = agg.Overall.Fail / 2
 	agg.Overall.Pass = agg.Overall.Pass / 2
+	packagesTmp := map[string]Summary{}
 	for k, v := range agg.Packages {
-		agg.Packages[k].Fail = v.Fail / 2
-		agg.Packages[k].Pass = v.Pass / 2
+		packagesTmp[k] = Summary{
+			Fail: v.Fail / 2,
+			Pass: v.Pass / 2,
+		}
 	}
+	agg.Packages = packagesTmp
 
 	readme := "README.md"
 	errored := false
