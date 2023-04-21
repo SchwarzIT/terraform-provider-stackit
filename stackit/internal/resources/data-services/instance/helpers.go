@@ -24,7 +24,7 @@ func (r Resource) getDefaultVersion() string {
 	case Postgres:
 		return "11"
 	case Redis:
-		return "6.0"
+		return "6"
 	case RabbitMQ:
 		return "3.7"
 	}
