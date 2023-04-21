@@ -12,6 +12,7 @@ import (
 	metricsStorageRetention "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/metrics-storage-retention"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -397,6 +398,9 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	res, err := c.Argus.Instances.Delete(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
 		resp.Diagnostics.AddError("failed to delete instance", agg.Error())
+		if res != nil {
+			common.Dump(&resp.Diagnostics, res.Body)
+		}
 		return
 	}
 
