@@ -27,7 +27,7 @@ func TestAcc_ResourceRedisInstanceJob(t *testing.T) {
 	planID1 := "09876364-e1ba-49ec-845c-e8ac45f84921"
 	plan2 := "stackit-redis-single-medium"
 	planID2 := "45f135e3-adaf-462f-9293-78011159610b"
-	version := "6.0"
+	version := "6"
 
 	resource.ParallelTest(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){
