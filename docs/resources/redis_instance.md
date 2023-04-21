@@ -32,7 +32,7 @@ Manages Redis instances
 resource "stackit_redis_instance" "example" {
   name       = "example"
   project_id = "example"
-  version    = "6.0"
+  version    = "6"
   plan       = "stackit-redis-single-small"
 }
 ```
@@ -50,7 +50,7 @@ resource "stackit_redis_instance" "example" {
 - `acl` (List of String) Access Control rules to whitelist IP addresses
 - `plan` (String) The Redis Plan. Default is `stackit-redis-single-small`
 - `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
-- `version` (String) Redis version. Default is 6.0
+- `version` (String) Redis version. Default is 6
 
 ### Read-Only
 
