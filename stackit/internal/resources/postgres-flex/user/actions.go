@@ -105,7 +105,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	// read cluster
 	res, err := r.client.PostgresFlex.Users.Get(ctx, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString())
 	if agg := validate.Response(res, err, "JSON200.Item"); agg != nil {
-		if res.JSON400 != nil {
+		if validate.StatusEquals(res, http.StatusBadRequest, http.StatusInternalServerError) {
 			// verify the instance exists
 			res, err := r.client.PostgresFlex.Instance.List(ctx, state.ProjectID.ValueString())
 			if agg2 := validate.Response(res, err, "JSON200.Items"); agg2 != nil {
