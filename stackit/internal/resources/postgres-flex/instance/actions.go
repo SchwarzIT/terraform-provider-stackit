@@ -88,6 +88,9 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	res, err := c.Instance.Create(ctx, plan.ProjectID.ValueString(), body)
 	if agg := validate.Response(res, err, "JSON201.ID"); agg != nil {
 		resp.Diagnostics.AddError("failed creating Postgres flex instance", agg.Error())
+		if res != nil {
+			common.Dump(&resp.Diagnostics, res.Body)
+		}
 		return
 	}
 
