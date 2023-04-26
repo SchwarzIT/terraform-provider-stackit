@@ -7,10 +7,12 @@ import (
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -127,10 +129,14 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Optional:    true,
 			},
 			"acl": schema.ListAttribute{
-				Description: "Access Control rules to whitelist IP addresses",
+				Description: "Access Control rules to whitelist IP addresses. Default is 193.148.160.0/19, 45.129.40.1/21",
 				ElementType: types.StringType,
 				Optional:    true,
 				Computed:    true,
+				Default: listdefault.StaticValue(types.ListValueMust(types.StringType, []attr.Value{
+					types.StringValue("193.148.160.0/19"),
+					types.StringValue("45.129.40.1/21"),
+				})),
 			},
 			"timeouts": common.Timeouts(ctx, timeouts.Opts{
 				Create: true,
