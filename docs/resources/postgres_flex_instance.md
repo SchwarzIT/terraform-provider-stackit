@@ -47,7 +47,7 @@ resource "stackit_postgres_flex_instance" "example" {
 
 ### Optional
 
-- `acl` (List of String) Access Control rules to whitelist IP addresses
+- `acl` (List of String) Access Control rules to whitelist IP addresses. Default is 193.148.160.0/19, 45.129.40.1/21
 - `backup_schedule` (String) Specifies the backup schedule (cron style)
 - `labels` (Map of String) Instance Labels
 - `options` (Map of String) Specifies postgres instance options
