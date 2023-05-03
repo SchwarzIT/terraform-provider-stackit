@@ -223,7 +223,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	// handle deletion
 	res, err := r.client.Instances.Deprovision(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 	if agg := validate.Response(res, err); agg != nil {
-		if validate.StatusEquals(res, http.StatusNotFound) {
+		if validate.StatusEquals(res, http.StatusNotFound, http.StatusForbidden) {
 			resp.State.RemoveResource(ctx)
 			return
 		}
