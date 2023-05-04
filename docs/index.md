@@ -97,6 +97,7 @@ provider "stackit" {
 
 ### Optional
 
+- `enable_trace_context` (Boolean) Enable trace context. If `true` a `Traceparent` header will be added to the request. Default: `false`
 - `environment` (String) The API environment that the provider interacts with. Options are `dev`, `qa`, `prod`.<br />This attribute can also be loaded from `STACKIT_ENV` environment variable instead.
 - `private_key` (String, Sensitive) Private RSA Key.<br />This attribute can also be loaded from `STACKIT_PRIVATE_KEY` environment variable instead.
 - `private_key_path` (String) Path to the Private RSA Key.<br />This attribute can also be loaded from `STACKIT_PRIVATE_KEY_PATH` environment variable instead.
