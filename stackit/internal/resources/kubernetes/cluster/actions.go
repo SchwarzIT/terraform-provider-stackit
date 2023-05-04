@@ -96,6 +96,7 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 	)
 	if agg := validate.Response(resp, err); agg != nil {
 		diags.AddError("failed during SKE create/update", agg.Error())
+		return
 	}
 
 	process := resp.WaitHandler(ctx, c.Kubernetes.Cluster, projectID, clusterName).SetTimeout(timeout)

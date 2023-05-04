@@ -5,13 +5,21 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sync"
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/clients"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/helpers/traceparent"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
+)
+
+var (
+	once sync.Once
+	t    *traceparent.Traceparent
 )
 
 func (p *StackitProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
@@ -45,14 +53,31 @@ func (p *StackitProvider) Configure(ctx context.Context, req provider.ConfigureR
 		config.PrivateKeyPath = types.StringValue(os.Getenv(PrivateKeyPath))
 	}
 
-	kfcl, err := keyFlow(ctx, config)
+	var err error
+	if config.EnableTraceContext.ValueBool() || os.Getenv("TF_ACC") == "1" {
+		once.Do(func() {
+			t, err = traceparent.Generate()
+			if t != nil {
+				tflog.Info(ctx, "Trace context generated successfully\n\n"+t.Pretty())
+			}
+		})
+		if t == nil {
+			if err == nil {
+				err = errors.New("received nil value")
+			}
+			resp.Diagnostics.AddError("failed generating traceparent", err.Error())
+			return
+		}
+	}
+
+	kfcl, err := keyFlow(ctx, config, t)
 	if err == nil {
 		resp.DataSourceData = kfcl
 		resp.ResourceData = kfcl
 		return
 	}
 
-	tfcl, err2 := tokenFlow(ctx, config)
+	tfcl, err2 := tokenFlow(ctx, config, t)
 	if err2 == nil {
 		resp.DataSourceData = tfcl
 		resp.ResourceData = tfcl
@@ -62,23 +87,25 @@ func (p *StackitProvider) Configure(ctx context.Context, req provider.ConfigureR
 	resp.Diagnostics.AddError("couldn't initialize client with an authentication flow", fmt.Sprintf("key flow client auth:\n%s\n\ntoken flow client auth:\n%s", err.Error(), err2.Error()))
 }
 
-func keyFlow(ctx context.Context, config providerSchema) (*services.Services, error) {
+func keyFlow(ctx context.Context, config providerSchema, t *traceparent.Traceparent) (*services.Services, error) {
 	return client.NewClientWithKeyAuth(ctx, clients.KeyFlowConfig{
 		ServiceAccountKey:     []byte(config.ServiceAccountKey.ValueString()),
 		PrivateKey:            []byte(config.PrivateKey.ValueString()),
 		ServiceAccountKeyPath: config.ServiceAccountKeyPath.ValueString(),
 		PrivateKeyPath:        config.PrivateKeyPath.ValueString(),
 		Environment:           env.Environment(config.Environment.ValueString()),
+		Traceparent:           t,
 	})
 }
 
-func tokenFlow(ctx context.Context, config providerSchema) (*services.Services, error) {
+func tokenFlow(ctx context.Context, config providerSchema, t *traceparent.Traceparent) (*services.Services, error) {
 	if config.ServiceAccountEmail.ValueString() != "" &&
 		config.ServiceAccountToken.ValueString() != "" {
 		return client.NewClientWithTokenAuth(ctx, clients.TokenFlowConfig{
 			ServiceAccountEmail: config.ServiceAccountEmail.ValueString(),
 			ServiceAccountToken: config.ServiceAccountToken.ValueString(),
 			Environment:         env.Environment(config.Environment.ValueString()),
+			Traceparent:         t,
 		})
 	}
 	return nil, errors.New("no proper settings found for token flow")

@@ -88,9 +88,9 @@ type providerSchema struct {
 	ServiceAccountKeyPath types.String `tfsdk:"service_account_key_path"`
 	PrivateKeyPath        types.String `tfsdk:"private_key_path"`
 
-	// Key Flow
-
-	Environment types.String `tfsdk:"environment"`
+	// General
+	Environment        types.String `tfsdk:"environment"`
+	EnableTraceContext types.Bool   `tfsdk:"enable_trace_context"`
 }
 
 // Schema returns the provider's schema
@@ -131,6 +131,10 @@ func (p *StackitProvider) Schema(ctx context.Context, req provider.SchemaRequest
 				Validators: []validator.String{
 					stringvalidator.OneOf("dev", "qa", "prod"),
 				},
+			},
+			"enable_trace_context": schema.BoolAttribute{
+				Optional:            true,
+				MarkdownDescription: "Enable trace context. If `true` a `Traceparent` header will be added to the request. Default: `false`",
 			},
 		},
 	}
