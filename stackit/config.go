@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sync"
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/clients"
@@ -14,6 +15,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
+)
+
+var (
+	once sync.Once
+	t    *traceparent.Traceparent
 )
 
 func (p *StackitProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
@@ -47,16 +53,21 @@ func (p *StackitProvider) Configure(ctx context.Context, req provider.ConfigureR
 		config.PrivateKeyPath = types.StringValue(os.Getenv(PrivateKeyPath))
 	}
 
-	var t *traceparent.Traceparent
 	var err error
-
 	if config.EnableTraceContext.ValueBool() || os.Getenv("TF_ACC") == "1" {
-		t, err = traceparent.Generate()
-		if err != nil {
+		once.Do(func() {
+			t, err = traceparent.Generate()
+			if t != nil {
+				tflog.Info(ctx, "Trace context generated successfully\n\n"+t.Pretty())
+			}
+		})
+		if t == nil {
+			if err == nil {
+				err = errors.New("received nil value")
+			}
 			resp.Diagnostics.AddError("failed generating traceparent", err.Error())
 			return
 		}
-		tflog.Info(ctx, "Trace context generated successfully\n\n"+t.Pretty())
 	}
 
 	kfcl, err := keyFlow(ctx, config, t)
