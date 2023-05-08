@@ -53,7 +53,9 @@ func main() {
 			continue
 		}
 		name := sp[6]
+		isDS := false
 		if name == "data-services" {
+			isDS = true
 			name = getDataServiceName(event.Test)
 			event.Action = getDataServiceEventAction(event.Output)
 			if name == "" {
@@ -65,9 +67,21 @@ func main() {
 		case "fail":
 			ts.Overall.Fail++
 			v.Fail++
+			if isDS {
+				// in process test results all results appear twice besides that of data-services because they're manually processed
+				// so the double increment here (and in pass) is to simulate the auto-process
+				ts.Overall.Fail++
+				v.Fail++
+			}
 		case "pass":
 			ts.Overall.Pass++
 			v.Pass++
+			if isDS {
+				// in process test results all results appear twice besides that of data-services because they're manually processed
+				// so the double increment here (and in fail) is to simulate the auto-process
+				ts.Overall.Pass++
+				v.Pass++
+			}
 		}
 		ts.Packages[name] = v
 	}
