@@ -74,7 +74,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Required:    true,
 			},
 			"type": schema.StringAttribute{
-				Description: "The service type. Available options: `Single`, `Replica`, `Sharded`.",
+				Description: "The service type. Available options: `Single`, `Replica`, `Sharded`. Changing this value requires the resource to be recreated.",
 				Optional:    true,
 				Computed:    true,
 				Validators: []validator.String{
@@ -82,6 +82,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.RequiresReplace(),
 				},
 				Default: stringdefault.StaticString(DefaultType),
 			},
