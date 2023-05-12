@@ -39,7 +39,7 @@ resource "stackit_kubernetes_project" "example" {
 
 ### Required
 
-- `project_id` (String) the project ID that SKE will be enabled in
+- `project_id` (String) the project UUID that SKE will be enabled in
 
 ### Optional
 
