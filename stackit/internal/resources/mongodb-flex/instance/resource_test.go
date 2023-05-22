@@ -88,6 +88,7 @@ func config(name string) string {
 		name         = "%s"
 		project_id   = "%s"
 		machine_type = "%s"
+		acl = ["193.148.160.0/19","45.129.40.1/21"]
 	}  
 	  `,
 		name,

@@ -138,7 +138,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			"acl": schema.ListAttribute{
 				Description: "Access Control rules to whitelist IP addresses",
 				ElementType: types.StringType,
-				Optional:    true,
+				Required:    true,
 				Computed:    true,
 			},
 			"timeouts": common.Timeouts(ctx, timeouts.Opts{
