@@ -176,6 +176,9 @@ func (r Resource) setMetricsConfig(ctx context.Context, diags *diag.Diagnostics,
 	}
 	res, err := r.client.Argus.MetricsStorageRetention.Update(ctx, s.ProjectID.ValueString(), s.ID.ValueString(), cfg)
 	if agg := validate.Response(res, err); agg != nil {
+		if res != nil {
+			common.Dump(diags, res.Body)
+		}
 		diags.AddError("failed to make metrics config request", agg.Error())
 		return
 	}
