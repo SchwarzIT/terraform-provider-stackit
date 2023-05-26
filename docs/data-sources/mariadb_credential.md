@@ -60,7 +60,7 @@ data "stackit_mariadb_credential" "example" {
 - `database_name` (String) Database name
 - `host` (String) Credential host
 - `hosts` (List of String) Credential hosts
-- `password` (String) Credential password
+- `password` (String, Sensitive) Credential password
 - `port` (Number) Credential port
 - `route_service_url` (String) Credential route_service_url
 - `syslog_drain_url` (String) Credential syslog_drain_url

@@ -54,9 +54,9 @@ resource "stackit_postgres_credential" "example" {
 - `host` (String) Credential host
 - `hosts` (List of String) Credential hosts
 - `id` (String) Specifies the resource ID
-- `password` (String) Credential password
+- `password` (String, Sensitive) Credential password
 - `port` (Number) Credential port
-- `raw_response` (String) The full API response (as JSON string)
+- `raw_response` (String, Sensitive) The full API response (as JSON string)
 - `route_service_url` (String) Credential route_service_url
 - `syslog_drain_url` (String) Credential syslog_drain_url
 - `uri` (String) The instance URI

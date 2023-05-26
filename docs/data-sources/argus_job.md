@@ -78,7 +78,7 @@ Read-Only:
 
 Read-Only:
 
-- `password` (String) Specifies basic auth password
+- `password` (String, Sensitive) Specifies basic auth password
 - `username` (String) Specifies basic auth username
 
 
