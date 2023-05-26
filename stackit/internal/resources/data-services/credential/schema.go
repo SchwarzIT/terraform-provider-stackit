@@ -91,6 +91,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			"password": schema.StringAttribute{
 				Description: "Credential password",
 				Computed:    true,
+				Sensitive:   true,
 			},
 
 			"port": schema.Int64Attribute{
@@ -116,6 +117,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			"raw_response": schema.StringAttribute{
 				Description: "The full API response (as JSON string)",
 				Computed:    true,
+				Sensitive:   true,
 			},
 		},
 	}

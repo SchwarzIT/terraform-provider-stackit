@@ -88,6 +88,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 					"password": schema.StringAttribute{
 						Description: "Specifies basic auth password",
 						Computed:    true,
+						Sensitive:   true,
 					},
 				},
 			},

@@ -143,6 +143,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 					"password": schema.StringAttribute{
 						Description: "Specifies basic auth password",
 						Required:    true,
+						Sensitive:   true,
 					},
 				},
 			},

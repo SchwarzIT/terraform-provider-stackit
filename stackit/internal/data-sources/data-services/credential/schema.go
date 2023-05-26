@@ -78,6 +78,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 			"password": schema.StringAttribute{
 				Description: "Credential password",
 				Computed:    true,
+				Sensitive:   true,
 			},
 
 			"port": schema.Int64Attribute{
