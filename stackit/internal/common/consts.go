@@ -8,3 +8,10 @@ const (
 	// errors
 	ERR_UNEXPECTED_EOF = "unexpected EOF"
 )
+
+// KnownRanges are the known ranges of IP addresses used by STACKIT
+var KnownRanges = []string{
+	"193.148.160.0/19",
+	"45.129.40.0/21",
+	"45.135.244.0/22",
+}

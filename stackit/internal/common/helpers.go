@@ -10,6 +10,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/defaults"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -90,4 +92,12 @@ func Timeouts(ctx context.Context, opts timeouts.Opts) schema.SingleNestedAttrib
 		types.ObjectNull(attr),
 	)
 	return timeout
+}
+
+func GetDefaultACL() defaults.List {
+	av := []attr.Value{}
+	for _, r := range KnownRanges {
+		av = append(av, types.StringValue(r))
+	}
+	return listdefault.StaticValue(types.ListValueMust(types.StringType, av))
 }

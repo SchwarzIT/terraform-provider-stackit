@@ -41,13 +41,13 @@ resource "stackit_mongodb_flex_instance" "example" {
 
 ### Required
 
-- `acl` (List of String) Access Control rules to whitelist IP addresses
 - `machine_type` (String) The Machine Type. Available options: `1.1` (1 CPU, 1 Memory), `1.2` (1 CPU, 2 Memory), `1.4` (1 CPU, 4 Memory), `1.8` (1 CPU, 8 Memory), `2.4` (2 CPU, 4 Memory), `2.8` (2 CPU, 8 Memory), `2.16` (2 CPU, 16 Memory), `4.8` (4 CPU, 8 Memory), `4.16` (4 CPU, 16 Memory), `4.32` (4 CPU, 32 Memory), `8.16` (8 CPU, 16 Memory), `8.32` (8 CPU, 32 Memory), `8.64` (8 CPU, 64 Memory), `16.32` (16 CPU, 32 Memory), `16.64` (16 CPU, 64 Memory)
 - `name` (String) Specifies the instance name.
 - `project_id` (String) The project ID the instance runs in. Changing this value requires the resource to be recreated.
 
 ### Optional
 
+- `acl` (List of String) Whitelist IP address ranges. Default is [193.148.160.0/19 45.129.40.0/21 45.135.244.0/22]
 - `backup_schedule` (String) Specifies the backup schedule (cron style).
 - `labels` (Map of String) Instance Labels
 - `replicas` (Number) Number of replicas (Default is `1`).

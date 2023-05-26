@@ -136,9 +136,11 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Optional: true,
 			},
 			"acl": schema.ListAttribute{
-				Description: "Access Control rules to whitelist IP addresses",
+				Description: fmt.Sprintf("Whitelist IP address ranges. Default is %v", common.KnownRanges),
 				ElementType: types.StringType,
-				Required:    true,
+				Optional:    true,
+				Computed:    true,
+				Default:     common.GetDefaultACL(),
 			},
 			"timeouts": common.Timeouts(ctx, timeouts.Opts{
 				Create: true,
