@@ -41,6 +41,7 @@ func TestAcc_ResourceRabbitMQCredentialJob(t *testing.T) {
 					resource.TestCheckResourceAttrSet("stackit_rabbitmq_credential.example", "password"),
 					resource.TestCheckResourceAttrSet("stackit_rabbitmq_credential.example", "port"),
 					resource.TestCheckResourceAttrSet("stackit_rabbitmq_credential.example", "uri"),
+					resource.TestCheckResourceAttrSet("stackit_rabbitmq_credential.example", "raw_response"),
 				),
 			},
 			// test import

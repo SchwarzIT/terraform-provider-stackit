@@ -28,6 +28,7 @@ type Credential struct {
 	SyslogDrainURL  types.String `tfsdk:"syslog_drain_url"`
 	RouteServiceURL types.String `tfsdk:"route_service_url"`
 	URI             types.String `tfsdk:"uri"`
+	RawResponse     types.String `tfsdk:"raw_response"`
 }
 
 // Schema returns the terraform schema structure
@@ -109,6 +110,11 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 
 			"uri": schema.StringAttribute{
 				Description: "The instance URI",
+				Computed:    true,
+			},
+
+			"raw_response": schema.StringAttribute{
+				Description: "The full API response (as JSON string)",
 				Computed:    true,
 			},
 		},

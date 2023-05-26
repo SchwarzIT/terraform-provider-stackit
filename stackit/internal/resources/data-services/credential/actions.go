@@ -11,6 +11,7 @@ import (
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 // Create - lifecycle function
@@ -40,6 +41,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
 	}
+	cred.RawResponse = types.StringValue(string(res.Body))
 
 	// update state
 	diags = resp.State.Set(ctx, &cred)
@@ -72,6 +74,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
 	}
+	cred.RawResponse = types.StringValue(string(res.Body))
 
 	// update state
 	diags = resp.State.Set(ctx, &cred)
