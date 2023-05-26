@@ -57,6 +57,7 @@ resource "stackit_elasticsearch_credential" "example" {
 - `id` (String) Specifies the resource ID
 - `password` (String) Credential password
 - `port` (Number) Credential port
+- `raw_response` (String) The full API response (as JSON string)
 - `route_service_url` (String) Credential route_service_url
 - `syslog_drain_url` (String) Credential syslog_drain_url
 - `uri` (String) The instance URI
