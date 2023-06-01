@@ -42,8 +42,9 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	// handle creation
-	params := map[string]interface{}{
-		"sgw_acl": strings.Join(acl, ","),
+	aclString := strings.Join(acl, ",")
+	params := instances.InstanceParameters{
+		SgwAcl: &aclString,
 	}
 	body := instances.InstanceProvisionRequest{
 		InstanceName: plan.Name.ValueString(),
@@ -168,8 +169,9 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	// handle update
-	params := map[string]interface{}{
-		"sgw_acl": strings.Join(acl, ","),
+	aclString := strings.Join(acl, ",")
+	params := instances.InstanceParameters{
+		SgwAcl: &aclString,
 	}
 	body := instances.UpdateJSONRequestBody{
 		PlanID:     plan.PlanID.ValueString(),

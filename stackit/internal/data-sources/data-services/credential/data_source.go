@@ -16,6 +16,7 @@ const (
 	ElasticSearch DataSourceService = "elasticsearch"
 	LogMe         DataSourceService = "logme"
 	MariaDB       DataSourceService = "mariadb"
+	Opensearch    DataSourceService = "opensearch"
 	Postgres      DataSourceService = "postgres"
 	Redis         DataSourceService = "redis"
 	RabbitMQ      DataSourceService = "rabbitmq"
@@ -29,6 +30,8 @@ func (s DataSourceService) Display() string {
 		return "LogMe"
 	case MariaDB:
 		return "MariaDB"
+	case Opensearch:
+		return "Opensearch"
 	case Postgres:
 		return "Postgres"
 	case Redis:
@@ -60,6 +63,14 @@ func NewMariaDB() datasource.DataSource {
 	return &DataSource{
 		service: MariaDB,
 		urls:    dataservices.GetBaseURLs(dataservices.MariaDB),
+	}
+}
+
+// NewOpensearch returns a new configured resource
+func NewOpensearch() datasource.DataSource {
+	return &DataSource{
+		service: Opensearch,
+		urls:    dataservices.GetBaseURLs(dataservices.Opensearch),
 	}
 }
 
@@ -126,6 +137,8 @@ func (d *DataSource) Configure(ctx context.Context, req datasource.ConfigureRequ
 		d.client = c.LogMe
 	case MariaDB:
 		d.client = c.MariaDB
+	case Opensearch:
+		d.client = c.Opensearch
 	case Postgres:
 		d.client = c.PostgresDB
 	case Redis:

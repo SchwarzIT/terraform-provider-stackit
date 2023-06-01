@@ -16,6 +16,7 @@ const (
 	ElasticSearch ResourceService = "elasticsearch"
 	LogMe         ResourceService = "logme"
 	MariaDB       ResourceService = "mariadb"
+	Opensearch    ResourceService = "opensearch"
 	Postgres      ResourceService = "postgres"
 	Redis         ResourceService = "redis"
 	RabbitMQ      ResourceService = "rabbitmq"
@@ -29,6 +30,8 @@ func (s ResourceService) Display() string {
 		return "LogMe"
 	case MariaDB:
 		return "MariaDB"
+	case Opensearch:
+		return "Opensearch"
 	case Postgres:
 		return "Postgres"
 	case Redis:
@@ -87,6 +90,14 @@ func NewRabbitMQ() resource.Resource {
 	}
 }
 
+// NewOpensearch returns a new configured resource
+func NewOpensearch() resource.Resource {
+	return &Resource{
+		service: Opensearch,
+		urls:    dataservices.GetBaseURLs(dataservices.Opensearch),
+	}
+}
+
 // Resource is the exported resource
 type Resource struct {
 	client  *dataservices.ClientWithResponses
@@ -129,6 +140,8 @@ func (r *Resource) setClient(c *services.Services) {
 		r.client = c.LogMe
 	case MariaDB:
 		r.client = c.MariaDB
+	case Opensearch:
+		r.client = c.Opensearch
 	case Postgres:
 		r.client = c.PostgresDB
 	case Redis:
