@@ -9,7 +9,6 @@ import (
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
-	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
@@ -111,14 +110,6 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
-			"project_id": schema.StringAttribute{
-				Description:        "this attribure is deprecated. please remove it from your terraform config and use `kubernetes_project_id` instead",
-				Optional:           true,
-				DeprecationMessage: "this attribure is deprecated. please remove it from your terraform config and use `kubernetes_project_id` instead",
-				Validators: []validator.String{
-					validate.ProjectID(),
-				},
-			},
 			"kubernetes_project_id": schema.StringAttribute{
 				Description: "The ID of a `stackit_kubernetes_project` resource",
 				Required:    true,
@@ -126,24 +117,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 					validate.ProjectID(),
 				},
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplaceIf(func(ctx context.Context, sr planmodifier.StringRequest, rrifr *stringplanmodifier.RequiresReplaceIfFuncResponse) {
-						if sr.StateValue.IsNull() || sr.StateValue.IsUnknown() {
-							var s *string
-							diags := sr.State.GetAttribute(ctx, path.Root("project_id"), &s)
-							rrifr.Diagnostics.Append(diags...)
-							if rrifr.Diagnostics.HasError() {
-								rrifr.RequiresReplace = true
-								return
-							}
-							if s != nil && *s == sr.ConfigValue.ValueString() {
-								rrifr.RequiresReplace = false
-								return
-							}
-						} else if sr.StateValue.ValueString() != sr.ConfigValue.ValueString() {
-							rrifr.RequiresReplace = true
-							return
-						}
-					}, "require modification if project ID has been modified", "require modification if project ID has been modified"),
+					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"kubernetes_version": schema.StringAttribute{

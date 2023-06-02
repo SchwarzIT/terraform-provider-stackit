@@ -45,6 +45,9 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Validators: []validator.String{
 					validate.ProjectID(),
 				},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 
 			"timeouts": common.Timeouts(ctx, timeouts.Opts{
