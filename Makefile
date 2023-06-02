@@ -81,7 +81,7 @@ dummy:
 quality:
 	@goreportcard-cli -v .
 
-pre-commit: docs quality
+pre-commit: quality
 	@go run .github/files/generate-acceptance-tests/main.go  
 	@find docs -type f | sort | cat | md5 > .github/files/pre-commit-check/checksum
 	@cat .github/workflows/acceptance_test.yml | md5 >> .github/files/pre-commit-check/checksum
