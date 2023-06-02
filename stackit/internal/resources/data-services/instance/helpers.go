@@ -21,6 +21,8 @@ func (r Resource) getDefaultVersion() string {
 		return "LogMe"
 	case MariaDB:
 		return "10.4"
+	case Opensearch:
+		return "2"
 	case Postgres:
 		return "11"
 	case Redis:
@@ -39,6 +41,8 @@ func (r Resource) getDefaultPlan() string {
 		return "stackit-logme-single-small-non-ssl"
 	case MariaDB:
 		return "stackit-mariadb-single-small"
+	case Opensearch:
+		return "stackit-opensearch-1.4.10-single"
 	case Postgres:
 		return "stackit-postgresql-single-small"
 	case Redis:
