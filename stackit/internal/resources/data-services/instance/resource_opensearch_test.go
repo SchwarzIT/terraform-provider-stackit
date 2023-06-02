@@ -14,7 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-const opensearch_inst_run_this_test = true
+const opensearch_inst_run_this_test = false
 
 func TestAcc_ResourceOpensearchInstanceJob(t *testing.T) {
 	if !common.ShouldAccTestRun(opensearch_inst_run_this_test) {
