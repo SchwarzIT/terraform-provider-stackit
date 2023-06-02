@@ -19,7 +19,7 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 		return
 	}
 
-	res, err := d.client.Credentials.Get(ctx, config.ProjectID.ValueString(), config.InstanceID.ValueString(), config.ID.ValueString())
+	res, err := d.client.Credentials.GetCredentialByID(ctx, config.ProjectID.ValueString(), config.InstanceID.ValueString(), config.ID.ValueString())
 	if agg := validate.Response(res, err, "JSON200.Raw"); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
@@ -33,18 +33,24 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 	// set computed fields
 	config.Host = types.StringValue(i.Raw.Credentials.Host)
 	config.Hosts = types.ListNull(types.StringType)
-	if len(i.Raw.Credentials.Hosts) > 0 {
+	if i.Raw.Credentials.Hosts != nil && len(*i.Raw.Credentials.Hosts) > 0 {
 		h := []attr.Value{}
-		for _, v := range i.Raw.Credentials.Hosts {
+		for _, v := range *i.Raw.Credentials.Hosts {
 			h = append(h, types.StringValue(v))
 		}
 		config.Hosts = types.ListValueMust(types.StringType, h)
 	}
 
-	config.DatabaseName = types.StringValue(i.Raw.Credentials.Name)
+	config.DatabaseName = types.StringValue("")
+	if i.Raw.Credentials.Name != nil {
+		config.DatabaseName = types.StringValue(*i.Raw.Credentials.Name)
+	}
 	config.Username = types.StringValue(i.Raw.Credentials.Username)
 	config.Password = types.StringValue(i.Raw.Credentials.Password)
-	config.Port = types.Int64Value(int64(i.Raw.Credentials.Port))
+	config.Port = types.Int64Value(0)
+	if i.Raw.Credentials.Port != nil {
+		config.Port = types.Int64Value(int64(*i.Raw.Credentials.Port))
+	}
 	config.SyslogDrainURL = types.StringValue(i.Raw.SyslogDrainUrl)
 	config.RouteServiceURL = types.StringValue(i.Raw.RouteServiceUrl)
 	config.URI = types.StringValue(i.Uri)

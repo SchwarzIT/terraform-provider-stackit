@@ -13,18 +13,23 @@ func (r Resource) applyClientResponse(ctx context.Context, c *Credential, cgr *c
 	c.Host = types.StringValue(cgr.Raw.Credentials.Host)
 
 	c.Hosts = types.ListNull(types.StringType)
-	if len(cgr.Raw.Credentials.Hosts) > 0 {
+	if cgr.Raw.Credentials.Hosts != nil && len(*cgr.Raw.Credentials.Hosts) > 0 {
 		h := []attr.Value{}
-		for _, v := range cgr.Raw.Credentials.Hosts {
+		for _, v := range *cgr.Raw.Credentials.Hosts {
 			h = append(h, types.StringValue(v))
 		}
 		c.Hosts = types.ListValueMust(types.StringType, h)
 	}
-
-	c.DatabaseName = types.StringValue(cgr.Raw.Credentials.Name)
+	c.DatabaseName = types.StringValue("")
+	if cgr.Raw.Credentials.Name != nil {
+		c.DatabaseName = types.StringValue(*cgr.Raw.Credentials.Name)
+	}
+	c.Port = types.Int64Value(0)
+	if cgr.Raw.Credentials.Port != nil {
+		c.Port = types.Int64Value(int64(*cgr.Raw.Credentials.Port))
+	}
 	c.Username = types.StringValue(cgr.Raw.Credentials.Username)
 	c.Password = types.StringValue(cgr.Raw.Credentials.Password)
-	c.Port = types.Int64Value(int64(cgr.Raw.Credentials.Port))
 	c.SyslogDrainURL = types.StringValue(cgr.Raw.SyslogDrainUrl)
 	c.RouteServiceURL = types.StringValue(cgr.Raw.RouteServiceUrl)
 	c.URI = types.StringValue(cgr.Uri)

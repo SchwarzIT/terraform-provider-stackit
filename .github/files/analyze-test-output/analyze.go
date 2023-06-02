@@ -112,6 +112,9 @@ func getDataServiceName(testName string) string {
 	if strings.Contains(testName, "Postgres") {
 		return "postgres-dsa"
 	}
+	if strings.Contains(testName, "Opensearch") {
+		return "opensearch-dsa"
+	}
 	if strings.Contains(testName, "RabbitMQ") {
 		return "rabbitmq-dsa"
 	}

@@ -21,6 +21,8 @@ func (r Resource) getDefaultVersion() string {
 		return "LogMe"
 	case MariaDB:
 		return "10.4"
+	case Opensearch:
+		return "2"
 	case Postgres:
 		return "11"
 	case Redis:
@@ -39,6 +41,8 @@ func (r Resource) getDefaultPlan() string {
 		return "stackit-logme-single-small-non-ssl"
 	case MariaDB:
 		return "stackit-mariadb-single-small"
+	case Opensearch:
+		return "stackit-opensearch-1.4.10-single"
 	case Postgres:
 		return "stackit-postgresql-single-small"
 	case Redis:
@@ -54,7 +58,7 @@ func (r Resource) validate(ctx context.Context, data *Instance) error {
 		return errors.New("at least 1 ip address must be specified for `acl`")
 	}
 
-	res, err := r.client.Offerings.Get(ctx, data.ProjectID.ValueString())
+	res, err := r.client.Offerings.List(ctx, data.ProjectID.ValueString())
 	if agg := validate.Response(res, err, "JSON200"); agg != nil {
 		return agg
 	}
@@ -131,7 +135,7 @@ func (r Resource) getPlanAndVersion(ctx context.Context, projectID, instanceID s
 		return "", "", agg
 	}
 
-	res, err := r.client.Offerings.Get(ctx, projectID)
+	res, err := r.client.Offerings.List(ctx, projectID)
 	if agg := validate.Response(res, err, "JSON200"); agg != nil {
 		return "", "", agg
 	}
