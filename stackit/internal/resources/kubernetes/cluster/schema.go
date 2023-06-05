@@ -24,7 +24,6 @@ import (
 type Cluster struct {
 	ID                        types.String   `tfsdk:"id"`
 	Name                      types.String   `tfsdk:"name"`
-	ProjectID                 types.String   `tfsdk:"project_id"`
 	KubernetesProjectID       types.String   `tfsdk:"kubernetes_project_id"`
 	KubernetesVersion         types.String   `tfsdk:"kubernetes_version"`
 	KubernetesVersionUsed     types.String   `tfsdk:"kubernetes_version_used"`
