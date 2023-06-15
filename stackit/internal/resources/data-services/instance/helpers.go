@@ -36,19 +36,19 @@ func (r Resource) getDefaultVersion() string {
 func (r Resource) getDefaultPlan() string {
 	switch r.service {
 	case ElasticSearch:
-		return "stackit-elasticsearch-single-small"
+		return "stackit-elasticsearch-1.4.10-single"
 	case LogMe:
-		return "stackit-logme-single-small-non-ssl"
+		return "stackit-logme-1.4.10-single"
 	case MariaDB:
-		return "stackit-mariadb-single-small"
+		return "stackit-mariadb-1.4.10-single"
 	case Opensearch:
 		return "stackit-opensearch-1.4.10-single"
 	case Postgres:
-		return "stackit-postgresql-single-small"
+		return "stackit-postgresql-1.4.10-single"
 	case Redis:
-		return "stackit-redis-single-small"
+		return "stackit-redis-1.4.10-single"
 	case RabbitMQ:
-		return "stackit-rabbitmq-single-small"
+		return "stackit-rabbitmq-2.4.10-single"
 	}
 	return ""
 }
