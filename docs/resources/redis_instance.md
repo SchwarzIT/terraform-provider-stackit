@@ -48,7 +48,7 @@ resource "stackit_redis_instance" "example" {
 ### Optional
 
 - `acl` (List of String) Access Control rules to whitelist IP addresses
-- `plan` (String) The Redis Plan. Default is `stackit-redis-single-small`
+- `plan` (String) The Redis Plan. Default is `stackit-redis-1.4.10-single`
 - `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
 - `version` (String) Redis version. Default is 6
 

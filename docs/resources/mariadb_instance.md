@@ -48,9 +48,9 @@ resource "stackit_mariadb_instance" "example" {
 ### Optional
 
 - `acl` (List of String) Access Control rules to whitelist IP addresses
-- `plan` (String) The MariaDB Plan. Default is `stackit-mariadb-single-small`
+- `plan` (String) The MariaDB Plan. Default is `stackit-mariadb-1.4.10-single`
 - `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
-- `version` (String) MariaDB version. Default is 10.4
+- `version` (String) MariaDB version. Default is 10.6
 
 ### Read-Only
 

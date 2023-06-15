@@ -48,9 +48,9 @@ resource "stackit_rabbitmq_instance" "example" {
 ### Optional
 
 - `acl` (List of String) Access Control rules to whitelist IP addresses
-- `plan` (String) The RabbitMQ Plan. Default is `stackit-rabbitmq-single-small`
+- `plan` (String) The RabbitMQ Plan. Default is `stackit-rabbitmq-2.4.10-single`
 - `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
-- `version` (String) RabbitMQ version. Default is 3.7
+- `version` (String) RabbitMQ version. Default is 3.10
 
 ### Read-Only
 
