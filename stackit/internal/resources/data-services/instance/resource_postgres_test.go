@@ -23,11 +23,11 @@ func TestAcc_ResourcePostgresInstanceJob(t *testing.T) {
 	}
 
 	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
-	plan1 := "stackit-postgresql-single-small"
-	planID1 := "d5752507-13d1-48ee-8ef1-cd6537bd00a4"
-	plan2 := "stackit-postgresql-single-medium"
-	planID2 := "d70c635e-bb9c-44f0-8437-61f41a458d58"
-	version := "11"
+	plan1 := "stackit-postgresql-2.8.50-single"
+	planID1 := "04c5e3b8-3e87-4348-80ca-41b4f10c4a44"
+	plan2 := "stackit-postgresql-4.8.50-single"
+	planID2 := "40ccb9aa-5252-441f-b2f7-61a11f79da29"
+	version := "13"
 
 	resource.ParallelTest(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){
