@@ -20,15 +20,15 @@ func (r Resource) getDefaultVersion() string {
 	case LogMe:
 		return "LogMe"
 	case MariaDB:
-		return "10.4"
+		return "10.6"
 	case Opensearch:
 		return "2"
 	case Postgres:
-		return "11"
+		return "13"
 	case Redis:
 		return "6"
 	case RabbitMQ:
-		return "3.7"
+		return "3.10"
 	}
 	return ""
 }
