@@ -48,7 +48,7 @@ resource "stackit_elasticsearch_instance" "example" {
 ### Optional
 
 - `acl` (List of String) Access Control rules to whitelist IP addresses
-- `plan` (String) The ElasticSearch Plan. Default is `stackit-elasticsearch-single-small`
+- `plan` (String) The ElasticSearch Plan. Default is `stackit-elasticsearch-1.4.10-single`
 - `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
 - `version` (String) ElasticSearch version. Default is 7
 

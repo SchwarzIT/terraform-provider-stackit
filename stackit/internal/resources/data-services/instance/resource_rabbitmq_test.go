@@ -23,11 +23,11 @@ func TestAcc_ResourceRabbitMQInstanceJob(t *testing.T) {
 	}
 
 	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
-	plan1 := "stackit-rabbitmq-single-small"
-	planID1 := "4bc417ff-cb98-4064-bb56-8a2654120768"
-	plan2 := "stackit-rabbitmq-single-medium"
-	planID2 := "4e7dcd06-13f0-4e4d-9c2b-6b057d166e1d"
-	version := "3.7"
+	plan1 := "stackit-rabbitmq-2.4.10-single"
+	planID1 := "7e1f8394-5dd5-40b1-8608-16b4344eb51b"
+	plan2 := "stackit-rabbitmq-4.8.50-single"
+	planID2 := "c5e2758b-4611-49a7-99a1-2df20aca5616"
+	version := "3.10"
 
 	resource.ParallelTest(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){
