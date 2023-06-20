@@ -23,11 +23,11 @@ func TestAcc_ResourceLogMeInstanceJob(t *testing.T) {
 	}
 
 	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
-	plan1 := "stackit-logme-single-small-non-ssl"
-	planID1 := "839695A3-6943-4F55-8FB0-9469143178DE"
-	plan2 := "stackit-logme-single-medium-non-ssl"
-	planID2 := "84beabaf-605d-4f00-8a9b-272bd009ad76"
-	version := "LogMe"
+	plan1 := "stackit-logme2-1.4.10-single"
+	planID1 := "7a54492c-8a2e-4d3c-b6c2-a4f20cb65912"
+	plan2 := "stackit-logme2-2.8.50-single"
+	planID2 := "6147ee05-3a78-461a-b6e7-af65e65f1ce6"
+	version := "2"
 
 	resource.ParallelTest(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){

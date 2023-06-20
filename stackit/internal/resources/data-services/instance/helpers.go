@@ -18,7 +18,7 @@ func (r Resource) getDefaultVersion() string {
 	case ElasticSearch:
 		return "7"
 	case LogMe:
-		return "LogMe"
+		return "2"
 	case MariaDB:
 		return "10.6"
 	case Opensearch:
@@ -38,7 +38,7 @@ func (r Resource) getDefaultPlan() string {
 	case ElasticSearch:
 		return "stackit-elasticsearch-1.4.10-single"
 	case LogMe:
-		return "stackit-logme-1.4.10-single"
+		return "stackit-logme2-1.4.10-single"
 	case MariaDB:
 		return "stackit-mariadb-1.4.10-single"
 	case Opensearch:
