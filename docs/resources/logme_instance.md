@@ -31,9 +31,7 @@ Manages LogMe instances
 ```terraform
 resource "stackit_logme_instance" "example" {
   name       = "example"
-  project_id = "example"
-  version    = "LogMe"
-  plan       = "stackit-logme-single-small-non-ssl"
+  project_id = var.project_id
 }
 ```
 
@@ -48,9 +46,9 @@ resource "stackit_logme_instance" "example" {
 ### Optional
 
 - `acl` (List of String) Access Control rules to whitelist IP addresses
-- `plan` (String) The LogMe Plan. Default is `stackit-logme-1.4.10-single`
+- `plan` (String) The LogMe Plan. Default is `stackit-logme2-1.4.10-single`
 - `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
-- `version` (String) LogMe version. Default is LogMe
+- `version` (String) LogMe version. Default is 2
 
 ### Read-Only
 

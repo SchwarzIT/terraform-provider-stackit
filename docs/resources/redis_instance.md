@@ -31,9 +31,7 @@ Manages Redis instances
 ```terraform
 resource "stackit_redis_instance" "example" {
   name       = "example"
-  project_id = "example"
-  version    = "6"
-  plan       = "stackit-redis-single-small"
+  project_id = var.project_id
 }
 ```
 
