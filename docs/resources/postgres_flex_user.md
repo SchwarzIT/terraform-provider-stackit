@@ -52,7 +52,8 @@ resource "stackit_postgres_flex_user" "example" {
 
 ### Optional
 
-- `roles` (List of String) Specifies the roles assigned to the user, valid options are: `login`, `createdb`
+- `role_set` (Set of String) Specifies the roles assigned to the user, valid options are: `login`, `createdb`
+- `roles` (List of String, Deprecated) Specifies the roles assigned to the user, valid options are: `login`, `createdb`
 - `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
 - `username` (String) Specifies the username. Defaults to `psqluser`
 
