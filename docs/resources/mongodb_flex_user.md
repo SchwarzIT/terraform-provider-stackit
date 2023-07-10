@@ -61,7 +61,7 @@ output "mongodb_password" {
 ### Optional
 
 - `database` (String) Specifies the database the user can access
-- `roles` (List of String) Specifies the role assigned to the user, valid options are: `readWrite`, `read`
+- `roles` (List of String) Specifies the role assigned to the user, valid options are: `readWrite` or `read`
 - `username` (String) Specifies the user's username
 
 ### Read-Only

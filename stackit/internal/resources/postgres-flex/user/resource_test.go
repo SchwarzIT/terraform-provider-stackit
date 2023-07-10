@@ -80,9 +80,11 @@ func config(name string) string {
 	 	project_id   = "%s"
 		machine_type = "%s"
 		version      = "14"
-	}  
+	}
+
 	resource "stackit_postgres_flex_user" "example" {
 		project_id   = "%s"
+		role_set = ["login", "createdb"]
 		instance_id  = stackit_postgres_flex_instance.example.id
 	}  
 	  `,

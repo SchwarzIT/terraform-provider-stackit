@@ -34,10 +34,20 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	var roles []string
-	resp.Diagnostics.Append(plan.Roles.ElementsAs(ctx, &roles, true)...)
-	if resp.Diagnostics.HasError() {
-		return
+	var usingRoleSet bool = plan.Roles.IsUnknown()
+	if usingRoleSet {
+		resp.Diagnostics.Append(plan.RoleSet.ElementsAs(ctx, &roles, true)...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+	} else {
+		// @TODO: remove roles in future release
+		resp.Diagnostics.Append(plan.Roles.ElementsAs(ctx, &roles, true)...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
 	}
+
 	if len(roles) == 0 {
 		roles = []string{"login"}
 	}
@@ -65,7 +75,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	item := *res.JSON201.Item
 
 	elems := []attr.Value{}
-	if *item.Roles != nil {
+	if item.Roles != nil {
 		for _, v := range *item.Roles {
 			elems = append(elems, types.StringValue(v))
 		}
@@ -84,6 +94,9 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	plan.Host = nullOrValStr(item.Host)
 	plan.Port = nullOrValInt64(item.Port)
 	plan.URI = nullOrValStr(item.URI)
+	plan.RoleSet = types.SetValueMust(types.StringType, elems)
+
+	// @TODO: remove roles in future release
 	plan.Roles = types.ListValueMust(types.StringType, elems)
 
 	// update state with user
@@ -137,7 +150,11 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 			roles = append(roles, types.StringValue(v))
 		}
 	}
+	state.RoleSet = types.SetValueMust(types.StringType, roles)
+
+	// @TODO: remove roles in future release
 	state.Roles = types.ListValueMust(types.StringType, roles)
+
 	if state.URI.IsUnknown() {
 		state.URI = types.StringNull()
 	}

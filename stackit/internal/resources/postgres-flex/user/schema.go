@@ -8,12 +8,13 @@ import (
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -31,6 +32,7 @@ type User struct {
 	Port       types.Int64    `tfsdk:"port"`
 	URI        types.String   `tfsdk:"uri"`
 	Roles      types.List     `tfsdk:"roles"`
+	RoleSet    types.Set      `tfsdk:"role_set"`
 	Timeouts   timeouts.Value `tfsdk:"timeouts"`
 }
 
@@ -95,17 +97,30 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Computed:    true,
 				Sensitive:   true,
 			},
+			// @TODO: remove in later release
 			"roles": schema.ListAttribute{
-				Description: "Specifies the roles assigned to the user, valid options are: `login`, `createdb`",
-				Optional:    true,
-				Computed:    true,
-				ElementType: types.StringType,
+				Description:        "Specifies the roles assigned to the user, valid options are: `login`, `createdb`",
+				DeprecationMessage: "The `roles` attribute is deprecated, use `role_set` instead.",
+				Optional:           true,
+				Computed:           true,
+				ElementType:        types.StringType,
 				Validators: []validator.List{
 					listvalidator.ValueStringsAre(
 						stringvalidator.OneOf("login", "createdb"),
 					),
 				},
-				Default: listdefault.StaticValue(types.ListValueMust(types.StringType, []attr.Value{
+			},
+			"role_set": schema.SetAttribute{
+				Description: "Specifies the roles assigned to the user, valid options are: `login`, `createdb`",
+				Optional:    true,
+				Computed:    true,
+				ElementType: types.StringType,
+				Validators: []validator.Set{
+					setvalidator.ValueStringsAre(
+						stringvalidator.OneOf("login", "createdb"),
+					),
+				},
+				Default: setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{
 					types.StringValue(DefaultRole),
 				})),
 			},

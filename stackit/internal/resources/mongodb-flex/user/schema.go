@@ -101,7 +101,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Sensitive:   true,
 			},
 			"roles": schema.ListAttribute{
-				Description: "Specifies the role assigned to the user, valid options are: `readWrite`, `read`",
+				Description: "Specifies the role assigned to the user, valid options are: `readWrite` or `read`",
 				Optional:    true,
 				Computed:    true,
 				ElementType: types.StringType,
@@ -109,6 +109,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 					listvalidator.ValueStringsAre(
 						stringvalidator.OneOf("readWrite", "read"),
 					),
+					listvalidator.SizeAtMost(1),
 				},
 				Default: listdefault.StaticValue(types.ListValueMust(types.StringType, []attr.Value{
 					types.StringValue(DefaultRole),
