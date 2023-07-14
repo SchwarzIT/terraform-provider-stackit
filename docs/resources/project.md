@@ -6,9 +6,9 @@ description: |-
   Manages STACKIT projects
   
   -> Environment support
-  Productionhttps://api.stackit.cloud/resource-management/v2/
-  QAhttps://api-qa.stackit.cloud/resource-management/v2/
-  Devhttps://api-dev.stackit.cloud/resource-management/v2/
+  Productionhttps://resource-manager.api.stackit.cloud/v2/
+  QAhttps://resource-manager.api.qa.stackit.cloud/v2/
+  Devhttps://resource-manager.api.dev.stackit.cloud/v2/
   
   By default, production is used.To set a custom URL, set an environment variable STACKITRESOURCEMANAGEMENT_BASEURL
 ---
@@ -20,9 +20,9 @@ Manages STACKIT projects
 <br />
 
 -> __Environment support__<br /><table style='border-collapse: separate; border-spacing: 0px; margin-top:-20px; margin-left: 24px; font-size: smaller;'>
-<tr><td style='width: 100px; background: #fbfcff; border: none;'>Production</td><td style='background: #fbfcff; border: none;'>https://api.stackit.cloud/resource-management/v2/</td></tr>
-<tr><td style='background: #fbfcff; border: none;'>QA</td><td style='background: #fbfcff; border: none;'>https://api-qa.stackit.cloud/resource-management/v2/</td></tr>
-<tr><td style='background: #fbfcff; border: none;'>Dev</td><td style='background: #fbfcff; border: none;'>https://api-dev.stackit.cloud/resource-management/v2/</td></tr>
+<tr><td style='width: 100px; background: #fbfcff; border: none;'>Production</td><td style='background: #fbfcff; border: none;'>https://resource-manager.api.stackit.cloud/v2/</td></tr>
+<tr><td style='background: #fbfcff; border: none;'>QA</td><td style='background: #fbfcff; border: none;'>https://resource-manager.api.qa.stackit.cloud/v2/</td></tr>
+<tr><td style='background: #fbfcff; border: none;'>Dev</td><td style='background: #fbfcff; border: none;'>https://resource-manager.api.dev.stackit.cloud/v2/</td></tr>
 </table><br />
 <small style='margin-left: 24px; margin-top: -5px; display: inline-block;'><a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">By default</a>, production is used.<br />To set a custom URL, set an environment variable <code>STACKIT_RESOURCE_MANAGEMENT_BASEURL</code></small>
 
