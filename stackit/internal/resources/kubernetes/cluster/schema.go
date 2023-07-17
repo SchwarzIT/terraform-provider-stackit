@@ -3,12 +3,14 @@ package cluster
 import (
 	"context"
 	"fmt"
+	"regexp"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/cluster"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
@@ -265,12 +267,18 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 						Required:    true,
 					},
 					"start": schema.StringAttribute{
-						Description: "RFC3339 Date time for maintenance window start. i.e. `2019-08-24T23:00:00Z`",
+						Description: "RFC3339 Date time for maintenance window start. i.e. `0000-01-01T23:00:00Z`",
 						Required:    true,
+						Validators: []validator.String{
+							stringvalidator.RegexMatches(regexp.MustCompile(`^(0000-01-01T\d{2}:\d{2}:\d{2}Z)$`), "validate RFC3339 date time that starts with 0000-01-01"),
+						},
 					},
 					"end": schema.StringAttribute{
-						Description: "RFC3339 Date time for maintenance window end. i.e. `2019-08-24T23:30:00Z`",
+						Description: "RFC3339 Date time for maintenance window end. i.e. `0000-01-01T23:30:00Z`",
 						Required:    true,
+						Validators: []validator.String{
+							stringvalidator.RegexMatches(regexp.MustCompile(`^(0000-01-01T\d{2}:\d{2}:\d{2}Z)$`), "validate RFC3339 date time that starts with 0000-01-01"),
+						},
 					},
 				},
 			},

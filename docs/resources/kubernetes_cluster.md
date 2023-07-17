@@ -106,8 +106,8 @@ Required:
 
 - `enable_kubernetes_version_updates` (Boolean) Flag to enable/disable auto-updates of the Kubernetes version
 - `enable_machine_image_version_updates` (Boolean) Flag to enable/disable auto-updates of the OS image version
-- `end` (String) RFC3339 Date time for maintenance window end. i.e. `2019-08-24T23:30:00Z`
-- `start` (String) RFC3339 Date time for maintenance window start. i.e. `2019-08-24T23:00:00Z`
+- `end` (String) RFC3339 Date time for maintenance window end. i.e. `0000-01-01T23:30:00Z`
+- `start` (String) RFC3339 Date time for maintenance window start. i.e. `0000-01-01T23:00:00Z`
 
 
 <a id="nestedatt--node_pools"></a>
