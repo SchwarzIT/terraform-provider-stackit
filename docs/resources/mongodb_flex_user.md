@@ -5,12 +5,7 @@ subcategory: ""
 description: |-
   Manages MongoDB Flex instance users
   
-  -> Environment support
-  Productionhttps://mongodb-flex-service.api.eu01.stackit.cloud/v1/
-  QAhttps://mongodb-flex-service.api.eu01.qa.stackit.cloud/v1/
-  Devhttps://mongodb-flex-service.api.eu01.dev.stackit.cloud/v1/
-  
-  By default, production is used.To set a custom URL, set an environment variable STACKITMONGODBFLEX_BASEURL
+  -> Environment supportTo set a custom API base URL, set STACKITMONGODBFLEX_BASEURL environment variable
 ---
 
 # stackit_mongodb_flex_user (Resource)
@@ -19,12 +14,7 @@ Manages MongoDB Flex instance users
 
 <br />
 
--> __Environment support__<br /><table style='border-collapse: separate; border-spacing: 0px; margin-top:-20px; margin-left: 24px; font-size: smaller;'>
-<tr><td style='width: 100px; background: #fbfcff; border: none;'>Production</td><td style='background: #fbfcff; border: none;'>https://mongodb-flex-service.api.eu01.stackit.cloud/v1/</td></tr>
-<tr><td style='background: #fbfcff; border: none;'>QA</td><td style='background: #fbfcff; border: none;'>https://mongodb-flex-service.api.eu01.qa.stackit.cloud/v1/</td></tr>
-<tr><td style='background: #fbfcff; border: none;'>Dev</td><td style='background: #fbfcff; border: none;'>https://mongodb-flex-service.api.eu01.dev.stackit.cloud/v1/</td></tr>
-</table><br />
-<small style='margin-left: 24px; margin-top: -5px; display: inline-block;'><a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">By default</a>, production is used.<br />To set a custom URL, set an environment variable <code>STACKIT_MONGODB_FLEX_BASEURL</code></small>
+-> __Environment support__<br /><small style='margin-left: 24px; margin-top: -5px; display: inline-block;'>To set a custom API base URL, set <code>STACKIT_MONGODB_FLEX_BASEURL</code> environment variable </small>
 
 ## Example Usage
 
