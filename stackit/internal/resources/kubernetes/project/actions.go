@@ -78,35 +78,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 
 // Delete - lifecycle function
 func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var state KubernetesProject
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	// handle deletion
-	c := r.client.Kubernetes.Project
-	res, err := c.Delete(ctx, state.ID.ValueString())
-	if agg := validate.Response(res, err); agg != nil {
-		if validate.StatusEquals(res, http.StatusNotFound) {
-			resp.State.RemoveResource(ctx)
-			return
-		}
-		resp.Diagnostics.AddError("failed during SKE project deletion", agg.Error())
-		return
-	}
-
-	timeout, d := state.Timeouts.Delete(ctx, 10*time.Minute)
-	if resp.Diagnostics.Append(d...); resp.Diagnostics.HasError() {
-		return
-	}
-	process := res.WaitHandler(ctx, c, state.ID.ValueString()).SetTimeout(timeout)
-	if _, err := process.WaitWithContext(ctx); err != nil {
-		if !strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
-			resp.Diagnostics.AddError("failed to verify project deletion", err.Error())
-			return
-		}
-	}
+	resp.Diagnostics.AddWarning("deletion is not supported", "SKE project deletion is not supported")
 	resp.State.RemoveResource(ctx)
 }
 

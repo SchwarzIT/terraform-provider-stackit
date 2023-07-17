@@ -67,19 +67,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 
 // Delete - lifecycle function
 func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var state ObjectStorageProject
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	// handle creation
-	c := r.client.ObjectStorage.Project
-	res, err := c.Delete(ctx, state.ID.ValueString())
-	if agg := validate.Response(res, err); agg != nil {
-		resp.Diagnostics.AddError("failed ObjectStorage project deletion", agg.Error())
-		return
-	}
+	resp.Diagnostics.AddWarning("ObjectStorage project deletion is not supported", "ObjectStorage project deletion is not supported")
 	resp.State.RemoveResource(ctx)
 }
 

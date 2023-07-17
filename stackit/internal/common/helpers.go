@@ -57,7 +57,7 @@ func EnvironmentInfo(u baseurl.BaseURL) string {
 	return fmt.Sprintf(`
 <br />
 
--> __Environment support__<br /><small>To set a custom API base URL, set <code>%s</code> environment variable </small>
+-> __Environment support__<small>To set a custom API base URL, set <code>%s</code> environment variable </small>
 	`,
 		u.OverrideWith,
 	)
