@@ -5,12 +5,7 @@ subcategory: ""
 description: |-
   Manages STACKIT projects
   
-  -> Environment support
-  Productionhttps://resource-manager.api.stackit.cloud/v2/
-  QAhttps://resource-manager.api.qa.stackit.cloud/v2/
-  Devhttps://resource-manager.api.dev.stackit.cloud/v2/
-  
-  By default, production is used.To set a custom URL, set an environment variable STACKITRESOURCEMANAGEMENT_BASEURL
+  -> Environment supportTo set a custom API base URL, set STACKITRESOURCEMANAGEMENT_BASEURL environment variable
 ---
 
 # stackit_project (Resource)
@@ -19,12 +14,7 @@ Manages STACKIT projects
 
 <br />
 
--> __Environment support__<br /><table style='border-collapse: separate; border-spacing: 0px; margin-top:-20px; margin-left: 24px; font-size: smaller;'>
-<tr><td style='width: 100px; background: #fbfcff; border: none;'>Production</td><td style='background: #fbfcff; border: none;'>https://resource-manager.api.stackit.cloud/v2/</td></tr>
-<tr><td style='background: #fbfcff; border: none;'>QA</td><td style='background: #fbfcff; border: none;'>https://resource-manager.api.qa.stackit.cloud/v2/</td></tr>
-<tr><td style='background: #fbfcff; border: none;'>Dev</td><td style='background: #fbfcff; border: none;'>https://resource-manager.api.dev.stackit.cloud/v2/</td></tr>
-</table><br />
-<small style='margin-left: 24px; margin-top: -5px; display: inline-block;'><a href="https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs#environment">By default</a>, production is used.<br />To set a custom URL, set an environment variable <code>STACKIT_RESOURCE_MANAGEMENT_BASEURL</code></small>
+-> __Environment support__<br /><small style='margin-left: 24px; margin-top: -5px; display: inline-block;'>To set a custom API base URL, set <code>STACKIT_RESOURCE_MANAGEMENT_BASEURL</code> environment variable </small>
 
 ## Example Usage
 

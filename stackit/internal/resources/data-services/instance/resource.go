@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/baseurl"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services"
 	dataservices "github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -102,7 +102,7 @@ func NewOpensearch() resource.Resource {
 type Resource struct {
 	client  *dataservices.ClientWithResponses
 	service ResourceService
-	urls    env.EnvironmentURLs
+	urls    baseurl.BaseURL
 }
 
 var _ = resource.Resource(&Resource{})

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/baseurl"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services"
 	postgresflex "github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -20,7 +20,7 @@ func New() datasource.DataSource {
 // DataSource is the exported data source
 type DataSource struct {
 	client *services.Services
-	urls   env.EnvironmentURLs
+	urls   baseurl.BaseURL
 }
 
 var _ = datasource.DataSource(&DataSource{})

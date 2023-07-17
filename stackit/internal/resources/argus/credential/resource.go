@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/baseurl"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services"
 	argus "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -22,7 +22,7 @@ func New() resource.Resource {
 // Resource is the exported resource
 type Resource struct {
 	client *argus.ClientWithResponses
-	urls   env.EnvironmentURLs
+	urls   baseurl.BaseURL
 }
 
 var _ = resource.Resource(&Resource{})

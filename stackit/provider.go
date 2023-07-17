@@ -36,12 +36,10 @@ import (
 	resourcePostgresFlexUser "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/postgres-flex/user"
 	resourceProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/project"
 
-	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -89,8 +87,7 @@ type providerSchema struct {
 	PrivateKeyPath        types.String `tfsdk:"private_key_path"`
 
 	// General
-	Environment        types.String `tfsdk:"environment"`
-	EnableTraceContext types.Bool   `tfsdk:"enable_trace_context"`
+	EnableTraceContext types.Bool `tfsdk:"enable_trace_context"`
 }
 
 // Schema returns the provider's schema
@@ -124,13 +121,6 @@ func (p *StackitProvider) Schema(ctx context.Context, req provider.SchemaRequest
 			"private_key_path": schema.StringAttribute{
 				Optional:            true,
 				MarkdownDescription: "Path to the Private RSA Key.<br />This attribute can also be loaded from `STACKIT_PRIVATE_KEY_PATH` environment variable instead.",
-			},
-			"environment": schema.StringAttribute{
-				Optional:            true,
-				MarkdownDescription: "The API environment that the provider interacts with. Options are `dev`, `qa`, `prod`.<br />This attribute can also be loaded from `STACKIT_ENV` environment variable instead.",
-				Validators: []validator.String{
-					stringvalidator.OneOf("dev", "qa", "prod"),
-				},
 			},
 			"enable_trace_context": schema.BoolAttribute{
 				Optional:            true,
