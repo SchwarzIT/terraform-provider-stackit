@@ -14,7 +14,7 @@ Data source for STACKIT Kubernetes Engine (SKE) clusters
 
 <br />
 
--> __Environment support__<br /><small>To set a custom API base URL, set <code>STACKIT_KUBERNETES_BASEURL</code> environment variable </small>
+-> __Environment support__<small>To set a custom API base URL, set <code>STACKIT_KUBERNETES_BASEURL</code> environment variable </small>
 
 ## Example Usage
 
