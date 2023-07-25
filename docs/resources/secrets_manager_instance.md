@@ -35,7 +35,7 @@ resource "stackit_secrets_manager_instance" "example" {
 
 ### Optional
 
-- `acl` (Set of String) Specifies the ACLs for the instance. Each item must be CIDR notation.
+- `acl` (Set of String) Specifies the access list for the instance. Each item must be CIDR notation.
 
 ### Read-Only
 

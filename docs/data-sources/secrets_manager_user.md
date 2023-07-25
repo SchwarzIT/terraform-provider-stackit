@@ -25,10 +25,10 @@ resource "stackit_secrets_manager_instance" "example" {
 }
 
 resource "stackit_secrets_manager_user" "example" {
-  project_id  = var.project_id
-  instance_id = stackit_secrets_manager_instance.example.id
-  description = "test"
-  writable    = true
+  project_id    = var.project_id
+  instance_id   = stackit_secrets_manager_instance.example.id
+  description   = "test"
+  write_enabled = true
 }
 
 data "stackit_secrets_manager_user" "example" {
@@ -49,7 +49,7 @@ data "stackit_secrets_manager_user" "example" {
 
 ### Optional
 
-- `writable` (Boolean) Specifies if the user can write secrets. `false` by default.
+- `write_enabled` (Boolean) Specifies if the user can write secrets. `false` by default.
 
 ### Read-Only
 

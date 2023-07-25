@@ -25,10 +25,10 @@ resource "stackit_secrets_manager_instance" "example" {
 }
 
 resource "stackit_secrets_manager_user" "example" {
-  project_id  = var.project_id
-  instance_id = stackit_secrets_manager_instance.example.id
-  description = "example"
-  writable    = true
+  project_id    = var.project_id
+  instance_id   = stackit_secrets_manager_instance.example.id
+  description   = "example"
+  write_enabled = true
 }
 ```
 
@@ -43,7 +43,7 @@ resource "stackit_secrets_manager_user" "example" {
 ### Optional
 
 - `description` (String) Specifies the description of the user. Changing this value requires the resource to be recreated.
-- `writable` (Boolean) Specifies if the user can write secrets. `false` by default.
+- `write_enabled` (Boolean) Specifies if the user can write secrets. `false` by default.
 
 ### Read-Only
 

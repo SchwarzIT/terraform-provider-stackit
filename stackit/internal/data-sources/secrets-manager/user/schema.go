@@ -18,7 +18,7 @@ type User struct {
 	ProjectID   types.String `tfsdk:"project_id"`
 	InstanceID  types.String `tfsdk:"instance_id"`
 	Description types.String `tfsdk:"description"`
-	Write       types.Bool   `tfsdk:"writable"`
+	Write       types.Bool   `tfsdk:"write_enabled"`
 	Username    types.String `tfsdk:"username"`
 }
 
@@ -55,7 +55,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Description: "Specifies the description of the user. Changing this value requires the resource to be recreated.",
 				Computed:    true,
 			},
-			"writable": schema.BoolAttribute{
+			"write_enabled": schema.BoolAttribute{
 				Description: "Specifies if the user can write secrets. `false` by default.",
 				Optional:    true,
 			},

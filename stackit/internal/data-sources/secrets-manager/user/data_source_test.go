@@ -33,7 +33,7 @@ func TestAcc_SecretsManagerUser(t *testing.T) {
 					resource.TestCheckTypeSetElemAttrPair("stackit_secrets_manager_user.example", "username", "data.stackit_secrets_manager_user.example", "username"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_secrets_manager_user.example", "id", "data.stackit_secrets_manager_user.example", "id"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_secrets_manager_user.example", "instance_id", "data.stackit_secrets_manager_user.example", "instance_id"),
-					resource.TestCheckTypeSetElemAttrPair("stackit_secrets_manager_user.example", "writable", "data.stackit_secrets_manager_user.example", "writable"),
+					resource.TestCheckTypeSetElemAttrPair("stackit_secrets_manager_user.example", "write_enabled", "data.stackit_secrets_manager_user.example", "write_enabled"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_secrets_manager_user.example", "description", "data.stackit_secrets_manager_user.example", "description"),
 				),
 			},
@@ -52,7 +52,7 @@ resource "stackit_secrets_manager_user" "example" {
 	project_id         = stackit_secrets_manager_instance.example.project_id
 	instance_id        = stackit_secrets_manager_instance.example.id
 	description        = "test"
-	writable           = true
+	write_enabled      = true
 }
 
 data "stackit_secrets_manager_user" "example" {

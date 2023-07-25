@@ -56,7 +56,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Computed:    true,
 			},
 			"acl": schema.SetAttribute{
-				Description: "Specifies the ACLs for the instance.",
+				Description: "Specifies the access list for the instance.",
 				Computed:    true,
 				ElementType: types.StringType,
 			},
