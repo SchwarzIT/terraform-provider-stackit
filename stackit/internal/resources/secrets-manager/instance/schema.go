@@ -19,6 +19,7 @@ type Instance struct {
 	ID        types.String `tfsdk:"id"`
 	Name      types.String `tfsdk:"name"`
 	ProjectID types.String `tfsdk:"project_id"`
+	ACL       types.Set    `tfsdk:"acl"`
 	Frontend  types.String `tfsdk:"frontend_url"`
 	API       types.String `tfsdk:"api_url"`
 }
@@ -53,6 +54,12 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
+			},
+			"acl": schema.SetAttribute{
+				Description: "Specifies the ACLs for the instance.",
+				Optional:    true,
+				Computed:    true,
+				ElementType: types.StringType,
 			},
 			"frontend_url": schema.StringAttribute{
 				Description: "Specifies the frontend for managing secrets.",

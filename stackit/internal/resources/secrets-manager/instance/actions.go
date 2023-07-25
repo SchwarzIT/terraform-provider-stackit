@@ -7,14 +7,18 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/secrets-manager/v1.1.0/acls"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/secrets-manager/v1.1.0/instances"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/google/uuid"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"k8s.io/utils/strings/slices"
 )
 
 // Create - lifecycle function
@@ -51,10 +55,69 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	plan.Frontend = types.StringValue(res.JSON201.ApiUrl + "/ui")
 	plan.API = types.StringValue(res.JSON201.ApiUrl)
 
+	if !plan.ACL.IsUnknown() {
+		r.manageACLs(ctx, &plan, &resp.Diagnostics)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+	}
+
+	r.readACLs(ctx, &plan, &resp.Diagnostics)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	diags = resp.State.Set(ctx, plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
+	}
+
+}
+
+func (r Resource) manageACLs(ctx context.Context, plan *Instance, diags *diag.Diagnostics) {
+	want, idsToRemove := []string{}, []string{}
+	diags.Append(plan.ACL.ElementsAs(ctx, &want, true)...)
+	if diags.HasError() {
+		return
+	}
+	r.readACLs(ctx, plan, diags)
+	if diags.HasError() {
+		return
+	}
+	c := r.client
+	res, err := c.SecretsManager.Acls.List(ctx, uuid.MustParse(plan.ProjectID.ValueString()), uuid.MustParse(plan.ID.ValueString()))
+	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+		diags.AddError("failed to get instance ACLs", agg.Error())
+		return
+	}
+	for _, el := range res.JSON200.Acls {
+		if !slices.Contains(want, el.Cidr) {
+			idsToRemove = append(idsToRemove, el.ID)
+			continue
+		}
+		// remove from want
+		if i := slices.Index(want, el.Cidr); i > -1 {
+			want = append(want[:i], want[i+1:]...)
+		}
+	}
+	// remove
+	for _, id := range idsToRemove {
+		_, err := c.SecretsManager.Acls.Delete(ctx, uuid.MustParse(plan.ProjectID.ValueString()), uuid.MustParse(plan.ID.ValueString()), uuid.MustParse(id))
+		if err != nil {
+			diags.AddError("failed to delete instance ACL", err.Error())
+			return
+		}
+	}
+	// add
+	for _, cidr := range want {
+		_, err := c.SecretsManager.Acls.Create(ctx, uuid.MustParse(plan.ProjectID.ValueString()), uuid.MustParse(plan.ID.ValueString()), acls.AclCreate{
+			Cidr: cidr,
+		})
+		if err != nil {
+			diags.AddError("failed to create instance ACL", err.Error())
+			return
+		}
 	}
 }
 
@@ -83,6 +146,11 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	state.Frontend = types.StringValue(res.JSON200.ApiUrl + "/ui")
 	state.API = types.StringValue(res.JSON200.ApiUrl)
 
+	r.readACLs(ctx, &state, &resp.Diagnostics)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	// update state
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -91,8 +159,54 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 }
 
+func (r Resource) readACLs(ctx context.Context, config *Instance, diags *diag.Diagnostics) {
+	c := r.client
+	res, err := c.SecretsManager.Acls.List(ctx, uuid.MustParse(config.ProjectID.ValueString()), uuid.MustParse(config.ID.ValueString()))
+	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+		diags.AddError("failed to get instance ACLs", agg.Error())
+		return
+	}
+	els := []attr.Value{}
+	for _, el := range res.JSON200.Acls {
+		els = append(els, types.StringValue(el.Cidr))
+	}
+	config.ACL = types.SetValueMust(types.StringType, els)
+	return
+}
+
 // Update - lifecycle function
 func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+	var plan Instance
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	var state Instance
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	if plan.ACL.Equal(state.ACL) {
+		return
+	}
+
+	r.manageACLs(ctx, &plan, &resp.Diagnostics)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	r.readACLs(ctx, &state, &resp.Diagnostics)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// update state
+	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 }
 
 // Delete - lifecycle function

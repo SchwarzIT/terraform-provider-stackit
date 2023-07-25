@@ -12,6 +12,7 @@ require (
 	github.com/hashicorp/terraform-plugin-go v0.15.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.24.1
 	github.com/pkg/errors v0.9.1
+	k8s.io/utils v0.0.0-20230406110748-d93618cff8a2
 )
 
 require (
@@ -72,5 +73,4 @@ require (
 	google.golang.org/protobuf v1.30.0 // indirect
 	k8s.io/apimachinery v0.27.0 // indirect
 	k8s.io/klog/v2 v2.90.1 // indirect
-	k8s.io/utils v0.0.0-20230406110748-d93618cff8a2 // indirect
 )

@@ -14,7 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-const run_this_test = false
+const run_this_test = true
 
 func TestAcc_SecretsManagerInstance(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
@@ -36,6 +36,18 @@ func TestAcc_SecretsManagerInstance(t *testing.T) {
 					resource.TestCheckResourceAttrSet("stackit_secrets_manager_instance.example", "id"),
 					resource.TestCheckResourceAttrSet("stackit_secrets_manager_instance.example", "frontend_url"),
 					resource.TestCheckResourceAttrSet("stackit_secrets_manager_instance.example", "api_url"),
+				),
+			},
+			{
+				Config: config2(name),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("stackit_secrets_manager_instance.example", "acl.#", "2"),
+				),
+			},
+			{
+				Config: config3(name),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("stackit_secrets_manager_instance.example", "acl.#", "1"),
 				),
 			},
 			// test import
@@ -65,6 +77,32 @@ func config(name string) string {
 resource "stackit_secrets_manager_instance" "example" {
 	project_id         = "%s"
 	name               = "%s"
+}
+	  `,
+		common.GetAcceptanceTestsProjectID(),
+		name,
+	)
+}
+
+func config2(name string) string {
+	return fmt.Sprintf(`
+resource "stackit_secrets_manager_instance" "example" {
+	project_id         = "%s"
+	name               = "%s"
+	acl                = ["193.148.160.0/19","45.129.40.1/21"]
+}
+	  `,
+		common.GetAcceptanceTestsProjectID(),
+		name,
+	)
+}
+
+func config3(name string) string {
+	return fmt.Sprintf(`
+resource "stackit_secrets_manager_instance" "example" {
+	project_id         = "%s"
+	name               = "%s"
+	acl                = ["193.148.160.0/19"]
 }
 	  `,
 		common.GetAcceptanceTestsProjectID(),
