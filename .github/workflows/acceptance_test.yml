@@ -320,6 +320,47 @@ jobs:
         with:
           path: .github/files/analyze-test-output/result/*.json
 
+  datasource-secrets-manager:
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        name: [secrets-manager instance,secrets-manager user]
+        include:
+
+        - name: secrets-manager instance
+          path: stackit/internal/data-sources/secrets-manager/instance
+
+        - name: secrets-manager user
+          path: stackit/internal/data-sources/secrets-manager/user
+
+    name: ${{ matrix.name }} data source
+    needs: createproject
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: 'go.mod'
+          check-latest: true
+          cache: true
+      - name: Test ${{ matrix.name }} Data Source
+        run: |
+          echo $path
+          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
+          if [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]]; then
+            exit 1;
+          fi;
+          make ci-testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+      - name: Save results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          path: .github/files/analyze-test-output/result/*.json
+
   datasources:
     strategy:
       fail-fast: false
@@ -607,6 +648,46 @@ jobs:
         with:
           path: .github/files/analyze-test-output/result/*.json
 
+  resource-secrets-manager:
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        name: [secrets-manager instance,secrets-manager user]
+        include:
+
+        - name: secrets-manager instance
+          path: stackit/internal/resources/secrets-manager/instance
+
+        - name: secrets-manager user
+          path: stackit/internal/resources/secrets-manager/user
+
+    name: ${{ matrix.name }} resource
+    needs: [createproject,datasource-secrets-manager]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: 'go.mod'
+          check-latest: true
+          cache: true
+      - name: Test ${{ matrix.name }} resource
+        run: |
+          export ACC_TEST_PROJECT_ID=${{needs.createproject.outputs.projectID}}
+          if [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]]; then
+            exit 1;
+          fi;
+          make ci-testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+      - name: Save results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          path: .github/files/analyze-test-output/result/*.json
+
   resources:
     strategy:
       fail-fast: false
@@ -648,7 +729,7 @@ jobs:
   deleteproject:
     name: Delete Project
     runs-on: ubuntu-latest
-    needs: [createproject,resources,resource-argus,resource-data-services,resource-kubernetes,resource-mongodb-flex,resource-object-storage,resource-postgres-flex]
+    needs: [createproject,resources,resource-argus,resource-data-services,resource-kubernetes,resource-mongodb-flex,resource-object-storage,resource-postgres-flex,resource-secrets-manager]
     if: ${{ always() }}
     steps:
       - name: Prepare deletion
@@ -671,7 +752,7 @@ jobs:
   processresult:
     name: Process Test Results
     runs-on: ubuntu-latest
-    needs: [createproject,resources,resource-argus,resource-data-services,resource-kubernetes,resource-mongodb-flex,resource-object-storage,resource-postgres-flex]
+    needs: [createproject,resources,resource-argus,resource-data-services,resource-kubernetes,resource-mongodb-flex,resource-object-storage,resource-postgres-flex,resource-secrets-manager]
     if: ${{ always() }}
     steps:
       - uses: actions/checkout@v3
