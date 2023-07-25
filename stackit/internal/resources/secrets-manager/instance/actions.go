@@ -56,6 +56,8 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	plan.ID = types.StringValue(res.JSON201.ID)
+	plan.Frontend = types.StringValue(res.JSON201.ApiUrl + "/ui")
+	plan.API = types.StringValue(res.JSON201.ApiUrl)
 
 	diags = resp.State.Set(ctx, plan)
 	resp.Diagnostics.Append(diags...)
@@ -86,6 +88,8 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	state.Name = types.StringValue(res.JSON200.Name)
+	state.Frontend = types.StringValue(res.JSON200.ApiUrl + "/ui")
+	state.API = types.StringValue(res.JSON200.ApiUrl)
 
 	// update state
 	diags = resp.State.Set(ctx, &state)

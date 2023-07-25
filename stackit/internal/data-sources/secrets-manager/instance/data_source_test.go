@@ -1,7 +1,6 @@
 package instance_test
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 
@@ -11,7 +10,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
 const run_this_test = false
@@ -32,29 +30,11 @@ func TestAcc_SecretsManagerInstance(t *testing.T) {
 			{
 				Config: config(name),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("stackit_secrets_manager_instance.example", "name", name),
-					resource.TestCheckResourceAttrSet("stackit_secrets_manager_instance.example", "id"),
-					resource.TestCheckResourceAttrSet("stackit_secrets_manager_instance.example", "frontend_url"),
-					resource.TestCheckResourceAttrSet("stackit_secrets_manager_instance.example", "api_url"),
+					resource.TestCheckTypeSetElemAttrPair("stackit_secrets_manager_instance.example", "name", "data.stackit_secrets_manager_instance.example", "name"),
+					resource.TestCheckTypeSetElemAttrPair("stackit_secrets_manager_instance.example", "id", "data.stackit_secrets_manager_instance.example", "id"),
+					resource.TestCheckTypeSetElemAttrPair("stackit_secrets_manager_instance.example", "frontend_url", "data.stackit_secrets_manager_instance.example", "frontend_url"),
+					resource.TestCheckTypeSetElemAttrPair("stackit_secrets_manager_instance.example", "api_url", "data.stackit_secrets_manager_instance.example", "api_url"),
 				),
-			},
-			// test import
-			{
-				ResourceName: "stackit_secrets_manager_instance.example",
-				ImportStateIdFunc: func(s *terraform.State) (string, error) {
-					r, ok := s.RootModule().Resources["stackit_secrets_manager_instance.example"]
-					if !ok {
-						return "", errors.New("couldn't find resource stackit_secrets_manager_instance.example")
-					}
-					id, ok := r.Primary.Attributes["id"]
-					if !ok {
-						return "", errors.New("couldn't find attribute id")
-					}
-
-					return fmt.Sprintf("%s,%s", common.GetAcceptanceTestsProjectID(), id), nil
-				},
-				ImportState:       true,
-				ImportStateVerify: true,
 			},
 		},
 	})
@@ -65,6 +45,11 @@ func config(name string) string {
 resource "stackit_secrets_manager_instance" "example" {
 	project_id         = "%s"
 	name               = "%s"
+}
+
+data "stackit_secrets_manager_instance" "example" {
+	id                 = stackit_secrets_manager_instance.example.id
+	project_id         = stackit_secrets_manager_instance.example.project_id
 }
 	  `,
 		common.GetAcceptanceTestsProjectID(),
