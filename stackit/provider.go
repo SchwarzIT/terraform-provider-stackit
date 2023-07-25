@@ -19,6 +19,7 @@ import (
 	dataPostgresFlexUser "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/postgres-flex/user"
 	dataProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/project"
 	dataSecretsManagerInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/secrets-manager/instance"
+	dataSecretsManagerUser "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/secrets-manager/user"
 
 	resourceArgusCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/credential"
 	resourceArgusInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/instance"
@@ -205,6 +206,7 @@ func (p *StackitProvider) DataSources(context.Context) []func() datasource.DataS
 		dataPostgresFlexUser.New,
 		dataProject.New,
 		dataSecretsManagerInstance.New,
+		dataSecretsManagerUser.New,
 	}
 }
 
