@@ -35,6 +35,7 @@ import (
 	resourcePostgresFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/postgres-flex/instance"
 	resourcePostgresFlexUser "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/postgres-flex/user"
 	resourceProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/project"
+	resourceSecretsManager "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/secrets-manager/instance"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -166,6 +167,7 @@ func (p *StackitProvider) Resources(_ context.Context) []func() resource.Resourc
 		resourcePostgresFlexInstance.New,
 		resourcePostgresFlexUser.New,
 		resourceProject.New,
+		resourceSecretsManager.New,
 	}
 }
 
