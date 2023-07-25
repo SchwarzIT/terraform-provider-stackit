@@ -97,7 +97,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		return
 	}
 
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("writable"), write)...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("write_enabled"), write)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}

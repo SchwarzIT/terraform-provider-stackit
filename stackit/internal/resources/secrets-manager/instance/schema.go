@@ -56,7 +56,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"acl": schema.SetAttribute{
-				Description: "Specifies the ACLs for the instance. Each item must be CIDR notation.",
+				Description: "Specifies the access list for the instance. Each item must be CIDR notation.",
 				Optional:    true,
 				Computed:    true,
 				ElementType: types.StringType,

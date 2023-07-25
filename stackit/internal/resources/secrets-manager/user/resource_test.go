@@ -33,7 +33,7 @@ func TestAcc_SecretsManagerUser(t *testing.T) {
 				Config: config(name, true),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_secrets_manager_user.example", "description", "test"),
-					resource.TestCheckResourceAttr("stackit_secrets_manager_user.example", "writable", "true"),
+					resource.TestCheckResourceAttr("stackit_secrets_manager_user.example", "write_enabled", "true"),
 					resource.TestCheckResourceAttrSet("stackit_secrets_manager_user.example", "username"),
 					resource.TestCheckResourceAttrSet("stackit_secrets_manager_user.example", "password"),
 					resource.TestCheckResourceAttrSet("stackit_secrets_manager_user.example", "id"),
@@ -42,7 +42,7 @@ func TestAcc_SecretsManagerUser(t *testing.T) {
 			{
 				Config: config(name, false),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("stackit_secrets_manager_user.example", "writable", "false"),
+					resource.TestCheckResourceAttr("stackit_secrets_manager_user.example", "write_enabled", "false"),
 				),
 			},
 			// test import
@@ -83,7 +83,7 @@ func config(name string, writeable bool) string {
 		project_id         = stackit_secrets_manager_instance.example.project_id
 		instance_id        = stackit_secrets_manager_instance.example.id
 		description        = "test"
-		writable           = %v
+		write_enabled      = %v
 	}
 	  `,
 		common.GetAcceptanceTestsProjectID(),
