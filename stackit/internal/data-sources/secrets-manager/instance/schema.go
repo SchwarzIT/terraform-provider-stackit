@@ -19,6 +19,7 @@ type Instance struct {
 	ProjectID types.String `tfsdk:"project_id"`
 	Frontend  types.String `tfsdk:"frontend_url"`
 	API       types.String `tfsdk:"api_url"`
+	ACL       types.Set    `tfsdk:"acl"`
 }
 
 // Schema returns the terraform schema structure
@@ -53,6 +54,11 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 			"api_url": schema.StringAttribute{
 				Description: "Specifies the API URL for managing secrets.",
 				Computed:    true,
+			},
+			"acl": schema.SetAttribute{
+				Description: "Specifies the ACLs for the instance.",
+				Computed:    true,
+				ElementType: types.StringType,
 			},
 		},
 	}
