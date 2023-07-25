@@ -18,7 +18,7 @@ import (
 	dataPostgresFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/postgres-flex/instance"
 	dataPostgresFlexUser "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/postgres-flex/user"
 	dataProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/project"
-	dataSecretsManager "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/secrets-manager/instance"
+	dataSecretsManagerInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/secrets-manager/instance"
 
 	resourceArgusCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/credential"
 	resourceArgusInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/argus/instance"
@@ -36,7 +36,8 @@ import (
 	resourcePostgresFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/postgres-flex/instance"
 	resourcePostgresFlexUser "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/postgres-flex/user"
 	resourceProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/project"
-	resourceSecretsManager "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/secrets-manager/instance"
+	resourceSecretsManagerInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/secrets-manager/instance"
+	resourceSecretsManagerUser "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/secrets-manager/user"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -168,7 +169,8 @@ func (p *StackitProvider) Resources(_ context.Context) []func() resource.Resourc
 		resourcePostgresFlexInstance.New,
 		resourcePostgresFlexUser.New,
 		resourceProject.New,
-		resourceSecretsManager.New,
+		resourceSecretsManagerInstance.New,
+		resourceSecretsManagerUser.New,
 	}
 }
 
@@ -202,7 +204,7 @@ func (p *StackitProvider) DataSources(context.Context) []func() datasource.DataS
 		dataPostgresFlexInstance.New,
 		dataPostgresFlexUser.New,
 		dataProject.New,
-		dataSecretsManager.New,
+		dataSecretsManagerInstance.New,
 	}
 }
 

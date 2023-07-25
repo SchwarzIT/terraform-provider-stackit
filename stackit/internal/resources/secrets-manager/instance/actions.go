@@ -27,15 +27,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	c := r.client
-	uuidProjectID, err := uuid.Parse(plan.ProjectID.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Unexpected Project ID",
-			fmt.Sprintf("Couldn't parse project_id\n%s", err.Error()),
-		)
-		return
-	}
-
+	uuidProjectID := uuid.MustParse(plan.ProjectID.ValueString())
 	res, err := c.SecretsManager.Instances.Create(ctx, uuidProjectID, instances.CreateJSONRequestBody{
 		Name: plan.Name.ValueString(),
 	})
