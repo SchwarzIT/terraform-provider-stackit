@@ -40,7 +40,7 @@ data "stackit_secrets_manager_instance" "example" {
 
 ### Read-Only
 
-- `acl` (Set of String) Specifies the ACLs for the instance.
+- `acl` (Set of String) Specifies the access list for the instance.
 - `api_url` (String) Specifies the API URL for managing secrets.
 - `frontend_url` (String) Specifies the frontend for managing secrets.
 - `name` (String) Specifies the instance name.
