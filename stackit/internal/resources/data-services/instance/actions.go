@@ -54,8 +54,8 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	res, err := r.client.Instances.Provision(ctx, plan.ProjectID.ValueString(), body)
 	if agg := validate.Response(res, err, "JSON202"); agg != nil {
 		resp.Diagnostics.AddError("failed instance provisioning", agg.Error())
-		if res != nil && res.JSON400 != nil {
-			resp.Diagnostics.AddError("bad request", fmt.Sprintf("%+v", *res.JSON400))
+		if res != nil {
+			common.Dump(&resp.Diagnostics, res.Body)
 		}
 		return
 	}
@@ -179,6 +179,9 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 	res, err := r.client.Instances.Update(ctx, state.ProjectID.ValueString(), state.ID.ValueString(), body)
 	if agg := validate.Response(res, err); agg != nil {
+		if res != nil {
+			common.Dump(&resp.Diagnostics, res.Body)
+		}
 		resp.Diagnostics.AddError("failed instance update", agg.Error())
 		return
 	}
