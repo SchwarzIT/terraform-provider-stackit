@@ -11,6 +11,7 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/users"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -187,8 +188,12 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 			resp.State.RemoveResource(ctx)
 			return
 		}
+		if res != nil {
+			common.Dump(&resp.Diagnostics, res.Body)
+		}
 		if !strings.Contains(agg.Error(), "timed out waiting for the condition") {
 			resp.Diagnostics.AddError("failed to delete user", agg.Error())
+			resp.Diagnostics.AddWarning("remove user ownership", "failure to delete user usually means the user is still an owner of a database")
 			return
 		}
 	}
