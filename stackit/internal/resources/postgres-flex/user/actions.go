@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -17,7 +16,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
-	"github.com/pkg/errors"
 )
 
 // Create - lifecycle function
@@ -60,15 +58,6 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	res, err := r.client.PostgresFlex.Users.Create(ctx, plan.ProjectID.ValueString(), plan.InstanceID.ValueString(), body)
 	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON201.Item"); agg != nil {
-		if res.StatusCode() == http.StatusBadRequest {
-			j := ""
-			if res.JSON400 != nil {
-				b, _ := json.Marshal(res.JSON400)
-				j = string(b)
-			}
-			resp.Diagnostics.AddError("failed creating postgres flex db user", errors.Wrapf(agg, j).Error())
-			return
-		}
 		resp.Diagnostics.AddError("failed creating postgres flex db user", agg.Error())
 		return
 	}

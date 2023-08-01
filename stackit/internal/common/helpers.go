@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"reflect"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/baseurl"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
@@ -98,15 +99,14 @@ func GetDefaultACL() defaults.List {
 	return listdefault.StaticValue(types.ListValueMust(types.StringType, av))
 }
 
-type Response struct {
-	Body []byte
-}
-
 func Validate(d *diag.Diagnostics, res interface{}, err error, checkNullFields ...string) error {
 	agg := validate.Response(res, err, checkNullFields...)
 	if agg != nil && res != nil {
-		if v, ok := res.(Response); ok && v.Body != nil {
-			Dump(d, v.Body)
+		body := reflect.ValueOf(res).Elem().FieldByName("Body")
+		if body.IsValid() && !body.IsNil() {
+			if b, ok := body.Interface().([]byte); ok {
+				Dump(d, b)
+			}
 		}
 	}
 	return agg

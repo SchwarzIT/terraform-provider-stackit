@@ -2,7 +2,6 @@ package cluster
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -97,12 +96,6 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 		},
 	)
 	if agg := common.Validate(diags, resp, err); agg != nil {
-		if resp != nil && resp.JSON400 != nil {
-			b, err := json.MarshalIndent(*resp.JSON400, "", " ")
-			if err == nil {
-				diags.AddError("server response", string(b))
-			}
-		}
 		diags.AddError("failed during SKE create/update", agg.Error())
 		return
 	}

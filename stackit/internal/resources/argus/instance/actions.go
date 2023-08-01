@@ -71,9 +71,6 @@ func (r Resource) createInstance(ctx context.Context, diags *diag.Diagnostics, p
 	res, err := c.Instances.Create(ctx, plan.ProjectID.ValueString(), body)
 	if agg := common.Validate(diags, res, err, "JSON202"); agg != nil {
 		diags.AddError("failed to create argus instance", agg.Error())
-		if res != nil && res.JSON400 != nil {
-			diags.AddError("bad request", fmt.Sprintf("%+v", *res.JSON400))
-		}
 		return
 	}
 
