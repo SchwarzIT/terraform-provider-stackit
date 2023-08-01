@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/baseurl"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -95,4 +96,18 @@ func GetDefaultACL() defaults.List {
 		av = append(av, types.StringValue(r))
 	}
 	return listdefault.StaticValue(types.ListValueMust(types.StringType, av))
+}
+
+type Response struct {
+	Body []byte
+}
+
+func Validate(d *diag.Diagnostics, res interface{}, err error, checkNullFields ...string) error {
+	agg := validate.Response(res, err, checkNullFields...)
+	if agg != nil && res != nil {
+		if v, ok := res.(Response); ok && v.Body != nil {
+			Dump(d, v.Body)
+		}
+	}
+	return agg
 }

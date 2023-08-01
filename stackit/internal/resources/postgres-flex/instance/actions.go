@@ -11,6 +11,7 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -29,7 +30,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	plan.setDefaults()
 
 	// validate
-	if err := r.validate(ctx, plan); err != nil {
+	if err := r.validate(ctx, &resp.Diagnostics, plan); err != nil {
 		resp.Diagnostics.AddError("failed postgres validation", err.Error())
 		return
 	}
@@ -86,11 +87,8 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		Version: &v,
 	}
 	res, err := c.Instance.Create(ctx, plan.ProjectID.ValueString(), body)
-	if agg := validate.Response(res, err, "JSON201.ID"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON201.ID"); agg != nil {
 		resp.Diagnostics.AddError("failed creating Postgres flex instance", agg.Error())
-		if res != nil {
-			common.Dump(&resp.Diagnostics, res.Body)
-		}
 		return
 	}
 
@@ -109,7 +107,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	ins, err := process.WaitWithContext(ctx)
 	if err != nil {
 		// last check
-		if err := checkStatus(ctx, c.Instance, plan.ProjectID.ValueString(), *res.JSON201.ID, instance.STATUS_READY); err != nil {
+		if err := checkStatus(ctx, &resp.Diagnostics, c.Instance, plan.ProjectID.ValueString(), *res.JSON201.ID, instance.STATUS_READY); err != nil {
 			resp.Diagnostics.AddError("failed Postgres flex instance creation validation", err.Error())
 			return
 		}
@@ -134,9 +132,9 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 }
 
-func checkStatus(ctx context.Context, instance *instance.ClientWithResponses, projectID, instanceID, wantStatus string) error {
+func checkStatus(ctx context.Context, diags *diag.Diagnostics, instance *instance.ClientWithResponses, projectID, instanceID, wantStatus string) error {
 	res, err := instance.Get(ctx, projectID, instanceID)
-	if err = validate.Response(res, err, "JSON200.Item.Status"); err == nil {
+	if err = common.Validate(diags, res, err, "JSON200.Item.Status"); err == nil {
 		status := *res.JSON200.Item.Status
 		if !strings.EqualFold(status, wantStatus) {
 			return fmt.Errorf("expected status %s for instance ID %s in project %s, received status %s instead.", wantStatus, instanceID, projectID, status)
@@ -158,7 +156,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	// read instance
 	c := r.client.PostgresFlex
 	res, err := c.Instance.Get(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
-	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200"); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
 			return
@@ -192,7 +190,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	plan.ID = state.ID
 
 	// validate
-	if err := r.validate(ctx, plan); err != nil {
+	if err := r.validate(ctx, &resp.Diagnostics, plan); err != nil {
 		resp.Diagnostics.AddError("failed postgres validation", err.Error())
 		return
 	}
@@ -248,7 +246,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	// handle update
 	c := r.client.PostgresFlex.Instance
 	res, err := c.Patch(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
-	if agg := validate.Response(res, err); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
 			return
@@ -265,7 +263,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	isi, err := process.WaitWithContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("failed Postgres instance update validation", err.Error())
-		if err := checkStatus(ctx, c, plan.ProjectID.ValueString(), plan.ID.ValueString(), "READY"); err != nil {
+		if err := checkStatus(ctx, &resp.Diagnostics, c, plan.ProjectID.ValueString(), plan.ID.ValueString(), "READY"); err != nil {
 			resp.Diagnostics.AddError("instance isn't ready", err.Error())
 		}
 		return
@@ -300,7 +298,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 
 	c := r.client.PostgresFlex.Instance
 	res, err := c.Delete(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
-	if agg := validate.Response(res, err); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
 			return

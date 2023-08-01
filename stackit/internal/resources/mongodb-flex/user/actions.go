@@ -41,7 +41,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		Username: &username,
 	}
 	res, err := r.client.MongoDBFlex.User.Create(ctx, plan.ProjectID.ValueString(), plan.InstanceID.ValueString(), body)
-	if agg := validate.Response(res, err, "JSON202.Item"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON202.Item"); agg != nil {
 		resp.Diagnostics.AddError("failed creating mongodb flex db user", agg.Error())
 		return
 	}
@@ -89,7 +89,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 	// read cluster
 	res, err := r.client.MongoDBFlex.User.Get(ctx, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString())
-	if agg := validate.Response(res, err, "JSON200.Item"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200.Item"); agg != nil {
 		resp.Diagnostics.AddError("failed making read user request", agg.Error())
 		return
 	}
@@ -134,14 +134,10 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	res, err := r.client.MongoDBFlex.User.Delete(ctx, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString())
-	if agg := validate.Response(res, err); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
 			return
-		}
-
-		if res != nil {
-			common.Dump(&resp.Diagnostics, res.Body)
 		}
 		resp.Diagnostics.AddError("failed to delete user", agg.Error())
 		resp.Diagnostics.AddWarning("remove user ownership", "failure to delete user usually means the user is still an owner of a database")

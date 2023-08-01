@@ -9,6 +9,7 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -25,11 +26,11 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	// handle creation
 	res, err := r.client.Credentials.Post(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString())
-	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200"); agg != nil {
 		if res.Error != nil && strings.Contains(res.Error.Error(), "service bind failed") {
 			time.Sleep(30 * time.Second)
 			res, err = r.client.Credentials.Post(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString())
-			agg = validate.Response(res, err, "JSON200")
+			agg = common.Validate(&resp.Diagnostics, res, err, "JSON200")
 		}
 		if agg != nil {
 			diags.AddError("failed credential creation", agg.Error())
@@ -62,7 +63,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 	// read instance credential
 	res, err := r.client.Credentials.GetCredentialByID(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString(), cred.ID.ValueString())
-	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200"); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
 			return
@@ -96,7 +97,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	res, err := r.client.Credentials.Delete(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString(), cred.ID.ValueString())
-	if agg := validate.Response(res, err); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err); agg != nil {
 		if !strings.Contains(agg.Error(), "EOF") {
 			resp.Diagnostics.AddError("failed to delete credential", agg.Error())
 			return

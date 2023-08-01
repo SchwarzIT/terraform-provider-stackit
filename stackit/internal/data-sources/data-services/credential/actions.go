@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -20,7 +21,7 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 	}
 
 	res, err := d.client.Credentials.GetCredentialByID(ctx, config.ProjectID.ValueString(), config.InstanceID.ValueString(), config.ID.ValueString())
-	if agg := validate.Response(res, err, "JSON200.Raw"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200.Raw"); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
 			return

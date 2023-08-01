@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/instances"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -23,7 +23,7 @@ func (r Resource) loadPlanID(ctx context.Context, diags *diag.Diagnostics, s *In
 	c := r.client.Argus
 
 	res, err := c.Plans.ListPlans(ctx, s.ProjectID.ValueString())
-	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+	if agg := common.Validate(diags, res, err, "JSON200"); agg != nil {
 		diags.AddError("failed to list argus plans", agg.Error())
 		return
 	}

@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/secrets-manager/v1.1.0/users"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -29,7 +29,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		Description: plan.Description.ValueString(),
 		Write:       plan.Write.ValueBool(),
 	})
-	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200"); agg != nil {
 		resp.Diagnostics.AddError("failed to create user", agg.Error())
 		return
 	}
@@ -57,7 +57,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	res, err := c.SecretsManager.Users.Get(ctx, uuid.MustParse(state.ProjectID.ValueString()), uuid.MustParse(state.InstanceID.ValueString()), uuid.MustParse(state.ID.ValueString()))
-	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200"); agg != nil {
 		if res != nil && res.StatusCode() == http.StatusNotFound {
 			resp.State.RemoveResource(ctx)
 			return

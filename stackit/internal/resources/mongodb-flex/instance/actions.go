@@ -29,7 +29,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	plan.setDefaults()
 
 	// validate
-	if err := r.validate(ctx, plan); err != nil {
+	if err := r.validate(ctx, &resp.Diagnostics, plan); err != nil {
 		resp.Diagnostics.AddError("failed mongodb validation", err.Error())
 		return
 	}
@@ -85,11 +85,8 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	res, err := r.client.MongoDBFlex.Instance.Create(ctx, plan.ProjectID.ValueString(), body)
-	if agg := validate.Response(res, err, "JSON202.ID"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON202.ID"); agg != nil {
 		resp.Diagnostics.AddError("failed MongoDB flex instance creation", agg.Error())
-		if res != nil {
-			common.Dump(&resp.Diagnostics, res.Body)
-		}
 		return
 	}
 
@@ -124,7 +121,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	// read cluster
 	get, err := r.client.MongoDBFlex.Instance.Get(ctx, plan.ProjectID.ValueString(), instanceID)
-	if agg := validate.Response(get, err, "JSON200.Item"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, get, err, "JSON200.Item"); agg != nil {
 		resp.Diagnostics.AddError("failed to get instance after create", agg.Error())
 		return
 	}
@@ -154,7 +151,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 	// read cluster
 	res, err := r.client.MongoDBFlex.Instance.Get(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
-	if agg := validate.Response(res, err, "JSON200.Item"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200.Item"); agg != nil {
 		resp.Diagnostics.AddError("failed to read instance", agg.Error())
 		return
 	}
@@ -181,7 +178,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	// validate
-	if err := r.validate(ctx, plan); err != nil {
+	if err := r.validate(ctx, &resp.Diagnostics, plan); err != nil {
 		resp.Diagnostics.AddError("failed mongodb validation", err.Error())
 		return
 	}
@@ -235,11 +232,8 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 
 	// handle update
 	res, err := r.client.MongoDBFlex.Instance.Patch(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
-	if agg := validate.Response(res, err, "JSON202.Item"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON202.Item"); agg != nil {
 		resp.Diagnostics.AddError("failed updating mongodb flex instance", agg.Error())
-		if res != nil {
-			common.Dump(&resp.Diagnostics, res.Body)
-		}
 		return
 	}
 
@@ -256,7 +250,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 
 	// read cluster
 	get, err := r.client.MongoDBFlex.Instance.Get(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString())
-	if agg := validate.Response(get, err, "JSON200.Item"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, get, err, "JSON200.Item"); agg != nil {
 		resp.Diagnostics.AddError("failed to get instance after create", agg.Error())
 		return
 	}
@@ -283,15 +277,12 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	res, err := r.client.MongoDBFlex.Instance.Delete(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
-	if agg := validate.Response(res, err); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
 			return
 		}
 		resp.Diagnostics.AddError("failed to delete instance", agg.Error())
-		if res != nil {
-			common.Dump(&resp.Diagnostics, res.Body)
-		}
 		return
 	}
 

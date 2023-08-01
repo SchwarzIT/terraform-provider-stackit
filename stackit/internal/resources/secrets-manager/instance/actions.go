@@ -35,11 +35,8 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	res, err := c.SecretsManager.Instances.Create(ctx, uuidProjectID, instances.CreateJSONRequestBody{
 		Name: plan.Name.ValueString(),
 	})
-	if agg := validate.Response(res, err, "JSON201"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON201"); agg != nil {
 		if res == nil || res.StatusCode() != http.StatusOK {
-			if res != nil {
-				common.Dump(&resp.Diagnostics, res.Body)
-			}
 			resp.Diagnostics.AddError("failed to create instance", agg.Error())
 			return
 		}
@@ -87,7 +84,7 @@ func (r Resource) manageACLs(ctx context.Context, plan *Instance, diags *diag.Di
 	}
 	c := r.client
 	res, err := c.SecretsManager.Acls.List(ctx, uuid.MustParse(plan.ProjectID.ValueString()), uuid.MustParse(plan.ID.ValueString()))
-	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+	if agg := common.Validate(diags, res, err, "JSON200"); agg != nil {
 		diags.AddError("failed to get instance ACLs", agg.Error())
 		return
 	}
@@ -133,7 +130,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	res, err := c.SecretsManager.Instances.Get(ctx, uuid.MustParse(state.ProjectID.ValueString()), uuid.MustParse(state.ID.ValueString()))
-	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200"); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
 			return
@@ -162,7 +159,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 func (r Resource) readACLs(ctx context.Context, config *Instance, diags *diag.Diagnostics) {
 	c := r.client
 	res, err := c.SecretsManager.Acls.List(ctx, uuid.MustParse(config.ProjectID.ValueString()), uuid.MustParse(config.ID.ValueString()))
-	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+	if agg := common.Validate(diags, res, err, "JSON200"); agg != nil {
 		diags.AddError("failed to get instance ACLs", agg.Error())
 		return
 	}

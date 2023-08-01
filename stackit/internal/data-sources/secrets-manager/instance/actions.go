@@ -3,7 +3,7 @@ package instance
 import (
 	"context"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -23,7 +23,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	}
 
 	res, err := c.SecretsManager.Instances.Get(ctx, uuid.MustParse(config.ProjectID.ValueString()), uuid.MustParse(config.ID.ValueString()))
-	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200"); agg != nil {
 		resp.Diagnostics.AddError("failed to get instance", agg.Error())
 		return
 	}
@@ -48,7 +48,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 func (r DataSource) readACLs(ctx context.Context, config *Instance, diags *diag.Diagnostics) {
 	c := r.client
 	res, err := c.SecretsManager.Acls.List(ctx, uuid.MustParse(config.ProjectID.ValueString()), uuid.MustParse(config.ID.ValueString()))
-	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+	if agg := common.Validate(diags, res, err, "JSON200"); agg != nil {
 		diags.AddError("failed to get instance ACLs", agg.Error())
 		return
 	}

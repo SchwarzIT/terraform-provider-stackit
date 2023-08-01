@@ -3,7 +3,7 @@ package project
 import (
 	"context"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -20,7 +20,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	}
 	c := r.client.Kubernetes.Project
 	p, err := c.Get(ctx, config.ProjectID.ValueString())
-	if agg := validate.Response(p, err); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, p, err); agg != nil {
 		resp.Diagnostics.AddError("failed to read SKE project", agg.Error())
 		return
 	}

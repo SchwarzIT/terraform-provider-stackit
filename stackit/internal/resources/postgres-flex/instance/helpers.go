@@ -8,8 +8,9 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/instance"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/versions"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
@@ -37,11 +38,11 @@ func (i *Instance) setDefaults() {
 	}
 }
 
-func (r Resource) validate(ctx context.Context, data Instance) error {
-	if err := r.validateVersion(ctx, data.ProjectID.ValueString(), data.Version.ValueString()); err != nil {
+func (r Resource) validate(ctx context.Context, diags *diag.Diagnostics, data Instance) error {
+	if err := r.validateVersion(ctx, diags, data.ProjectID.ValueString(), data.Version.ValueString()); err != nil {
 		return err
 	}
-	if err := r.validateMachineType(ctx, data.ProjectID.ValueString(), data.MachineType.ValueString()); err != nil {
+	if err := r.validateMachineType(ctx, diags, data.ProjectID.ValueString(), data.MachineType.ValueString()); err != nil {
 		return err
 	}
 
@@ -55,15 +56,15 @@ func (r Resource) validate(ctx context.Context, data Instance) error {
 		return errors.New("failed setting storage from object")
 	}
 
-	if err := r.validateStorage(ctx, data.ProjectID.ValueString(), data.MachineType.ValueString(), storage); err != nil {
+	if err := r.validateStorage(ctx, diags, data.ProjectID.ValueString(), data.MachineType.ValueString(), storage); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r Resource) validateVersion(ctx context.Context, projectID, version string) error {
+func (r Resource) validateVersion(ctx context.Context, diags *diag.Diagnostics, projectID, version string) error {
 	res, err := r.client.PostgresFlex.Versions.List(ctx, projectID, &versions.ListParams{})
-	if agg := validate.Response(res, err, "JSON200.Versions"); agg != nil {
+	if agg := common.Validate(diags, res, err, "JSON200.Versions"); agg != nil {
 		return agg
 	}
 
@@ -77,9 +78,9 @@ func (r Resource) validateVersion(ctx context.Context, projectID, version string
 	return fmt.Errorf("couldn't find version '%s'. Available options are:%s\n", version, opts)
 }
 
-func (r Resource) validateMachineType(ctx context.Context, projectID, flavorID string) error {
+func (r Resource) validateMachineType(ctx context.Context, diags *diag.Diagnostics, projectID, flavorID string) error {
 	res, err := r.client.PostgresFlex.Flavors.List(ctx, projectID)
-	if agg := validate.Response(res, err, "JSON200.Flavors"); agg != nil {
+	if agg := common.Validate(diags, res, err, "JSON200.Flavors"); agg != nil {
 		return agg
 	}
 
@@ -96,9 +97,9 @@ func (r Resource) validateMachineType(ctx context.Context, projectID, flavorID s
 	return fmt.Errorf("couldn't find machine type '%s'. Available options are:%s\n", flavorID, opts)
 }
 
-func (r Resource) validateStorage(ctx context.Context, projectID, machineType string, storage Storage) error {
+func (r Resource) validateStorage(ctx context.Context, diags *diag.Diagnostics, projectID, machineType string, storage Storage) error {
 	res, err := r.client.PostgresFlex.Storage.GetStorageOptions(ctx, projectID, machineType)
-	if agg := validate.Response(res, err, "JSON200.StorageClasses"); agg != nil {
+	if agg := common.Validate(diags, res, err, "JSON200.StorageClasses"); agg != nil {
 		return agg
 	}
 

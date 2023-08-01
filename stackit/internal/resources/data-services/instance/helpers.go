@@ -7,8 +7,9 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/instances"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/offerings"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/pkg/errors"
 )
@@ -53,13 +54,13 @@ func (r Resource) getDefaultPlan() string {
 	return ""
 }
 
-func (r Resource) validate(ctx context.Context, data *Instance) error {
+func (r Resource) validate(ctx context.Context, diags *diag.Diagnostics, data *Instance) error {
 	if !data.ACL.IsUnknown() && len(data.ACL.Elements()) == 0 {
 		return errors.New("at least 1 ip address must be specified for `acl`")
 	}
 
 	res, err := r.client.Offerings.List(ctx, data.ProjectID.ValueString())
-	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+	if agg := common.Validate(diags, res, err, "JSON200"); agg != nil {
 		return agg
 	}
 
@@ -129,14 +130,14 @@ func (r Resource) applyClientResponse(ctx context.Context, pi *Instance, i *inst
 	return nil
 }
 
-func (r Resource) getPlanAndVersion(ctx context.Context, projectID, instanceID string) (plan, version string, err error) {
+func (r Resource) getPlanAndVersion(ctx context.Context, diags *diag.Diagnostics, projectID, instanceID string) (plan, version string, err error) {
 	i, err := r.client.Instances.Get(ctx, projectID, instanceID)
-	if agg := validate.Response(i, err, "JSON200"); agg != nil {
+	if agg := common.Validate(diags, i, err, "JSON200"); agg != nil {
 		return "", "", agg
 	}
 
 	res, err := r.client.Offerings.List(ctx, projectID)
-	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+	if agg := common.Validate(diags, res, err, "JSON200"); agg != nil {
 		return "", "", agg
 	}
 
