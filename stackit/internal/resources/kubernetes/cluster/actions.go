@@ -2,7 +2,6 @@ package cluster
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -11,6 +10,7 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/cluster"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -54,7 +54,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnostics, cl *Cluster, timeout time.Duration) {
 	c := r.client
-	versions, err := r.loadAvaiableVersions(ctx)
+	versions, err := r.loadAvaiableVersions(ctx, diags)
 	if err != nil {
 		diags.AddError("failed while loading version options", err.Error())
 		return
@@ -77,7 +77,7 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 		return
 	}
 
-	if err := r.validate(ctx, projectID, clusterName, clusterConfig, &nodePools, maintenance, hibernations, extensions); err != nil {
+	if err := r.validate(ctx, diags, projectID, clusterName, clusterConfig, &nodePools, maintenance, hibernations, extensions); err != nil {
 		diags.AddError(
 			"Failed cluster validation",
 			err.Error(),
@@ -95,20 +95,14 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 			Nodepools:   nodePools,
 		},
 	)
-	if agg := validate.Response(resp, err); agg != nil {
-		if resp != nil && resp.JSON400 != nil {
-			b, err := json.MarshalIndent(*resp.JSON400, "", " ")
-			if err == nil {
-				diags.AddError("server response", string(b))
-			}
-		}
+	if agg := common.Validate(diags, resp, err); agg != nil {
 		diags.AddError("failed during SKE create/update", agg.Error())
 		return
 	}
 
 	process := resp.WaitHandler(ctx, c.Kubernetes.Cluster, projectID, clusterName).SetTimeout(timeout)
 	res, err := process.WaitWithContext(ctx)
-	if agg := validate.Response(res, err, "JSON200.Status.Aggregated"); agg != nil {
+	if agg := common.Validate(diags, res, err, "JSON200.Status.Aggregated"); agg != nil {
 		diags.AddError("failed to validate SKE create/update", agg.Error())
 		return
 	}
@@ -124,7 +118,7 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 func (r Resource) getCredential(ctx context.Context, diags *diag.Diagnostics, cl *Cluster) {
 	c := r.client
 	res, err := c.Kubernetes.Credentials.List(ctx, cl.KubernetesProjectID.ValueString(), cl.Name.ValueString())
-	if agg := validate.Response(res, err, "JSON200.Kubeconfig"); agg != nil {
+	if agg := common.Validate(diags, res, err, "JSON200.Kubeconfig"); agg != nil {
 		diags.AddError("failed fetching cluster credentials", agg.Error())
 		return
 	}
@@ -145,7 +139,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 	// read cluster
 	res, err := c.Kubernetes.Cluster.Get(ctx, state.KubernetesProjectID.ValueString(), state.Name.ValueString())
-	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200"); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
 			return
@@ -214,7 +208,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 
 	c := r.client
 	res, err := c.Kubernetes.Cluster.Delete(ctx, state.KubernetesProjectID.ValueString(), state.Name.ValueString())
-	if agg := validate.Response(res, err); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err); agg != nil {
 		resp.Diagnostics.AddError("failed deleting cluster", agg.Error())
 		return
 	}
@@ -277,7 +271,7 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 	// pre-read imports
 	c := r.client
 	res, err := c.Kubernetes.Cluster.Get(ctx, idParts[0], idParts[1])
-	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200"); agg != nil {
 		resp.Diagnostics.AddError("failed import pre-read", agg.Error())
 		return
 	}

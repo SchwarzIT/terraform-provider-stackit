@@ -7,7 +7,6 @@ import (
 
 	"github.com/Masterminds/semver"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/cluster"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/pkg/errors"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
@@ -31,11 +30,11 @@ const (
 	DefaultVersion                      = "1.24"
 )
 
-func (r Resource) loadAvaiableVersions(ctx context.Context) ([]*semver.Version, error) {
+func (r Resource) loadAvaiableVersions(ctx context.Context, diags *diag.Diagnostics) ([]*semver.Version, error) {
 	c := r.client
 	var versionOptions []*semver.Version
 	res, err := c.Kubernetes.ProviderOptions.List(ctx)
-	if agg := validate.Response(res, err, "JSON200.KubernetesVersions"); agg != nil {
+	if agg := common.Validate(diags, res, err, "JSON200.KubernetesVersions"); agg != nil {
 		return nil, errors.Wrap(agg, "failed fetching cluster versions")
 	}
 

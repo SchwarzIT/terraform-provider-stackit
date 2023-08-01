@@ -6,8 +6,8 @@ import (
 	"time"
 
 	rmv2 "github.com/SchwarzIT/community-stackit-go-client/pkg/services/resource-management/v2.0"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -73,11 +73,8 @@ func (r Resource) createProject(ctx context.Context, resp *resource.CreateRespon
 		Name:              plan.Name.ValueString(),
 	}
 	res, err := r.client.ResourceManagement.Create(ctx, body)
-	if agg := validate.Response(res, err, "JSON201"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON201"); agg != nil {
 		resp.Diagnostics.AddError("failed creating project", agg.Error())
-		if res != nil && res.JSON400 != nil {
-			resp.Diagnostics.AddError("bad request", fmt.Sprintf("%+v", *res.JSON400))
-		}
 		return plan
 	}
 
@@ -111,7 +108,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	res, err := c.ResourceManagement.Get(ctx, p.ID.ValueString(), &rmv2.GetParams{})
-	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200"); agg != nil {
 		resp.Diagnostics.AddError("failed reading project", agg.Error())
 		return
 	}
@@ -188,7 +185,7 @@ func (r Resource) updateProject(ctx context.Context, plan, state Project, resp *
 		Name:              &name,
 	}
 	res, err := r.client.ResourceManagement.Update(ctx, plan.ContainerID.ValueString(), body)
-	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200"); agg != nil {
 		resp.Diagnostics.AddError("failed updating project", agg.Error())
 		return
 	}
@@ -204,7 +201,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 
 	c := r.client
 	res, err := c.ResourceManagement.Delete(ctx, state.ContainerID.ValueString())
-	if agg := validate.Response(res, err); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err); agg != nil {
 		resp.Diagnostics.AddError("failed deleting project", agg.Error())
 		return
 	}

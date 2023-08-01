@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -23,7 +22,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	// handle creation
 	c := r.client.ObjectStorage.Project
 	res, err := c.Create(ctx, plan.ProjectID.ValueString())
-	if agg := validate.Response(res, err); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err); agg != nil {
 		if !strings.Contains(agg.Error(), common.ERR_UNEXPECTED_EOF) {
 			resp.Diagnostics.AddError("failed ObjectStorage project creation", agg.Error())
 			return
@@ -51,7 +50,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	// read
 	c := r.client.ObjectStorage.Project
 	res, err := c.Get(ctx, state.ID.ValueString())
-	if agg := validate.Response(res, err); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err); agg != nil {
 		resp.Diagnostics.AddError("failed ObjectStorage project read", agg.Error())
 		return
 	}

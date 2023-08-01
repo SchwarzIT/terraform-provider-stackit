@@ -69,11 +69,8 @@ func (r Resource) createInstance(ctx context.Context, diags *diag.Diagnostics, p
 		Parameter: &pa,
 	}
 	res, err := c.Instances.Create(ctx, plan.ProjectID.ValueString(), body)
-	if agg := validate.Response(res, err, "JSON202"); agg != nil {
+	if agg := common.Validate(diags, res, err, "JSON202"); agg != nil {
 		diags.AddError("failed to create argus instance", agg.Error())
-		if res != nil && res.JSON400 != nil {
-			diags.AddError("bad request", fmt.Sprintf("%+v", *res.JSON400))
-		}
 		return
 	}
 
@@ -86,7 +83,7 @@ func (r Resource) createInstance(ctx context.Context, diags *diag.Diagnostics, p
 	wr, err := process.WaitWithContext(ctx)
 	if err != nil {
 		diags.AddError("failed validating instance creation", err.Error())
-		if err := checkStatus(ctx, c.Instances, plan.ProjectID.ValueString(), res.JSON202.InstanceID, instances.PROJECT_INSTANCE_UI_STATUS_CREATE_SUCCEEDED); err != nil {
+		if err := checkStatus(ctx, diags, c.Instances, plan.ProjectID.ValueString(), res.JSON202.InstanceID, instances.PROJECT_INSTANCE_UI_STATUS_CREATE_SUCCEEDED); err != nil {
 			diags.AddError("instance isn't ready", err.Error())
 		}
 		return
@@ -101,9 +98,9 @@ func (r Resource) createInstance(ctx context.Context, diags *diag.Diagnostics, p
 	updateByAPIResult(plan, got)
 }
 
-func checkStatus(ctx context.Context, instance *instances.ClientWithResponses, projectID, instanceID string, wantStatus ...instances.ProjectInstanceUIStatus) error {
+func checkStatus(ctx context.Context, diags *diag.Diagnostics, instance *instances.ClientWithResponses, projectID, instanceID string, wantStatus ...instances.ProjectInstanceUIStatus) error {
 	res, err := instance.Get(ctx, projectID, instanceID)
-	if err := validate.Response(res, err, "JSON200"); err == nil {
+	if err := common.Validate(diags, res, err, "JSON200"); err == nil {
 		status := res.JSON200.Status
 		oneof := false
 		options := ""
@@ -144,7 +141,7 @@ func (r Resource) setGrafanaConfig(ctx context.Context, diags *diag.Diagnostics,
 	}
 
 	res, err := c.Argus.GrafanaConfigs.Update(ctx, s.ProjectID.ValueString(), s.ID.ValueString(), cfg)
-	if agg := validate.Response(res, err); agg != nil {
+	if agg := common.Validate(diags, res, err); agg != nil {
 		diags.AddError("failed to make grafana config request", agg.Error())
 		return
 	}
@@ -175,10 +172,7 @@ func (r Resource) setMetricsConfig(ctx context.Context, diags *diag.Diagnostics,
 		MetricsRetentionTime1h:  fmt.Sprintf("%dd", m.RetentionDays1hDownsampling.ValueInt64()),
 	}
 	res, err := r.client.Argus.MetricsStorageRetention.Update(ctx, s.ProjectID.ValueString(), s.ID.ValueString(), cfg)
-	if agg := validate.Response(res, err); agg != nil {
-		if res != nil {
-			common.Dump(diags, res.Body)
-		}
+	if agg := common.Validate(diags, res, err); agg != nil {
 		diags.AddError("failed to make metrics config request", agg.Error())
 		return
 	}
@@ -224,7 +218,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 func (r Resource) readInstance(ctx context.Context, diags *diag.Diagnostics, s *Instance) {
 	c := r.client
 	res, err := c.Argus.Instances.Get(ctx, s.ProjectID.ValueString(), s.ID.ValueString())
-	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+	if agg := common.Validate(diags, res, err, "JSON200"); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			s.ID = types.StringValue("")
 			return
@@ -246,7 +240,7 @@ func (r Resource) readGrafana(ctx context.Context, diags *diag.Diagnostics, s *I
 
 	c := r.client
 	res, err := c.Argus.GrafanaConfigs.List(ctx, s.ProjectID.ValueString(), s.ID.ValueString())
-	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+	if agg := common.Validate(diags, res, err, "JSON200"); agg != nil {
 		diags.AddError("failed to read grafana configs", agg.Error())
 		return
 	}
@@ -265,7 +259,7 @@ func (r Resource) readMetrics(ctx context.Context, diags *diag.Diagnostics, s *I
 
 	c := r.client
 	res, err := c.Argus.MetricsStorageRetention.List(ctx, s.ProjectID.ValueString(), s.ID.ValueString())
-	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+	if agg := common.Validate(diags, res, err, "JSON200"); agg != nil {
 		diags.AddError("failed to read metrics storage retention", agg.Error())
 		return
 	}
@@ -354,7 +348,7 @@ func (r Resource) updateInstance(ctx context.Context, diags *diag.Diagnostics, p
 		PlanID:    plan.PlanID.ValueString(),
 	}
 	res, err := c.Argus.Instances.Update(ctx, plan.ProjectID.ValueString(), plan.ID.ValueString(), body)
-	if agg := validate.Response(res, err, "JSON202"); agg != nil {
+	if agg := common.Validate(diags, res, err, "JSON202"); agg != nil {
 		diags.AddError("failed to update instance", agg.Error())
 		return
 	}
@@ -374,7 +368,7 @@ func (r Resource) updateInstance(ctx context.Context, diags *diag.Diagnostics, p
 	got, ok := wr.(*instances.ProjectInstanceUI)
 	if !ok || got == nil {
 		diags.AddError("failed wait result conversion", "response is not of *instances.ProjectInstanceUI or nil")
-		if err := checkStatus(ctx, c.Argus.Instances, plan.ProjectID.ValueString(), plan.ID.ValueString(), instances.PROJECT_INSTANCE_UI_STATUS_UPDATE_SUCCEEDED); err != nil {
+		if err := checkStatus(ctx, diags, c.Argus.Instances, plan.ProjectID.ValueString(), plan.ID.ValueString(), instances.PROJECT_INSTANCE_UI_STATUS_UPDATE_SUCCEEDED); err != nil {
 			diags.AddError("instance isn't ready", err.Error())
 		}
 		return
@@ -399,11 +393,8 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 
 	c := r.client
 	res, err := c.Argus.Instances.Delete(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
-	if agg := validate.Response(res, err); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err); agg != nil {
 		resp.Diagnostics.AddError("failed to delete instance", agg.Error())
-		if res != nil {
-			common.Dump(&resp.Diagnostics, res.Body)
-		}
 		return
 	}
 

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -22,7 +22,7 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 	}
 
 	res, err := d.client.Instances.List(ctx, config.ProjectID.ValueString())
-	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200"); agg != nil {
 		resp.Diagnostics.AddError("failed to list instances", agg.Error())
 		return
 	}
@@ -52,7 +52,7 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 	instance := list.Instances[found]
 
 	ores, err := d.client.Offerings.List(ctx, config.ProjectID.ValueString())
-	if agg := validate.Response(ores, err, "JSON200"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, ores, err, "JSON200"); agg != nil {
 		resp.Diagnostics.AddError("failed to get offerings", agg.Error())
 		return
 	}

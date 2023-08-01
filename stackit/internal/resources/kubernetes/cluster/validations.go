@@ -9,10 +9,13 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/cluster"
 	provideroptions "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/provider-options"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 )
 
 func (r Resource) validate(
 	ctx context.Context,
+	diags *diag.Diagnostics,
 	projectID string,
 	clusterName string,
 	clusterConfig cluster.Kubernetes,
@@ -31,7 +34,7 @@ func (r Resource) validate(
 	c := r.client
 	opts, err := c.Kubernetes.ProviderOptions.List(ctx)
 
-	if agg := validate.Response(opts, err, "JSON200.KubernetesVersions"); agg != nil {
+	if agg := common.Validate(diags, opts, err, "JSON200.KubernetesVersions"); agg != nil {
 		// if options cannot be fetched, skip validation
 		return nil
 	}

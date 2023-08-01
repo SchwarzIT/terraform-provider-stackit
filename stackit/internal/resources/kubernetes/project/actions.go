@@ -23,7 +23,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	// handle creation
 	c := r.client.Kubernetes.Project
 	res, err := c.Create(ctx, plan.ProjectID.ValueString())
-	if agg := validate.Response(res, err); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err); agg != nil {
 		if !strings.Contains(agg.Error(), common.ERR_UNEXPECTED_EOF) {
 			resp.Diagnostics.AddError("failed during SKE project creation", agg.Error())
 			return
@@ -61,7 +61,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	// read
 	c := r.client.Kubernetes.Project
 	res, err := c.Get(ctx, state.ID.ValueString())
-	if agg := validate.Response(res, err); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
 			return

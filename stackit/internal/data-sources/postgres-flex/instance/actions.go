@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -23,7 +23,7 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 	}
 
 	res, err := c.List(ctx, config.ProjectID.ValueString())
-	if agg := validate.Response(res, err, "JSON200.Items"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200.Items"); agg != nil {
 		resp.Diagnostics.AddError("failed to list postgres flex instances", agg.Error())
 		return
 	}
@@ -59,7 +59,7 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 		return
 	}
 	ires, err := c.Get(ctx, config.ProjectID.ValueString(), *instance.ID)
-	if agg := validate.Response(ires, err, "JSON200.Item"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, ires, err, "JSON200.Item"); agg != nil {
 		resp.Diagnostics.AddError("failed to get postgres flex instance", agg.Error())
 		return
 	}

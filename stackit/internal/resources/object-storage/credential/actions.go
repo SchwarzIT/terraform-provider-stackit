@@ -5,7 +5,7 @@ import (
 	"time"
 
 	accesskey "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1.0.1/access-key"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -61,7 +61,7 @@ func (r Resource) createAccessKey(ctx context.Context, resp *resource.CreateResp
 		params.CredentialsGroup = nil
 	}
 	res, err := c.ObjectStorage.AccessKey.Create(ctx, key.ObjectStorageProjectID.ValueString(), params, body)
-	if agg := validate.Response(res, err, "JSON201"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON201"); agg != nil {
 		resp.Diagnostics.AddError("failed to create credential", agg.Error())
 		return res
 	}
@@ -88,7 +88,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		params.CredentialsGroup = nil
 	}
 	res, err := c.ObjectStorage.AccessKey.Get(ctx, state.ObjectStorageProjectID.ValueString(), params)
-	if agg := validate.Response(res, err, "JSON200.AccessKeys"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200.AccessKeys"); agg != nil {
 		resp.Diagnostics.AddError("failed to list credentials", agg.Error())
 		return
 	}
@@ -136,7 +136,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 
 	c := r.client
 	res, err := c.ObjectStorage.AccessKey.Delete(ctx, state.ObjectStorageProjectID.ValueString(), state.ID.ValueString(), params)
-	if agg := validate.Response(res, err); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err); agg != nil {
 		resp.Diagnostics.AddError("failed to delete credential", agg.Error())
 		return
 	}

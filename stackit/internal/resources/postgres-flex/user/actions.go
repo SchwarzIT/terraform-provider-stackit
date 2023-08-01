@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -17,7 +16,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
-	"github.com/pkg/errors"
 )
 
 // Create - lifecycle function
@@ -59,16 +57,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	res, err := r.client.PostgresFlex.Users.Create(ctx, plan.ProjectID.ValueString(), plan.InstanceID.ValueString(), body)
-	if agg := validate.Response(res, err, "JSON201.Item"); agg != nil {
-		if res.StatusCode() == http.StatusBadRequest {
-			j := ""
-			if res.JSON400 != nil {
-				b, _ := json.Marshal(res.JSON400)
-				j = string(b)
-			}
-			resp.Diagnostics.AddError("failed creating postgres flex db user", errors.Wrapf(agg, j).Error())
-			return
-		}
+	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON201.Item"); agg != nil {
 		resp.Diagnostics.AddError("failed creating postgres flex db user", agg.Error())
 		return
 	}
@@ -118,11 +107,11 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 	// read cluster
 	res, err := r.client.PostgresFlex.Users.Get(ctx, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString())
-	if agg := validate.Response(res, err, "JSON200.Item"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200.Item"); agg != nil {
 		if validate.StatusEquals(res, http.StatusBadRequest, http.StatusInternalServerError) {
 			// verify the instance exists
 			res, err := r.client.PostgresFlex.Instance.List(ctx, state.ProjectID.ValueString())
-			if agg2 := validate.Response(res, err, "JSON200.Items"); agg2 != nil {
+			if agg2 := common.Validate(&resp.Diagnostics, res, err, "JSON200.Items"); agg2 != nil {
 				resp.Diagnostics.AddError("failed making read user request", agg.Error())
 				resp.Diagnostics.AddError("failed verifying instance status", agg2.Error())
 				return
@@ -183,13 +172,10 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	res, err := r.client.PostgresFlex.Users.Delete(ctx, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString())
-	if agg := validate.Response(res, err); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
 			return
-		}
-		if res != nil {
-			common.Dump(&resp.Diagnostics, res.Body)
 		}
 		if !strings.Contains(agg.Error(), "timed out waiting for the condition") {
 			resp.Diagnostics.AddError("failed to delete user", agg.Error())
