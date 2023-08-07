@@ -11,7 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-const run_this_test = false
+const run_this_test = true
 
 func TestAcc_ObjectStorageCredential(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
@@ -50,14 +50,22 @@ func config() string {
 		object_storage_project_id = stackit_object_storage_project.example.id
 	}
 
-	data "stackit_object_storage_credential" "ex1" {
+	data "stackit_object_storage_credentials_group" "example" {
+		depends_on                = [stackit_object_storage_credential.example]
 		object_storage_project_id = stackit_object_storage_project.example.id
-		id		   					   = stackit_object_storage_credential.example.id
+		name                      = "default"
+	}
+
+	data "stackit_object_storage_credential" "ex1" {
+		object_storage_project_id 	= stackit_object_storage_project.example.id
+		credentials_group_id 		= data.stackit_object_storage_credentials_group.example.id
+		id		   					= stackit_object_storage_credential.example.id
 	}
 
 	data "stackit_object_storage_credential" "ex2" {
 		object_storage_project_id   = stackit_object_storage_project.example.id
-		display_name 					 = stackit_object_storage_credential.example.display_name
+		credentials_group_id 		= data.stackit_object_storage_credentials_group.example.id
+		display_name 				= stackit_object_storage_credential.example.display_name
 	}
 
 	`,

@@ -25,7 +25,10 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	params := &accesskey.GetParams{}
+	credGroup := config.CredentialsGroupID.ValueString()
+	params := &accesskey.GetParams{
+		CredentialsGroup: &credGroup,
+	}
 	res, err := c.ObjectStorage.AccessKey.Get(ctx, config.ObjectStorageProjectID.ValueString(), params)
 	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200.AccessKeys"); agg != nil {
 		resp.Diagnostics.AddError("failed to list credentials", agg.Error())
@@ -45,11 +48,9 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		config.Expiry = types.StringValue(k.Expires)
 		diags = resp.State.Set(ctx, &config)
 		resp.Diagnostics.Append(diags...)
-
 		if resp.Diagnostics.HasError() {
 			return
 		}
-
 		break
 	}
 
