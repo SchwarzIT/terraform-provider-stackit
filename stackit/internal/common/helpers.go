@@ -103,7 +103,7 @@ func Validate(d *diag.Diagnostics, res interface{}, err error, checkNullFields .
 	agg := validate.Response(res, err, checkNullFields...)
 	if agg != nil && res != nil {
 		resValue := reflect.ValueOf(res)
-		if resValue.Kind() == reflect.Ptr && resValue.Elem().Kind() == reflect.Struct {
+		if resValue.Kind() == reflect.Ptr {
 			resValue = resValue.Elem()
 		}
 		if resValue.Kind() != reflect.Struct {
