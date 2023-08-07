@@ -102,7 +102,14 @@ func GetDefaultACL() defaults.List {
 func Validate(d *diag.Diagnostics, res interface{}, err error, checkNullFields ...string) error {
 	agg := validate.Response(res, err, checkNullFields...)
 	if agg != nil && res != nil {
-		body := reflect.ValueOf(res).Elem().FieldByName("Body")
+		resValue := reflect.ValueOf(res)
+		if resValue.Kind() == reflect.Ptr {
+			resValue = resValue.Elem()
+		}
+		if resValue.Kind() != reflect.Struct {
+			return agg
+		}
+		body := resValue.FieldByName("Body")
 		if body.IsValid() && !body.IsNil() {
 			if b, ok := body.Interface().([]byte); ok {
 				Dump(d, b)
