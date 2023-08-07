@@ -20,7 +20,8 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "the credential group ID",
-				Required:    true,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"object_storage_project_id": schema.StringAttribute{
@@ -33,6 +34,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 
 			"name": schema.StringAttribute{
 				Description: "the credential group's display name",
+				Optional:    true,
 				Computed:    true,
 			},
 

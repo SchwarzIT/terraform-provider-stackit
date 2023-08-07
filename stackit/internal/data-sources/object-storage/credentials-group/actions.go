@@ -19,6 +19,11 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
+	if data.ID.ValueString() == "" && data.Name.ValueString() == "" {
+		resp.Diagnostics.AddError("missing configuration", "either name or id must be provided")
+		return
+	}
+
 	res, err := c.ObjectStorage.CredentialsGroup.Get(ctx, data.ObjectStorageProjectID.ValueString())
 	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200.CredentialsGroups"); agg != nil {
 		resp.Diagnostics.AddError("failed to read credential groups", agg.Error())
@@ -27,12 +32,14 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 
 	found := false
 	for _, group := range res.JSON200.CredentialsGroups {
-		if group.CredentialsGroupID == data.ID.ValueString() {
-			found = true
-			data.Name = types.StringValue(group.DisplayName)
-			data.URN = types.StringValue(group.URN)
-			break
+		if group.CredentialsGroupID != data.ID.ValueString() && group.DisplayName != data.Name.ValueString() {
+			continue
 		}
+		found = true
+		data.ID = types.StringValue(group.CredentialsGroupID)
+		data.Name = types.StringValue(group.DisplayName)
+		data.URN = types.StringValue(group.URN)
+		break
 	}
 
 	if !found {

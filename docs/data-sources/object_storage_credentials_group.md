@@ -39,12 +39,15 @@ data "stackit_object_storage_credentials_group" "example" {
 
 ### Required
 
-- `id` (String) the credential group ID
 - `object_storage_project_id` (String) The ID returned from `stackit_object_storage_project`
+
+### Optional
+
+- `id` (String) the credential group ID
+- `name` (String) the credential group's display name
 
 ### Read-Only
 
-- `name` (String) the credential group's display name
 - `urn` (String) credential group URN
 
 

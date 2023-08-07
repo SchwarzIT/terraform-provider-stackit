@@ -16,6 +16,7 @@ import (
 type Credential struct {
 	ID                     types.String `tfsdk:"id"`
 	ObjectStorageProjectID types.String `tfsdk:"object_storage_project_id"`
+	CredentialsGroupID     types.String `tfsdk:"credentials_group_id"`
 	Expiry                 types.String `tfsdk:"expiry"`
 	DisplayName            types.String `tfsdk:"display_name"`
 }
@@ -39,6 +40,11 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Validators: []validator.String{
 					validate.ProjectID(),
 				},
+			},
+
+			"credentials_group_id": schema.StringAttribute{
+				Description: "the credentials group ID",
+				Required:    true,
 			},
 
 			"expiry": schema.StringAttribute{
