@@ -112,6 +112,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
+			// TODO: remove in next releases
 			"kubernetes_project_id": schema.StringAttribute{
 				Description:        "The ID of a `stackit_kubernetes_project` resource",
 				DeprecationMessage: "This attribute is deprecated and will be removed in a future version. Please use the `project_id` attribute instead.",

@@ -15,6 +15,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
+// TODO: remove in next releases
+
 // KubernetesProject is the schema model
 type KubernetesProject struct {
 	ID        types.String   `tfsdk:"id"`
