@@ -155,24 +155,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 }
 
 // Update - lifecycle function - not used for this resource
-func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	var state CredentialsGroup
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	// pre-process config
-	r.preProcessConfig(&resp.Diagnostics, &state)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	diags := resp.State.Set(ctx, &state)
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
+func (r Resource) Update(context.Context, resource.UpdateRequest, *resource.UpdateResponse) {
 }
 
 // Delete - lifecycle function

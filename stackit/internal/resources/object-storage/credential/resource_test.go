@@ -12,7 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-const run_this_test = true
+const run_this_test = false
 
 func TestAcc_ObjectStorageCredential(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {

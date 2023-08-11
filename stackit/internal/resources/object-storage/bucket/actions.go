@@ -56,6 +56,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		ID:                     types.StringValue(b.Bucket.Name),
 		Name:                   types.StringValue(b.Bucket.Name),
 		ObjectStorageProjectID: types.StringValue(b.Project),
+		ProjectID:              types.StringValue(b.Project),
 		Region:                 types.StringValue(b.Bucket.Region),
 		HostStyleURL:           types.StringValue(b.Bucket.UrlVirtualHostedStyle),
 		PathStyleURL:           types.StringValue(b.Bucket.UrlPathStyle),
@@ -156,6 +157,8 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	state.Region = types.StringValue(res.JSON200.Bucket.Region)
+	state.ObjectStorageProjectID = types.StringValue(res.JSON200.Project)
+	state.ProjectID = types.StringValue(res.JSON200.Project)
 	state.HostStyleURL = types.StringValue(res.JSON200.Bucket.UrlVirtualHostedStyle)
 	state.PathStyleURL = types.StringValue(res.JSON200.Bucket.UrlPathStyle)
 	diags = resp.State.Set(ctx, &state)
@@ -166,24 +169,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 }
 
 // Update - lifecycle function - not used for this resource
-func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	var state Bucket
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	// pre-process config
-	r.preProcessConfig(&resp.Diagnostics, &state)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	diags := resp.State.Set(ctx, &state)
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
+func (r Resource) Update(context.Context, resource.UpdateRequest, *resource.UpdateResponse) {
 }
 
 // Delete - lifecycle function

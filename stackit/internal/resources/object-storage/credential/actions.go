@@ -44,6 +44,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	diags = resp.State.Set(ctx, Credential{
 		ID:                     types.StringValue(k.KeyID),
 		ObjectStorageProjectID: types.StringValue(k.Project),
+		ProjectID:              types.StringValue(k.Project),
 		CredentialsGroupID:     types.StringValue(data.CredentialsGroupID.ValueString()),
 		Expiry:                 types.StringValue(k.Expires),
 		DisplayName:            types.StringValue(k.DisplayName),
@@ -141,7 +142,8 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	if cg == "" {
 		params.CredentialsGroup = nil
 	}
-	res, err := c.ObjectStorage.AccessKey.Get(ctx, state.ObjectStorageProjectID.ValueString(), params)
+
+	res, err := c.ObjectStorage.AccessKey.Get(ctx, state.ProjectID.ValueString(), params)
 	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200.AccessKeys"); agg != nil {
 		resp.Diagnostics.AddError("failed to list credentials", agg.Error())
 		return
@@ -170,24 +172,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 }
 
 // Update - lifecycle function - not used for this resource
-func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	var state Credential
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	// pre-process config
-	r.preProcessConfig(&resp.Diagnostics, &state)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	diags := resp.State.Set(ctx, &state)
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
+func (r Resource) Update(context.Context, resource.UpdateRequest, *resource.UpdateResponse) {
 }
 
 // Delete - lifecycle function
@@ -213,7 +198,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	c := r.client
-	res, err := c.ObjectStorage.AccessKey.Delete(ctx, state.ObjectStorageProjectID.ValueString(), state.ID.ValueString(), params)
+	res, err := c.ObjectStorage.AccessKey.Delete(ctx, state.ProjectID.ValueString(), state.ID.ValueString(), params)
 	if agg := common.Validate(&resp.Diagnostics, res, err); agg != nil {
 		resp.Diagnostics.AddError("failed to delete credential", agg.Error())
 		return
