@@ -20,7 +20,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	res, err := c.ObjectStorage.Bucket.Get(ctx, config.ObjectStorageProjectID.ValueString(), config.Name.ValueString())
+	res, err := c.ObjectStorage.Bucket.Get(ctx, config.ProjectID.ValueString(), config.Name.ValueString())
 	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200.Bucket"); agg != nil {
 		resp.Diagnostics.AddError("failed to read bucket", agg.Error())
 		return
