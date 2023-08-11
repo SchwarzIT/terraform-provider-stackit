@@ -85,7 +85,7 @@ func (r Resource) enableProject(ctx context.Context, diags *diag.Diagnostics, cl
 
 	found := true
 	status, err := c.Get(ctx, projectID)
-	if agg := common.Validate(diags, status, err, "JSON200.State"); agg != nil {
+	if agg := common.Validate(&diag.Diagnostics{}, status, err, "JSON200.State"); agg != nil {
 		if status == nil || status.StatusCode() != http.StatusNotFound {
 			diags.AddError("failed to fetch SKE project status", agg.Error())
 			return
