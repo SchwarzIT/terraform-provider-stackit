@@ -25,6 +25,7 @@ type KubernetesProject struct {
 // Schema returns the terraform schema structure
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
+		DeprecationMessage: "This resource is deprecated and will be removed in a future version. Please use the `stackit_kubernetes_cluster` resource instead.",
 		MarkdownDescription: fmt.Sprintf("This resource enables STACKIT Kubernetes Engine (SKE) in a project\n%s",
 			common.EnvironmentInfo(r.urls),
 		),
