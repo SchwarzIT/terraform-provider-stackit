@@ -19,13 +19,9 @@ Manages Object Storage buckets
 ## Example Usage
 
 ```terraform
-resource "stackit_object_storage_project" "example" {
-  project_id = "example"
-}
-
 resource "stackit_object_storage_bucket" "example" {
-  object_storage_project_id = stackit_object_storage_project.example.id
-  name                      = "example"
+  project_id = stackit_object_storage_project.example.id
+  name       = "example"
 }
 ```
 
@@ -35,10 +31,11 @@ resource "stackit_object_storage_bucket" "example" {
 ### Required
 
 - `name` (String) Bucket name
-- `object_storage_project_id` (String) The ID returned from `stackit_object_storage_project`
 
 ### Optional
 
+- `object_storage_project_id` (String, Deprecated) The ID returned from `stackit_object_storage_project`
+- `project_id` (String) The project UUID.
 - `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
 
 ### Read-Only
