@@ -12,7 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-const run_this_test = false
+const run_this_test = true
 
 func TestAcc_ObjectStorageBucket(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
@@ -33,7 +33,7 @@ func TestAcc_ObjectStorageBucket(t *testing.T) {
 				Config: config(name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_object_storage_bucket.example", "name", name),
-					resource.TestCheckResourceAttr("stackit_object_storage_bucket.example", "object_storage_project_id", common.GetAcceptanceTestsProjectID()),
+					resource.TestCheckResourceAttr("stackit_object_storage_bucket.example", "project_id", common.GetAcceptanceTestsProjectID()),
 					resource.TestCheckResourceAttrSet("stackit_object_storage_bucket.example", "region"),
 					resource.TestCheckResourceAttrSet("stackit_object_storage_bucket.example", "host_style_url"),
 					resource.TestCheckResourceAttrSet("stackit_object_storage_bucket.example", "path_style_url"),
@@ -44,7 +44,7 @@ func TestAcc_ObjectStorageBucket(t *testing.T) {
 				Config: config(newName),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_object_storage_bucket.example", "name", newName),
-					resource.TestCheckResourceAttr("stackit_object_storage_bucket.example", "object_storage_project_id", common.GetAcceptanceTestsProjectID()),
+					resource.TestCheckResourceAttr("stackit_object_storage_bucket.example", "project_id", common.GetAcceptanceTestsProjectID()),
 				),
 			},
 			// test import
@@ -60,13 +60,9 @@ func TestAcc_ObjectStorageBucket(t *testing.T) {
 
 func config(name string) string {
 	return fmt.Sprintf(`
-resource "stackit_object_storage_project" "example" {
-	project_id         = "%s"
-}
-
 resource "stackit_object_storage_bucket" "example" {
-	object_storage_project_id = stackit_object_storage_project.example.id
-    name      				  = "%s"
+	project_id = "%s"
+    name       = "%s"
 }
 	  `,
 		common.GetAcceptanceTestsProjectID(),

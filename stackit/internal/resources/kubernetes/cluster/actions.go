@@ -64,6 +64,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 }
+
 func (r Resource) preProcessConfig(diags *diag.Diagnostics, cl *Cluster) {
 	projectID := cl.ProjectID.ValueString()
 	kubernetesProjectID := cl.KubernetesProjectID.ValueString()
@@ -233,6 +234,12 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	var plan Cluster
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// pre process state
+	r.preProcessConfig(&resp.Diagnostics, &plan)
 	if resp.Diagnostics.HasError() {
 		return
 	}

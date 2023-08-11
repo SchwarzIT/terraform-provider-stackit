@@ -2,10 +2,12 @@ package credential
 
 import (
 	"context"
+	"net/http"
 	"time"
 
 	accesskey "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1.0.1/access-key"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -15,6 +17,18 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	var data Credential
 	diags := req.Plan.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// pre process plan
+	r.preProcessConfig(&resp.Diagnostics, &data)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// handle project init
+	r.enableProject(ctx, &resp.Diagnostics, &data)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -38,6 +52,40 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	})
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
+		return
+	}
+}
+
+func (r Resource) preProcessConfig(diags *diag.Diagnostics, b *Credential) {
+	projectID := b.ProjectID.ValueString()
+	osProjectID := b.ObjectStorageProjectID.ValueString()
+	if projectID == "" && osProjectID == "" {
+		diags.AddError("project_id or object_storage_project_id must be set", "please note that object_storage_project_id is deprecated and will be removed in a future release")
+		return
+	}
+	if projectID == "" {
+		b.ProjectID = b.ObjectStorageProjectID
+	}
+	if osProjectID == "" {
+		b.ObjectStorageProjectID = b.ProjectID
+	}
+}
+
+func (r Resource) enableProject(ctx context.Context, diags *diag.Diagnostics, b *Credential) {
+	projectID := b.ProjectID.ValueString()
+	c := r.client.ObjectStorage.Project
+
+	status, err := c.Get(ctx, projectID)
+	if agg := common.Validate(&diag.Diagnostics{}, status, err, "JSON200"); agg != nil {
+		if status == nil || status.StatusCode() != http.StatusNotFound {
+			diags.AddError("failed to fetch Object Storage project status", agg.Error())
+			return
+		}
+	}
+
+	res, err := c.Create(ctx, projectID)
+	if agg := common.Validate(diags, res, err); agg != nil {
+		diags.AddError("failed during Object Storage project init", agg.Error())
 		return
 	}
 }
@@ -80,6 +128,12 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
+	// pre process plan
+	r.preProcessConfig(&resp.Diagnostics, &state)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	cg := state.CredentialsGroupID.ValueString()
 	params := &accesskey.GetParams{
 		CredentialsGroup: &cg,
@@ -116,12 +170,36 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 }
 
 // Update - lifecycle function - not used for this resource
-func (r Resource) Update(context.Context, resource.UpdateRequest, *resource.UpdateResponse) {}
+func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+	var state Credential
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// pre-process config
+	r.preProcessConfig(&resp.Diagnostics, &state)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	diags := resp.State.Set(ctx, &state)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+}
 
 // Delete - lifecycle function
 func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var state Credential
 	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// pre process plan
+	r.preProcessConfig(&resp.Diagnostics, &state)
 	if resp.Diagnostics.HasError() {
 		return
 	}

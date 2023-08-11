@@ -12,7 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-const run_this_test = false
+const run_this_test = true
 
 func TestAcc_ObjectStorageCredentialsGroup(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
@@ -35,7 +35,7 @@ func TestAcc_ObjectStorageCredentialsGroup(t *testing.T) {
 					resource.TestCheckResourceAttrSet("stackit_object_storage_credentials_group.example", "id"),
 					resource.TestCheckResourceAttrSet("stackit_object_storage_credentials_group.example", "urn"),
 					resource.TestCheckResourceAttr("stackit_object_storage_credentials_group.example", "name", name),
-					resource.TestCheckResourceAttr("stackit_object_storage_credentials_group.example", "object_storage_project_id", common.GetAcceptanceTestsProjectID()),
+					resource.TestCheckResourceAttr("stackit_object_storage_credentials_group.example", "project_id", common.GetAcceptanceTestsProjectID()),
 				),
 			},
 			// new name
@@ -45,7 +45,7 @@ func TestAcc_ObjectStorageCredentialsGroup(t *testing.T) {
 					resource.TestCheckResourceAttrSet("stackit_object_storage_credentials_group.example", "id"),
 					resource.TestCheckResourceAttrSet("stackit_object_storage_credentials_group.example", "urn"),
 					resource.TestCheckResourceAttr("stackit_object_storage_credentials_group.example", "name", newName),
-					resource.TestCheckResourceAttr("stackit_object_storage_credentials_group.example", "object_storage_project_id", common.GetAcceptanceTestsProjectID()),
+					resource.TestCheckResourceAttr("stackit_object_storage_credentials_group.example", "project_id", common.GetAcceptanceTestsProjectID()),
 				),
 			},
 			// test import
@@ -61,13 +61,9 @@ func TestAcc_ObjectStorageCredentialsGroup(t *testing.T) {
 
 func config(name string) string {
 	return fmt.Sprintf(`
-	resource "stackit_object_storage_project" "example" {
-		project_id         = "%s"
-	}
-
 	resource "stackit_object_storage_credentials_group" "example" {
-		object_storage_project_id = stackit_object_storage_project.example.id
-		name	  				  = "%s"
+		project_id 	= "%s"
+		name	  	= "%s"
 	}
 	`,
 		common.GetAcceptanceTestsProjectID(),
