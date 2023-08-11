@@ -48,17 +48,18 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 					validate.StringWith(clientCluster.ValidateClusterName, "validate cluster name"),
 				},
 			},
+			// TODO: remove in next releases
 			"kubernetes_project_id": schema.StringAttribute{
-				Description: "The ID of a `stackit_kubernetes_project` resource",
-				Required:    true,
+				Description:        "The ID of a `stackit_kubernetes_project` resource",
+				DeprecationMessage: "This attribute is being deprecated. Use `project_id` instead",
+				Optional:           true,
 				Validators: []validator.String{
 					validate.ProjectID(),
 				},
 			},
 			"project_id": schema.StringAttribute{
-				Description:        "this attribure is deprecated. please remove it from your terraform config and use `kubernetes_project_id` instead",
-				Optional:           true,
-				DeprecationMessage: "this attribure is deprecated. please remove it from your terraform config and use `kubernetes_project_id` instead",
+				Description: "The project UUID.",
+				Required:    true,
 				Validators: []validator.String{
 					validate.ProjectID(),
 				},

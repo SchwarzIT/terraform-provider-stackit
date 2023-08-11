@@ -66,13 +66,9 @@ func TestAcc_kubernetes(t *testing.T) {
 
 func config(name, nodepoolName, machineType string) string {
 	return fmt.Sprintf(`
-	resource "stackit_kubernetes_project" "example" {
-		project_id = "%s"
-	}
 
 resource "stackit_kubernetes_cluster" "example" {
-	depends_on 					  = [stackit_kubernetes_project.example]
-	kubernetes_project_id         = stackit_kubernetes_project.example.id
+	project_id         = "%s"
 	name               = "%s"
 	kubernetes_version = "1.24"
 	allow_privileged_containers = false
@@ -120,9 +116,9 @@ resource "stackit_kubernetes_cluster" "example" {
 }
 
 data "stackit_kubernetes_cluster" "example" {
-	depends_on 				= [stackit_kubernetes_project.example,stackit_kubernetes_cluster.example]
-	name       				= "%s"
-	kubernetes_project_id 	= stackit_kubernetes_project.example.id
+	depends_on 	= [stackit_kubernetes_cluster.example]
+	name       	= "%s"
+	project_id 	= stackit_kubernetes_cluster.example.project_id
 }
   
 	  `,

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/cluster"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/project"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
@@ -31,6 +32,18 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
+	// pre process plan
+	r.preProcessConfig(&resp.Diagnostics, &plan)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// handle project init
+	r.enableProject(ctx, &resp.Diagnostics, &plan, timeout)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	// handle creation
 	r.createOrUpdateCluster(ctx, &resp.Diagnostics, &plan, timeout)
 	if resp.Diagnostics.HasError() {
@@ -51,6 +64,51 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 }
+func (r Resource) preProcessConfig(diags *diag.Diagnostics, cl *Cluster) {
+	projectID := cl.ProjectID.ValueString()
+	kubernetesProjectID := cl.KubernetesProjectID.ValueString()
+	if projectID == "" && kubernetesProjectID == "" {
+		diags.AddError("project_id or kubernetes_project_id must be set", "please note that kubernetes_project_id is deprecated and will be removed in a future release")
+		return
+	}
+	if projectID == "" {
+		cl.ProjectID = cl.KubernetesProjectID
+	}
+	if kubernetesProjectID == "" {
+		cl.KubernetesProjectID = cl.ProjectID
+	}
+}
+
+func (r Resource) enableProject(ctx context.Context, diags *diag.Diagnostics, cl *Cluster, timeout time.Duration) {
+	projectID := cl.ProjectID.ValueString()
+	c := r.client.Kubernetes.Project
+
+	found := true
+	status, err := c.Get(ctx, projectID)
+	if agg := common.Validate(&diag.Diagnostics{}, status, err, "JSON200.State"); agg != nil {
+		if status == nil || status.StatusCode() != http.StatusNotFound {
+			diags.AddError("failed to fetch SKE project status", agg.Error())
+			return
+		}
+		found = false
+	}
+
+	// check if project already enabled
+	if found && *status.JSON200.State == project.STATE_CREATED {
+		return
+	}
+
+	res, err := c.Create(ctx, projectID)
+	if agg := common.Validate(diags, res, err); agg != nil {
+		diags.AddError("failed during SKE project init", agg.Error())
+		return
+	}
+	process := res.WaitHandler(ctx, c, projectID).SetTimeout(timeout)
+	if _, err := process.WaitWithContext(ctx); err != nil {
+		diags.AddError("failed to verify SKE project init", err.Error())
+		return
+	}
+}
 
 func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnostics, cl *Cluster, timeout time.Duration) {
 	c := r.client
@@ -61,7 +119,7 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 	}
 
 	// cluster vars
-	projectID := cl.KubernetesProjectID.ValueString()
+	projectID := cl.ProjectID.ValueString()
 	clusterName := cl.Name.ValueString()
 	clusterConfig, err := cl.clusterConfig(versions)
 	if err != nil {
@@ -117,7 +175,7 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 
 func (r Resource) getCredential(ctx context.Context, diags *diag.Diagnostics, cl *Cluster) {
 	c := r.client
-	res, err := c.Kubernetes.Credentials.List(ctx, cl.KubernetesProjectID.ValueString(), cl.Name.ValueString())
+	res, err := c.Kubernetes.Credentials.List(ctx, cl.ProjectID.ValueString(), cl.Name.ValueString())
 	if agg := common.Validate(diags, res, err, "JSON200.Kubeconfig"); agg != nil {
 		diags.AddError("failed fetching cluster credentials", agg.Error())
 		return
@@ -137,8 +195,14 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
+	// pre process state
+	r.preProcessConfig(&resp.Diagnostics, &state)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	// read cluster
-	res, err := c.Kubernetes.Cluster.Get(ctx, state.KubernetesProjectID.ValueString(), state.Name.ValueString())
+	res, err := c.Kubernetes.Cluster.Get(ctx, state.ProjectID.ValueString(), state.Name.ValueString())
 	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200"); agg != nil {
 		if validate.StatusEquals(res, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
@@ -206,8 +270,14 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
+	// pre process plan
+	r.preProcessConfig(&resp.Diagnostics, &state)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	c := r.client
-	res, err := c.Kubernetes.Cluster.Delete(ctx, state.KubernetesProjectID.ValueString(), state.Name.ValueString())
+	res, err := c.Kubernetes.Cluster.Delete(ctx, state.ProjectID.ValueString(), state.Name.ValueString())
 	if agg := common.Validate(&resp.Diagnostics, res, err); agg != nil {
 		resp.Diagnostics.AddError("failed deleting cluster", agg.Error())
 		return
@@ -218,7 +288,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	process := res.WaitHandler(ctx, c.Kubernetes.Cluster, state.KubernetesProjectID.ValueString(), state.Name.ValueString()).SetTimeout(timeout)
+	process := res.WaitHandler(ctx, c.Kubernetes.Cluster, state.ProjectID.ValueString(), state.Name.ValueString()).SetTimeout(timeout)
 	if _, err := process.WaitWithContext(ctx); err != nil {
 		if !strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.Diagnostics.AddError("failed to verify cluster deletion", err.Error())
@@ -261,6 +331,7 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 
 	// set main attributes
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("kubernetes_project_id"), idParts[0])...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project_id"), idParts[0])...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("name"), idParts[1])...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), idParts[1])...)
 

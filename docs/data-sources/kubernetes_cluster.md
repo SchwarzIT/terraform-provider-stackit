@@ -19,19 +19,9 @@ Data source for STACKIT Kubernetes Engine (SKE) clusters
 ## Example Usage
 
 ```terraform
-resource "stackit_project" "example" {
-  name        = "example"
-  billing_ref = var.project_billing_ref
-  owner       = var.project_owner
-}
-
-data "stackit_kubernetes_project" "example" {
-  project_id = stackit_project.example.id
-}
-
 data "stackit_kubernetes_cluster" "example" {
-  name                  = "example"
-  kubernetes_project_id = data.stackit_kubernetes_project.example.id
+  name       = "example"
+  project_id = var.project_id
 }
 ```
 
@@ -40,14 +30,14 @@ data "stackit_kubernetes_cluster" "example" {
 
 ### Required
 
-- `kubernetes_project_id` (String) The ID of a `stackit_kubernetes_project` resource
 - `name` (String) Specifies the cluster name (lower case, alphanumeric, hypens allowed, up to 11 chars)
+- `project_id` (String) The project UUID.
 
 ### Optional
 
 - `allow_privileged_containers` (Boolean) Should containers be allowed to run in privileged mode?
+- `kubernetes_project_id` (String, Deprecated) The ID of a `stackit_kubernetes_project` resource
 - `node_pools` (Attributes List) One or more `node_pool` block as defined below (see [below for nested schema](#nestedatt--node_pools))
-- `project_id` (String, Deprecated) this attribure is deprecated. please remove it from your terraform config and use `kubernetes_project_id` instead
 
 ### Read-Only
 
