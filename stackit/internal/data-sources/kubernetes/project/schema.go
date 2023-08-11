@@ -20,6 +20,7 @@ type KubernetesProject struct {
 // Schema returns the terraform schema structure
 func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
+		DeprecationMessage: "This data source is deprecated and will be removed in a future version.",
 		MarkdownDescription: fmt.Sprintf("Data source for STACKIT Kubernetes Engine (SKE) project\n%s",
 			common.EnvironmentInfo(d.urls),
 		),

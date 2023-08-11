@@ -27,6 +27,7 @@ type Cluster struct {
 	ID                        types.String   `tfsdk:"id"`
 	Name                      types.String   `tfsdk:"name"`
 	KubernetesProjectID       types.String   `tfsdk:"kubernetes_project_id"`
+	ProjectID                 types.String   `tfsdk:"project_id"`
 	KubernetesVersion         types.String   `tfsdk:"kubernetes_version"`
 	KubernetesVersionUsed     types.String   `tfsdk:"kubernetes_version_used"`
 	AllowPrivilegedContainers types.Bool     `tfsdk:"allow_privileged_containers"`
@@ -112,8 +113,21 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"kubernetes_project_id": schema.StringAttribute{
-				Description: "The ID of a `stackit_kubernetes_project` resource",
-				Required:    true,
+				Description:        "The ID of a `stackit_kubernetes_project` resource",
+				DeprecationMessage: "This attribute is deprecated and will be removed in a future version. Please use the `project_id` attribute instead.",
+				Optional:           true,
+				Computed:           true,
+				Validators: []validator.String{
+					validate.ProjectID(),
+				},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
+			},
+			"project_id": schema.StringAttribute{
+				Description: "The project UUID.",
+				Optional:    true,
+				Computed:    true,
 				Validators: []validator.String{
 					validate.ProjectID(),
 				},
