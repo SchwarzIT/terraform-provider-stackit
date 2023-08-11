@@ -18,6 +18,7 @@ import (
 // Credential is the schema model
 type Credential struct {
 	ID                     types.String `tfsdk:"id"`
+	ProjectID              types.String `tfsdk:"project_id"`
 	ObjectStorageProjectID types.String `tfsdk:"object_storage_project_id"`
 	CredentialsGroupID     types.String `tfsdk:"credentials_group_id"`
 	Expiry                 types.String `tfsdk:"expiry"`
@@ -44,8 +45,22 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			},
 
 			"object_storage_project_id": schema.StringAttribute{
-				Description: "The ID returned from `stackit_object_storage_project`",
-				Required:    true,
+				DeprecationMessage: "This attribute is deprecated and will be removed in a future version of the provider. Please use `project_id` instead.",
+				Description:        "The ID returned from `stackit_object_storage_project`",
+				Optional:           true,
+				Computed:           true,
+				Validators: []validator.String{
+					validate.ProjectID(),
+				},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
+			},
+
+			"project_id": schema.StringAttribute{
+				Description: "The project UUID.",
+				Optional:    true,
+				Computed:    true,
 				Validators: []validator.String{
 					validate.ProjectID(),
 				},
