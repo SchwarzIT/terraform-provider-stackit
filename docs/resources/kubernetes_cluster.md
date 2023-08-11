@@ -19,13 +19,9 @@ Manages kubernetes clusters
 ## Example Usage
 
 ```terraform
-resource "stackit_kubernetes_project" "example" {
-  project_id = "example"
-}
-
 resource "stackit_kubernetes_cluster" "example" {
-  name                  = "example"
-  kubernetes_project_id = stackit_kubernetes_project.example.id
+  name       = "example"
+  project_id = var.project_id
 
   node_pools = [{
     name         = "example"
@@ -39,7 +35,6 @@ resource "stackit_kubernetes_cluster" "example" {
 
 ### Required
 
-- `kubernetes_project_id` (String) The ID of a `stackit_kubernetes_project` resource
 - `name` (String) Specifies the cluster name (lower case, alphanumeric, hypens allowed, up to 11 chars)
 
 ### Optional
@@ -47,9 +42,11 @@ resource "stackit_kubernetes_cluster" "example" {
 - `allow_privileged_containers` (Boolean) Should containers be allowed to run in privileged mode? Default is `true`
 - `extensions` (Attributes) A single extensions block as defined below (see [below for nested schema](#nestedatt--extensions))
 - `hibernations` (Attributes List) One or more hibernation block as defined below (see [below for nested schema](#nestedatt--hibernations))
+- `kubernetes_project_id` (String, Deprecated) The ID of a `stackit_kubernetes_project` resource
 - `kubernetes_version` (String) Kubernetes version. Allowed Options are: `1.22`, `1.23`, `1.24`, or a full version including patch (not recommended).
 - `maintenance` (Attributes) A single maintenance block as defined below (see [below for nested schema](#nestedatt--maintenance))
 - `node_pools` (Attributes List) One or more `node_pool` block as defined below (see [below for nested schema](#nestedatt--node_pools))
+- `project_id` (String) The project UUID.
 - `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
 
 ### Read-Only
