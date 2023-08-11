@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/cluster"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/project"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
@@ -31,6 +32,12 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
+	// handle project init
+	r.enableProject(ctx, &resp.Diagnostics, &plan, timeout)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	// handle creation
 	r.createOrUpdateCluster(ctx, &resp.Diagnostics, &plan, timeout)
 	if resp.Diagnostics.HasError() {
@@ -48,6 +55,33 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	diags = resp.State.Set(ctx, plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
+		return
+	}
+}
+
+func (r Resource) enableProject(ctx context.Context, diags *diag.Diagnostics, cl *Cluster, timeout time.Duration) {
+	projectID := cl.KubernetesProjectID.ValueString()
+	c := r.client.Kubernetes.Project
+
+	status, err := c.Get(ctx, projectID)
+	if agg := common.Validate(diags, status, err, "JSON200.Status.State"); agg != nil {
+		diags.AddError("failed to fetch SKE project status", agg.Error())
+		return
+	}
+
+	// check if project already enabled
+	if *status.JSON200.State == project.STATE_CREATED {
+		return
+	}
+
+	res, err := c.Create(ctx, projectID)
+	if agg := common.Validate(diags, res, err); agg != nil {
+		diags.AddError("failed during SKE project init", agg.Error())
+		return
+	}
+	process := res.WaitHandler(ctx, c, projectID).SetTimeout(timeout)
+	if _, err := process.WaitWithContext(ctx); err != nil {
+		diags.AddError("failed to verify SKE project init", err.Error())
 		return
 	}
 }
