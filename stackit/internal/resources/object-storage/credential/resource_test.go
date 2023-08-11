@@ -53,12 +53,8 @@ func TestAcc_ObjectStorageCredential(t *testing.T) {
 func config() string {
 	return fmt.Sprintf(`
 
-	resource "stackit_object_storage_project" "example" {
-		project_id         = "%s"
-	}
-
 	resource "stackit_object_storage_credential" "example" {
-		object_storage_project_id = stackit_object_storage_project.example.id
+		project_id = "%s"
 	}
 	`,
 		common.GetAcceptanceTestsProjectID(),
@@ -68,18 +64,14 @@ func config() string {
 func configWithGroup(groupName string) string {
 	return fmt.Sprintf(`
 
-	resource "stackit_object_storage_project" "example" {
-		project_id         = "%s"
-	}
-
 	resource "stackit_object_storage_credentials_group" "example" {
-		object_storage_project_id = stackit_object_storage_project.example.id
-		name	   				  = "%s"
+		project_id = "%s"
+		name	   = "%s"
 	}
 
 	resource "stackit_object_storage_credential" "example" {
-		object_storage_project_id 	= stackit_object_storage_project.example.id
-		credentials_group_id 		= stackit_object_storage_credentials_group.example.id
+		project_id 				= stackit_object_storage_credentials_group.example.project_id
+		credentials_group_id 	= stackit_object_storage_credentials_group.example.id
 	}
 	  `,
 		common.GetAcceptanceTestsProjectID(),

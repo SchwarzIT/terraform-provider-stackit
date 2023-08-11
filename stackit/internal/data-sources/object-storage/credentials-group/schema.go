@@ -25,6 +25,15 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 			},
 
 			"object_storage_project_id": schema.StringAttribute{
+				Description:        "The ID returned from `stackit_object_storage_project`",
+				DeprecationMessage: "Use `project_id` instead.",
+				Optional:           true,
+				Validators: []validator.String{
+					validate.ProjectID(),
+				},
+			},
+
+			"project_id": schema.StringAttribute{
 				Description: "The ID returned from `stackit_object_storage_project`",
 				Required:    true,
 				Validators: []validator.String{

@@ -2,10 +2,12 @@ package credential
 
 import (
 	"context"
+	"net/http"
 	"time"
 
 	accesskey "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1.0.1/access-key"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -15,6 +17,18 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	var data Credential
 	diags := req.Plan.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// pre process plan
+	r.preProcessConfig(&resp.Diagnostics, &data)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// handle project init
+	r.enableProject(ctx, &resp.Diagnostics, &data)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -30,6 +44,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	diags = resp.State.Set(ctx, Credential{
 		ID:                     types.StringValue(k.KeyID),
 		ObjectStorageProjectID: types.StringValue(k.Project),
+		ProjectID:              types.StringValue(k.Project),
 		CredentialsGroupID:     types.StringValue(data.CredentialsGroupID.ValueString()),
 		Expiry:                 types.StringValue(k.Expires),
 		DisplayName:            types.StringValue(k.DisplayName),
@@ -38,6 +53,40 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	})
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
+		return
+	}
+}
+
+func (r Resource) preProcessConfig(diags *diag.Diagnostics, b *Credential) {
+	projectID := b.ProjectID.ValueString()
+	osProjectID := b.ObjectStorageProjectID.ValueString()
+	if projectID == "" && osProjectID == "" {
+		diags.AddError("project_id or object_storage_project_id must be set", "please note that object_storage_project_id is deprecated and will be removed in a future release")
+		return
+	}
+	if projectID == "" {
+		b.ProjectID = b.ObjectStorageProjectID
+	}
+	if osProjectID == "" {
+		b.ObjectStorageProjectID = b.ProjectID
+	}
+}
+
+func (r Resource) enableProject(ctx context.Context, diags *diag.Diagnostics, b *Credential) {
+	projectID := b.ProjectID.ValueString()
+	c := r.client.ObjectStorage.Project
+
+	status, err := c.Get(ctx, projectID)
+	if agg := common.Validate(&diag.Diagnostics{}, status, err, "JSON200"); agg != nil {
+		if status == nil || status.StatusCode() != http.StatusNotFound {
+			diags.AddError("failed to fetch Object Storage project status", agg.Error())
+			return
+		}
+	}
+
+	res, err := c.Create(ctx, projectID)
+	if agg := common.Validate(diags, res, err); agg != nil {
+		diags.AddError("failed during Object Storage project init", agg.Error())
 		return
 	}
 }
@@ -80,6 +129,12 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
+	// pre process plan
+	r.preProcessConfig(&resp.Diagnostics, &state)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	cg := state.CredentialsGroupID.ValueString()
 	params := &accesskey.GetParams{
 		CredentialsGroup: &cg,
@@ -87,7 +142,8 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	if cg == "" {
 		params.CredentialsGroup = nil
 	}
-	res, err := c.ObjectStorage.AccessKey.Get(ctx, state.ObjectStorageProjectID.ValueString(), params)
+
+	res, err := c.ObjectStorage.AccessKey.Get(ctx, state.ProjectID.ValueString(), params)
 	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200.AccessKeys"); agg != nil {
 		resp.Diagnostics.AddError("failed to list credentials", agg.Error())
 		return
@@ -116,12 +172,19 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 }
 
 // Update - lifecycle function - not used for this resource
-func (r Resource) Update(context.Context, resource.UpdateRequest, *resource.UpdateResponse) {}
+func (r Resource) Update(context.Context, resource.UpdateRequest, *resource.UpdateResponse) {
+}
 
 // Delete - lifecycle function
 func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var state Credential
 	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// pre process plan
+	r.preProcessConfig(&resp.Diagnostics, &state)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -135,7 +198,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	c := r.client
-	res, err := c.ObjectStorage.AccessKey.Delete(ctx, state.ObjectStorageProjectID.ValueString(), state.ID.ValueString(), params)
+	res, err := c.ObjectStorage.AccessKey.Delete(ctx, state.ProjectID.ValueString(), state.ID.ValueString(), params)
 	if agg := common.Validate(&resp.Diagnostics, res, err); agg != nil {
 		resp.Diagnostics.AddError("failed to delete credential", agg.Error())
 		return

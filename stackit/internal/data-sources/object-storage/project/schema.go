@@ -14,6 +14,7 @@ import (
 // Schema returns the terraform schema structure
 func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
+		DeprecationMessage: "This data source is deprecated and will be removed in a future version of the provider.",
 		MarkdownDescription: fmt.Sprintf("Data source for Object Storage project\n%s",
 			common.EnvironmentInfo(d.urls),
 		),

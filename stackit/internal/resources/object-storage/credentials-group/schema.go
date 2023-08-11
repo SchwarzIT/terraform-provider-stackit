@@ -18,6 +18,7 @@ import (
 type CredentialsGroup struct {
 	ID                     types.String `tfsdk:"id"`
 	Name                   types.String `tfsdk:"name"`
+	ProjectID              types.String `tfsdk:"project_id"`
 	ObjectStorageProjectID types.String `tfsdk:"object_storage_project_id"`
 	URN                    types.String `tfsdk:"urn"`
 }
@@ -37,8 +38,22 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			},
 
 			"object_storage_project_id": schema.StringAttribute{
-				Description: "The ID returned from `stackit_object_storage_project`",
-				Required:    true,
+				DeprecationMessage: "This attribute is deprecated and will be removed in a future version of the provider. Please use `project_id` instead.",
+				Description:        "The ID returned from `stackit_object_storage_project`",
+				Optional:           true,
+				Computed:           true,
+				Validators: []validator.String{
+					validate.ProjectID(),
+				},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
+			},
+
+			"project_id": schema.StringAttribute{
+				Description: "The project UUID.",
+				Optional:    true,
+				Computed:    true,
 				Validators: []validator.String{
 					validate.ProjectID(),
 				},

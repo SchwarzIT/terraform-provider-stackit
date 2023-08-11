@@ -23,6 +23,7 @@ type ObjectStorageProject struct {
 // Schema returns the terraform schema structure
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
+		DeprecationMessage: "This resource is deprecated and will be removed in a future version of the provider. Please use the `stackit_object_storage_bucket` or `stackit_object_storage_credential` directly.",
 		MarkdownDescription: fmt.Sprintf("This resource enables STACKIT Object Storage in a project\n%s",
 			common.EnvironmentInfo(r.urls),
 		),

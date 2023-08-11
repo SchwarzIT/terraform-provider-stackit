@@ -32,8 +32,8 @@ func TestAcc_ObjectStorageCredential(t *testing.T) {
 					resource.TestCheckTypeSetElemAttrPair("stackit_object_storage_credential.example", "id", "data.stackit_object_storage_credential.ex2", "id"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_object_storage_credential.example", "expiry", "data.stackit_object_storage_credential.ex1", "expiry"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_object_storage_credential.example", "expiry", "data.stackit_object_storage_credential.ex2", "expiry"),
-					resource.TestCheckTypeSetElemAttrPair("stackit_object_storage_credential.example", "object_storage_project_id", "data.stackit_object_storage_credential.ex1", "object_storage_project_id"),
-					resource.TestCheckTypeSetElemAttrPair("stackit_object_storage_credential.example", "object_storage_project_id", "data.stackit_object_storage_credential.ex2", "object_storage_project_id"),
+					resource.TestCheckTypeSetElemAttrPair("stackit_object_storage_credential.example", "project_id", "data.stackit_object_storage_credential.ex1", "project_id"),
+					resource.TestCheckTypeSetElemAttrPair("stackit_object_storage_credential.example", "project_id", "data.stackit_object_storage_credential.ex2", "project_id"),
 				),
 			},
 		},
@@ -42,28 +42,24 @@ func TestAcc_ObjectStorageCredential(t *testing.T) {
 
 func config() string {
 	return fmt.Sprintf(`
-	resource "stackit_object_storage_project" "example" {
-		project_id         = "%s"
-	}
-
 	resource "stackit_object_storage_credential" "example" {
-		object_storage_project_id = stackit_object_storage_project.example.id
+		project_id = "%s"
 	}
 
 	data "stackit_object_storage_credentials_group" "example" {
-		depends_on                = [stackit_object_storage_credential.example]
-		object_storage_project_id = stackit_object_storage_project.example.id
-		name                      = "default"
+		depends_on = [stackit_object_storage_credential.example]
+		project_id = stackit_object_storage_credential.example.project_id
+		name       = "default"
 	}
 
 	data "stackit_object_storage_credential" "ex1" {
-		object_storage_project_id	= stackit_object_storage_project.example.id
+		project_id					= stackit_object_storage_credential.example.project_id
 		credentials_group_id		= data.stackit_object_storage_credentials_group.example.id
 		id							= stackit_object_storage_credential.example.id
 	}
 
 	data "stackit_object_storage_credential" "ex2" {
-		object_storage_project_id	= stackit_object_storage_project.example.id
+		project_id					= stackit_object_storage_credential.example.project_id
 		credentials_group_id		= data.stackit_object_storage_credentials_group.example.id
 		display_name				= stackit_object_storage_credential.example.display_name
 	}
