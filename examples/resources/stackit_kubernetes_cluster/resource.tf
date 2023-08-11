@@ -1,6 +1,6 @@
 resource "stackit_kubernetes_cluster" "example" {
   name       = "example"
-  project_id = stackit_kubernetes_project.example.id
+  project_id = var.project_id
 
   node_pools = [{
     name         = "example"
