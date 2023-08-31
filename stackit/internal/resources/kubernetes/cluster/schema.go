@@ -121,9 +121,6 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Validators: []validator.String{
 					validate.ProjectID(),
 				},
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
-				},
 			},
 			"project_id": schema.StringAttribute{
 				Description: "The project UUID.",
@@ -131,9 +128,6 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Computed:    true,
 				Validators: []validator.String{
 					validate.ProjectID(),
-				},
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"kubernetes_version": schema.StringAttribute{
