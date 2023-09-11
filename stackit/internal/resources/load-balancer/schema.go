@@ -107,15 +107,12 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			"listeners": schema.SetNestedAttribute{
 				Description: "The load balancers listeners.",
 				Required:    true,
-				Validators: []validator.Set{
-					setvalidator.SizeAtLeast(1),
-				},
 				PlanModifiers: []planmodifier.Set{
 					setplanmodifier.RequiresReplace(),
 				},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
-						"display_name": schema.Int64Attribute{
+						"display_name": schema.StringAttribute{
 							Description: "The port the load balancer listens on.",
 							Required:    true,
 						},
@@ -140,9 +137,6 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			"networks": schema.SetNestedAttribute{
 				Description: "The load balancers networks.",
 				Required:    true,
-				Validators: []validator.Set{
-					setvalidator.SizeAtLeast(1),
-				},
 				PlanModifiers: []planmodifier.Set{
 					setplanmodifier.RequiresReplace(),
 				},
@@ -170,9 +164,6 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			"target_pools": schema.SetNestedAttribute{
 				Description: "The load balancers target pools.",
 				Required:    true,
-				Validators: []validator.Set{
-					setvalidator.SizeAtLeast(1),
-				},
 				PlanModifiers: []planmodifier.Set{
 					setplanmodifier.RequiresReplace(),
 				},
@@ -194,7 +185,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 							},
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
-									"display_name": schema.Int64Attribute{
+									"display_name": schema.StringAttribute{
 										Description: "The target display name.",
 										Required:    true,
 									},
