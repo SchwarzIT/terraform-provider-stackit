@@ -10,7 +10,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -21,17 +25,18 @@ type Instance struct {
 	ID                 types.String `tfsdk:"id"`
 	Name               types.String `tfsdk:"name"`
 	ProjectID          types.String `tfsdk:"project_id"`
-	ExternalIP         types.String `tfsdk:"external_ip"`
-	Listeners          types.Set    `tfsdk:"listeners"`
-	Networks           types.Set    `tfsdk:"networks"`
-	TargetPools        types.Set    `tfsdk:"target_pools"`
+	ExternalAddress    types.String `tfsdk:"external_address"`
+	Listeners          []Listener   `tfsdk:"listeners"`
+	Networks           []Network    `tfsdk:"networks"`
+	TargetPools        []TargetPool `tfsdk:"target_pools"`
 	ACL                types.Set    `tfsdk:"acl"`
 	PrivateNetworkOnly types.Bool   `tfsdk:"private_network_only"`
+	PrivateAddress     types.String `tfsdk:"private_address"`
 }
 
 type Listener struct {
 	DisplayName types.String `tfsdk:"display_name"`
-	Port        types.Number `tfsdk:"port"`
+	Port        types.Int64  `tfsdk:"port"`
 	Protocol    types.String `tfsdk:"protocol"`
 	TargetPool  types.String `tfsdk:"target_pool"`
 }
@@ -42,23 +47,23 @@ type Network struct {
 }
 
 type TargetPool struct {
-	Name         types.String `tfsdk:"name"`
-	TargetPort   types.Number `tfsdk:"target_port"`
-	Targets      types.Set    `tfsdk:"targets"`
-	HealthChecks types.Set    `tfsdk:"health_check"`
+	Name        types.String `tfsdk:"name"`
+	TargetPort  types.Int64  `tfsdk:"target_port"`
+	Targets     []Target     `tfsdk:"targets"`
+	HealthCheck HealthCheck  `tfsdk:"health_check"`
 }
 
 type Target struct {
-	DisplayName types.Number `tfsdk:"display_name"`
+	DisplayName types.String `tfsdk:"display_name"`
 	IPAddress   types.String `tfsdk:"ip_address"`
 }
 
 type HealthCheck struct {
-	HealthyThreshold   types.Number `tfsdk:"healthy_threshold"`
+	HealthyThreshold   types.Int64  `tfsdk:"healthy_threshold"`
 	Interval           types.String `tfsdk:"interval"`
 	IntervalJitter     types.String `tfsdk:"interval_jitter"`
 	Timeout            types.String `tfsdk:"timeout"`
-	UnhealthyThreshold types.Number `tfsdk:"unhealthy_threshold"`
+	UnhealthyThreshold types.Int64  `tfsdk:"unhealthy_threshold"`
 }
 
 // Schema returns the terraform schema structure
@@ -92,24 +97,30 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
-			"external_ip": schema.StringAttribute{
-				Description: "The external IP address of the instance.",
+			"external_address": schema.StringAttribute{
+				Description: "The external address of the instance.",
 				Optional:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"listeners": schema.SetNestedAttribute{
 				Description: "The load balancers listeners.",
 				Optional:    true,
-				// Required:    true,
-				// Validators: []validator.Set{
-				// 	setvalidator.SizeAtLeast(1),
-				// },
+				Required:    true,
+				Validators: []validator.Set{
+					setvalidator.SizeAtLeast(1),
+				},
+				PlanModifiers: []planmodifier.Set{
+					setplanmodifier.RequiresReplace(),
+				},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
-						"display_name": schema.NumberAttribute{
+						"display_name": schema.Int64Attribute{
 							Description: "The port the load balancer listens on.",
 							Required:    true,
 						},
-						"port": schema.NumberAttribute{
+						"port": schema.Int64Attribute{
 							Description: "The port the load balancer listens on [ 1 .. 65535 ].",
 							Required:    true,
 						},
@@ -130,19 +141,29 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			"networks": schema.SetNestedAttribute{
 				Description: "The load balancers networks.",
 				Optional:    true,
-				// Required:    true,
-				// Validators: []validator.Set{
-				// 	setvalidator.SizeAtLeast(1),
-				// },
+				Required:    true,
+				Validators: []validator.Set{
+					setvalidator.SizeAtLeast(1),
+				},
+				PlanModifiers: []planmodifier.Set{
+					setplanmodifier.RequiresReplace(),
+				},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"network_id": schema.StringAttribute{
 							Description: "The network UUID.",
 							Required:    true,
+							Validators: []validator.String{
+								validate.UUID(),
+							},
 						},
 						"role": schema.StringAttribute{
-							Description: "The network role.",
-							Required:    true,
+							Description: "The network role. only `ROLE_LISTENERS_AND_TARGETS` is supported.",
+							Optional:    true,
+							Default:     stringdefault.StaticString("ROLE_LISTENERS_AND_TARGETS"),
+							Validators: []validator.String{
+								stringvalidator.OneOf("ROLE_LISTENERS_AND_TARGETS"),
+							},
 						},
 					},
 				},
@@ -150,17 +171,20 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			"target_pools": schema.SetNestedAttribute{
 				Description: "The load balancers target pools.",
 				Optional:    true,
-				// Required:    true,
-				// Validators: []validator.Set{
-				// 	setvalidator.SizeAtLeast(1),
-				// },
+				Required:    true,
+				Validators: []validator.Set{
+					setvalidator.SizeAtLeast(1),
+				},
+				PlanModifiers: []planmodifier.Set{
+					setplanmodifier.RequiresReplace(),
+				},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"name": schema.StringAttribute{
 							Description: "The target pool name.",
 							Required:    true,
 						},
-						"target_port": schema.NumberAttribute{
+						"target_port": schema.Int64Attribute{
 							Description: "The target port.",
 							Required:    true,
 						},
@@ -172,7 +196,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 							},
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
-									"display_name": schema.NumberAttribute{
+									"display_name": schema.Int64Attribute{
 										Description: "The target display name.",
 										Required:    true,
 									},
@@ -183,34 +207,28 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 								},
 							},
 						},
-						"health_check": schema.SetNestedAttribute{
-							Description: "The target pool health checks.",
-							Required:    true,
-							Validators: []validator.Set{
-								setvalidator.SizeAtLeast(1),
-							},
-							NestedObject: schema.NestedAttributeObject{
-								Attributes: map[string]schema.Attribute{
-									"healthy_threshold": schema.NumberAttribute{
-										Description: "The healthy threshold.",
-										Required:    true,
-									},
-									"interval": schema.StringAttribute{
-										Description: "The interval.",
-										Required:    true,
-									},
-									"interval_jitter": schema.StringAttribute{
-										Description: "The interval jitter.",
-										Required:    true,
-									},
-									"timeout": schema.StringAttribute{
-										Description: "The timeout.",
-										Required:    true,
-									},
-									"unhealthy_threshold": schema.NumberAttribute{
-										Description: "The unhealthy threshold.",
-										Required:    true,
-									},
+						"health_check": schema.SingleNestedAttribute{
+							Optional: true,
+							Attributes: map[string]schema.Attribute{
+								"healthy_threshold": schema.Int64Attribute{
+									Description: "The healthy threshold.",
+									Required:    true,
+								},
+								"interval": schema.StringAttribute{
+									Description: "The interval.",
+									Required:    true,
+								},
+								"interval_jitter": schema.StringAttribute{
+									Description: "The interval jitter.",
+									Required:    true,
+								},
+								"timeout": schema.StringAttribute{
+									Description: "The timeout.",
+									Required:    true,
+								},
+								"unhealthy_threshold": schema.Int64Attribute{
+									Description: "The unhealthy threshold.",
+									Required:    true,
 								},
 							},
 						},
@@ -221,10 +239,24 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Description: "The load balancers ACLs.",
 				Optional:    true,
 				ElementType: types.StringType,
+				PlanModifiers: []planmodifier.Set{
+					setplanmodifier.RequiresReplace(),
+				},
 			},
 			"private_network_only": schema.BoolAttribute{
 				Description: "Whether the load balancer is only accessible via private networks.",
 				Optional:    true,
+				Computed:    true,
+				Default:     booldefault.StaticBool(false),
+				PlanModifiers: []planmodifier.Bool{
+					boolplanmodifier.RequiresReplace(),
+				},
+			},
+			"private_address": schema.StringAttribute{
+				Description: "The private address of the load balancer.",
+				Optional:    false,
+				Required:    false,
+				Computed:    true,
 			},
 		},
 	}
