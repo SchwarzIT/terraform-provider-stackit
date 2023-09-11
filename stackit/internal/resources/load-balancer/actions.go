@@ -37,15 +37,17 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	for _, e := range *res.JSON200.Errors {
-		detail := ""
-		if e.Type != nil {
-			detail = fmt.Sprintf("Type: %s", *e.Type)
+	if res.JSON200.Errors != nil {
+		for _, e := range *res.JSON200.Errors {
+			detail := ""
+			if e.Type != nil {
+				detail = fmt.Sprintf("Type: %s", *e.Type)
+			}
+			if e.Description != nil {
+				detail = fmt.Sprintf("%s\nDescription: %s", detail, *e.Description)
+			}
+			resp.Diagnostics.AddError("Couldn't create instance", detail)
 		}
-		if e.Description != nil {
-			detail = fmt.Sprintf("%s\nDescription: %s", detail, *e.Description)
-		}
-		resp.Diagnostics.AddError("Couldn't create instance", detail)
 	}
 	if resp.Diagnostics.HasError() {
 		return
@@ -118,6 +120,10 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 	res, err := r.client.LoadBalancer.Instances.Get(ctx, state.ProjectID.ValueString(), state.Name.ValueString())
 	if agg := validate.Response(res, err, "JSON200.Name"); agg != nil {
+		if res.StatusCode() == http.StatusNotFound {
+			resp.State.RemoveResource(ctx)
+			return
+		}
 		resp.Diagnostics.AddError("Couldn't get instance information", agg.Error())
 		return
 	}
@@ -126,21 +132,8 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		common.Dump(&resp.Diagnostics, res.Body)
 		return
 	}
-	for _, e := range *res.JSON200.Errors {
-		detail := ""
-		if e.Type != nil {
-			detail = fmt.Sprintf("Type: %s", *e.Type)
-		}
-		if e.Description != nil {
-			detail = fmt.Sprintf("%s\nDescription: %s", detail, *e.Description)
-		}
-		resp.Diagnostics.AddError("Couldn't get instance information", detail)
-	}
-	if resp.Diagnostics.HasError() {
-		return
-	}
 
-	state.ExternalAddress = resToStr(res.JSON200.ExternalAddress)
+	state.PrivateAddress = resToStr(res.JSON200.PrivateAddress)
 
 	// update state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
