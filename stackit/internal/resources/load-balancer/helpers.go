@@ -67,7 +67,12 @@ func prepareData(lb Instance) instances.LoadBalancer {
 
 func prepareListeners(lb Instance) *[]instances.Listener {
 	var listeners []instances.Listener
-	for _, l := range lb.Listeners {
+	if lb.Listeners.IsNull() || lb.Listeners.IsUnknown() {
+		return nil
+	}
+	var ls []Listener
+	_ = lb.Listeners.ElementsAs(context.Background(), &ls, false)
+	for _, l := range ls {
 		listeners = append(listeners, instances.Listener{
 			DisplayName: strPtrOrNil(l.DisplayName),
 			Port:        intPtrOrNil(l.Port),
@@ -80,7 +85,12 @@ func prepareListeners(lb Instance) *[]instances.Listener {
 
 func prepareNetworks(lb Instance) *[]instances.Network {
 	var networks []instances.Network
-	for _, n := range lb.Networks {
+	if lb.Networks.IsNull() || lb.Networks.IsUnknown() {
+		return nil
+	}
+	var ns []Network
+	_ = lb.Networks.ElementsAs(context.Background(), &ns, false)
+	for _, n := range ns {
 		networks = append(networks, instances.Network{
 			NetworkID: uuidPtrOrNil(n.NetworkID),
 			Role:      (*instances.NetworkRole)(strPtrOrNil(n.Role)),
@@ -91,7 +101,12 @@ func prepareNetworks(lb Instance) *[]instances.Network {
 
 func prepareTargetPools(lb Instance) *[]instances.TargetPool {
 	var targetPools []instances.TargetPool
-	for _, tp := range lb.TargetPools {
+	if lb.TargetPools.IsNull() || lb.TargetPools.IsUnknown() {
+		return nil
+	}
+	var tp []TargetPool
+	_ = lb.TargetPools.ElementsAs(context.Background(), &tp, false)
+	for _, tp := range tp {
 		targetPools = append(targetPools, instances.TargetPool{
 			Name:              strPtrOrNil(tp.Name),
 			TargetPort:        intPtrOrNil(tp.TargetPort),
@@ -104,7 +119,12 @@ func prepareTargetPools(lb Instance) *[]instances.TargetPool {
 
 func prepareTargets(tp TargetPool) *[]instances.Target {
 	var targets []instances.Target
-	for _, t := range tp.Targets {
+	if tp.Targets.IsNull() || tp.Targets.IsUnknown() {
+		return nil
+	}
+	var ts []Target
+	_ = tp.Targets.ElementsAs(context.Background(), &ts, false)
+	for _, t := range ts {
 		targets = append(targets, instances.Target{
 			DisplayName: strPtrOrNil(t.DisplayName),
 			Ip:          strPtrOrNil(t.IPAddress),
@@ -114,7 +134,11 @@ func prepareTargets(tp TargetPool) *[]instances.Target {
 }
 
 func prepareHealthCheck(tp TargetPool) *instances.ActiveHealthCheck {
-	var hc = tp.HealthCheck
+	var hc HealthCheck
+	if tp.HealthCheck.IsNull() || tp.HealthCheck.IsUnknown() {
+		return nil
+	}
+	_ = tp.HealthCheck.As(context.Background(), &hc, basetypes.ObjectAsOptions{})
 	var healthCheck = instances.ActiveHealthCheck{
 		HealthyThreshold:   intPtrOrNil(hc.HealthyThreshold),
 		Interval:           strPtrOrNil(hc.Interval),

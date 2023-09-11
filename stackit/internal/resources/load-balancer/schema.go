@@ -26,9 +26,9 @@ type Instance struct {
 	Name               types.String `tfsdk:"name"`
 	ProjectID          types.String `tfsdk:"project_id"`
 	ExternalAddress    types.String `tfsdk:"external_address"`
-	Listeners          []Listener   `tfsdk:"listeners"`
-	Networks           []Network    `tfsdk:"networks"`
-	TargetPools        []TargetPool `tfsdk:"target_pools"`
+	Listeners          types.Set    `tfsdk:"listeners"`
+	Networks           types.Set    `tfsdk:"networks"`
+	TargetPools        types.Set    `tfsdk:"target_pools"`
 	ACL                types.Set    `tfsdk:"acl"`
 	PrivateNetworkOnly types.Bool   `tfsdk:"private_network_only"`
 	PrivateAddress     types.String `tfsdk:"private_address"`
@@ -49,8 +49,8 @@ type Network struct {
 type TargetPool struct {
 	Name        types.String `tfsdk:"name"`
 	TargetPort  types.Int64  `tfsdk:"target_port"`
-	Targets     []Target     `tfsdk:"targets"`
-	HealthCheck HealthCheck  `tfsdk:"health_check"`
+	Targets     types.Set    `tfsdk:"targets"`
+	HealthCheck types.Object `tfsdk:"health_check"`
 }
 
 type Target struct {
@@ -106,7 +106,6 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			},
 			"listeners": schema.SetNestedAttribute{
 				Description: "The load balancers listeners.",
-				Optional:    true,
 				Required:    true,
 				Validators: []validator.Set{
 					setvalidator.SizeAtLeast(1),
@@ -140,7 +139,6 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			},
 			"networks": schema.SetNestedAttribute{
 				Description: "The load balancers networks.",
-				Optional:    true,
 				Required:    true,
 				Validators: []validator.Set{
 					setvalidator.SizeAtLeast(1),
@@ -160,6 +158,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 						"role": schema.StringAttribute{
 							Description: "The network role. only `ROLE_LISTENERS_AND_TARGETS` is supported.",
 							Optional:    true,
+							Computed:    true,
 							Default:     stringdefault.StaticString("ROLE_LISTENERS_AND_TARGETS"),
 							Validators: []validator.String{
 								stringvalidator.OneOf("ROLE_LISTENERS_AND_TARGETS"),
@@ -170,7 +169,6 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			},
 			"target_pools": schema.SetNestedAttribute{
 				Description: "The load balancers target pools.",
-				Optional:    true,
 				Required:    true,
 				Validators: []validator.Set{
 					setvalidator.SizeAtLeast(1),
