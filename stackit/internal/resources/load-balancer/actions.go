@@ -20,8 +20,7 @@ import (
 // Create - lifecycle function
 func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var plan Instance
-	diags := req.Plan.Get(ctx, &plan)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -33,14 +32,11 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	res, err := r.client.LoadBalancer.Instances.Create(ctx, plan.ProjectID.ValueString(), &instances.CreateParams{}, prepareData(plan))
 	if agg := validate.Response(res, err, "JSON200.Name"); agg != nil {
-		diags.AddError("Couldn't create instance", agg.Error())
-		return
-	}
-	if res.StatusCode() != http.StatusOK {
-		diags.AddError("Couldn't create instance", fmt.Sprintf("Received status code %d", res.StatusCode()))
+		resp.Diagnostics.AddError("Couldn't create instance", agg.Error())
 		common.Dump(&resp.Diagnostics, res.Body)
 		return
 	}
+
 	for _, e := range *res.JSON200.Errors {
 		detail := ""
 		if e.Type != nil {
@@ -49,9 +45,9 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		if e.Description != nil {
 			detail = fmt.Sprintf("%s\nDescription: %s", detail, *e.Description)
 		}
-		diags.AddError("Couldn't create instance", detail)
+		resp.Diagnostics.AddError("Couldn't create instance", detail)
 	}
-	if diags.HasError() {
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
@@ -64,13 +60,13 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	process := res.WaitHandler(ctx, r.client.LoadBalancer.Instances, plan.ProjectID.ValueString(), plan.Name.ValueString())
 	wres, err := process.Wait()
 	if err != nil {
-		diags.AddError("Received an error while waiting for load balancer instance to be created", err.Error())
+		resp.Diagnostics.AddError("Received an error while waiting for load balancer instance to be created", err.Error())
 		return
 	}
 
 	if g, ok := wres.(*instances.GetResponse); ok {
 		if agg := validate.Response(g, nil, "JSON200.Name"); agg != nil {
-			diags.AddError("Couldn't get instance information", agg.Error())
+			resp.Diagnostics.AddError("Couldn't get instance information", agg.Error())
 			return
 		}
 		plan.ExternalAddress = resToStr(g.JSON200.ExternalAddress)
@@ -115,9 +111,7 @@ func (r Resource) enableProject(ctx context.Context, projectID string, diags *di
 // Read - lifecycle function
 func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var state Instance
-
-	diags := req.State.Get(ctx, &state)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -149,8 +143,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	state.ExternalAddress = resToStr(res.JSON200.ExternalAddress)
 
 	// update state
-	diags = resp.State.Set(ctx, &state)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}

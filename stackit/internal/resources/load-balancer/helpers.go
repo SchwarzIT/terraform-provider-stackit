@@ -57,6 +57,7 @@ func prepareData(lb Instance) instances.LoadBalancer {
 	ilb := instances.LoadBalancer{
 		Name:            strPtrOrNil(lb.Name),
 		ExternalAddress: strPtrOrNil(lb.ExternalAddress),
+		TargetPools:     prepareTargetPools(lb),
 		Listeners:       prepareListeners(lb),
 		Networks:        prepareNetworks(lb),
 		Options:         prepareOptions(lb),
