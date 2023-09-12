@@ -3,7 +3,6 @@ package cluster
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/Masterminds/semver"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/cluster"
@@ -42,9 +41,6 @@ func (r Resource) loadAvaiableVersions(ctx context.Context, diags *diag.Diagnost
 	versionOptions = []*semver.Version{}
 	for _, v := range *opts.KubernetesVersions {
 		if v.State == nil || v.Version == nil {
-			continue
-		}
-		if !strings.EqualFold(*v.State, "supported") {
 			continue
 		}
 		versionOption, err := semver.NewVersion(*v.Version)
