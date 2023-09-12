@@ -8,6 +8,7 @@ import (
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
@@ -41,9 +42,21 @@ type Listener struct {
 	TargetPool  types.String `tfsdk:"target_pool"`
 }
 
+var listenerType = map[string]attr.Type{
+	"display_name": types.StringType,
+	"port":         types.Int64Type,
+	"protocol":     types.StringType,
+	"target_pool":  types.StringType,
+}
+
 type Network struct {
 	NetworkID types.String `tfsdk:"network_id"`
 	Role      types.String `tfsdk:"role"`
+}
+
+var networkType = map[string]attr.Type{
+	"network_id": types.StringType,
+	"role":       types.StringType,
 }
 
 type TargetPool struct {
@@ -53,9 +66,29 @@ type TargetPool struct {
 	HealthCheck types.Object `tfsdk:"health_check"`
 }
 
+var targetPoolType = map[string]attr.Type{
+	"name":        types.StringType,
+	"target_port": types.Int64Type,
+	"targets":     targetsType,
+	"health_check": types.ObjectType{
+		AttrTypes: healthCheckType,
+	},
+}
+
 type Target struct {
 	DisplayName types.String `tfsdk:"display_name"`
 	IPAddress   types.String `tfsdk:"ip_address"`
+}
+
+var targetsType = types.SetType{
+	ElemType: types.ObjectType{
+		AttrTypes: targetType,
+	},
+}
+
+var targetType = map[string]attr.Type{
+	"display_name": types.StringType,
+	"ip_address":   types.StringType,
 }
 
 type HealthCheck struct {
@@ -64,6 +97,14 @@ type HealthCheck struct {
 	IntervalJitter     types.String `tfsdk:"interval_jitter"`
 	Timeout            types.String `tfsdk:"timeout"`
 	UnhealthyThreshold types.Int64  `tfsdk:"unhealthy_threshold"`
+}
+
+var healthCheckType = map[string]attr.Type{
+	"healthy_threshold":   types.Int64Type,
+	"interval":            types.StringType,
+	"interval_jitter":     types.StringType,
+	"timeout":             types.StringType,
+	"unhealthy_threshold": types.Int64Type,
 }
 
 // Schema returns the terraform schema structure

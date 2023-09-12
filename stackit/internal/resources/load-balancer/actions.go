@@ -71,7 +71,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 			resp.Diagnostics.AddError("Couldn't get instance information", agg.Error())
 			return
 		}
-		plan.ExternalAddress = resToStr(g.JSON200.ExternalAddress)
+		plan.PrivateAddress = resToStr(g.JSON200.PrivateAddress)
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, plan)...)
@@ -133,7 +133,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	state.PrivateAddress = resToStr(res.JSON200.PrivateAddress)
+	state.parse(*res.JSON200)
 
 	// update state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
