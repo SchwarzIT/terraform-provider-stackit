@@ -7,9 +7,10 @@ description: |-
   
   -> Environment supportTo set a custom API base URL, set STACKITSECRETSMANAGER_BASEURL environment variable
       \n
-  The example below uses the openstack
-  To set it up, Create a token for the OpenStack provider on your project's Infrastructure API
-  and use the following configuration:
+  Setting up openstack provider
+  To automate the creation of load balancers, openstack can be used to setup the supporting infrastructure.
+  To set up the provider, create a token on your project's Infrastructure API page
+  and configure the provider as follows:
   ```terraform
   terraform {
       required_providers {
@@ -32,6 +33,62 @@ description: |-
       auth_url         = "https://keystone.api.iaas.eu01.stackit.cloud/v3"
   }
   ```
+  Setting up supporting infrastructure
+  The example below uses openstack to create the network, router, a public IP address and a compute instance.
+  ```terraform
+  Create a network
+  resource "openstacknetworkingnetworkv2" "example" {
+    name = "examplenetwork"
+  }
+  Create a subnet
+  resource "openstacknetworkingsubnetv2" "example" {
+    name            = "examplesubnet"
+    cidr            = "192.168.0.0/25"
+    dnsnameservers = ["8.8.8.8"] // DNS is needed to reach the control plane
+    networkid      = openstacknetworkingnetwork_v2.example.id
+  }
+  Get public network
+  data "openstacknetworkingnetwork_v2" "public" {
+    name = "floating-net"
+  }
+  Create a floating IP
+  resource "openstacknetworkingfloatingipv2" "exampleip" {
+    pool = data.openstacknetworkingnetwork_v2.public.name
+  }
+  Get flavor for instance
+  data "openstackcomputeflavor_v2" "example" {
+    name = "g1.1"
+  }
+  Create instance
+  resource "openstackcomputeinstancev2" "example" {
+    dependson      = [openstacknetworkingsubnetv2.example]
+    name            = "exampleinstance"
+    flavorid       = data.openstackcomputeflavorv2.example.id
+    adminpass      = "example"
+    securitygroups = ["default"]
+  blockdevice {
+      uuid                  = "4364cdb2-dacd-429b-803e-f0f7cfde1c24" // Ubuntu 22.04
+      volumesize           = 32
+      sourcetype           = "image"
+      destinationtype      = "volume"
+      deleteontermination = true
+    }
+  network {
+      name = openstacknetworkingnetwork_v2.example.name
+    }
+  }
+  Create a router and attach it to the public network
+  resource "openstacknetworkingrouterv2" "examplerouter" {
+    name                = "examplerouter"
+    adminstateup      = "true"
+    externalnetworkid = data.openstacknetworkingnetworkv2.public.id
+  }
+  Attach the subnet to the router
+  resource "openstacknetworkingrouterinterfacev2" "exampleinterface" {
+    routerid = openstacknetworkingrouterv2.examplerouter.id
+    subnetid = openstacknetworkingsubnetv2.example.id
+  }
+  ```
 ---
 
 # stackit_load_balancer (Resource)
@@ -41,10 +98,15 @@ Manages Load Balancer instances\n
 
 -> __Environment support__<small>To set a custom API base URL, set <code>STACKIT_SECRETS_MANAGER_BASEURL</code> environment variable </small>
 	\n
-	
-The example below uses the openstack
-To set it up, Create a token for the OpenStack provider on your project's Infrastructure API
-and use the following configuration:
+
+## Setting up openstack provider
+
+To automate the creation of load balancers, openstack can be used to setup the supporting infrastructure.
+
+To set up the provider, create a token on your project's Infrastructure API page
+
+and configure the provider as follows:
+
 
 ```terraform
 
@@ -73,9 +135,14 @@ provider "openstack" {
 
 ```
 
-## Example Usage
+## Setting up supporting infrastructure
+
+The example below uses openstack to create the network, router, a public IP address and a compute instance.
+
 
 ```terraform
+
+
 # Create a network
 resource "openstack_networking_network_v2" "example" {
   name = "example_network"
@@ -89,7 +156,7 @@ resource "openstack_networking_subnet_v2" "example" {
   network_id      = openstack_networking_network_v2.example.id
 }
 
-
+# Get public network
 data "openstack_networking_network_v2" "public" {
   name = "floating-net"
 }
@@ -138,6 +205,12 @@ resource "openstack_networking_router_interface_v2" "example_interface" {
   subnet_id = openstack_networking_subnet_v2.example.id
 }
 
+
+```
+
+## Example Usage
+
+```terraform
 # create a load balancer
 resource "stackit_load_balancer" "example" {
   project_id = var.project_id
