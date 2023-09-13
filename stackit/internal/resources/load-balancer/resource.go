@@ -6,14 +6,14 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/baseurl"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services"
-	secretsmanager "github.com/SchwarzIT/community-stackit-go-client/pkg/services/secrets-manager/v1.1.0"
+	loadbalancer "github.com/SchwarzIT/community-stackit-go-client/pkg/services/load-balancer/1beta.0.0"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 )
 
 // New returns a new configured resource
 func New() resource.Resource {
 	return &Resource{
-		urls: secretsmanager.BaseURLs,
+		urls: loadbalancer.BaseURLs,
 	}
 }
 
