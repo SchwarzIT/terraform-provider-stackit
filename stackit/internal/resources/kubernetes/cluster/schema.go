@@ -125,7 +125,6 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			"project_id": schema.StringAttribute{
 				Description: "The project UUID.",
 				Required:    true,
-				Computed:    true,
 				Validators: []validator.String{
 					validate.ProjectID(),
 				},
