@@ -36,6 +36,7 @@ resource "stackit_kubernetes_cluster" "example" {
 ### Required
 
 - `name` (String) Specifies the cluster name (lower case, alphanumeric, hypens allowed, up to 11 chars)
+- `project_id` (String) The project UUID.
 
 ### Optional
 
@@ -46,7 +47,6 @@ resource "stackit_kubernetes_cluster" "example" {
 - `kubernetes_version` (String) Kubernetes version. Allowed Options are: `1.22`, `1.23`, `1.24`, or a full version including patch (not recommended).
 - `maintenance` (Attributes) A single maintenance block as defined below (see [below for nested schema](#nestedatt--maintenance))
 - `node_pools` (Attributes List) One or more `node_pool` block as defined below (see [below for nested schema](#nestedatt--node_pools))
-- `project_id` (String) The project UUID.
 - `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
 
 ### Read-Only
