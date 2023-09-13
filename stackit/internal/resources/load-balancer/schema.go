@@ -113,8 +113,11 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 		MarkdownDescription: fmt.Sprintf(`Manages Load Balancer instances\n%s\n
 	
 The example below uses the openstack
-To set it up, Create a token for the OpenStack provider on your project's Infrastructure API
-and use the following configuration:
+
+To set it up, create a token on your project's Infrastructure API page
+
+use the following configuration:
+
 `+"\n```terraform\n"+`
 terraform {
 	required_providers {
