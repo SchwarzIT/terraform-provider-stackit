@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   Manages Load Balancer instances\n
   
-  -> Environment supportTo set a custom API base URL, set STACKITSECRETSMANAGER_BASEURL environment variable
+  -> Environment supportTo set a custom API base URL, set STACKITLOADBALANCER_BASEURL environment variable
       \n
   Setting up openstack provider
   To automate the creation of load balancers, openstack can be used to setup the supporting infrastructure.
@@ -96,7 +96,7 @@ description: |-
 Manages Load Balancer instances\n
 <br />
 
--> __Environment support__<small>To set a custom API base URL, set <code>STACKIT_SECRETS_MANAGER_BASEURL</code> environment variable </small>
+-> __Environment support__<small>To set a custom API base URL, set <code>STACKIT_LOAD_BALANCER_BASEURL</code> environment variable </small>
 	\n
 
 ## Setting up openstack provider
