@@ -37,22 +37,6 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	if res.JSON200.Errors != nil {
-		for _, e := range *res.JSON200.Errors {
-			detail := ""
-			if e.Type != nil {
-				detail = fmt.Sprintf("Type: %s", *e.Type)
-			}
-			if e.Description != nil {
-				detail = fmt.Sprintf("%s\nDescription: %s", detail, *e.Description)
-			}
-			resp.Diagnostics.AddError("Couldn't create instance", detail)
-		}
-	}
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
 	plan.ID = types.StringValue(*res.JSON200.Name)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), plan.ID)...)
 	if resp.Diagnostics.HasError() {
@@ -180,7 +164,7 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 	if len(idParts) != 2 || idParts[0] == "" || idParts[1] == "" {
 		resp.Diagnostics.AddError(
 			"Unexpected Import Identifier",
-			fmt.Sprintf("Expected import identifier with format: `project_id,id` where `id` is the instance ID.\nInstead got: %q", req.ID),
+			fmt.Sprintf("Expected import identifier with format: `project_id,name`.\nInstead got: %q", req.ID),
 		)
 		return
 	}
@@ -189,7 +173,7 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 	if err := clientValidate.ProjectID(idParts[0]); err != nil {
 		resp.Diagnostics.AddError(
 			"Unexpected Import Identifier",
-			fmt.Sprintf("Couldn't validate kubernetes_project_id.\n%s", err.Error()),
+			fmt.Sprintf("Couldn't validate project_id.\n%s", err.Error()),
 		)
 		return
 	}
@@ -197,6 +181,7 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 	// set main attributes
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project_id"), idParts[0])...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), idParts[1])...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("name"), idParts[1])...)
 
 	if resp.Diagnostics.HasError() {
 		return
