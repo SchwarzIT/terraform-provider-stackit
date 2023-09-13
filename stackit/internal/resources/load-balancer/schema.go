@@ -110,7 +110,36 @@ var healthCheckType = map[string]attr.Type{
 // Schema returns the terraform schema structure
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: fmt.Sprintf("Manages Secrets Manager instances\n%s",
+		MarkdownDescription: fmt.Sprintf(`Manages Load Balancer instances\n%s\n
+	
+The example below uses the openstack
+To set it up, Create a token for the OpenStack provider on your project's Infrastructure API
+and use the following configuration:
+		
+		terraform {
+			required_providers {
+				stackit = {
+					source = "github.com/schwarzit/stackit"
+				}
+				openstack = {
+					source = "terraform-provider-openstack/openstack"
+				}
+			}
+		}
+		
+		provider "stackit" {}
+		
+		provider "openstack" {
+			tenant_id        = "{OpenStack project ID}"
+			tenant_name      = "{OpenStack project name}"
+			user_name        = "{Token name}"
+			user_domain_name = "portal_mvp"
+			password         = "{Token password}"
+			region           = "RegionOne"
+			auth_url         = "https://keystone.api.iaas.eu01.stackit.cloud/v3"
+		}
+		  
+		`,
 			common.EnvironmentInfo(r.urls),
 		),
 		Attributes: map[string]schema.Attribute{
