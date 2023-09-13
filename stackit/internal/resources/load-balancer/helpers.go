@@ -193,6 +193,7 @@ func prepareACL(lb Instance) *instances.LoadbalancerOptionAccessControl {
 }
 
 func (i *Instance) parse(ctx context.Context, lb instances.LoadBalancer, diags *diag.Diagnostics) {
+	i.ID = resToStr(lb.Name)
 	i.Name = resToStr(lb.Name)
 	i.ExternalAddress = resToStr(lb.ExternalAddress)
 	i.PrivateAddress = resToStr(lb.PrivateAddress)
