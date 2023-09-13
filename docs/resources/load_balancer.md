@@ -10,28 +10,28 @@ description: |-
   The example below uses the openstack
   To set it up, Create a token for the OpenStack provider on your project's Infrastructure API
   and use the following configuration:
-      terraform {
-          required_providers {
-              stackit = {
-                  source = "github.com/schwarzit/stackit"
-              }
-              openstack = {
-                  source = "terraform-provider-openstack/openstack"
-              }
+  ```terraform
+  terraform {
+      required_providers {
+          stackit = {
+              source = "github.com/schwarzit/stackit"
+          }
+          openstack = {
+              source = "terraform-provider-openstack/openstack"
           }
       }
-  
-      provider "stackit" {}
-  
-      provider "openstack" {
-          tenant_id        = "{OpenStack project ID}"
-          tenant_name      = "{OpenStack project name}"
-          user_name        = "{Token name}"
-          user_domain_name = "portal_mvp"
-          password         = "{Token password}"
-          region           = "RegionOne"
-          auth_url         = "https://keystone.api.iaas.eu01.stackit.cloud/v3"
-      }
+  }
+  provider "stackit" {}
+  provider "openstack" {
+      tenantid        = "{OpenStack project ID}"
+      tenantname      = "{OpenStack project name}"
+      username        = "{Token name}"
+      userdomainname = "portalmvp"
+      password         = "{Token password}"
+      region           = "RegionOne"
+      auth_url         = "https://keystone.api.iaas.eu01.stackit.cloud/v3"
+  }
+  ```
 ---
 
 # stackit_load_balancer (Resource)
@@ -45,29 +45,33 @@ Manages Load Balancer instances\n
 The example below uses the openstack
 To set it up, Create a token for the OpenStack provider on your project's Infrastructure API
 and use the following configuration:
-		
-		terraform {
-			required_providers {
-				stackit = {
-					source = "github.com/schwarzit/stackit"
-				}
-				openstack = {
-					source = "terraform-provider-openstack/openstack"
-				}
-			}
+
+```terraform
+
+terraform {
+	required_providers {
+		stackit = {
+			source = "github.com/schwarzit/stackit"
 		}
-		
-		provider "stackit" {}
-		
-		provider "openstack" {
-			tenant_id        = "{OpenStack project ID}"
-			tenant_name      = "{OpenStack project name}"
-			user_name        = "{Token name}"
-			user_domain_name = "portal_mvp"
-			password         = "{Token password}"
-			region           = "RegionOne"
-			auth_url         = "https://keystone.api.iaas.eu01.stackit.cloud/v3"
+		openstack = {
+			source = "terraform-provider-openstack/openstack"
 		}
+	}
+}
+
+provider "stackit" {}
+
+provider "openstack" {
+	tenant_id        = "{OpenStack project ID}"
+	tenant_name      = "{OpenStack project name}"
+	user_name        = "{Token name}"
+	user_domain_name = "portal_mvp"
+	password         = "{Token password}"
+	region           = "RegionOne"
+	auth_url         = "https://keystone.api.iaas.eu01.stackit.cloud/v3"
+}
+
+```
 
 ## Example Usage
 
