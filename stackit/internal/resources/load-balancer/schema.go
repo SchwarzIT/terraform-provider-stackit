@@ -115,31 +115,30 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 The example below uses the openstack
 To set it up, Create a token for the OpenStack provider on your project's Infrastructure API
 and use the following configuration:
-		
-		terraform {
-			required_providers {
-				stackit = {
-					source = "github.com/schwarzit/stackit"
-				}
-				openstack = {
-					source = "terraform-provider-openstack/openstack"
-				}
-			}
+`+"\n```terraform\n"+`
+terraform {
+	required_providers {
+		stackit = {
+			source = "github.com/schwarzit/stackit"
 		}
-		
-		provider "stackit" {}
-		
-		provider "openstack" {
-			tenant_id        = "{OpenStack project ID}"
-			tenant_name      = "{OpenStack project name}"
-			user_name        = "{Token name}"
-			user_domain_name = "portal_mvp"
-			password         = "{Token password}"
-			region           = "RegionOne"
-			auth_url         = "https://keystone.api.iaas.eu01.stackit.cloud/v3"
+		openstack = {
+			source = "terraform-provider-openstack/openstack"
 		}
-		  
-		`,
+	}
+}
+
+provider "stackit" {}
+
+provider "openstack" {
+	tenant_id        = "{OpenStack project ID}"
+	tenant_name      = "{OpenStack project name}"
+	user_name        = "{Token name}"
+	user_domain_name = "portal_mvp"
+	password         = "{Token password}"
+	region           = "RegionOne"
+	auth_url         = "https://keystone.api.iaas.eu01.stackit.cloud/v3"
+}
+`+"\n```",
 			common.EnvironmentInfo(r.urls),
 		),
 		Attributes: map[string]schema.Attribute{
