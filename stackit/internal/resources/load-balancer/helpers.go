@@ -8,6 +8,7 @@ import (
 	"github.com/go-test/deep"
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
@@ -191,21 +192,24 @@ func prepareACL(lb Instance) *instances.LoadbalancerOptionAccessControl {
 	return &acl
 }
 
-func (i *Instance) parse(lb instances.LoadBalancer) {
+func (i *Instance) parse(ctx context.Context, lb instances.LoadBalancer, diags *diag.Diagnostics) {
 	i.Name = resToStr(lb.Name)
 	i.ExternalAddress = resToStr(lb.ExternalAddress)
 	i.PrivateAddress = resToStr(lb.PrivateAddress)
-	i.parseNetworks(lb)
-	i.parseListeners(lb)
-	i.parseTargetPools(lb)
-	i.parseOptions(lb)
+	i.parseOptions(ctx, lb, diags)
+	i.parseNetworks(ctx, lb, diags)
+	i.parseListeners(ctx, lb, diags)
+	i.parseTargetPools(ctx, lb, diags)
 }
 
-func (i *Instance) parseOptions(lb instances.LoadBalancer) {
+func (i *Instance) parseOptions(ctx context.Context, lb instances.LoadBalancer, diags *diag.Diagnostics) {
 	if lb.Options == nil {
 		return
 	}
+	// Private Network only
 	i.PrivateNetworkOnly = resToBool(lb.Options.PrivateNetworkOnly)
+
+	// ACL
 	if lb.Options.AccessControl == nil ||
 		lb.Options.AccessControl.AllowedSourceRanges == nil {
 		return
@@ -215,36 +219,15 @@ func (i *Instance) parseOptions(lb instances.LoadBalancer) {
 	for _, r := range ranges {
 		acl = append(acl, types.StringValue(r))
 	}
-	i.ACL = types.SetValueMust(types.StringType, acl)
-}
-
-func (i *Instance) parseListeners(lb instances.LoadBalancer) {
-	if lb.Listeners == nil {
+	val, d := types.SetValueFrom(ctx, types.StringType, acl)
+	diags.Append(d...)
+	if diags.HasError() {
 		return
 	}
-	listeners := []attr.Value{}
-	for _, l := range *lb.Listeners {
-		attrs := map[string]attr.Value{
-			"display_name": resToStr(l.DisplayName),
-			"port":         resToStr(l.DisplayName),
-			"protocol":     types.StringNull(),
-			"target_pool":  resToStr(l.TargetPool),
-		}
-		if l.Protocol != nil {
-			attrs["protocol"] = types.StringValue(string(*l.Protocol))
-		}
-		listeners = append(listeners, types.ObjectValueMust(listenerType, attrs))
-	}
-	if len(listeners) == 0 {
-		return
-	}
-	i.Listeners = types.SetValueMust(
-		listeners[0].Type(context.Background()),
-		listeners,
-	)
+	i.ACL = val
 }
 
-func (i *Instance) parseNetworks(lb instances.LoadBalancer) {
+func (i *Instance) parseNetworks(ctx context.Context, lb instances.LoadBalancer, diags *diag.Diagnostics) {
 	if lb.Networks == nil {
 		return
 	}
@@ -262,16 +245,48 @@ func (i *Instance) parseNetworks(lb instances.LoadBalancer) {
 		}
 		networks = append(networks, types.ObjectValueMust(networkType, attrs))
 	}
-	if len(networks) == 0 {
-		return
-	}
-	i.Networks = types.SetValueMust(
-		networks[0].Type(context.Background()),
+	val, d := types.SetValueFrom(
+		ctx,
+		types.ObjectType{AttrTypes: networkType},
 		networks,
 	)
+	diags.Append(d...)
+	if diags.HasError() {
+		return
+	}
+	i.Networks = val
 }
 
-func (i *Instance) parseTargetPools(lb instances.LoadBalancer) {
+func (i *Instance) parseListeners(ctx context.Context, lb instances.LoadBalancer, diags *diag.Diagnostics) {
+	if lb.Listeners == nil {
+		return
+	}
+	listeners := []attr.Value{}
+	for _, l := range *lb.Listeners {
+		attrs := map[string]attr.Value{
+			"display_name": resToStr(l.DisplayName),
+			"port":         resToInt64(l.Port),
+			"protocol":     types.StringNull(),
+			"target_pool":  resToStr(l.TargetPool),
+		}
+		if l.Protocol != nil {
+			attrs["protocol"] = types.StringValue(string(*l.Protocol))
+		}
+		listeners = append(listeners, types.ObjectValueMust(listenerType, attrs))
+	}
+	val, d := types.SetValueFrom(
+		ctx,
+		types.ObjectType{AttrTypes: listenerType},
+		listeners,
+	)
+	diags.Append(d...)
+	if diags.HasError() {
+		return
+	}
+	i.Listeners = val
+}
+
+func (i *Instance) parseTargetPools(ctx context.Context, lb instances.LoadBalancer, diags *diag.Diagnostics) {
 	if lb.TargetPools == nil {
 		return
 	}
@@ -291,7 +306,7 @@ func (i *Instance) parseTargetPools(lb instances.LoadBalancer) {
 					"ip_address":   resToStr(t.Ip),
 				}))
 			}
-			attrs["targets"] = types.SetValueMust(targets[0].Type(context.Background()), targets)
+			attrs["targets"] = types.SetValueMust(types.ObjectType{AttrTypes: targetType}, targets)
 		}
 		if tp.ActiveHealthCheck != nil {
 			attrs["health_check"] = types.ObjectValueMust(healthCheckType, map[string]attr.Value{
@@ -304,11 +319,14 @@ func (i *Instance) parseTargetPools(lb instances.LoadBalancer) {
 		}
 		targetPools = append(targetPools, types.ObjectValueMust(targetPoolType, attrs))
 	}
-	if len(targetPools) == 0 {
-		return
-	}
-	i.TargetPools = types.SetValueMust(
-		targetPools[0].Type(context.Background()),
+	v, d := types.SetValueFrom(
+		ctx,
+		types.ObjectType{AttrTypes: targetPoolType},
 		targetPools,
 	)
+	diags.Append(d...)
+	if diags.HasError() {
+		return
+	}
+	i.TargetPools = v
 }

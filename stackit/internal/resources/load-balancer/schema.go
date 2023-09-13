@@ -284,9 +284,11 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			},
 			"private_address": schema.StringAttribute{
 				Description: "The private address of the load balancer.",
-				Optional:    false,
-				Required:    false,
+				Optional:    true,
 				Computed:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 		},
 	}

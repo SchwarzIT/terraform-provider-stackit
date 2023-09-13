@@ -66,12 +66,14 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	if g, ok := wres.(*instances.GetResponse); ok {
-		if agg := validate.Response(g, nil, "JSON200.Name"); agg != nil {
-			resp.Diagnostics.AddError("Couldn't get instance information", agg.Error())
-			return
-		}
-		plan.PrivateAddress = resToStr(g.JSON200.PrivateAddress)
+	gres, ok := wres.(*instances.GetResponse)
+	if !ok || gres == nil {
+		resp.Diagnostics.AddError("Couldn't get load balancer instance information", "Received an unexpected response type")
+		return
+	}
+	plan.parse(ctx, *gres.JSON200, &resp.Diagnostics)
+	if resp.Diagnostics.HasError() {
+		return
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, plan)...)
@@ -133,7 +135,10 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	state.parse(*res.JSON200)
+	state.parse(ctx, *res.JSON200, &resp.Diagnostics)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// update state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
