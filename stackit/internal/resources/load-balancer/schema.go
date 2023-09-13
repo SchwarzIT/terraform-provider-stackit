@@ -114,7 +114,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 
 ## Setting up openstack provider
 
-To automate the creation of load balancers, you need to set up the openstack provider, which is used to setup the supporting infrastructure.
+To automate the creation of load balancers, openstack can be used to setup the supporting infrastructure.
 
 To set up the provider, create a token on your project's Infrastructure API page
 
@@ -147,7 +147,7 @@ provider "openstack" {
 
 ## Setting up supporting infrastructure
 
-The example below uses openstack to create the network, router and public IP address:
+The example below uses openstack to create the network, router, a public IP address and a compute instance.
 
 `+"\n```terraform\n"+`
 
