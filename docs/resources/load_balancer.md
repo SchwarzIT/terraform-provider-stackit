@@ -3,18 +3,71 @@
 page_title: "stackit_load_balancer Resource - stackit"
 subcategory: ""
 description: |-
-  Manages Secrets Manager instances
+  Manages Load Balancer instances\n
   
   -> Environment supportTo set a custom API base URL, set STACKITSECRETSMANAGER_BASEURL environment variable
+      \n
+  The example below uses the openstack
+  To set it up, Create a token for the OpenStack provider on your project's Infrastructure API
+  and use the following configuration:
+      terraform {
+          required_providers {
+              stackit = {
+                  source = "github.com/schwarzit/stackit"
+              }
+              openstack = {
+                  source = "terraform-provider-openstack/openstack"
+              }
+          }
+      }
+  
+      provider "stackit" {}
+  
+      provider "openstack" {
+          tenant_id        = "{OpenStack project ID}"
+          tenant_name      = "{OpenStack project name}"
+          user_name        = "{Token name}"
+          user_domain_name = "portal_mvp"
+          password         = "{Token password}"
+          region           = "RegionOne"
+          auth_url         = "https://keystone.api.iaas.eu01.stackit.cloud/v3"
+      }
 ---
 
 # stackit_load_balancer (Resource)
 
-Manages Secrets Manager instances
-
+Manages Load Balancer instances\n
 <br />
 
 -> __Environment support__<small>To set a custom API base URL, set <code>STACKIT_SECRETS_MANAGER_BASEURL</code> environment variable </small>
+	\n
+	
+The example below uses the openstack
+To set it up, Create a token for the OpenStack provider on your project's Infrastructure API
+and use the following configuration:
+		
+		terraform {
+			required_providers {
+				stackit = {
+					source = "github.com/schwarzit/stackit"
+				}
+				openstack = {
+					source = "terraform-provider-openstack/openstack"
+				}
+			}
+		}
+		
+		provider "stackit" {}
+		
+		provider "openstack" {
+			tenant_id        = "{OpenStack project ID}"
+			tenant_name      = "{OpenStack project name}"
+			user_name        = "{Token name}"
+			user_domain_name = "portal_mvp"
+			password         = "{Token password}"
+			region           = "RegionOne"
+			auth_url         = "https://keystone.api.iaas.eu01.stackit.cloud/v3"
+		}
 
 ## Example Usage
 
