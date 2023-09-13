@@ -28,6 +28,7 @@ import (
 	resourceDataServicesInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/data-services/instance"
 	resourceKubernetesCluster "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/kubernetes/cluster"
 	resourceKubernetesProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/kubernetes/project"
+	resourceLoadBalancer "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/load-balancer"
 	resourceMongoDBFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mongodb-flex/instance"
 	resourceMongoDBFlexUser "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mongodb-flex/user"
 	resourceObjectStorageBucket "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/bucket"
@@ -161,6 +162,7 @@ func (p *StackitProvider) Resources(_ context.Context) []func() resource.Resourc
 		resourceDataServicesInstance.NewRedis,
 		resourceKubernetesCluster.New,
 		resourceKubernetesProject.New,
+		resourceLoadBalancer.New,
 		resourceMongoDBFlexInstance.New,
 		resourceMongoDBFlexUser.New,
 		resourceObjectStorageBucket.New,
