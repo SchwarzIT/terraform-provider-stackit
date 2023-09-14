@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/load-balancer/1beta.0.0/instances"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/load-balancer/1beta.0.0/project"
@@ -39,11 +40,18 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	plan.ID = types.StringValue(*res.JSON200.Name)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), plan.ID)...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("name"), plan.ID)...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project_id"), plan.ProjectID)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	process := res.WaitHandler(ctx, r.client.LoadBalancer.Instances, plan.ProjectID.ValueString(), plan.Name.ValueString())
+	timeout, d := plan.Timeouts.Create(ctx, 1*time.Hour)
+	if resp.Diagnostics.Append(d...); resp.Diagnostics.HasError() {
+		return
+	}
+
+	process := res.WaitHandler(ctx, r.client.LoadBalancer.Instances, plan.ProjectID.ValueString(), plan.Name.ValueString()).SetTimeout(timeout)
 	wres, err := process.Wait()
 	if err != nil {
 		resp.Diagnostics.AddError("Received an error while waiting for load balancer instance to be created", err.Error())
@@ -55,6 +63,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		resp.Diagnostics.AddError("Couldn't get load balancer instance information", "Received an unexpected response type")
 		return
 	}
+
 	plan.parse(ctx, *gres.JSON200, &resp.Diagnostics)
 	if resp.Diagnostics.HasError() {
 		return
@@ -148,7 +157,13 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		resp.Diagnostics.AddError("Couldn't delete instance", agg.Error())
 		return
 	}
-	process := res.WaitHandler(ctx, r.client.LoadBalancer.Instances, state.ProjectID.ValueString(), state.Name.ValueString())
+
+	timeout, d := state.Timeouts.Delete(ctx, 1*time.Hour)
+	if resp.Diagnostics.Append(d...); resp.Diagnostics.HasError() {
+		return
+	}
+
+	process := res.WaitHandler(ctx, r.client.LoadBalancer.Instances, state.ProjectID.ValueString(), state.Name.ValueString()).SetTimeout(timeout)
 	if _, err := process.Wait(); err != nil {
 		resp.Diagnostics.AddError("Received an error while waiting for load balancer instance to be deleted", err.Error())
 		return

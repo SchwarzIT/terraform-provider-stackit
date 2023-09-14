@@ -6,6 +6,7 @@ import (
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
+	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -23,16 +24,17 @@ import (
 
 // Instance is the schema model
 type Instance struct {
-	ID                 types.String `tfsdk:"id"`
-	Name               types.String `tfsdk:"name"`
-	ProjectID          types.String `tfsdk:"project_id"`
-	ExternalAddress    types.String `tfsdk:"external_address"`
-	Listeners          types.Set    `tfsdk:"listeners"`
-	Networks           types.Set    `tfsdk:"networks"`
-	TargetPools        types.Set    `tfsdk:"target_pools"`
-	ACL                types.Set    `tfsdk:"acl"`
-	PrivateNetworkOnly types.Bool   `tfsdk:"private_network_only"`
-	PrivateAddress     types.String `tfsdk:"private_address"`
+	ID                 types.String   `tfsdk:"id"`
+	Name               types.String   `tfsdk:"name"`
+	ProjectID          types.String   `tfsdk:"project_id"`
+	ExternalAddress    types.String   `tfsdk:"external_address"`
+	Listeners          types.Set      `tfsdk:"listeners"`
+	Networks           types.Set      `tfsdk:"networks"`
+	TargetPools        types.Set      `tfsdk:"target_pools"`
+	ACL                types.Set      `tfsdk:"acl"`
+	PrivateNetworkOnly types.Bool     `tfsdk:"private_network_only"`
+	PrivateAddress     types.String   `tfsdk:"private_address"`
+	Timeouts           timeouts.Value `tfsdk:"timeouts"`
 }
 
 type Listener struct {
@@ -393,6 +395,10 @@ resource "openstack_networking_router_interface_v2" "example_interface" {
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
+			"timeouts": common.Timeouts(ctx, timeouts.Opts{
+				Create: true,
+				Delete: true,
+			}),
 		},
 	}
 }
