@@ -9,6 +9,7 @@ import (
 	dataDataServicesInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/data-services/instance"
 	dataKubernetesCluster "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/kubernetes/cluster"
 	dataKubernetesProject "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/kubernetes/project"
+	dataLoadBalancer "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/load-balancer"
 	dataMongoDBFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/mongodb-flex/instance"
 	dataMongoDBFlexUser "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/mongodb-flex/user"
 	dataObjectStorageBucket "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/object-storage/bucket"
@@ -198,6 +199,7 @@ func (p *StackitProvider) DataSources(context.Context) []func() datasource.DataS
 		dataDataServicesInstance.NewRedis,
 		dataKubernetesCluster.New,
 		dataKubernetesProject.New,
+		dataLoadBalancer.New,
 		dataMongoDBFlexInstance.New,
 		dataMongoDBFlexUser.New,
 		dataObjectStorageBucket.New,

@@ -365,8 +365,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        name: [project]
+        name: [load-balancer,project]
         include:
+
+        - name: load-balancer
+          path: stackit/internal/data-sources/load-balancer
 
         - name: project
           path: stackit/internal/data-sources/project
@@ -692,8 +695,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        name: [project]
+        name: [load-balancer,project]
         include:
+
+        - name: load-balancer
+          path: stackit/internal/resources/load-balancer
 
         - name: project
           path: stackit/internal/resources/project
