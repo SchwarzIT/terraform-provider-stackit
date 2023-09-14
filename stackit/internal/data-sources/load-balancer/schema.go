@@ -100,7 +100,7 @@ var healthCheckType = map[string]attr.Type{
 // Schema returns the terraform schema structure
 func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: fmt.Sprintf("Data source for STACKIT projects\n%s",
+		MarkdownDescription: fmt.Sprintf("Data source for Load Balancer instances\n%s",
 			common.EnvironmentInfo(d.urls),
 		),
 		Attributes: map[string]schema.Attribute{
