@@ -3,14 +3,14 @@
 page_title: "stackit_load_balancer Data Source - stackit"
 subcategory: ""
 description: |-
-  Data source for STACKIT projects
+  Data source for Load Balancer instances
   
   -> Environment supportTo set a custom API base URL, set STACKITLOADBALANCER_BASEURL environment variable
 ---
 
 # stackit_load_balancer (Data Source)
 
-Data source for STACKIT projects
+Data source for Load Balancer instances
 
 <br />
 

@@ -3,10 +3,9 @@
 page_title: "stackit_load_balancer Resource - stackit"
 subcategory: ""
 description: |-
-  Manages Load Balancer instances\n
+  Manages Load Balancer instances
   
-  -> Environment supportTo set a custom API base URL, set STACKITLOADBALANCER_BASEURL environment variable
-      \n
+  -> Environment supportTo set a custom API base URL, set STACKITLOADBALANCER_BASEURL environment variable 
   Setting up openstack provider
   To automate the creation of load balancers, openstack can be used to setup the supporting infrastructure.
   To set up the provider, create a token on your project's Infrastructure API page
@@ -93,11 +92,13 @@ description: |-
 
 # stackit_load_balancer (Resource)
 
-Manages Load Balancer instances\n
+Manages Load Balancer instances
+		
+
 <br />
 
 -> __Environment support__<small>To set a custom API base URL, set <code>STACKIT_LOAD_BALANCER_BASEURL</code> environment variable </small>
-	\n
+	
 
 ## Setting up openstack provider
 

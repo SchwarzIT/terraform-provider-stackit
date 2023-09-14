@@ -112,7 +112,9 @@ var healthCheckType = map[string]attr.Type{
 // Schema returns the terraform schema structure
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: fmt.Sprintf(`Manages Load Balancer instances\n%s\n
+		MarkdownDescription: fmt.Sprintf(`Manages Load Balancer instances
+		
+%s
 
 ## Setting up openstack provider
 
