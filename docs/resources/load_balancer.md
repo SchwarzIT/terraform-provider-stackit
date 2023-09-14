@@ -254,6 +254,7 @@ resource "stackit_load_balancer" "example" {
 - `external_address` (String) The external address of the instance.
 - `private_address` (String) The private address of the load balancer.
 - `private_network_only` (Boolean) Whether the load balancer is only accessible via private networks.
+- `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
 
 ### Read-Only
 
@@ -317,5 +318,15 @@ Required:
 - `interval_jitter` (String) The interval jitter.
 - `timeout` (String) The timeout.
 - `unhealthy_threshold` (Number) The unhealthy threshold.
+
+
+
+<a id="nestedatt--timeouts"></a>
+### Nested Schema for `timeouts`
+
+Optional:
+
+- `create` (String)
+- `delete` (String)
 
 
