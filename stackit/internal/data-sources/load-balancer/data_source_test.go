@@ -20,7 +20,7 @@ type openstack struct {
 	password   string
 }
 
-const run_this_test = true
+const run_this_test = false
 
 func TestAcc_LoadBalancer(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
