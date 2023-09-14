@@ -20,7 +20,7 @@ type openstack struct {
 	password   string
 }
 
-const run_this_test = false
+const run_this_test = true
 
 func TestAcc_LoadBalancer(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
@@ -50,16 +50,21 @@ func TestAcc_LoadBalancer(t *testing.T) {
 			{
 				Config: config(name, projectID, os),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("stackit_load_balancer.example", "project_id", projectID),
-					resource.TestCheckResourceAttr("stackit_load_balancer.example", "id", name),
+					resource.TestCheckResourceAttrPair("stackit_load_balancer.example", "project_id", "data.stackit_load_balancer.example", "project_id"),
+					resource.TestCheckResourceAttrPair("stackit_load_balancer.example", "id", "data.stackit_load_balancer.example", "id"),
+					resource.TestCheckResourceAttrPair("stackit_load_balancer.example", "external_address", "data.stackit_load_balancer.example", "external_address"),
+					resource.TestCheckResourceAttrPair("stackit_load_balancer.example", "private_network_only", "data.stackit_load_balancer.example", "private_network_only"),
+					resource.TestCheckResourceAttrPair("stackit_load_balancer.example", "name", "data.stackit_load_balancer.example", "name"),
+					resource.TestCheckResourceAttrPair("stackit_load_balancer.example", "target_pools.0.name", "data.stackit_load_balancer.example", "target_pools.0.name"),
+					resource.TestCheckResourceAttrPair("stackit_load_balancer.example", "target_pools.0.target_port", "data.stackit_load_balancer.example", "target_pools.0.target_port"),
+					resource.TestCheckResourceAttrPair("stackit_load_balancer.example", "target_pools.0.targets.0.display_name", "data.stackit_load_balancer.example", "target_pools.0.targets.0.display_name"),
+					resource.TestCheckResourceAttrPair("stackit_load_balancer.example", "target_pools.0.targets.0.ip_address", "data.stackit_load_balancer.example", "target_pools.0.targets.0.ip_address"),
+					resource.TestCheckResourceAttrPair("stackit_load_balancer.example", "listeners.0.display_name", "data.stackit_load_balancer.example", "listeners.0.display_name"),
+					resource.TestCheckResourceAttrPair("stackit_load_balancer.example", "listeners.0.port", "data.stackit_load_balancer.example", "listeners.0.port"),
+					resource.TestCheckResourceAttrPair("stackit_load_balancer.example", "listeners.0.protocol", "data.stackit_load_balancer.example", "listeners.0.protocol"),
+					resource.TestCheckResourceAttrPair("stackit_load_balancer.example", "listeners.0.target_pool", "data.stackit_load_balancer.example", "listeners.0.target_pool"),
+					resource.TestCheckResourceAttrPair("stackit_load_balancer.example", "networks.0.network_id", "data.stackit_load_balancer.example", "networks.0.network_id"),
 				),
-			},
-			// test import
-			{
-				ResourceName:      "stackit_load_balancer.example",
-				ImportStateId:     fmt.Sprintf("%s,%s", projectID, "example"),
-				ImportState:       true,
-				ImportStateVerify: true,
 			},
 		},
 	})
@@ -89,6 +94,12 @@ func config(name, projectID string, os openstack) string {
 		networks = [
 			{ network_id = openstack_networking_network_v2.example.id }
 		]
+	}
+
+	data "stackit_load_balancer" "example" {
+		depends_on = [stackit_load_balancer.example]
+		project_id = stackit_load_balancer.example.project_id
+		name       = stackit_load_balancer.example.name
 	}
 
 %s
@@ -154,7 +165,7 @@ func supportingInfra(name string, os openstack) string {
 		network {
 			name = openstack_networking_network_v2.example.name
 		}
-		
+
 		lifecycle {
 			ignore_changes = [security_groups]
 		}
