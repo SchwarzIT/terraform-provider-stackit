@@ -57,7 +57,7 @@ func TestAcc_LoadBalancer(t *testing.T) {
 			// test import
 			{
 				ResourceName:      "stackit_load_balancer.example",
-				ImportStateId:     fmt.Sprintf("%s,%s", projectID, "example"),
+				ImportStateId:     fmt.Sprintf("%s,%s", projectID, name),
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
