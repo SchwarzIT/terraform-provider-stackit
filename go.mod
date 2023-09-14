@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/Masterminds/semver v1.5.0
-	github.com/SchwarzIT/community-stackit-go-client v1.27.0
+	github.com/SchwarzIT/community-stackit-go-client v1.27.1
 	github.com/go-test/deep v1.0.3
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/terraform-plugin-framework v1.2.0
