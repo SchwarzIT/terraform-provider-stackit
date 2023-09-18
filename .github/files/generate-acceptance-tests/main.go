@@ -150,7 +150,7 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
           if [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]]; then
             exit 1;
           fi;
-          make ci-testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+          make ci-testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}" OS_AUTH_URL="${{ secrets.OS_AUTH_URL }}" OS_PASSWORD="${{ secrets.OS_PASSWORD }}" OS_PROJECT_DOMAIN_ID="${{ secrets.OS_PROJECT_DOMAIN_ID }}" OS_PROJECT_NAME="${{ secrets.OS_PROJECT_NAME }}" OS_REGION_NAME="${{ secrets.OS_REGION_NAME }}" OS_TENANT_ID="${{ secrets.OS_TENANT_ID }}" OS_TENANT_NAME="${{ secrets.OS_TENANT_NAME }}" OS_USERNAME="${{ secrets.OS_USERNAME }}" OS_USER_DOMAIN_NAME="${{ secrets.OS_USER_DOMAIN_NAME }}"
       - name: Save results
         if: always()
         uses: actions/upload-artifact@v3
@@ -204,7 +204,7 @@ func printDataSourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyA
           if [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]]; then
             exit 1;
           fi;
-          make ci-testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+          make ci-testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}" OS_AUTH_URL="${{ secrets.OS_AUTH_URL }}" OS_PASSWORD="${{ secrets.OS_PASSWORD }}" OS_PROJECT_DOMAIN_ID="${{ secrets.OS_PROJECT_DOMAIN_ID }}" OS_PROJECT_NAME="${{ secrets.OS_PROJECT_NAME }}" OS_REGION_NAME="${{ secrets.OS_REGION_NAME }}" OS_TENANT_ID="${{ secrets.OS_TENANT_ID }}" OS_TENANT_NAME="${{ secrets.OS_TENANT_NAME }}" OS_USERNAME="${{ secrets.OS_USERNAME }}" OS_USER_DOMAIN_NAME="${{ secrets.OS_USER_DOMAIN_NAME }}"
       - name: Save results
         if: always()
         uses: actions/upload-artifact@v3
@@ -276,7 +276,7 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
           if [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]]; then
             exit 1;
           fi;
-          make ci-testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+          make ci-testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}" OS_AUTH_URL="${{ secrets.OS_AUTH_URL }}" OS_PASSWORD="${{ secrets.OS_PASSWORD }}" OS_PROJECT_DOMAIN_ID="${{ secrets.OS_PROJECT_DOMAIN_ID }}" OS_PROJECT_NAME="${{ secrets.OS_PROJECT_NAME }}" OS_REGION_NAME="${{ secrets.OS_REGION_NAME }}" OS_TENANT_ID="${{ secrets.OS_TENANT_ID }}" OS_TENANT_NAME="${{ secrets.OS_TENANT_NAME }}" OS_USERNAME="${{ secrets.OS_USERNAME }}" OS_USER_DOMAIN_NAME="${{ secrets.OS_USER_DOMAIN_NAME }}"
       - name: Save results
         if: always()
         uses: actions/upload-artifact@v3
@@ -331,7 +331,7 @@ func printResourceOutcome(sortedglobalKeys []string, sortedKeys []string, keyAnd
           if [[ -z "${ACC_TEST_PROJECT_ID}" || "${ACC_TEST_PROJECT_ID}" == "NULL" || "${ACC_TEST_PROJECT_ID}" == "null" ]]; then
             exit 1;
           fi;
-          make ci-testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}"
+          make ci-testacc TEST="./${{ matrix.path }}/..." ACC_TEST_BILLING_REF="${{ secrets.ACC_TEST_BILLING_REF }}" ACC_TEST_USER_EMAIL="${{ secrets.ACC_TEST_USER_EMAIL }}" STACKIT_SERVICE_ACCOUNT_TOKEN="${{ secrets.STACKIT_SERVICE_ACCOUNT_TOKEN }}" STACKIT_SERVICE_ACCOUNT_EMAIL="${{ secrets.STACKIT_SERVICE_ACCOUNT_EMAIL }}" OS_AUTH_URL="${{ secrets.OS_AUTH_URL }}" OS_PASSWORD="${{ secrets.OS_PASSWORD }}" OS_PROJECT_DOMAIN_ID="${{ secrets.OS_PROJECT_DOMAIN_ID }}" OS_PROJECT_NAME="${{ secrets.OS_PROJECT_NAME }}" OS_REGION_NAME="${{ secrets.OS_REGION_NAME }}" OS_TENANT_ID="${{ secrets.OS_TENANT_ID }}" OS_TENANT_NAME="${{ secrets.OS_TENANT_NAME }}" OS_USERNAME="${{ secrets.OS_USERNAME }}" OS_USER_DOMAIN_NAME="${{ secrets.OS_USER_DOMAIN_NAME }}"
       - name: Save results
         if: always()
         uses: actions/upload-artifact@v3
