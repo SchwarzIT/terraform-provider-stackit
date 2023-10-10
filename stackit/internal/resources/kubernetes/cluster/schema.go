@@ -130,7 +130,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"kubernetes_version": schema.StringAttribute{
-				Description: "Kubernetes version. Allowed Options are: `1.22`, `1.23`, `1.24`, or a full version including patch (not recommended).",
+				Description: "Kubernetes version. Allowed Options are: `1.25`, `1.26`, or a full version including patch (not recommended).",
 				Optional:    true,
 				Computed:    true,
 				Validators: []validator.String{
