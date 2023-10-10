@@ -70,7 +70,7 @@ func config(name, nodepoolName, machineType string) string {
 resource "stackit_kubernetes_cluster" "example" {
 	project_id         = "%s"
 	name               = "%s"
-	kubernetes_version = "1.24"
+	kubernetes_version = "1.26"
 	allow_privileged_containers = false
 	
 	node_pools = [{
