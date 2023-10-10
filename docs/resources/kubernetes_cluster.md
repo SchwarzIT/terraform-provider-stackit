@@ -44,7 +44,7 @@ resource "stackit_kubernetes_cluster" "example" {
 - `extensions` (Attributes) A single extensions block as defined below (see [below for nested schema](#nestedatt--extensions))
 - `hibernations` (Attributes List) One or more hibernation block as defined below (see [below for nested schema](#nestedatt--hibernations))
 - `kubernetes_project_id` (String, Deprecated) The ID of a `stackit_kubernetes_project` resource
-- `kubernetes_version` (String) Kubernetes version. Allowed Options are: `1.22`, `1.23`, `1.24`, or a full version including patch (not recommended).
+- `kubernetes_version` (String) Kubernetes version. Allowed Options are: `1.25`, `1.26`, or a full version including patch (not recommended).
 - `maintenance` (Attributes) A single maintenance block as defined below (see [below for nested schema](#nestedatt--maintenance))
 - `node_pools` (Attributes List) One or more `node_pool` block as defined below (see [below for nested schema](#nestedatt--node_pools))
 - `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
