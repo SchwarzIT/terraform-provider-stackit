@@ -45,7 +45,7 @@ func (j *Job) setDefaultsUpdate(partialUpdate scrapeconfig.PartialUpdateJSONBody
 	if len(partialUpdate) == 0 {
 		return
 	}
-	job := partialUpdate[0]
+	job := &partialUpdate[0]
 	if j.MetricsPath.IsNull() || j.MetricsPath.IsUnknown() {
 		s := DefaultMetricsPath
 		job.MetricsPath = &s
@@ -62,15 +62,14 @@ func (j *Job) setDefaultsUpdate(partialUpdate scrapeconfig.PartialUpdateJSONBody
 }
 
 func (j *Job) ToClientJob() scrapeconfig.CreateJSONBody {
-	// This conversion might be lossy if the value is greater than 16777215.
-	sampleLimit := float32(j.SampleLimit.ValueInt64())
 	job := scrapeconfig.CreateJSONBody{
 		JobName:        j.Name.ValueString(),
 		Scheme:         scrapeconfig.CreateJSONBodyScheme(j.Scheme.ValueString()),
 		MetricsPath:    j.MetricsPath.ValueStringPointer(),
 		ScrapeInterval: j.ScrapeInterval.ValueString(),
 		ScrapeTimeout:  j.ScrapeTimeout.ValueString(),
-		SampleLimit:    &sampleLimit,
+		// This conversion might be lossy if the value is greater than 16777215.
+		SampleLimit: toFloat32Ptr(float32(j.SampleLimit.ValueInt64())),
 	}
 
 	j.setDefaults(&job)
