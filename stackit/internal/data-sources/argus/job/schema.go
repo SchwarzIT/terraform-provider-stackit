@@ -66,6 +66,11 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Computed:    true,
 			},
 
+			"sample_limit": schema.Int64Attribute{
+				Description: "Specifies the scrape sample limit.",
+				Computed:    true,
+			},
+
 			"saml2": schema.SingleNestedAttribute{
 				Description: "A saml2 configuration block",
 				Optional:    true,

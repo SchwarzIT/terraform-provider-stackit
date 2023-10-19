@@ -130,8 +130,7 @@ func (j *Job) ToClientPartialUpdateJobs() scrapeconfig.PartialUpdateJSONBody {
 		ScrapeInterval: j.ScrapeInterval.ValueString(),
 		ScrapeTimeout:  j.ScrapeTimeout.ValueString(),
 		SampleLimit:    toFloat32Ptr(float32(j.SampleLimit.ValueInt64())),
-	},
-	}
+	}}
 	j.setDefaultsUpdate(jobs)
 
 	job := &jobs[0]
@@ -195,6 +194,7 @@ func (j *Job) FromClientJob(cj scrapeconfig.Job) {
 	}
 	j.ScrapeInterval = types.StringValue(cj.ScrapeInterval)
 	j.ScrapeTimeout = types.StringValue(cj.ScrapeTimeout)
+	j.SampleLimit = types.Int64Null()
 	if cj.SampleLimit != nil {
 		j.SampleLimit = types.Int64Value(int64(*cj.SampleLimit))
 	}
