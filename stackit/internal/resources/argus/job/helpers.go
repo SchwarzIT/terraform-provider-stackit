@@ -4,9 +4,10 @@ import (
 	"context"
 
 	scrapeconfig "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/scrape-config"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 )
 
 const (
@@ -14,6 +15,7 @@ const (
 	DefaultScheme                   = "https"
 	DefaultScrapeInterval           = "5m"
 	DefaultScrapeTimeout            = "2m"
+	DefaultSampleLimit              = 5000
 	DefaultSAML2EnableURLParameters = true
 )
 
@@ -26,7 +28,7 @@ func (j *Job) setDefaults(job *scrapeconfig.CreateJSONBody) {
 		job.MetricsPath = &s
 	}
 	if j.Scheme.IsNull() || j.Scheme.IsUnknown() {
-		job.Scheme = scrapeconfig.CreateJSONBodyScheme(DefaultScheme)
+		job.Scheme = DefaultScheme
 	}
 	if j.ScrapeInterval.IsNull() || j.ScrapeInterval.IsUnknown() {
 		job.ScrapeInterval = DefaultScrapeInterval
@@ -34,17 +36,22 @@ func (j *Job) setDefaults(job *scrapeconfig.CreateJSONBody) {
 	if j.ScrapeTimeout.IsNull() || j.ScrapeTimeout.IsUnknown() {
 		job.ScrapeTimeout = DefaultScrapeTimeout
 	}
+	if j.SampleLimit.IsNull() || j.SampleLimit.IsUnknown() {
+		job.SampleLimit = toFloat32Ptr(DefaultSampleLimit)
+	}
 }
 
-func (j *Job) setDefaultsUpdate(job *scrapeconfig.UpdateJSONBody) {
-	if job == nil {
+func (j *Job) setDefaultsUpdate(partialUpdate scrapeconfig.PartialUpdateJSONBody) {
+	if len(partialUpdate) == 0 {
 		return
 	}
+	job := &partialUpdate[0]
 	if j.MetricsPath.IsNull() || j.MetricsPath.IsUnknown() {
-		job.MetricsPath = DefaultMetricsPath
+		s := DefaultMetricsPath
+		job.MetricsPath = &s
 	}
 	if j.Scheme.IsNull() || j.Scheme.IsUnknown() {
-		job.Scheme = scrapeconfig.UpdateJSONBodyScheme(DefaultScheme)
+		job.Scheme = DefaultScheme
 	}
 	if j.ScrapeInterval.IsNull() || j.ScrapeInterval.IsUnknown() {
 		job.ScrapeInterval = DefaultScrapeInterval
@@ -55,13 +62,14 @@ func (j *Job) setDefaultsUpdate(job *scrapeconfig.UpdateJSONBody) {
 }
 
 func (j *Job) ToClientJob() scrapeconfig.CreateJSONBody {
-	mp := j.MetricsPath.ValueString()
 	job := scrapeconfig.CreateJSONBody{
 		JobName:        j.Name.ValueString(),
 		Scheme:         scrapeconfig.CreateJSONBodyScheme(j.Scheme.ValueString()),
-		MetricsPath:    &mp,
+		MetricsPath:    j.MetricsPath.ValueStringPointer(),
 		ScrapeInterval: j.ScrapeInterval.ValueString(),
 		ScrapeTimeout:  j.ScrapeTimeout.ValueString(),
+		// This conversion might be lossy if the value is greater than 16777215.
+		SampleLimit: toFloat32Ptr(float32(j.SampleLimit.ValueInt64())),
 	}
 
 	j.setDefaults(&job)
@@ -114,15 +122,18 @@ func (j *Job) ToClientJob() scrapeconfig.CreateJSONBody {
 	return job
 }
 
-func (j *Job) ToClientUpdateJob() scrapeconfig.UpdateJSONBody {
-	job := scrapeconfig.UpdateJSONBody{
-		Scheme:         scrapeconfig.UpdateJSONBodyScheme(j.Scheme.ValueString()),
-		MetricsPath:    j.MetricsPath.ValueString(),
+func (j *Job) ToClientPartialUpdateJobs() scrapeconfig.PartialUpdateJSONBody {
+	jobs := scrapeconfig.PartialUpdateJSONBody{{
+		JobName:        j.Name.ValueString(),
+		Scheme:         scrapeconfig.PartialUpdateJSONBodyScheme(j.Scheme.ValueString()),
+		MetricsPath:    j.MetricsPath.ValueStringPointer(),
 		ScrapeInterval: j.ScrapeInterval.ValueString(),
 		ScrapeTimeout:  j.ScrapeTimeout.ValueString(),
-	}
+		SampleLimit:    toFloat32Ptr(float32(j.SampleLimit.ValueInt64())),
+	}}
+	j.setDefaultsUpdate(jobs)
 
-	j.setDefaultsUpdate(&job)
+	job := &jobs[0]
 
 	if j.SAML2 != nil && !j.SAML2.EnableURLParameters.ValueBool() {
 		if job.Params == nil {
@@ -169,7 +180,7 @@ func (j *Job) ToClientUpdateJob() scrapeconfig.UpdateJSONBody {
 		t[i] = ti
 	}
 	job.StaticConfigs = t
-	return job
+	return jobs
 }
 
 func (j *Job) FromClientJob(cj scrapeconfig.Job) {
@@ -183,6 +194,10 @@ func (j *Job) FromClientJob(cj scrapeconfig.Job) {
 	}
 	j.ScrapeInterval = types.StringValue(cj.ScrapeInterval)
 	j.ScrapeTimeout = types.StringValue(cj.ScrapeTimeout)
+	j.SampleLimit = types.Int64Null()
+	if cj.SampleLimit != nil {
+		j.SampleLimit = types.Int64Value(int64(*cj.SampleLimit))
+	}
 	j.handleSAML2(cj)
 	j.handleBasicAuth(cj)
 	j.handleTargets(cj)
@@ -246,4 +261,8 @@ func (j *Job) handleTargets(cj scrapeconfig.Job) {
 		newTargets = append(newTargets, nt)
 	}
 	j.Targets = newTargets
+}
+
+func toFloat32Ptr(v float32) *float32 {
+	return &v
 }

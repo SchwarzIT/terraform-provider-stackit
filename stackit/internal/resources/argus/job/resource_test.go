@@ -14,7 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-const run_this_test = false
+const run_this_test = true
 
 func TestAcc_ArgusJob(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {

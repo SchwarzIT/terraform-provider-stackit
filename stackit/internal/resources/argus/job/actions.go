@@ -7,9 +7,10 @@ import (
 
 	scrapeconfig "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/scrape-config"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 )
 
 // Create - lifecycle function
@@ -86,8 +87,8 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	c := r.client
-	job := scrapeconfig.UpdateJSONRequestBody(plan.ToClientUpdateJob())
-	ures, err := c.Argus.ScrapeConfig.Update(ctx, plan.ProjectID.ValueString(), plan.ArgusInstanceID.ValueString(), plan.Name.ValueString(), job)
+	jobs := plan.ToClientPartialUpdateJobs()
+	ures, err := c.Argus.ScrapeConfig.PartialUpdate(ctx, plan.ProjectID.ValueString(), plan.ArgusInstanceID.ValueString(), jobs)
 	if agg := common.Validate(&resp.Diagnostics, ures, err); agg != nil {
 		resp.Diagnostics.AddError("failed to update argus job", agg.Error())
 		return
@@ -160,5 +161,4 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project_id"), projectID)...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("argus_instance_id"), instanceID)...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("name"), name)...)
-
 }

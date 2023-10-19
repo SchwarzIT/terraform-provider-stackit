@@ -50,6 +50,7 @@ data "stackit_argus_job" "example" {
 - `basic_auth` (Attributes) A basic_auth block (see [below for nested schema](#nestedatt--basic_auth))
 - `id` (String) Specifies the Argus Job ID
 - `metrics_path` (String) Specifies the job scraping path.
+- `sample_limit` (Number) Specifies the scrape sample limit.
 - `scheme` (String) Specifies the scheme.
 - `scrape_interval` (String) Specifies the scrape interval as duration string.
 - `scrape_timeout` (String) Specifies the scrape timeout as duration string.

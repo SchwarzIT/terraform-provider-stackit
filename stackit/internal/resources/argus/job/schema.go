@@ -4,17 +4,19 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
+	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 )
 
 // Job is the schema model
@@ -27,6 +29,7 @@ type Job struct {
 	Scheme          types.String `tfsdk:"scheme"`
 	ScrapeInterval  types.String `tfsdk:"scrape_interval"`
 	ScrapeTimeout   types.String `tfsdk:"scrape_timeout"`
+	SampleLimit     types.Int64  `tfsdk:"sample_limit"`
 	SAML2           *SAML2       `tfsdk:"saml2"`
 	BasicAuth       *BasicAuth   `tfsdk:"basic_auth"`
 	Targets         []Target     `tfsdk:"targets"`
@@ -117,6 +120,13 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Optional:    true,
 				Computed:    true,
 				Default:     stringdefault.StaticString(DefaultScrapeTimeout),
+			},
+
+			"sample_limit": schema.Int64Attribute{
+				Description: "Specifies the scrape sample limit. Upper limit is depends on the service plan. Default is `5000`.",
+				Optional:    true,
+				Computed:    true,
+				Default:     int64default.StaticInt64(DefaultSampleLimit),
 			},
 
 			"saml2": schema.SingleNestedAttribute{
