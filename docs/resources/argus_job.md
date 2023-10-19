@@ -52,6 +52,7 @@ resource "stackit_argus_job" "example" {
 - `basic_auth` (Attributes) A basic_auth block (see [below for nested schema](#nestedatt--basic_auth))
 - `metrics_path` (String) Specifies the job scraping path. Defaults to `/metrics`
 - `saml2` (Attributes) A saml2 configuration block (see [below for nested schema](#nestedatt--saml2))
+- `sample_limit` (Number) Specifies the scrape sample limit. Upper limit is depends on the service plan. Default is `5000`.
 - `scheme` (String) Specifies the scheme. Default is `https`.
 - `scrape_interval` (String) Specifies the scrape interval as duration string. Default is `5m`.
 - `scrape_timeout` (String) Specifies the scrape timeout as duration string. Default is `2m`.
