@@ -16,6 +16,8 @@ func transform(c *Cluster, cl *cluster.Cluster) {
 	c.KubernetesVersionUsed = types.StringValue(cl.Kubernetes.Version)
 	if cl.Kubernetes.AllowPrivilegedContainers != nil {
 		c.AllowPrivilegedContainers = types.BoolValue(*cl.Kubernetes.AllowPrivilegedContainers)
+	} else {
+		c.AllowPrivilegedContainers = types.BoolNull()
 	}
 	if cl.Status.Aggregated != nil {
 		c.Status = types.StringValue(string(*cl.Status.Aggregated))

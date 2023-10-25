@@ -143,10 +143,11 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Computed:    true,
 			},
 			"allow_privileged_containers": schema.BoolAttribute{
-				Description: "Should containers be allowed to run in privileged mode? Default is `true`",
-				Optional:    true,
-				Computed:    true,
-				Default:     booldefault.StaticBool(DefaultAllowPrivileged),
+				Description:        "Should containers be allowed to run in privileged mode? Default is `true`",
+				DeprecationMessage: "This attribute is deprecated starting from v1.25",
+				Optional:           true,
+				Computed:           true,
+				Default:            booldefault.StaticBool(DefaultAllowPrivileged),
 			},
 
 			"node_pools": schema.ListNestedAttribute{

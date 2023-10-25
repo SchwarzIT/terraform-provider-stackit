@@ -72,14 +72,13 @@ func (c *Cluster) clusterConfig(versionOptions []*semver.Version) (cluster.Kuber
 
 	pvlg := c.AllowPrivilegedContainers.ValueBool()
 	cfg := cluster.Kubernetes{
-		Version:                   clusterConfigVersion.String(),
-		AllowPrivilegedContainers: &pvlg,
+		Version: clusterConfigVersion.String(),
 	}
 
-	if c.AllowPrivilegedContainers.IsNull() || c.AllowPrivilegedContainers.IsUnknown() {
-		pvlg := DefaultAllowPrivileged
+	if clusterConfigVersion.Compare(semver.MustParse("1.25.0")) == -1 {
 		cfg.AllowPrivilegedContainers = &pvlg
 	}
+
 	return cfg, nil
 }
 
@@ -294,6 +293,8 @@ func (c *Cluster) Transform(cl cluster.Cluster) {
 	c.KubernetesVersionUsed = types.StringValue(cl.Kubernetes.Version)
 	if cl.Kubernetes.AllowPrivilegedContainers != nil {
 		c.AllowPrivilegedContainers = types.BoolValue(*cl.Kubernetes.AllowPrivilegedContainers)
+	} else {
+		c.AllowPrivilegedContainers = types.BoolValue(DefaultAllowPrivileged)
 	}
 	c.Status = types.StringValue(string(*cl.Status.Aggregated))
 	c.NodePools = []NodePool{}
