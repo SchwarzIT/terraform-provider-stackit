@@ -1,8 +1,8 @@
 resource "stackit_rabbitmq_instance" "example" {
   name       = "example"
   project_id = "example"
-  version    = "3.7"
-  plan       = "stackit-rabbitmq-single-small"
+  version    = "3.10"
+  plan       = "stackit-rabbitmq-2.4.10-single"
 }
 
 resource "stackit_rabbitmq_credential" "example" {

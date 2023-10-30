@@ -21,9 +21,9 @@ func TestAcc_DataSourceRabbitMQInstanceJob(t *testing.T) {
 	}
 
 	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
-	plan := "stackit-rabbitmq-single-small"
-	planID := "4bc417ff-cb98-4064-bb56-8a2654120768"
-	version := "3.7"
+	plan := "stackit-rabbitmq-2.4.10-single"
+	planID := "7e1f8394-5dd5-40b1-8608-16b4344eb51b"
+	version := "3.10"
 
 	resource.ParallelTest(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){
