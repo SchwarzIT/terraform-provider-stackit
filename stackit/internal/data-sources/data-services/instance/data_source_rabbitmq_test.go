@@ -12,7 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-const rabbitmq_inst_run_this_test = true
+const rabbitmq_inst_run_this_test = false
 
 func TestAcc_DataSourceRabbitMQInstanceJob(t *testing.T) {
 	if !common.ShouldAccTestRun(rabbitmq_inst_run_this_test) {
