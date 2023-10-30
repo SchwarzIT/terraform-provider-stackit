@@ -15,19 +15,18 @@ import (
 )
 
 type Cluster struct {
-	ID                        types.String          `tfsdk:"id"`
-	Name                      types.String          `tfsdk:"name"`
-	ProjectID                 types.String          `tfsdk:"project_id"`
-	KubernetesProjectID       types.String          `tfsdk:"kubernetes_project_id"`
-	KubernetesVersion         types.String          `tfsdk:"kubernetes_version"`
-	KubernetesVersionUsed     types.String          `tfsdk:"kubernetes_version_used"`
-	AllowPrivilegedContainers types.Bool            `tfsdk:"allow_privileged_containers"`
-	NodePools                 []cluster.NodePool    `tfsdk:"node_pools"`
-	Maintenance               *cluster.Maintenance  `tfsdk:"maintenance"`
-	Hibernations              []cluster.Hibernation `tfsdk:"hibernations"`
-	Extensions                *cluster.Extensions   `tfsdk:"extensions"`
-	Status                    types.String          `tfsdk:"status"`
-	KubeConfig                types.String          `tfsdk:"kube_config"`
+	ID                    types.String          `tfsdk:"id"`
+	Name                  types.String          `tfsdk:"name"`
+	ProjectID             types.String          `tfsdk:"project_id"`
+	KubernetesProjectID   types.String          `tfsdk:"kubernetes_project_id"`
+	KubernetesVersion     types.String          `tfsdk:"kubernetes_version"`
+	KubernetesVersionUsed types.String          `tfsdk:"kubernetes_version_used"`
+	NodePools             []cluster.NodePool    `tfsdk:"node_pools"`
+	Maintenance           *cluster.Maintenance  `tfsdk:"maintenance"`
+	Hibernations          []cluster.Hibernation `tfsdk:"hibernations"`
+	Extensions            *cluster.Extensions   `tfsdk:"extensions"`
+	Status                types.String          `tfsdk:"status"`
+	KubeConfig            types.String          `tfsdk:"kube_config"`
 }
 
 // Schema returns the terraform schema structure
@@ -72,12 +71,6 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Description: "Full Kubernetes version used. For example, if `1.22` was selected, this value may result to `1.22.15`",
 				Computed:    true,
 			},
-			"allow_privileged_containers": schema.BoolAttribute{
-				Description: "Should containers be allowed to run in privileged mode?",
-				Optional:    true,
-				Computed:    true,
-			},
-
 			"node_pools": schema.ListNestedAttribute{
 				Description: "One or more `node_pool` block as defined below",
 				Optional:    true,

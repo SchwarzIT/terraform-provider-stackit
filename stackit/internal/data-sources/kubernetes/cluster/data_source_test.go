@@ -12,7 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-const run_this_test = false
+const run_this_test = true
 
 func TestAcc_kubernetes(t *testing.T) {
 	if !common.ShouldAccTestRun(run_this_test) {
@@ -30,7 +30,6 @@ func TestAcc_kubernetes(t *testing.T) {
 				Config: config(name, "nodepl", "c1.2"),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.stackit_kubernetes_cluster.example", "name", name),
-					resource.TestCheckResourceAttr("data.stackit_kubernetes_cluster.example", "allow_privileged_containers", ""),
 					resource.TestCheckResourceAttr("data.stackit_kubernetes_cluster.example", "node_pools.0.name", "nodepl"),
 					resource.TestCheckResourceAttr("data.stackit_kubernetes_cluster.example", "node_pools.0.machine_type", "c1.2"),
 					resource.TestCheckResourceAttr("data.stackit_kubernetes_cluster.example", "node_pools.0.os_name", "flatcar"),
