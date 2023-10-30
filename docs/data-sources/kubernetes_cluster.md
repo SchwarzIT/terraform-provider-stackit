@@ -35,7 +35,6 @@ data "stackit_kubernetes_cluster" "example" {
 
 ### Optional
 
-- `allow_privileged_containers` (Boolean) Should containers be allowed to run in privileged mode?
 - `kubernetes_project_id` (String, Deprecated) The ID of a `stackit_kubernetes_project` resource
 - `node_pools` (Attributes List) One or more `node_pool` block as defined below (see [below for nested schema](#nestedatt--node_pools))
 
