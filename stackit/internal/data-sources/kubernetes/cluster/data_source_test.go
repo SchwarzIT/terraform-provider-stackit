@@ -37,7 +37,7 @@ func TestAcc_kubernetes(t *testing.T) {
 					resource.TestCheckResourceAttr("data.stackit_kubernetes_cluster.example", "node_pools.0.minimum", "1"),
 					resource.TestCheckResourceAttr("data.stackit_kubernetes_cluster.example", "node_pools.0.maximum", "1"),
 					resource.TestCheckResourceAttr("data.stackit_kubernetes_cluster.example", "node_pools.0.max_surge", "1"),
-					resource.TestCheckResourceAttr("data.stackit_kubernetes_cluster.example", "node_pools.0.max_unavailable", "1"),
+					resource.TestCheckResourceAttr("data.stackit_kubernetes_cluster.example", "node_pools.0.max_unavailable", "0"),
 					resource.TestCheckResourceAttr("data.stackit_kubernetes_cluster.example", "node_pools.0.volume_type", "storage_premium_perf1"),
 					resource.TestCheckResourceAttr("data.stackit_kubernetes_cluster.example", "node_pools.0.volume_size_gb", "20"),
 					resource.TestCheckResourceAttr("data.stackit_kubernetes_cluster.example", "node_pools.0.container_runtime", "containerd"),

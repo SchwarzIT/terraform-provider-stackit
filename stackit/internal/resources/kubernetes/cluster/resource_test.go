@@ -39,7 +39,7 @@ func TestAcc_kubernetes(t *testing.T) {
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.minimum", "1"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.maximum", "2"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.max_surge", "1"),
-					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.max_unavailable", "1"),
+					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.max_unavailable", "0"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.volume_type", "storage_premium_perf1"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.volume_size_gb", "20"),
 					resource.TestCheckResourceAttr("stackit_kubernetes_cluster.example", "node_pools.0.container_runtime", "containerd"),
@@ -129,10 +129,11 @@ resource "stackit_kubernetes_cluster" "example" {
 	name               			  = "%s"
 	
 	node_pools = [{
-		name         = "%s"
-		machine_type = "%s"
-		zones        = ["eu01-1"]
-		maximum      = 1
+		name            = "%s"
+		machine_type    = "%s"
+		zones           = ["eu01-1"]
+		maximum         = 1
+		max_unavailable = 1
 	
 		labels = {
 		  "az"   = "1"
