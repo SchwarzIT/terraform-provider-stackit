@@ -21,7 +21,7 @@ const (
 	DefaultNodepoolMin            int64 = 1
 	DefaultNodepoolMax            int64 = 2
 	DefaultNodepoolMaxSurge       int64 = 1
-	DefaultNodepoolMaxUnavailable int64 = 1
+	DefaultNodepoolMaxUnavailable int64 = 0
 	DefaultVolumeType                   = "storage_premium_perf1"
 	DefaultVolumeSizeGB           int64 = 20
 	DefaultCRI                          = "containerd"
