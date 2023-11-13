@@ -198,7 +198,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 							Default:     int64default.StaticInt64(DefaultNodepoolMaxSurge),
 						},
 						"max_unavailable": schema.Int64Attribute{
-							Description: "The maximum number of nodes unavailable during upgraded. Defaults to 1",
+							Description: "The maximum number of nodes unavailable during upgraded. Defaults to 0",
 							Optional:    true,
 							Computed:    true,
 							Default:     int64default.StaticInt64(DefaultNodepoolMaxUnavailable),
