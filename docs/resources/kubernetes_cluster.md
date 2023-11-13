@@ -120,7 +120,7 @@ Optional:
 - `container_runtime` (String) Specifies the container runtime. Defaults to `containerd`. Allowed options are `docker`, `containerd`
 - `labels` (Map of String) Labels to add to each node
 - `max_surge` (Number) The maximum number of nodes upgraded simultaneously. Defaults to 1. (Value must be between 1-10)
-- `max_unavailable` (Number) The maximum number of nodes unavailable during upgraded. Defaults to 1
+- `max_unavailable` (Number) The maximum number of nodes unavailable during upgraded. Defaults to 0
 - `maximum` (Number) Maximum nodes in the pool. Defaults to 2. (Value must be between 1-100)
 - `minimum` (Number) Minimum nodes in the pool. Defaults to 1. (Value must be between 1-100)
 - `os_name` (String) The name of the OS image. Only `flatcar` is supported
