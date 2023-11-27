@@ -3,7 +3,7 @@ package loadbalancer
 import (
 	"context"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/load-balancer/1beta.0.0/instances"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/load-balancer/1.3.0/instances"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"

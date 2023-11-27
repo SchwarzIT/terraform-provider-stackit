@@ -6,7 +6,7 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/baseurl"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services"
-	loadbalancer "github.com/SchwarzIT/community-stackit-go-client/pkg/services/load-balancer/1beta.0.0"
+	loadbalancer "github.com/SchwarzIT/community-stackit-go-client/pkg/services/load-balancer/1.3.0"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 )
 
