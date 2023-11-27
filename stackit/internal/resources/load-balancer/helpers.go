@@ -4,7 +4,7 @@ import (
 	"context"
 
 	openapiTypes "github.com/SchwarzIT/community-stackit-go-client/pkg/helpers/types"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/load-balancer/1beta.0.0/instances"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/load-balancer/1.3.0/instances"
 	"github.com/go-test/deep"
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/attr"

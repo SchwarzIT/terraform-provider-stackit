@@ -64,7 +64,7 @@ resource "openstack_networking_router_interface_v2" "example_interface" {
 
 # create a load balancer
 resource "stackit_load_balancer" "example" {
-  project_id = var.project_id
+  project_id = ""
   name       = "example"
   target_pools = [{
     name        = "example-target-pool"

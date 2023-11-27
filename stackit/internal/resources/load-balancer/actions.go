@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/load-balancer/1beta.0.0/instances"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/load-balancer/1beta.0.0/project"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/load-balancer/1.3.0/instances"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/load-balancer/1.3.0/project"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
