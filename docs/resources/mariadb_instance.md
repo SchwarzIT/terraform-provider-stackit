@@ -12,6 +12,7 @@ description: |-
 
 Manages MariaDB instances
 
+
 <br />
 
 -> __Environment support__<small>To set a custom API base URL, set <code>STACKIT_MARIADB_BASEURL</code> environment variable </small>
