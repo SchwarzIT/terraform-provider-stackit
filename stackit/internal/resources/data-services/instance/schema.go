@@ -36,16 +36,12 @@ type Instance struct {
 // Schema returns the terraform schema structure
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: fmt.Sprintf("Manages %s instances\n%s",
+		MarkdownDescription: fmt.Sprintf("Manages %s instances\n%s\n%s",
 			r.service.Display(),
+			printDeprecation(r.service.Display()),
 			common.EnvironmentInfo(r.urls),
 		),
-		DeprecationMessage: func() string {
-			if r.service.Display() == "ElasticSearch" {
-				return "This resource is deprecated and will be removed in a future release. Please use the `stackit_opensearch_instance` resource instead."
-			}
-			return ""
-		}(),
+		DeprecationMessage: printDeprecation(r.service.Display()),
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "Specifies the resource ID",
@@ -119,4 +115,11 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			}),
 		},
 	}
+}
+
+func printDeprecation(svc string) string {
+	if svc == "ElasticSearch" {
+		return "This resource is deprecated and will be removed in a future release.\nPlease use the `stackit_opensearch_instance` resource instead.\n"
+	}
+	return ""
 }
