@@ -36,6 +36,12 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 			d.service.Display(),
 			common.EnvironmentInfo(d.urls),
 		),
+		DeprecationMessage: func() string {
+			if d.service.Display() == "ElasticSearch" {
+				return "This resource is deprecated and will be removed in a future release. Please use OpenSearch instead."
+			}
+			return ""
+		}(),
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "Specifies the resource ID",
