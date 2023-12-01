@@ -12,6 +12,7 @@ description: |-
 
 Data source for RabbitMQ instances
 
+
 <br />
 
 -> __Environment support__<small>To set a custom API base URL, set <code>STACKIT_RABBITMQ_BASEURL</code> environment variable </small>
