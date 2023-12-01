@@ -100,9 +100,9 @@ func main() {
 }
 
 func getDataServiceName(testName string) string {
-	if strings.Contains(testName, "ElasticSearch") {
-		return "elasticsearch-dsa"
-	}
+	// if strings.Contains(testName, "ElasticSearch") {
+	// 	return "elasticsearch-dsa"
+	// }
 	if strings.Contains(testName, "LogMe") {
 		return "logme-dsa"
 	}

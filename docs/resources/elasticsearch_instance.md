@@ -4,6 +4,8 @@ page_title: "stackit_elasticsearch_instance Resource - stackit"
 subcategory: ""
 description: |-
   Manages ElasticSearch instances
+  This resource is deprecated and will be removed in a future release.
+  Please use the stackit_opensearch_instance resource instead.
   
   -> Environment supportTo set a custom API base URL, set STACKITELASTICSEARCHBASEURL environment variable
 ---
@@ -11,6 +13,9 @@ description: |-
 # stackit_elasticsearch_instance (Resource)
 
 Manages ElasticSearch instances
+This resource is deprecated and will be removed in a future release.
+Please use the `stackit_opensearch_instance` resource instead.
+
 
 <br />
 

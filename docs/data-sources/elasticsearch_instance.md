@@ -4,6 +4,8 @@ page_title: "stackit_elasticsearch_instance Data Source - stackit"
 subcategory: ""
 description: |-
   Data source for ElasticSearch instances
+  This resource is deprecated and will be removed in a future release.
+  Please use OpenSearch resource and data-source instead.
   
   -> Environment supportTo set a custom API base URL, set STACKITELASTICSEARCHBASEURL environment variable
 ---
@@ -11,6 +13,9 @@ description: |-
 # stackit_elasticsearch_instance (Data Source)
 
 Data source for ElasticSearch instances
+This resource is deprecated and will be removed in a future release.
+Please use `OpenSearch` resource and data-source instead.
+
 
 <br />
 
