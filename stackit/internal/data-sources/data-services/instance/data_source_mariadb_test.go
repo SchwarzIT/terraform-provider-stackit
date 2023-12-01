@@ -23,7 +23,7 @@ func TestAcc_DataSourceMariaDBInstanceJob(t *testing.T) {
 	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
 	plan := "stackit-mariadb-single-small"
 	planID := "8fc9e236-6173-40dc-a79a-02aba46ba75a"
-	version := "10.4"
+	version := "10.6"
 
 	resource.ParallelTest(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){

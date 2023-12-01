@@ -40,6 +40,12 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			r.service.Display(),
 			common.EnvironmentInfo(r.urls),
 		),
+		DeprecationMessage: func() string {
+			if r.service.Display() == "ElasticSearch" {
+				return "This resource is deprecated and will be removed in a future release. Please use the `stackit_opensearch_instance` resource instead."
+			}
+			return ""
+		}(),
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "Specifies the resource ID",
