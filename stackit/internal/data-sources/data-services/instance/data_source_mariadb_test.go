@@ -21,8 +21,8 @@ func TestAcc_DataSourceMariaDBInstanceJob(t *testing.T) {
 	}
 
 	name := "odjtest-" + acctest.RandStringFromCharSet(7, acctest.CharSetAlpha)
-	plan := "stackit-mariadb-single-small"
-	planID := "8fc9e236-6173-40dc-a79a-02aba46ba75a"
+	plan := "stackit-mariadb-1.4.10-single"
+	planID := "683be856-3587-42de-b1b5-a792ff854f52"
 	version := "10.6"
 
 	resource.ParallelTest(t, resource.TestCase{
