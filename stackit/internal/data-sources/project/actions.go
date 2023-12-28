@@ -37,6 +37,9 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		if v, ok := l["billingReference"]; ok {
 			p.BillingRef = types.StringValue(v)
 		}
+		for k, v := range l {
+			l[k] = v
+		}
 	}
 	diags = resp.State.Set(ctx, &p)
 	resp.Diagnostics.Append(diags...)

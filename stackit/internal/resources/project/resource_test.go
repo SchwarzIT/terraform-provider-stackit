@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	run_this_test        = false
+	run_this_test        = true
 	schwarz_container_id = "schwarz-it-kg-WJACUK1"
 )
 

@@ -36,6 +36,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		BillingRef:        types.StringValue(plan.BillingRef.ValueString()),
 		OwnerEmail:        types.StringValue(plan.OwnerEmail.ValueString()),
 		Timeouts:          plan.Timeouts,
+		Labels:            plan.Labels,
 	}
 
 	// update state
@@ -50,6 +51,10 @@ func (r Resource) createProject(ctx context.Context, resp *resource.CreateRespon
 	labels := rmv2.ResourceLabels{
 		"billingReference": plan.BillingRef.ValueString(),
 		"scope":            "PUBLIC",
+	}
+
+	for k, v := range plan.Labels {
+		labels[k] = v
 	}
 
 	owner := rmv2.PROJECT_OWNER

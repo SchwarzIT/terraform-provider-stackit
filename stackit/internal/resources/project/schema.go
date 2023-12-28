@@ -17,13 +17,14 @@ import (
 
 // Project is the schema model
 type Project struct {
-	ID                types.String   `tfsdk:"id"`
-	ContainerID       types.String   `tfsdk:"container_id"`
-	ParentContainerID types.String   `tfsdk:"parent_container_id"`
-	Name              types.String   `tfsdk:"name"`
-	BillingRef        types.String   `tfsdk:"billing_ref"`
-	OwnerEmail        types.String   `tfsdk:"owner_email"`
-	Timeouts          timeouts.Value `tfsdk:"timeouts"`
+	ID                types.String      `tfsdk:"id"`
+	ContainerID       types.String      `tfsdk:"container_id"`
+	ParentContainerID types.String      `tfsdk:"parent_container_id"`
+	Name              types.String      `tfsdk:"name"`
+	BillingRef        types.String      `tfsdk:"billing_ref"`
+	OwnerEmail        types.String      `tfsdk:"owner_email"`
+	Timeouts          timeouts.Value    `tfsdk:"timeouts"`
+	Labels            map[string]string `tfsdk:"labels"`
 }
 
 // Schema returns the terraform schema structure
@@ -81,10 +82,22 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Description: "Email address of owner of the project. This value is only considered during creation. changing it afterwards will have no effect.",
 				Required:    true,
 			},
+
 			"timeouts": common.Timeouts(ctx, timeouts.Opts{
 				Create: true,
 				Delete: true,
 			}),
+
+			"labels": schema.MapAttribute{
+				Description: "Extend project information with custom label values.",
+				Required:    true,
+				ElementType: types.MapType{
+					ElemType: types.StringType,
+				},
+				Validators: []validator.Map{
+					validate.ReserveProjectLabels(),
+				},
+			},
 		},
 	}
 }

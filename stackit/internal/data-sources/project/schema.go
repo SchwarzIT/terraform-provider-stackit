@@ -12,11 +12,12 @@ import (
 
 // Project is the schema model
 type Project struct {
-	ID                types.String `tfsdk:"id"`
-	ContainerID       types.String `tfsdk:"container_id"`
-	ParentContainerID types.String `tfsdk:"parent_container_id"`
-	Name              types.String `tfsdk:"name"`
-	BillingRef        types.String `tfsdk:"billing_ref"`
+	ID                types.String      `tfsdk:"id"`
+	ContainerID       types.String      `tfsdk:"container_id"`
+	ParentContainerID types.String      `tfsdk:"parent_container_id"`
+	Name              types.String      `tfsdk:"name"`
+	BillingRef        types.String      `tfsdk:"billing_ref"`
+	Labels            map[string]string `tfsdk:"labels"`
 }
 
 // Schema returns the terraform schema structure
@@ -49,6 +50,11 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 			"billing_ref": schema.StringAttribute{
 				Description: "billing reference for cost transparency",
 				Computed:    true,
+			},
+
+			"labels": schema.MapAttribute{
+				Description: "Extend project information with custom label values.",
+				Computed:    false,
 			},
 		},
 	}

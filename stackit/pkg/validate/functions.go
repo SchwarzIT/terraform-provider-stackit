@@ -87,3 +87,17 @@ func UUID() *Validator {
 		},
 	}
 }
+
+func ReserveProjectLabels() *Validator {
+	return &Validator{
+		description: "reserve project labels",
+		validateMap: func(ctx context.Context, req validator.MapRequest, resp *validator.MapResponse) {
+			for k, _ := range req.ConfigValue.Elements() {
+				if k == "billingReference" || k == "scope" {
+					resp.Diagnostics.AddError("Reserved Project Labels", "billingReference and scope are reserved project labels")
+					return
+				}
+			}
+		},
+	}
+}
