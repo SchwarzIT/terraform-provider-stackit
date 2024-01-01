@@ -90,7 +90,9 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 
 			"labels": schema.MapAttribute{
 				Description: "Extend project information with custom label values.",
-				Required:    true,
+				Required:    false,
+				Computed:    false,
+				Optional:    true,
 				ElementType: types.MapType{
 					ElemType: types.StringType,
 				},

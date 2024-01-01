@@ -38,7 +38,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 			p.BillingRef = types.StringValue(v)
 		}
 		for k, v := range l {
-			l[k] = v
+			p.Labels[k] = v
 		}
 	}
 	diags = resp.State.Set(ctx, &p)

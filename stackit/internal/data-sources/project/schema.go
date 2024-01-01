@@ -54,7 +54,12 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 
 			"labels": schema.MapAttribute{
 				Description: "Extend project information with custom label values.",
+				Required:    false,
 				Computed:    false,
+				Optional:    true,
+				ElementType: types.MapType{
+					ElemType: types.StringType,
+				},
 			},
 		},
 	}
