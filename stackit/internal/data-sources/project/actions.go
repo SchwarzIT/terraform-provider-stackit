@@ -33,6 +33,9 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	p.ContainerID = types.StringValue(project.ContainerID)
 	p.BillingRef = types.StringNull()
 	if project.Labels != nil {
+		if p.Labels == nil {
+			p.Labels = make(map[string]string)
+		}
 		l := *project.Labels
 		if v, ok := l["billingReference"]; ok {
 			p.BillingRef = types.StringValue(v)
