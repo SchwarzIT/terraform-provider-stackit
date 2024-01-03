@@ -93,9 +93,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Required:    false,
 				Computed:    false,
 				Optional:    true,
-				ElementType: types.MapType{
-					ElemType: types.StringType,
-				},
+				ElementType: types.StringType,
 				Validators: []validator.Map{
 					validate.ReserveProjectLabels(),
 				},
