@@ -38,7 +38,6 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		Timeouts:          plan.Timeouts,
 		Labels:            plan.Labels,
 	}
-	fmt.Println("00000:", plan.Labels)
 	// update state
 	diags = resp.State.Set(ctx, p)
 	resp.Diagnostics.Append(diags...)
@@ -122,14 +121,21 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	p.ContainerID = types.StringValue(res.JSON200.ContainerID)
 	p.ParentContainerID = types.StringValue(res.JSON200.Parent.ContainerID)
 	p.Name = types.StringValue(res.JSON200.Name)
+
 	if res.JSON200.Labels != nil {
 		l := *res.JSON200.Labels
-		p.Labels = l
 		if v, ok := l["billingReference"]; ok {
 			p.BillingRef = types.StringValue(v)
 		}
+
+		p.Labels = l
+
+		// delete "hidden" labels which we assign via attribute
+		// or similar to stay compatible with existing terraform code
+		delete(p.Labels, "billingReference")
+		delete(p.Labels, "scope")
 	}
-	fmt.Println("33333333:", p.Labels)
+
 	diags = resp.State.Set(ctx, &p)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -167,7 +173,6 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 
 	// update state
-	fmt.Println("1111111:", plan.Labels)
 	diags = resp.State.Set(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -186,10 +191,13 @@ func (r Resource) updateProject(ctx context.Context, plan, state Project, resp *
 	}
 
 	for k, v := range plan.Labels {
+		if k == "billingReference" || k == "scope" {
+			continue
+		}
+
 		labels[k] = v
 	}
 
-	fmt.Println("44444:", labels)
 	name := plan.Name.ValueString()
 	parent := plan.ParentContainerID.ValueString()
 	body := rmv2.UpdateJSONRequestBody{
