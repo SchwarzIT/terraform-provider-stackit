@@ -69,6 +69,7 @@ func TestAcc_Project(t *testing.T) {
 				ImportState:             true,
 				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{"owner_email"},
+				//ImportStatePersist:      true,
 			},
 		},
 	})

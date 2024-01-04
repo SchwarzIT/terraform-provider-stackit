@@ -57,9 +57,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Required:    false,
 				Computed:    false,
 				Optional:    true,
-				ElementType: types.MapType{
-					ElemType: types.StringType,
-				},
+				ElementType: types.StringType,
 			},
 		},
 	}
