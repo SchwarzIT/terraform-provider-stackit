@@ -9,8 +9,8 @@ import (
 )
 
 // Read - lifecycle function
-func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	c := r.client
+func (d DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+	c := d.client
 	var p Project
 
 	diags := req.Config.Get(ctx, &p)
@@ -31,14 +31,15 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	p.ParentContainerID = types.StringValue(project.Parent.ContainerID)
 	p.ContainerID = types.StringValue(project.ContainerID)
 	p.BillingRef = types.StringNull()
+	p.Labels = make(map[string]string)
+
 	if project.Labels != nil {
-		if p.Labels == nil {
-			p.Labels = make(map[string]string)
-		}
 		l := *project.Labels
+
 		if v, ok := l["billingReference"]; ok {
 			p.BillingRef = types.StringValue(v)
 		}
+
 		for k, v := range l {
 			p.Labels[k] = v
 		}
@@ -48,6 +49,7 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		delete(p.Labels, "billingReference")
 		delete(p.Labels, "scope")
 	}
+
 	diags = resp.State.Set(ctx, &p)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
