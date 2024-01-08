@@ -31,6 +31,10 @@ data "stackit_project" "example" {
 
 - `container_id` (String) the project container ID
 
+### Optional
+
+- `labels` (Map of String) Extend project information with custom label values.
+
 ### Read-Only
 
 - `billing_ref` (String) billing reference for cost transparency
