@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	run_this_test        = false
+	run_this_test        = true
 	schwarz_container_id = "schwarz-it-kg-WJACUK1"
 )
 
@@ -35,7 +35,6 @@ func TestAcc_Project(t *testing.T) {
 
 	name := "ODJ AccTest " + acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
 	newName := "ODJ AccTest " + acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
-
 	resource.ParallelTest(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){
 			"stackit": providerserver.NewProtocol6WithError(stackit.New("test")()),
@@ -47,6 +46,9 @@ func TestAcc_Project(t *testing.T) {
 					resource.TestCheckResourceAttrSet("stackit_project.example", "id"),
 					resource.TestCheckResourceAttr("stackit_project.example", "name", name),
 					resource.TestCheckResourceAttr("stackit_project.example", "billing_ref", billingRef),
+					resource.TestCheckResourceAttr("stackit_project.example", "labels.%", "2"),
+					resource.TestCheckResourceAttr("stackit_project.example", "labels.name", "Emil"),
+					resource.TestCheckResourceAttr("stackit_project.example", "labels.age", "35"),
 				),
 			},
 			// rename
@@ -56,6 +58,9 @@ func TestAcc_Project(t *testing.T) {
 					resource.TestCheckResourceAttrSet("stackit_project.example", "id"),
 					resource.TestCheckResourceAttr("stackit_project.example", "name", newName),
 					resource.TestCheckResourceAttr("stackit_project.example", "billing_ref", billingRef),
+					resource.TestCheckResourceAttr("stackit_project.example", "labels.%", "2"),
+					resource.TestCheckResourceAttr("stackit_project.example", "labels.name", "Emil"),
+					resource.TestCheckResourceAttr("stackit_project.example", "labels.age", "35"),
 				),
 			},
 			// test import
@@ -76,6 +81,10 @@ func config(name, billingRef, user string) string {
 		billing_ref = "%s"
 		owner_email = "%s"
 		parent_container_id = "%s"
+		labels = {
+			name = "Emil"
+			age = 35
+		}
 	}
 	`,
 		name,

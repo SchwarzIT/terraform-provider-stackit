@@ -13,7 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-const run_this_test = false
+const run_this_test = true
 
 const schwarz_container_id = "schwarz-it-kg-WJACUK1"
 
@@ -48,6 +48,7 @@ func TestAcc_ProjectDataSource(t *testing.T) {
 					resource.TestCheckTypeSetElemAttrPair("stackit_project.example", "billing_ref", "data.stackit_project.ex1", "billing_ref"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_project.example", "container_id", "data.stackit_project.ex1", "container_id"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_project.example", "parent_container_id", "data.stackit_project.ex1", "parent_container_id"),
+					resource.TestCheckTypeSetElemAttrPair("stackit_project.example", "labels", "data.stackit_project.ex1", "labels"),
 				),
 			},
 		},
@@ -61,6 +62,7 @@ func config(name, owner, billing string) string {
 		billing_ref = "%s"
 		owner_email = "%s"
 		parent_container_id = "%s"
+		labels = {}
 	}
 
 	data "stackit_project" "ex1" {

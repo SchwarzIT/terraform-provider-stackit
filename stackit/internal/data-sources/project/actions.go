@@ -2,7 +2,6 @@ package project
 
 import (
 	"context"
-
 	rmv2 "github.com/SchwarzIT/community-stackit-go-client/pkg/services/resource-management/v2.0"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -33,10 +32,21 @@ func (r DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	p.ContainerID = types.StringValue(project.ContainerID)
 	p.BillingRef = types.StringNull()
 	if project.Labels != nil {
+		if p.Labels == nil {
+			p.Labels = make(map[string]string)
+		}
 		l := *project.Labels
 		if v, ok := l["billingReference"]; ok {
 			p.BillingRef = types.StringValue(v)
 		}
+		for k, v := range l {
+			p.Labels[k] = v
+		}
+
+		// delete "hidden" labels which we assign via attribute
+		// or similar to stay compatible with existing terraform code
+		delete(p.Labels, "billingReference")
+		delete(p.Labels, "scope")
 	}
 	diags = resp.State.Set(ctx, &p)
 	resp.Diagnostics.Append(diags...)
