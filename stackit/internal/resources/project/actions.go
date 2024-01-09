@@ -36,8 +36,8 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		BillingRef:        types.StringValue(plan.BillingRef.ValueString()),
 		OwnerEmail:        types.StringValue(plan.OwnerEmail.ValueString()),
 		Timeouts:          plan.Timeouts,
+		Labels:            plan.Labels,
 	}
-
 	// update state
 	diags = resp.State.Set(ctx, p)
 	resp.Diagnostics.Append(diags...)
@@ -50,6 +50,10 @@ func (r Resource) createProject(ctx context.Context, resp *resource.CreateRespon
 	labels := rmv2.ResourceLabels{
 		"billingReference": plan.BillingRef.ValueString(),
 		"scope":            "PUBLIC",
+	}
+
+	for k, v := range plan.Labels {
+		labels[k] = v
 	}
 
 	owner := rmv2.PROJECT_OWNER
@@ -117,12 +121,21 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	p.ContainerID = types.StringValue(res.JSON200.ContainerID)
 	p.ParentContainerID = types.StringValue(res.JSON200.Parent.ContainerID)
 	p.Name = types.StringValue(res.JSON200.Name)
+
 	if res.JSON200.Labels != nil {
 		l := *res.JSON200.Labels
 		if v, ok := l["billingReference"]; ok {
 			p.BillingRef = types.StringValue(v)
 		}
+
+		p.Labels = l
+
+		// delete "hidden" labels which we assign via attribute
+		// or similar to stay compatible with existing terraform code
+		delete(p.Labels, "billingReference")
+		delete(p.Labels, "scope")
 	}
+
 	diags = resp.State.Set(ctx, &p)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -175,6 +188,16 @@ func (r Resource) updateProject(ctx context.Context, plan, state Project, resp *
 	labels := rmv2.ResourceLabels{
 		"billingReference": plan.BillingRef.ValueString(),
 		"scope":            "PUBLIC",
+	}
+
+	for k, v := range plan.Labels {
+		// skip these internally / hidden reserved ones
+		// this is to ensure backwards compatibility
+		if k == "billingReference" || k == "scope" {
+			continue
+		}
+
+		labels[k] = v
 	}
 
 	name := plan.Name.ValueString()

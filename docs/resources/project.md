@@ -39,6 +39,7 @@ resource "stackit_project" "example" {
 
 ### Optional
 
+- `labels` (Map of String) Extend project information with custom label values.
 - `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
 
 ### Read-Only
