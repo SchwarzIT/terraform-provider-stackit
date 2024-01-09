@@ -191,6 +191,8 @@ func (r Resource) updateProject(ctx context.Context, plan, state Project, resp *
 	}
 
 	for k, v := range plan.Labels {
+		// skip these internally / hidden reserved ones
+		// this is to ensure backwards compatibility
 		if k == "billingReference" || k == "scope" {
 			continue
 		}
