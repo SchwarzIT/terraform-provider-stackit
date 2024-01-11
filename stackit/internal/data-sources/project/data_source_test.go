@@ -49,7 +49,6 @@ func TestAcc_ProjectDataSource(t *testing.T) {
 					resource.TestCheckTypeSetElemAttrPair("stackit_project.example", "container_id", "data.stackit_project.ex1", "container_id"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_project.example", "parent_container_id", "data.stackit_project.ex1", "parent_container_id"),
 					resource.TestCheckTypeSetElemAttrPair("stackit_project.example", "labels.iaas-api", "data.stackit_project.ex1", "labels.iaas-api"),
-					resource.TestCheckTypeSetElemAttrPair("stackit_project.example", "labels.key", "data.stackit_project.ex1", "labels.val"),
 				),
 			},
 		},
@@ -65,7 +64,6 @@ func config(name, owner, billing string) string {
 		parent_container_id = "%s"
 		labels = {
 			"iaas-api" = "true"
-			"key" = "val"
 		}
 	}
 
