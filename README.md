@@ -1,9 +1,9 @@
 # Terraform Provider for STACKIT
 <!--summary-image-->
-<img src="https://hcti.io/v1/image/bf06b1ff-8bdf-4124-9add-a72bc2ad3918" width="250" align="right" />
-<!--revision-f1859165-0109-4743-aaf4-d70d05acaf7b--><!--summary-image-->
+<img src="https://hcti.io/v1/image/a8c12881-47fc-49ce-8281-a5c55581cf5d" width="250" align="right" />
+<!--revision-5b709e55-d963-4453-894a-542a137e3034--><!--summary-image-->
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/SchwarzIT/terraform-provider-stackit)](https://goreportcard.com/report/github.com/SchwarzIT/terraform-provider-stackit) <!--workflow-badge-->[![GitHub Workflow Status](https://img.shields.io/badge/Acceptance%20Tests-53%20passed%2C%204%20failed-success)](https://github.com/SchwarzIT/terraform-provider-stackit/actions/workflows/acceptance_test.yml)<!--revision-aae6fc39-20b5-40bc-93c6-5f56ae0a7d76--><!--workflow-badge--><br />[![GitHub release (latest by date)](https://img.shields.io/github/v/release/SchwarzIT/terraform-provider-stackit)](https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs) [![GitHub go.mod Go version of a Go module](https://img.shields.io/github/go-mod/go-version/gomods/athens.svg)](https://github.com/gomods/athens) [![License](https://img.shields.io/badge/License-Apache_2.0-lightgray.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Go Report Card](https://goreportcard.com/badge/github.com/SchwarzIT/terraform-provider-stackit)](https://goreportcard.com/report/github.com/SchwarzIT/terraform-provider-stackit) <!--workflow-badge-->[![GitHub Workflow Status](https://img.shields.io/badge/Acceptance%20Tests-53%20passed%2C%204%20failed-success)](https://github.com/SchwarzIT/terraform-provider-stackit/actions/workflows/acceptance_test.yml)<!--revision-3aee8805-9492-45b0-9dc7-58f4b861abae--><!--workflow-badge--><br />[![GitHub release (latest by date)](https://img.shields.io/github/v/release/SchwarzIT/terraform-provider-stackit)](https://registry.terraform.io/providers/SchwarzIT/stackit/latest/docs) [![GitHub go.mod Go version of a Go module](https://img.shields.io/github/go-mod/go-version/gomods/athens.svg)](https://github.com/gomods/athens) [![License](https://img.shields.io/badge/License-Apache_2.0-lightgray.svg)](https://opensource.org/licenses/Apache-2.0)
 
 The STACKIT provider is a project developed and maintained by the STACKIT community within Schwarz IT.
 
