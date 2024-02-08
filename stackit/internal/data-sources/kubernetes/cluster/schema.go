@@ -27,6 +27,7 @@ type Cluster struct {
 	Extensions            *cluster.Extensions   `tfsdk:"extensions"`
 	Status                types.String          `tfsdk:"status"`
 	KubeConfig            types.String          `tfsdk:"kube_config"`
+	NetworkID             types.String          `tfsdk:"network_id"`
 }
 
 // Schema returns the terraform schema structure
@@ -244,6 +245,13 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Description: "Kube config file used for connecting to the cluster",
 				Sensitive:   true,
 				Computed:    true,
+			},
+
+			"network_id": schema.StringAttribute{
+				Description: "Specifies the ID of the SNA-Network created",
+				Required:    false,
+				Computed:    false,
+				Optional:    true,
 			},
 		},
 	}
