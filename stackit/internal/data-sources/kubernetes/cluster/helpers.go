@@ -14,6 +14,7 @@ func transform(c *Cluster, cl *cluster.Cluster) {
 	}
 	c.KubernetesVersion = types.StringValue(cl.Kubernetes.Version)
 	c.KubernetesVersionUsed = types.StringValue(cl.Kubernetes.Version)
+	c.NetworkID = types.StringValue(*cl.Network.ID)
 	if cl.Status.Aggregated != nil {
 		c.Status = types.StringValue(string(*cl.Status.Aggregated))
 	}
