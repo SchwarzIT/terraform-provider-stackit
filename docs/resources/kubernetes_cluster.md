@@ -46,6 +46,7 @@ resource "stackit_kubernetes_cluster" "example" {
 - `kubernetes_project_id` (String, Deprecated) The ID of a `stackit_kubernetes_project` resource
 - `kubernetes_version` (String) Kubernetes version. Allowed Options are: `1.25`, `1.26`, or a full version including patch (not recommended).
 - `maintenance` (Attributes) A single maintenance block as defined below (see [below for nested schema](#nestedatt--maintenance))
+- `network_id` (String) Specifies the ID of the Network the SKE-Nodes should be created in
 - `node_pools` (Attributes List) One or more `node_pool` block as defined below (see [below for nested schema](#nestedatt--node_pools))
 - `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
 

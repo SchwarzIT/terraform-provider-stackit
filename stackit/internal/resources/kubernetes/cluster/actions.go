@@ -123,6 +123,7 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 	projectID := cl.ProjectID.ValueString()
 	clusterName := cl.Name.ValueString()
 	clusterConfig, err := cl.clusterConfig(versions)
+	networkID := cl.NetworkID.ValueString()
 	if err != nil {
 		diags.AddError("Failed to create cluster config", err.Error())
 		return
@@ -152,6 +153,9 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 			Kubernetes:  clusterConfig,
 			Maintenance: maintenance,
 			Nodepools:   nodePools,
+			Network: &cluster.Network{
+				ID: &networkID,
+			},
 		},
 	)
 	if agg := common.Validate(diags, resp, err); agg != nil {
