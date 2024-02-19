@@ -248,7 +248,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 			},
 
 			"network_id": schema.StringAttribute{
-				Description: "Specifies the ID of the SNA-Network created",
+				Description: "ID of the Network the SKE nodes are running in",
 				Required:    false,
 				Computed:    false,
 				Optional:    true,

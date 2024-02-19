@@ -376,7 +376,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			}),
 
 			"network_id": schema.StringAttribute{
-				Description: "Specifies the ID of the SNA-Network created",
+				Description: "Specifies the ID of the Network the SKE-Nodes should be created in",
 				Required:    false,
 				Computed:    false,
 				Optional:    true,
