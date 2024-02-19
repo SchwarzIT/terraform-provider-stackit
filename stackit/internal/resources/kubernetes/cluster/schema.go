@@ -38,6 +38,7 @@ type Cluster struct {
 	Status                    types.String   `tfsdk:"status"`
 	KubeConfig                types.String   `tfsdk:"kube_config"`
 	Timeouts                  timeouts.Value `tfsdk:"timeouts"`
+	NetworkID                 types.String   `tfsdk:"network_id"`
 }
 
 type NodePool struct {
@@ -373,6 +374,19 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Update: true,
 				Delete: true,
 			}),
+
+			"network_id": schema.StringAttribute{
+				Description: "Specifies the ID of the SNA-Network created",
+				Required:    false,
+				Computed:    false,
+				Optional:    true,
+				Validators: []validator.String{
+					validate.NetworkID(),
+				},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
+			},
 		},
 	}
 }

@@ -103,3 +103,20 @@ func ReserveProjectLabels() *Validator {
 		},
 	}
 }
+
+func NetworkID() *Validator {
+	return &Validator{
+		description: "validate project ID",
+		validate: func(ctx context.Context, req validator.StringRequest, resp *validator.StringResponse) {
+			v, diag := req.ConfigValue.ToStringValue(ctx)
+			if diag.HasError() {
+				resp.Diagnostics.Append(diag...)
+				return
+			}
+			if err := clientValidate.UUID(v.ValueString()); err != nil {
+				resp.Diagnostics.AddError(err.Error(), err.Error())
+				return
+			}
+		},
+	}
+}
