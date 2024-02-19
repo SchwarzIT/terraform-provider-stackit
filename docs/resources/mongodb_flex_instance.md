@@ -60,7 +60,7 @@ resource "stackit_mongodb_flex_instance" "example" {
 
 Optional:
 
-- `class` (String) Specifies the storage class. Available option: `premium-perf2-mongodb`
+- `class` (String) Specifies the storage class. Available option: `premium-perf2-mongodb` `premium-perf4-mongodb` `premium-perf6-mongodb` `premium-perf8-mongodb` `premium-perf10-mongodb` `premium-perf12-mongodb`
 - `size` (Number) The storage size in GB (Default is `10`).
 
 
