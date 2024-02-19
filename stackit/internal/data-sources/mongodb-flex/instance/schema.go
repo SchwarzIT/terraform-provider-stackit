@@ -68,7 +68,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Computed:    true,
 				Attributes: map[string]schema.Attribute{
 					"class": schema.StringAttribute{
-						Description: "Specifies the storage class. Available option: `premium-perf2-mongodb`.",
+						Description: "Specifies the storage class. Available option: `premium-perf2-mongodb` `premium-perf4-mongodb` `premium-perf6-mongodb` `premium-perf8-mongodb` `premium-perf10-mongodb` `premium-perf12-mongodb`",
 						Computed:    true,
 					},
 					"size": schema.Int64Attribute{
