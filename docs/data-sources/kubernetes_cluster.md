@@ -36,7 +36,7 @@ data "stackit_kubernetes_cluster" "example" {
 ### Optional
 
 - `kubernetes_project_id` (String, Deprecated) The ID of a `stackit_kubernetes_project` resource
-- `network_id` (String) Specifies the ID of the SNA-Network created
+- `network_id` (String) ID of the Network the SKE nodes are running in
 - `node_pools` (Attributes List) One or more `node_pool` block as defined below (see [below for nested schema](#nestedatt--node_pools))
 
 ### Read-Only
