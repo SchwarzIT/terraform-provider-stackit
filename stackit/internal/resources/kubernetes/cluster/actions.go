@@ -145,18 +145,23 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 		return
 	}
 
+	clusterData := cluster.SkeServiceCreateOrUpdateClusterRequest{
+		Extensions:  extensions,
+		Hibernation: hibernations,
+		Kubernetes:  clusterConfig,
+		Maintenance: maintenance,
+		Nodepools:   nodePools,
+	}
+
+	if networkID != "" {
+		clusterData.Network = &cluster.Network{
+			ID: &networkID,
+		}
+	}
+
 	resp, err := c.Kubernetes.Cluster.CreateOrUpdate(ctx,
 		projectID,
-		clusterName, cluster.SkeServiceCreateOrUpdateClusterRequest{
-			Extensions:  extensions,
-			Hibernation: hibernations,
-			Kubernetes:  clusterConfig,
-			Maintenance: maintenance,
-			Nodepools:   nodePools,
-			Network: &cluster.Network{
-				ID: &networkID,
-			},
-		},
+		clusterName, clusterData,
 	)
 	if agg := common.Validate(diags, resp, err); agg != nil {
 		diags.AddError("failed during SKE create/update", agg.Error())
