@@ -68,7 +68,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Computed:    true,
 				Attributes: map[string]schema.Attribute{
 					"class": schema.StringAttribute{
-						Description: "Specifies the storage class. Available option: `premium-perf6-stackit`",
+						Description: "Specifies the storage class. Available option: `premium-perf2-stackit` `premium-perf4-stackit` `premium-perf6-stackit` `premium-perf8-stackit` `premium-perf10-stackit` `premium-perf12-stackit`",
 						Computed:    true,
 					},
 					"size": schema.Int64Attribute{

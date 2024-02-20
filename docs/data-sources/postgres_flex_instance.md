@@ -48,7 +48,7 @@ data "stackit_postgres_flex_instance" "example" {
 
 Read-Only:
 
-- `class` (String) Specifies the storage class. Available option: `premium-perf6-stackit`
+- `class` (String) Specifies the storage class. Available option: `premium-perf2-stackit` `premium-perf4-stackit` `premium-perf6-stackit` `premium-perf8-stackit` `premium-perf10-stackit` `premium-perf12-stackit`
 - `size` (Number) The storage size in GB
 
 
