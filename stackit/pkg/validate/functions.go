@@ -120,3 +120,77 @@ func NetworkID() *Validator {
 		},
 	}
 }
+
+func NetworkName() *Validator {
+	return &Validator{
+		description: "validate network name",
+		validate: func(ctx context.Context, req validator.StringRequest, resp *validator.StringResponse) {
+			v, diag := req.ConfigValue.ToStringValue(ctx)
+			if diag.HasError() {
+				resp.Diagnostics.Append(diag...)
+				return
+			}
+			if err := clientValidate.NetworkName(v.ValueString()); err != nil {
+				resp.Diagnostics.AddError(err.Error(), err.Error())
+			}
+		},
+	}
+}
+
+func NameServers() *Validator {
+	return &Validator{
+		description: "validate name servers",
+		validateMap: func(ctx context.Context, req validator.MapRequest, resp *validator.MapResponse) {
+			for _, v := range req.ConfigValue.Elements() {
+				if err := clientValidate.NameServer(v); err != nil {
+					resp.Diagnostics.AddError(err.Error(), err.Error())
+				}
+			}
+		},
+	}
+}
+
+func Prefixes() *Validator {
+	return &Validator{
+		description: "validate prefixes",
+		validateMap: func(ctx context.Context, req validator.MapRequest, resp *validator.MapResponse) {
+			for _, v := range req.ConfigValue.Elements() {
+				if err := clientValidate.Prefixes(v); err != nil {
+					resp.Diagnostics.AddError(err.Error(), err.Error())
+				}
+			}
+		},
+	}
+}
+
+func PrefixLenghtV4() *Validator {
+	return &Validator{
+		description: "validate prefix length",
+		validate: func(ctx context.Context, req validator.StringRequest, resp *validator.StringResponse) {
+			v, diag := req.ConfigValue.ToStringValue(ctx)
+			if diag.HasError() {
+				resp.Diagnostics.Append(diag...)
+				return
+			}
+			if err := clientValidate.PrefixLengthV4(v.ValueString()); err != nil {
+				resp.Diagnostics.AddError(err.Error(), err.Error())
+			}
+		},
+	}
+}
+
+func PublicIP() *Validator {
+	return &Validator{
+		description: "validate public IP",
+		validate: func(ctx context.Context, req validator.StringRequest, resp *validator.StringResponse) {
+			v, diag := req.ConfigValue.ToStringValue(ctx)
+			if diag.HasError() {
+				resp.Diagnostics.Append(diag...)
+				return
+			}
+			if err := clientValidate.PublicIp(v.ValueString()); err != nil {
+				resp.Diagnostics.AddError(err.Error(), err.Error())
+			}
+		},
+	}
+}
