@@ -3,16 +3,18 @@ package network
 import (
 	"context"
 	"fmt"
-	iaas "github.com/SchwarzIT/community-stackit-go-client/pkg/services/iaas-api/v1alpha"
-	"github.com/google/uuid"
 	"reflect"
+	"strings"
 
-	openapiTypes "github.com/SchwarzIT/community-stackit-go-client/pkg/helpers/types"
-	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
+	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+
+	openapiTypes "github.com/SchwarzIT/community-stackit-go-client/pkg/helpers/types"
+	iaas "github.com/SchwarzIT/community-stackit-go-client/pkg/services/iaas-api/v1alpha"
+	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
 
 // Create - lifecycle function
@@ -208,8 +210,9 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	}
 
 	projectID, _ := uuid.Parse(state.ProjectID.String())
-	process := res.WaitHandler(ctx, c.IAAS, projectID, state.NetworkID)
-	res, err := process.WaitWithContext(ctx); err != nil {
+	networkID, _ := uuid.Parse(state.NetworkID.String())
+	process := res.WaitHandler(ctx, c.IAAS, projectID, networkID)
+	if _, err = process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed to verify network deletion", err.Error())
 	}
 
@@ -218,8 +221,26 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 
 // ImportState handles terraform import
 func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	// validate project id
-	if err := clientValidate.NetworkID(req.ID); err != nil {
+	idParts := strings.Split(req.ID, ",")
+	if len(idParts) != 2 || idParts[0] == "" || idParts[1] == "" {
+		resp.Diagnostics.AddError(
+			"Unexpected Import Identifier",
+			fmt.Sprintf("Expected import identifier with format: `project_id,networkd_id` where `network_id` is the network id and `project_id` is the project id.\nInstead got: %q", req.ID),
+		)
+		return
+	}
+
+	projectID := idParts[0]
+	networkID := idParts[1]
+
+	if err := clientValidate.ProjectID(projectID); err != nil {
+		resp.Diagnostics.AddError(
+			"Unexpected Import Identifier",
+			fmt.Sprintf("Couldn't validate project_id.\n%s", err.Error()),
+		)
+		return
+	}
+	if err := clientValidate.NetworkID(networkID); err != nil {
 		resp.Diagnostics.AddError(
 			"Unexpected Import Identifier",
 			fmt.Sprintf("Couldn't validate network_id.\n%s", err.Error()),
@@ -228,5 +249,6 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 	}
 
 	// set main attributes
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("network_id"), req.ID)...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project_id"), projectID)...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("network_id"), networkID)...)
 }

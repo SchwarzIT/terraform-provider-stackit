@@ -188,7 +188,7 @@ func PublicIP() *Validator {
 				resp.Diagnostics.Append(diag...)
 				return
 			}
-			if err := clientValidate.PublicIp(v.ValueString()); err != nil {
+			if err := clientValidate.PublicIP(v.ValueString()); err != nil {
 				resp.Diagnostics.AddError(err.Error(), err.Error())
 			}
 		},
