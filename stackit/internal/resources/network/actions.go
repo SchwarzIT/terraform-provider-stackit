@@ -12,7 +12,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	openapiTypes "github.com/SchwarzIT/community-stackit-go-client/pkg/helpers/types"
 	iaas "github.com/SchwarzIT/community-stackit-go-client/pkg/services/iaas-api/v1alpha"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
@@ -99,27 +98,24 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	projectID, _ := uuid.Parse(p.ProjectID.String())
-	res, err := c.IAAS.V1ListNetworksInProject(ctx, projectID)
+	networkID, _ := uuid.Parse(p.ProjectID.String())
+	res, err := c.IAAS.V1GetNetwork(ctx, projectID, networkID)
 	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200"); agg != nil {
 		resp.Diagnostics.AddError("failed reading project", agg.Error())
 		return
 	}
 
-	for _, n := range res.JSON200.Items {
-		if n.Name != p.Name.String() {
-			continue
-		}
-		prefixes := make([]types.String, len(n.Prefixes))
-		for i, pr := range n.Prefixes {
-			prefixes[i] = types.StringValue(pr)
-		}
-		p.NetworkID = types.StringValue(n.NetworkID.String())
-		p.PublicIp = types.StringValue(*n.PublicIp)
-		p.Prefixes = prefixes
-		p.Name = types.StringValue(n.Name)
-		p.NetworkID = types.StringValue(n.NetworkID.String())
-		p.ProjectID = types.StringValue(projectID.String())
+	n := res.JSON200
+	prefixes := make([]types.String, len(n.Prefixes))
+	for i, pr := range n.Prefixes {
+		prefixes[i] = types.StringValue(pr)
 	}
+	p.NetworkID = types.StringValue(n.NetworkID.String())
+	p.PublicIp = types.StringValue(*n.PublicIp)
+	p.Prefixes = prefixes
+	p.Name = types.StringValue(n.Name)
+	p.NetworkID = types.StringValue(n.NetworkID.String())
+	p.ProjectID = types.StringValue(projectID.String())
 
 	diags = resp.State.Set(ctx, &p)
 	resp.Diagnostics.Append(diags...)
@@ -176,13 +172,9 @@ func (r Resource) updateNetwork(ctx context.Context, plan, state Network, resp *
 		Nameservers: &ns,
 	}
 
-	id, err := uuid.Parse(state.NetworkID.String())
-	if err != nil {
-		return
-	}
-
 	projectID, _ := uuid.Parse(state.ProjectID.String())
-	res, err := r.client.IAAS.V1UpdateNetwork(ctx, projectID, id, iaas.V1UpdateNetworkJSONRequestBody(body))
+	networkID, _ := uuid.Parse(state.NetworkID.String())
+	res, err := r.client.IAAS.V1UpdateNetwork(ctx, projectID, networkID, iaas.V1UpdateNetworkJSONRequestBody(body))
 	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200"); agg != nil {
 		resp.Diagnostics.AddError("failed updating project", agg.Error())
 		return
@@ -197,20 +189,15 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	id, err := uuid.Parse(state.NetworkID.String())
-	if err != nil {
-		return
-	}
-
+	projectID, _ := uuid.Parse(state.ProjectID.String())
+	networkID, _ := uuid.Parse(state.NetworkID.String())
 	c := r.client
-	res, err := c.IAAS.V1DeleteNetwork(ctx, openapiTypes.UUID{}, id)
+	res, err := c.IAAS.V1DeleteNetwork(ctx, projectID, networkID)
 	if agg := common.Validate(&resp.Diagnostics, res, err); agg != nil {
 		resp.Diagnostics.AddError("failed deleting network", agg.Error())
 		return
 	}
 
-	projectID, _ := uuid.Parse(state.ProjectID.String())
-	networkID, _ := uuid.Parse(state.NetworkID.String())
 	process := res.WaitHandler(ctx, c.IAAS, projectID, networkID)
 	if _, err = process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed to verify network deletion", err.Error())
