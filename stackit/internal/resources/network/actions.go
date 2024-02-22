@@ -39,29 +39,6 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 }
 
 func (r Resource) createNetwork(ctx context.Context, resp *resource.CreateResponse, plan Network) Network {
-	//labels := rmv2.ResourceLabels{
-	//	"billingReference": plan.BillingRef.ValueString(),
-	//	"scope":            "PUBLIC",
-	//}
-
-	//for k, v := range plan.Labels {
-	//	labels[k] = v
-	//}
-
-	//owner := rmv2.PROJECT_OWNER
-	//subj1 := r.client.Client.GetServiceAccountEmail()
-	//subj2 := plan.OwnerEmail.ValueString()
-	//members := []rmv2.ProjectMember{
-	//	{
-	//		Subject: &subj1,
-	//		Role:    &owner,
-	//	},
-	//	{
-	//		Subject: &subj2,
-	//		Role:    &owner,
-	//	},
-	//}
-
 	var ns iaas.V1Nameserver
 	for _, i := range plan.NameServers {
 		ns = append(ns, i.String())
@@ -75,13 +52,6 @@ func (r Resource) createNetwork(ctx context.Context, resp *resource.CreateRespon
 	}
 	res, err := r.client.IAAS.V1CreateNetwork(ctx, openapiTypes.UUID{}, body)
 
-	//body := rmv2.ProjectRequestBody{
-	//	ContainerParentID: plan.ParentContainerID.ValueString(),
-	//	Labels:            &labels,
-	//	Members:           members,
-	//	Name:              plan.Name.ValueString(),
-	//}
-	//res, err := r.client.ResourceManagement.Create(ctx, body)
 	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON201"); agg != nil {
 		resp.Diagnostics.AddError("failed creating network", agg.Error())
 		return plan

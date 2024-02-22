@@ -140,9 +140,9 @@ func NetworkName() *Validator {
 func NameServers() *Validator {
 	return &Validator{
 		description: "validate name servers",
-		validateMap: func(ctx context.Context, req validator.MapRequest, resp *validator.MapResponse) {
+		validateList: func(ctx context.Context, req validator.ListRequest, resp *validator.ListResponse) {
 			for _, v := range req.ConfigValue.Elements() {
-				if err := clientValidate.NameServer(v); err != nil {
+				if err := clientValidate.NameServer(v.String()); err != nil {
 					resp.Diagnostics.AddError(err.Error(), err.Error())
 				}
 			}
@@ -153,9 +153,9 @@ func NameServers() *Validator {
 func Prefixes() *Validator {
 	return &Validator{
 		description: "validate prefixes",
-		validateMap: func(ctx context.Context, req validator.MapRequest, resp *validator.MapResponse) {
+		validateList: func(ctx context.Context, req validator.ListRequest, resp *validator.ListResponse) {
 			for _, v := range req.ConfigValue.Elements() {
-				if err := clientValidate.Prefixes(v); err != nil {
+				if err := clientValidate.Prefix(v.String()); err != nil {
 					resp.Diagnostics.AddError(err.Error(), err.Error())
 				}
 			}
@@ -163,16 +163,16 @@ func Prefixes() *Validator {
 	}
 }
 
-func PrefixLenghtV4() *Validator {
+func PrefixLengthV4() *Validator {
 	return &Validator{
 		description: "validate prefix length",
-		validate: func(ctx context.Context, req validator.StringRequest, resp *validator.StringResponse) {
-			v, diag := req.ConfigValue.ToStringValue(ctx)
+		validateInt: func(ctx context.Context, req validator.Int64Request, resp *validator.Int64Response) {
+			v, diag := req.ConfigValue.ToInt64Value(ctx)
 			if diag.HasError() {
 				resp.Diagnostics.Append(diag...)
 				return
 			}
-			if err := clientValidate.PrefixLengthV4(v.ValueString()); err != nil {
+			if err := clientValidate.PrefixLengthV4(v.ValueInt64()); err != nil {
 				resp.Diagnostics.AddError(err.Error(), err.Error())
 			}
 		},

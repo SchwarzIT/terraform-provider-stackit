@@ -36,11 +36,11 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 					validate.NetworkName(),
 				},
 			},
-			"nameservers": schema.MapAttribute{
+			"nameservers": schema.ListAttribute{
 				Description: "List of DNS Servers/Nameservers.",
 				Required:    false,
 				ElementType: types.StringType,
-				Validators: []validator.Map{
+				Validators: []validator.List{
 					validate.NameServers(),
 				},
 			},
@@ -48,18 +48,18 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Description: "The ID of the network",
 				Required:    true,
 			},
-			"prefixes": schema.MapAttribute{
+			"prefixes": schema.ListAttribute{
 				Required:    true,
 				ElementType: types.StringType,
-				Validators: []validator.Map{
+				Validators: []validator.List{
 					validate.Prefixes(),
 				},
 			},
-			"prefixLengthV4": schema.StringAttribute{
+			"prefixLengthV4": schema.Int64Attribute{
 				Description: "prefix length",
 				Required:    true,
-				Validators: []validator.String{
-					validate.PrefixLenghtV4(),
+				Validators: []validator.Int64{
+					validate.PrefixLengthV4(),
 				},
 			},
 			"publicIp": schema.StringAttribute{
