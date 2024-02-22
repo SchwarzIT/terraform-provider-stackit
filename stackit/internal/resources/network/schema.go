@@ -20,6 +20,7 @@ type Network struct {
 	Prefixes       []types.String `tfsdk:"prefixes"`
 	PrefixLengthV4 types.Int64    `tfsdk:"prefixLengthV4"`
 	PublicIp       types.String   `tssdk:"publicIp"`
+	ProjectID      types.String   `tfsdk:"project_id"`
 }
 
 // Schema returns terraform schema structure
@@ -67,6 +68,13 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Computed:    true,
 				Validators: []validator.String{
 					validate.PublicIP(),
+				},
+			},
+			"project_id": schema.StringAttribute{
+				Description: "The project UUID.",
+				Required:    true,
+				Validators: []validator.String{
+					validate.ProjectID(),
 				},
 			},
 		},

@@ -50,14 +50,16 @@ func (r Resource) createNetwork(ctx context.Context, resp *resource.CreateRespon
 		Nameservers:    &ns,
 		PrefixLengthV4: &pl,
 	}
-	res, err := r.client.IAAS.V1CreateNetwork(ctx, openapiTypes.UUID{}, body)
+
+	projectID, _ := uuid.Parse(plan.ProjectID.String())
+	res, err := r.client.IAAS.V1CreateNetwork(ctx, projectID, body)
 
 	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON201"); agg != nil {
 		resp.Diagnostics.AddError("failed creating network", agg.Error())
 		return plan
 	}
 
-	process := res.WaitHandler(ctx, r.client.IAAS, openapiTypes.UUID{}, openapiTypes.UUID{})
+	process := res.WaitHandler(ctx, r.client.IAAS, projectID)
 	createdNetwork, err := process.WaitWithContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(fmt.Sprintf("failed validating network %s creation", body.Name), err.Error())
@@ -77,6 +79,7 @@ func (r Resource) createNetwork(ctx context.Context, resp *resource.CreateRespon
 		plan.NetworkID = types.StringValue(n.NetworkID.String())
 		plan.PublicIp = types.StringValue(*n.PublicIp)
 		plan.Prefixes = prefixes
+		plan.ProjectID = types.StringValue(projectID.String())
 	}
 
 	return plan
@@ -93,7 +96,8 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	res, err := c.IAAS.V1ListNetworksInProject(ctx, openapiTypes.UUID{})
+	projectID, _ := uuid.Parse(p.ProjectID.String())
+	res, err := c.IAAS.V1ListNetworksInProject(ctx, projectID)
 	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200"); agg != nil {
 		resp.Diagnostics.AddError("failed reading project", agg.Error())
 		return
@@ -112,6 +116,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		p.Prefixes = prefixes
 		p.Name = types.StringValue(n.Name)
 		p.NetworkID = types.StringValue(n.NetworkID.String())
+		p.ProjectID = types.StringValue(projectID.String())
 	}
 
 	diags = resp.State.Set(ctx, &p)
@@ -154,7 +159,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	}
 }
 
-func (r Resource) updateNetwork(ctx context.Context, projectID openapiTypes.UUID, plan, state Network, resp *resource.UpdateResponse) {
+func (r Resource) updateNetwork(ctx context.Context, plan, state Network, resp *resource.UpdateResponse) {
 	if plan.Name.Equal(state.Name) && reflect.DeepEqual(plan.NameServers, state.NameServers) {
 		return
 	}
@@ -174,6 +179,7 @@ func (r Resource) updateNetwork(ctx context.Context, projectID openapiTypes.UUID
 		return
 	}
 
+	projectID, _ := uuid.Parse(state.ProjectID.String())
 	res, err := r.client.IAAS.V1UpdateNetwork(ctx, projectID, id, iaas.V1UpdateNetworkJSONRequestBody(body))
 	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200"); agg != nil {
 		resp.Diagnostics.AddError("failed updating project", agg.Error())
@@ -201,7 +207,8 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	process := res.WaitHandler(ctx, c.IAAS, openapiTypes.UUID{}, state.NetworkID).SetTimeout(timeout)
+	projectID, _ := uuid.Parse(state.ProjectID.String())
+	process := res.WaitHandler(ctx, c.IAAS, projectID, state.NetworkID)
 	res, err := process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed to verify network deletion", err.Error())
 	}
