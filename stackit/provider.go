@@ -12,6 +12,7 @@ import (
 	dataLoadBalancer "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/load-balancer"
 	dataMongoDBFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/mongodb-flex/instance"
 	dataMongoDBFlexUser "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/mongodb-flex/user"
+	dataNetwork "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/network"
 	dataObjectStorageBucket "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/object-storage/bucket"
 	dataObjectStorageCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/object-storage/credential"
 	dataObjectStorageCredentialsGroup "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/data-sources/object-storage/credentials-group"
@@ -32,6 +33,7 @@ import (
 	resourceLoadBalancer "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/load-balancer"
 	resourceMongoDBFlexInstance "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mongodb-flex/instance"
 	resourceMongoDBFlexUser "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/mongodb-flex/user"
+	resourceNetwork "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/network"
 	resourceObjectStorageBucket "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/bucket"
 	resourceObjectStorageCredential "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/credential"
 	resourceObjectStorageCredentialsGroup "github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/object-storage/credentials-group"
@@ -175,6 +177,7 @@ func (p *StackitProvider) Resources(_ context.Context) []func() resource.Resourc
 		resourceProject.New,
 		resourceSecretsManagerInstance.New,
 		resourceSecretsManagerUser.New,
+		resourceNetwork.New,
 	}
 }
 
@@ -211,6 +214,7 @@ func (p *StackitProvider) DataSources(context.Context) []func() datasource.DataS
 		dataProject.New,
 		dataSecretsManagerInstance.New,
 		dataSecretsManagerUser.New,
+		dataNetwork.New,
 	}
 }
 
