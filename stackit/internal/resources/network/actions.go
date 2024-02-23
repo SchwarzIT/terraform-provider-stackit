@@ -98,7 +98,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	projectID, _ := uuid.Parse(p.ProjectID.String())
-	networkID, _ := uuid.Parse(p.ProjectID.String())
+	networkID, _ := uuid.Parse(p.NetworkID.String())
 	res, err := c.IAAS.V1GetNetwork(ctx, projectID, networkID)
 	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200"); agg != nil {
 		resp.Diagnostics.AddError("failed reading project", agg.Error())
@@ -114,7 +114,6 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	p.PublicIp = types.StringValue(*n.PublicIp)
 	p.Prefixes = prefixes
 	p.Name = types.StringValue(n.Name)
-	p.NetworkID = types.StringValue(n.NetworkID.String())
 	p.ProjectID = types.StringValue(projectID.String())
 
 	diags = resp.State.Set(ctx, &p)
