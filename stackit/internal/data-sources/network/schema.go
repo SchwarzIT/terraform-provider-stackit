@@ -39,7 +39,7 @@ func (r *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 			},
 			"nameservers": schema.ListAttribute{
 				Description: "List of DNS Servers/Nameservers.",
-				Required:    false,
+				Optional:    true,
 				ElementType: types.StringType,
 				Validators: []validator.List{
 					validate.NameServers(),
@@ -47,10 +47,10 @@ func (r *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 			},
 			"network_id": schema.StringAttribute{
 				Description: "The ID of the network",
-				Required:    true,
+				Computed:    true,
 			},
 			"prefixes": schema.ListAttribute{
-				Required:    true,
+				Computed:    true,
 				ElementType: types.StringType,
 				Validators: []validator.List{
 					validate.Prefixes(),
@@ -58,7 +58,7 @@ func (r *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 			},
 			"prefix_length_v4": schema.Int64Attribute{
 				Description: "prefix length",
-				Required:    true,
+				Optional:    true,
 				Validators: []validator.Int64{
 					validate.PrefixLengthV4(),
 				},
