@@ -16,10 +16,10 @@ import (
 type Network struct {
 	Name           types.String   `tfsdk:"name"`
 	NameServers    []types.String `tfsdk:"nameservers"`
-	NetworkID      types.String   `tfsdk:"networkId"`
+	NetworkID      types.String   `tfsdk:"network_id"`
 	Prefixes       []types.String `tfsdk:"prefixes"`
-	PrefixLengthV4 types.Int64    `tfsdk:"prefixLengthV4"`
-	PublicIp       types.String   `tssdk:"publicIp"`
+	PrefixLengthV4 types.Int64    `tfsdk:"prefix_length_v4"`
+	PublicIp       types.String   `tssdk:"public_ip"`
 	ProjectID      types.String   `tfsdk:"project_id"`
 }
 
@@ -45,7 +45,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 					validate.NameServers(),
 				},
 			},
-			"networkId": schema.StringAttribute{
+			"network_id": schema.StringAttribute{
 				Description: "The ID of the network",
 				Required:    true,
 			},
@@ -56,14 +56,14 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 					validate.Prefixes(),
 				},
 			},
-			"prefixLengthV4": schema.Int64Attribute{
+			"prefix_length_v4": schema.Int64Attribute{
 				Description: "prefix length",
 				Required:    true,
 				Validators: []validator.Int64{
 					validate.PrefixLengthV4(),
 				},
 			},
-			"publicIp": schema.StringAttribute{
+			"public_ip": schema.StringAttribute{
 				Description: "public IP address",
 				Computed:    true,
 				Validators: []validator.String{
