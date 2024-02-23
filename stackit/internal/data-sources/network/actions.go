@@ -2,6 +2,7 @@ package network
 
 import (
 	"context"
+
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -36,7 +37,6 @@ func (d DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	n.PublicIp = types.StringValue(*network.PublicIp)
 	n.Prefixes = prefixes
 	n.Name = types.StringValue(network.Name)
-	n.NetworkID = types.StringValue(network.NetworkID.String())
 	n.ProjectID = types.StringValue(projectID.String())
 
 	diags = resp.State.Set(ctx, &n)
