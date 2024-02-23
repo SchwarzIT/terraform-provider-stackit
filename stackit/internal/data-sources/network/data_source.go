@@ -27,7 +27,7 @@ var _ = datasource.DataSource(&DataSource{})
 
 // Metadata returns data resource metadata
 func (d *DataSource) Metadata(_ context.Context, req datasource.MetadataRequest, res *datasource.MetadataResponse) {
-	res.TypeName = "stackit_project"
+	res.TypeName = "stackit_network"
 }
 
 // Configure configures the data source client
