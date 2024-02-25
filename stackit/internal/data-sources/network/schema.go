@@ -3,7 +3,6 @@ package network
 import (
 	"context"
 	"fmt"
-
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -14,13 +13,14 @@ import (
 
 // Network is the schema model
 type Network struct {
-	Name           types.String   `tfsdk:"name"`
-	NameServers    []types.String `tfsdk:"nameservers"`
-	NetworkID      types.String   `tfsdk:"network_id"`
-	Prefixes       []types.String `tfsdk:"prefixes"`
-	PrefixLengthV4 types.Int64    `tfsdk:"prefix_length_v4"`
-	PublicIp       types.String   `tssdk:"public_ip"`
-	ProjectID      types.String   `tfsdk:"project_id"`
+	ID             types.String `tfsdk:"id"`
+	Name           types.String `tfsdk:"name"`
+	NameServers    types.List   `tfsdk:"nameservers"`
+	NetworkID      types.String `tfsdk:"network_id"`
+	Prefixes       types.List   `tfsdk:"prefixes"`
+	PrefixLengthV4 types.Int64  `tfsdk:"prefix_length_v4"`
+	PublicIp       types.String `tfsdk:"public_ip"`
+	ProjectID      types.String `tfsdk:"project_id"`
 }
 
 // Schema returns terraform schema structure
@@ -30,45 +30,13 @@ func (r *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 			common.EnvironmentInfo(r.urls),
 		),
 		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
+				Description: "Specifies the Network ID.",
+				Computed:    true,
+			},
 			"name": schema.StringAttribute{
 				Description: "the name of the network",
 				Required:    true,
-				Validators: []validator.String{
-					validate.NetworkName(),
-				},
-			},
-			"nameservers": schema.ListAttribute{
-				Description: "List of DNS Servers/Nameservers.",
-				Optional:    true,
-				ElementType: types.StringType,
-				Validators: []validator.List{
-					validate.NameServers(),
-				},
-			},
-			"network_id": schema.StringAttribute{
-				Description: "The ID of the network",
-				Computed:    true,
-			},
-			"prefixes": schema.ListAttribute{
-				Computed:    true,
-				ElementType: types.StringType,
-				Validators: []validator.List{
-					validate.Prefixes(),
-				},
-			},
-			"prefix_length_v4": schema.Int64Attribute{
-				Description: "prefix length",
-				Optional:    true,
-				Validators: []validator.Int64{
-					validate.PrefixLengthV4(),
-				},
-			},
-			"public_ip": schema.StringAttribute{
-				Description: "public IP address",
-				Computed:    true,
-				Validators: []validator.String{
-					validate.PublicIP(),
-				},
 			},
 			"project_id": schema.StringAttribute{
 				Description: "The project UUID.",
@@ -76,6 +44,29 @@ func (r *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Validators: []validator.String{
 					validate.ProjectID(),
 				},
+			},
+
+			// read only
+			"nameservers": schema.ListAttribute{
+				Description: "List of DNS Servers/Nameservers.",
+				ElementType: types.StringType,
+				Computed:    true,
+			},
+			"network_id": schema.StringAttribute{
+				Description: "The ID of the network",
+				Computed:    true,
+			},
+			"prefixes": schema.ListAttribute{
+				ElementType: types.StringType,
+				Computed:    true,
+			},
+			"prefix_length_v4": schema.Int64Attribute{
+				Description: "prefix length",
+				Computed:    true,
+			},
+			"public_ip": schema.StringAttribute{
+				Description: "public IP address",
+				Computed:    true,
 			},
 		},
 	}

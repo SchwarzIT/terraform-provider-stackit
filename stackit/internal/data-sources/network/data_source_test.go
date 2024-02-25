@@ -1,9 +1,7 @@
 package network_test
 
 import (
-	"errors"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"testing"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit"
@@ -29,33 +27,13 @@ func TestAcc_Network(t *testing.T) {
 			"stackit": providerserver.NewProtocol6WithError(stackit.New("test")()),
 		},
 		Steps: []resource.TestStep{
-			// check minimal configuration
+			// check configuration
 			{
 				Config: config(name),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("stackit_network.example", "name", name),
-					resource.TestCheckResourceAttr("stackit_network.example", "project_id", common.GetAcceptanceTestsProjectID()),
-					resource.TestCheckResourceAttrSet("stackit_network.example", "id"),
-					resource.TestCheckResourceAttr("stackit_network.example", "name", name),
+					resource.TestCheckResourceAttr("data.stackit_network.example", "name", name),
+					resource.TestCheckResourceAttr("data.stackit_network.example", "project_id", common.GetAcceptanceTestsProjectID()),
 				),
-			},
-			// test import
-			{
-				ResourceName: "stackit_network.example",
-				ImportStateIdFunc: func(s *terraform.State) (string, error) {
-					r, ok := s.RootModule().Resources["stackit_network.example"]
-					if !ok {
-						return "", errors.New("couldn't find resource stackit_network.example")
-					}
-					id, ok := r.Primary.Attributes["id"]
-					if !ok {
-						return "", errors.New("couldn't find attribute id")
-					}
-
-					return fmt.Sprintf("%s,%s", common.GetAcceptanceTestsProjectID(), id), nil
-				},
-				ImportState:       true,
-				ImportStateVerify: true,
 			},
 		},
 	})
@@ -63,16 +41,24 @@ func TestAcc_Network(t *testing.T) {
 
 func config(name string) string {
 	return fmt.Sprintf(`
+
 resource "stackit_network" "example" {
-	project_id = "%s"
-    name       = "%s"
+	project_id 	= "%s"
+    name       	= "%s"
 	nameservers = [
 		"8.8.8.8",
 		"8.8.4.4"
 	]
 }
+
+data "stackit_network" "example" {
+	depends_on 	= [stackit_network.example]
+	project_id 	= stackit_network.example.project_id
+    name      	= "%s"
+}
 	  `,
 		common.GetAcceptanceTestsProjectID(),
+		name,
 		name,
 	)
 }
