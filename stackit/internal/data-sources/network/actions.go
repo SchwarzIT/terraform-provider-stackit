@@ -23,8 +23,6 @@ func (d DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	// IF ID IS SET AND NOT EMPTY
-
 	projectID, _ := uuid.Parse(config.ProjectID.ValueString())
 
 	resNetworkList, err := c.IAAS.V1ListNetworksInProject(ctx, projectID)
