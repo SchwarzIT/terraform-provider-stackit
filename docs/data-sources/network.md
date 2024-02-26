@@ -23,12 +23,12 @@ Data source for STACKIT network
 
 ### Required
 
-- `name` (String) the name of the network
+- `id` (String) Specifies the Network ID.
 - `project_id` (String) The project UUID.
 
 ### Read-Only
 
-- `id` (String) Specifies the Network ID.
+- `name` (String) the name of the network
 - `nameservers` (List of String) List of DNS Servers/Nameservers.
 - `network_id` (String) The ID of the network
 - `prefix_length_v4` (Number) prefix length
