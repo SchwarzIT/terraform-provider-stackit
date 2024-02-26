@@ -23,6 +23,8 @@ func (d DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
+	// IF ID IS SET AND NOT EMPTY
+
 	projectID, _ := uuid.Parse(config.ProjectID.ValueString())
 
 	resNetworkList, err := c.IAAS.V1ListNetworksInProject(ctx, projectID)
@@ -75,7 +77,6 @@ func (d DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	config.ID = types.StringValue(network.NetworkID.String())
 	config.ProjectID = types.StringValue(projectID.String())
 	config.Name = types.StringValue(network.Name)
-	config.NetworkID = types.StringValue(network.NetworkID.String())
 	config.PublicIp = types.StringPointerValue(network.PublicIp)
 	config.Prefixes = types.ListValueMust(types.StringType, prefixes)
 	config.NameServers = types.ListValueMust(types.StringType, nameservers)
