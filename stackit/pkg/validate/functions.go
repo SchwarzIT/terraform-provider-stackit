@@ -121,22 +121,6 @@ func NetworkID() *Validator {
 	}
 }
 
-func NetworkName() *Validator {
-	return &Validator{
-		description: "validate network name",
-		validate: func(ctx context.Context, req validator.StringRequest, resp *validator.StringResponse) {
-			v, diag := req.ConfigValue.ToStringValue(ctx)
-			if diag.HasError() {
-				resp.Diagnostics.Append(diag...)
-				return
-			}
-			if err := clientValidate.NetworkName(v.ValueString()); err != nil {
-				resp.Diagnostics.AddError(err.Error(), err.Error())
-			}
-		},
-	}
-}
-
 func NameServers() *Validator {
 	return &Validator{
 		description: "validate name servers",

@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   Data source for STACKIT network
   
-  -> Environment supportTo set a custom API base URL, set STACKITKUBERNETESBASEURL environment variable
+  -> Environment supportTo set a custom API base URL, set STACKITIAASBASEURL environment variable
 ---
 
 # stackit_network (Data Source)
@@ -14,7 +14,7 @@ Data source for STACKIT network
 
 <br />
 
--> __Environment support__<small>To set a custom API base URL, set <code>STACKIT_KUBERNETES_BASEURL</code> environment variable </small>
+-> __Environment support__<small>To set a custom API base URL, set <code>STACKIT_IAAS_BASEURL</code> environment variable </small>
 
 
 
@@ -26,14 +26,12 @@ Data source for STACKIT network
 - `name` (String) the name of the network
 - `project_id` (String) The project UUID.
 
-### Optional
-
-- `nameservers` (List of String) List of DNS Servers/Nameservers.
-- `prefix_length_v4` (Number) prefix length
-
 ### Read-Only
 
+- `id` (String) Specifies the Network ID.
+- `nameservers` (List of String) List of DNS Servers/Nameservers.
 - `network_id` (String) The ID of the network
+- `prefix_length_v4` (Number) prefix length
 - `prefixes` (List of String)
 - `public_ip` (String) public IP address
 

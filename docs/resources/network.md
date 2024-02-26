@@ -24,17 +24,28 @@ Manages STACKIT network
 ### Required
 
 - `name` (String) the name of the network
+- `nameservers` (List of String) List of DNS Servers/Nameservers.
 - `project_id` (String) The project UUID.
 
 ### Optional
 
-- `nameservers` (List of String) List of DNS Servers/Nameservers.
 - `prefix_length_v4` (Number) prefix length
+- `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
 
 ### Read-Only
 
+- `id` (String) Specifies the resource ID
 - `network_id` (String) The ID of the network
 - `prefixes` (List of String)
 - `public_ip` (String) public IP address
+
+<a id="nestedatt--timeouts"></a>
+### Nested Schema for `timeouts`
+
+Optional:
+
+- `create` (String)
+- `delete` (String)
+- `update` (String)
 
 
