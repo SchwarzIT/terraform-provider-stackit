@@ -21,7 +21,6 @@ type Network struct {
 	ID             types.String   `tfsdk:"id"`
 	Name           types.String   `tfsdk:"name"`
 	NameServers    types.List     `tfsdk:"nameservers"`
-	NetworkID      types.String   `tfsdk:"network_id"`
 	Prefixes       types.List     `tfsdk:"prefixes"`
 	PrefixLengthV4 types.Int64    `tfsdk:"prefix_length_v4"`
 	PublicIp       types.String   `tfsdk:"public_ip"`
@@ -57,10 +56,6 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Validators: []validator.List{
 					validate.NameServers(),
 				},
-			},
-			"network_id": schema.StringAttribute{
-				Description: "The ID of the network",
-				Computed:    true,
 			},
 			"prefixes": schema.ListAttribute{
 				Computed:    true,
