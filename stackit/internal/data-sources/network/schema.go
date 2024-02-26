@@ -3,6 +3,7 @@ package network
 import (
 	"context"
 	"fmt"
+
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -32,10 +33,6 @@ func (r *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "Specifies the Network ID.",
-				Computed:    true,
-			},
-			"name": schema.StringAttribute{
-				Description: "the name of the network",
 				Required:    true,
 			},
 			"project_id": schema.StringAttribute{
@@ -47,6 +44,10 @@ func (r *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 			},
 
 			// read only
+			"name": schema.StringAttribute{
+				Description: "the name of the network",
+				Computed:    true,
+			},
 			"nameservers": schema.ListAttribute{
 				Description: "List of DNS Servers/Nameservers.",
 				ElementType: types.StringType,
