@@ -100,7 +100,6 @@ func (r Resource) createNetwork(ctx context.Context, resp *resource.CreateRespon
 	}
 
 	plan.ID = types.StringValue(network.NetworkID.String())
-	plan.NetworkID = types.StringValue(network.NetworkID.String())
 	plan.PublicIp = types.StringPointerValue(network.PublicIp)
 	plan.Prefixes = types.ListValueMust(types.StringType, prefixes)
 	plan.ProjectID = types.StringValue(projectID.String())
@@ -120,7 +119,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	projectID, _ := uuid.Parse(state.ProjectID.ValueString())
-	networkID, _ := uuid.Parse(state.NetworkID.ValueString())
+	networkID, _ := uuid.Parse(state.ID.ValueString())
 
 	res, err := c.IAAS.V1GetNetwork(ctx, projectID, networkID)
 	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200"); agg != nil {
@@ -150,7 +149,6 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	state.ID = types.StringValue(n.NetworkID.String())
 	state.ProjectID = types.StringValue(projectID.String())
 	state.Name = types.StringValue(n.Name)
-	state.NetworkID = types.StringValue(n.NetworkID.String())
 	state.PublicIp = types.StringPointerValue(n.PublicIp)
 	state.Prefixes = types.ListValueMust(types.StringType, prefixes)
 	state.NameServers = types.ListValueMust(types.StringType, nameservers)
@@ -198,8 +196,8 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		return
 	}
 
-	if plan.NetworkID.IsUnknown() {
-		plan.NetworkID = state.NetworkID
+	if plan.ID.IsUnknown() {
+		plan.ID = state.ID
 	}
 
 	r.updateNetwork(ctx, plan, state, resp)
@@ -236,8 +234,8 @@ func (r Resource) updateNetwork(ctx context.Context, plan, state Network, resp *
 		Nameservers: &ns,
 	}
 
-	projectID, _ := uuid.Parse(state.ProjectID.String())
-	networkID, _ := uuid.Parse(state.NetworkID.String())
+	projectID, _ := uuid.Parse(state.ProjectID.ValueString())
+	networkID, _ := uuid.Parse(state.ID.ValueString())
 
 	res, err := r.client.IAAS.V1UpdateNetwork(ctx, projectID, networkID, iaas.V1UpdateNetworkJSONRequestBody(body))
 	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200"); agg != nil {
@@ -254,8 +252,9 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	projectID, _ := uuid.Parse(state.ProjectID.String())
-	networkID, _ := uuid.Parse(state.NetworkID.String())
+	projectID, _ := uuid.Parse(state.ProjectID.ValueString())
+	networkID, _ := uuid.Parse(state.ID.ValueString())
+
 	c := r.client
 	res, err := c.IAAS.V1DeleteNetwork(ctx, projectID, networkID)
 	if agg := common.Validate(&resp.Diagnostics, res, err); agg != nil {
@@ -303,5 +302,5 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 
 	// set main attributes
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project_id"), projectID)...)
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("network_id"), networkID)...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), networkID)...)
 }
