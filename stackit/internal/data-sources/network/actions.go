@@ -24,35 +24,18 @@ func (d DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	}
 
 	projectID, _ := uuid.Parse(config.ProjectID.ValueString())
+	id, _ := uuid.Parse(config.ID.ValueString())
 
-	resNetworkList, err := c.IAAS.V1ListNetworksInProject(ctx, projectID)
-	if agg := common.Validate(&resp.Diagnostics, resNetworkList, err, "JSON200"); agg != nil {
+	resNetwork, err := c.IAAS.V1GetNetwork(ctx, projectID, id)
+	if agg := common.Validate(&resp.Diagnostics, resNetwork, err, "JSON200"); agg != nil {
 		resp.Diagnostics.AddError("failed instance read", agg.Error())
 		return
 	}
 
-	networkList := resNetworkList.JSON200.Items
-	var networkID uuid.UUID
-	found := false
-
-	for _, n := range networkList {
-		if strings.EqualFold(n.Name, config.Name.ValueString()) {
-			networkID = n.NetworkID
-			found = true
-			break
-		}
-	}
-
-	if !found {
+	if resNetwork.JSON404 != nil {
 		resp.State.RemoveResource(ctx)
 		diags.AddError("couldn't find network", "network could not be found.")
 		resp.Diagnostics.Append(diags...)
-		return
-	}
-
-	resNetwork, err := c.IAAS.V1GetNetwork(ctx, projectID, networkID)
-	if agg := common.Validate(&resp.Diagnostics, resNetwork, err, "JSON200"); agg != nil {
-		resp.Diagnostics.AddError("failed instance read", agg.Error())
 		return
 	}
 

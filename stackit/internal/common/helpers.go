@@ -55,6 +55,14 @@ func GetAcceptanceTestsProjectID() string {
 	return ACC_TEST_PROJECT_ID
 }
 
+// GetAcceptanceTestsNetworkID returns the network ID for acceptance test
+func GetAcceptanceTestsNetworkID() string {
+	if v, ok := os.LookupEnv("ACC_TEST_NETWORK_ID"); ok && v != "" {
+		return v
+	}
+	return ""
+}
+
 func EnvironmentInfo(u baseurl.BaseURL) string {
 	return fmt.Sprintf(`
 <br />

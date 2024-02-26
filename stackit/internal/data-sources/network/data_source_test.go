@@ -31,7 +31,7 @@ func TestAcc_Network(t *testing.T) {
 			{
 				Config: config(name),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("data.stackit_network.example", "name", name),
+					resource.TestCheckResourceAttr("data.stackit_network.example", "id", common.GetAcceptanceTestsNetworkID()),
 					resource.TestCheckResourceAttr("data.stackit_network.example", "project_id", common.GetAcceptanceTestsProjectID()),
 				),
 			},
