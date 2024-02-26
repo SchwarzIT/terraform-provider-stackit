@@ -35,7 +35,6 @@ Manages STACKIT network
 ### Read-Only
 
 - `id` (String) Specifies the resource ID
-- `network_id` (String) The ID of the network
 - `prefixes` (List of String)
 - `public_ip` (String) public IP address
 
