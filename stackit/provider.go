@@ -221,7 +221,9 @@ func (p *StackitProvider) DataSources(context.Context) []func() datasource.DataS
 var md = `
 The STACKIT provider is a project developed and maintained by the STACKIT community within Schwarz IT. Please note that it is not an official provider endorsed or maintained by STACKIT.
 
-~> **Note:** The provider is built using Terraform's plugin framework, therefore we recommend using Terraform CLI v1.x which supports Protocol v6
+~> **Note:** This provider is deprecated and the development continues on [terraform-provider-stackit](https://github.com/stackitcloud/terraform-provider-stackit). Please follow the [Migration Guide](https://github.com/stackitcloud/terraform-provider-stackit/blob/main/MIGRATION.md) to have some guidance how to migrate.
+
+The provider is built using Terraform's plugin framework, therefore we recommend using Terraform CLI v1.x which supports Protocol v6
 
 ## Authentication
 
