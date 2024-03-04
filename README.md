@@ -7,7 +7,7 @@
 
 The STACKIT provider is a project developed and maintained by the STACKIT community within Schwarz IT.
 
-**⚠️ Important:** This project will continue be maintained as long as internal teams are using it.
+**⚠️ Important:** This project will continue to be maintained as long as internal teams are using it.
 
 > Note that the official STACKIT provider can be found [here](https://github.com/stackitcloud/terraform-provider-stackit).<br />To migrate to the official provider from the community provider, [refer to the migration notes](https://github.com/stackitcloud/terraform-provider-stackit/blob/main/MIGRATION.md).
 
