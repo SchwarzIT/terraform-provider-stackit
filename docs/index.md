@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   The STACKIT provider is a project developed and maintained by the STACKIT community within Schwarz IT. Please note that it is not an official provider endorsed or maintained by STACKIT.
   ~> Note: This provider is deprecated and the development continues on terraform-provider-stackit https://github.com/stackitcloud/terraform-provider-stackit. Please follow the Migration Guide https://github.com/stackitcloud/terraform-provider-stackit/blob/main/MIGRATION.md to have some guidance how to migrate.
-  The provider is built using Terraform's plugin framework, therefore we recommend using Terraform CLI v1.x which supports Protocol v6
+  The provider is built using Terraform's plugin framework, therefore we recommend using Terraform CLI v1.x which supports Protocol v6.
   Authentication
   Before you can start using the client, you will need to create a STACKIT Service Account in your project and assign it the appropriate permissions (i.e. project.owner).
   After the service account has been created, you can authenticate to the client using the Key flow  (recommended) or with the static Token flow (less secure as the token is long-lived).
@@ -35,7 +35,7 @@ The STACKIT provider is a project developed and maintained by the STACKIT commun
 
 ~> **Note:** This provider is deprecated and the development continues on [terraform-provider-stackit](https://github.com/stackitcloud/terraform-provider-stackit). Please follow the [Migration Guide](https://github.com/stackitcloud/terraform-provider-stackit/blob/main/MIGRATION.md) to have some guidance how to migrate.
 
-The provider is built using Terraform's plugin framework, therefore we recommend using Terraform CLI v1.x which supports Protocol v6
+The provider is built using Terraform's plugin framework, therefore we recommend using Terraform CLI v1.x which supports Protocol v6.
 
 ## Authentication
 
