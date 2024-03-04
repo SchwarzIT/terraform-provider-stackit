@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	clientCluster "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/cluster"
+	clientCluster "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.1/cluster"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/resources/kubernetes/cluster"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"

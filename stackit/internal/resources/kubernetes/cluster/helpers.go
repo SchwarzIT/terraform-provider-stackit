@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Masterminds/semver"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/cluster"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.1/cluster"
 	"github.com/pkg/errors"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"

@@ -3,12 +3,13 @@ package cluster
 import (
 	"context"
 	"fmt"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.1/credentials"
 	"net/http"
 	"strings"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/cluster"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/project"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.1/cluster"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.1/project"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
@@ -185,7 +186,14 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 
 func (r Resource) getCredential(ctx context.Context, diags *diag.Diagnostics, cl *Cluster) {
 	c := r.client
-	res, err := c.Kubernetes.Credentials.List(ctx, cl.ProjectID.ValueString(), cl.Name.ValueString())
+
+	// TODO: allow this to be changed later
+	expirationSeconds := "2678400"
+
+	res, err := c.Kubernetes.Credentials.CreateKubeconfig(ctx, cl.ProjectID.ValueString(), cl.Name.ValueString(), credentials.CreateKubeconfigJSONRequestBody{
+		ExpirationSeconds: &expirationSeconds,
+	})
+
 	if agg := common.Validate(diags, res, err, "JSON200.Kubeconfig"); agg != nil {
 		diags.AddError("failed fetching cluster credentials", agg.Error())
 		return
