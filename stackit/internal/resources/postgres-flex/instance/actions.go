@@ -71,20 +71,20 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	v := plan.Version.ValueString()
 
 	body := instance.InstanceCreateInstanceRequest{
-		Name: &name,
-		ACL: &instance.InstanceACL{
+		Name: name,
+		ACL: instance.InstanceACL{
 			Items: &acl,
 		},
-		BackupSchedule: &bu,
-		FlavorID:       &flavorID,
+		BackupSchedule: bu,
+		FlavorID:       flavorID,
 		Labels:         &plan.Labels,
-		Options:        &plan.Options,
-		Replicas:       &repl,
-		Storage: &instance.InstanceStorage{
+		Options:        plan.Options,
+		Replicas:       repl,
+		Storage: instance.InstanceStorage{
 			Class: &sc,
 			Size:  &ss,
 		},
-		Version: &v,
+		Version: v,
 	}
 	res, err := c.Instance.Create(ctx, plan.ProjectID.ValueString(), body)
 	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON201.ID"); agg != nil {
@@ -226,7 +226,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 	ss := int(storage.Size.ValueInt64())
 	v := plan.Version.ValueString()
 
-	body := instance.InstanceUpdateInstanceRequest{
+	body := instance.InstancePartialUpdateInstanceRequest{
 		Name: &name,
 		ACL: &instance.InstanceACL{
 			Items: &acl,

@@ -161,6 +161,52 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 // Update - lifecycle function
 func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+	var plan, state User
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	var roles []string
+	usingRoleSet := plan.Roles.IsUnknown()
+	if usingRoleSet {
+		resp.Diagnostics.Append(plan.RoleSet.ElementsAs(ctx, &roles, true)...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+	} else {
+		// @TODO: remove roles in future release
+		resp.Diagnostics.Append(plan.Roles.ElementsAs(ctx, &roles, true)...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+	}
+
+	body := users.PatchUserJSONRequestBody{
+		Roles: &roles,
+	}
+
+	res, err := r.client.PostgresFlex.Users.PatchUser(ctx, plan.ProjectID.ValueString(), plan.InstanceID.ValueString(), plan.ID.ValueString(), body)
+	if agg := common.Validate(&resp.Diagnostics, res, err); agg != nil {
+		resp.Diagnostics.AddError("failed updating postgres flex db user", agg.Error())
+		return
+	}
+
+	rolesState := []attr.Value{}
+	for _, v := range roles {
+		rolesState = append(rolesState, types.StringValue(v))
+	}
+	state.RoleSet = types.SetValueMust(types.StringType, rolesState)
+	// @TODO: remove roles in future release
+	state.Roles = types.ListValueMust(types.StringType, rolesState)
+
+	// update state
+	diags := resp.State.Set(ctx, &state)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 }
 
 // Delete - lifecycle function
