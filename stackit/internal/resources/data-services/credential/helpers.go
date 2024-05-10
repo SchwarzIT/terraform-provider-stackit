@@ -14,7 +14,7 @@ func (r Resource) applyClientResponse(ctx context.Context, c *Credential, cgr *c
 
 	c.Hosts = types.ListNull(types.StringType)
 	if cgr.Raw.Credentials.Hosts != nil && len(*cgr.Raw.Credentials.Hosts) > 0 {
-		h := []attr.Value{}
+		h := make([]attr.Value, 0)
 		for _, v := range *cgr.Raw.Credentials.Hosts {
 			h = append(h, types.StringValue(v))
 		}
