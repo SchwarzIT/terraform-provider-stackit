@@ -38,6 +38,11 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		}
 	}
 
+	// check for some buggy scenarios from bad API Responses
+	if res.JSON200 == nil {
+		resp.Diagnostics.AddError("failed to process client response", "Credentials response is empty")
+	}
+
 	if err := r.applyClientResponse(ctx, &cred, res.JSON200); err != nil {
 		resp.Diagnostics.AddError("failed to process client response", err.Error())
 		return
@@ -69,6 +74,10 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 			return
 		}
 		resp.Diagnostics.AddError("failed to read credential", agg.Error())
+	}
+
+	if res.JSON200 == nil {
+		resp.Diagnostics.AddError("failed to process client response", "Credentials response is empty")
 	}
 
 	if err := r.applyClientResponse(ctx, &cred, res.JSON200); err != nil {
