@@ -90,6 +90,12 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	// read cluster
 	res, err := r.client.MongoDBFlex.User.Get(ctx, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString())
 	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200.Item"); agg != nil {
+		if validate.StatusEquals(res, http.StatusNotFound) {
+			resp.State.RemoveResource(ctx)
+			resp.Diagnostics.AddError("resource not found", err.Error())
+			return
+		}
+
 		resp.Diagnostics.AddError("failed making read user request", agg.Error())
 		return
 	}
