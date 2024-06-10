@@ -82,7 +82,8 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 
 	res, err := r.client.Instances.CredentialsDelete(ctx, cred.ProjectID.ValueString(), cred.InstanceID.ValueString(), cred.ID.ValueString())
 	if agg := common.Validate(&resp.Diagnostics, res, err); agg != nil {
-		if !strings.Contains(agg.Error(), "EOF") {
+		// ignore non-existing...
+		if !strings.Contains(agg.Error(), "EOF") && !validate.StatusEquals(res, http.StatusNotFound) {
 			resp.Diagnostics.AddError("failed to delete credential", agg.Error())
 			return
 		}
