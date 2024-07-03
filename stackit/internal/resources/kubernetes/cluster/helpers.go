@@ -296,8 +296,14 @@ func (c *Cluster) Transform(cl cluster.Cluster) {
 	} else {
 		c.AllowPrivilegedContainers = types.BoolValue(DefaultAllowPrivileged)
 	}
+
+	if cl.Network != nil {
+		c.NetworkID = types.StringValue(*cl.Network.ID)
+	}
+
 	c.Status = types.StringValue(string(*cl.Status.Aggregated))
 	c.NodePools = []NodePool{}
+
 	for _, np := range cl.Nodepools {
 		maimna := types.StringNull()
 		if np.Machine.Image.Name != nil {
