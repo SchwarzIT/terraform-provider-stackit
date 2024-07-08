@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.1/credentials"
+	serviceenablement "github.com/SchwarzIT/community-stackit-go-client/pkg/services/service-enablement/v1"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.1/cluster"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.1/project"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	clientValidate "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
@@ -83,10 +83,12 @@ func (r Resource) preProcessConfig(diags *diag.Diagnostics, cl *Cluster) {
 
 func (r Resource) enableProject(ctx context.Context, diags *diag.Diagnostics, cl *Cluster, timeout time.Duration) {
 	projectID := cl.ProjectID.ValueString()
-	c := r.client.Kubernetes.Project
+	c := r.client.ServiceEnablement
+
+	serviceID := "cloud.stackit.ske"
 
 	found := true
-	status, err := c.Get(ctx, projectID)
+	status, err := c.GetService(ctx, projectID, serviceID)
 	if agg := common.Validate(&diag.Diagnostics{}, status, err, "JSON200.State"); agg != nil {
 		if status == nil || status.StatusCode() != http.StatusNotFound {
 			diags.AddError("failed to fetch SKE project status", agg.Error())
@@ -96,18 +98,19 @@ func (r Resource) enableProject(ctx context.Context, diags *diag.Diagnostics, cl
 	}
 
 	// check if project already enabled
-	if found && *status.JSON200.State == project.STATE_CREATED {
+	if found && *status.JSON200.State == serviceenablement.ENABLED {
 		return
 	}
 
-	res, err := c.Create(ctx, projectID)
+	res, err := c.EnableService(ctx, projectID, serviceID)
 	if agg := common.Validate(diags, res, err); agg != nil {
-		diags.AddError("failed during SKE project init", agg.Error())
+		diags.AddError("failed during SKE service enablement", agg.Error())
 		return
 	}
-	process := res.WaitHandler(ctx, c, projectID).SetTimeout(timeout)
+
+	process := res.WaitHandler(ctx, c, projectID, serviceID).SetTimeout(timeout)
 	if _, err := process.WaitWithContext(ctx); err != nil {
-		diags.AddError("failed to verify SKE project init", err.Error())
+		diags.AddError("failed to verify SKE service enablement", err.Error())
 		return
 	}
 }
