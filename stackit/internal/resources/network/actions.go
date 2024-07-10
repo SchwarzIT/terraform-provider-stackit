@@ -72,6 +72,10 @@ func (r Resource) createNetwork(ctx context.Context, resp *resource.CreateRespon
 	projectID, _ := uuid.Parse(plan.ProjectID.String())
 
 	res, err := r.client.IAAS.V1CreateNetwork(ctx, projectID, body)
+	if err != nil {
+		resp.Diagnostics.AddError(fmt.Sprintf("failed creating network %s", body.Name), err.Error())
+		return plan
+	}
 
 	timeout, d := plan.Timeouts.Create(ctx, 5*time.Minute)
 	if resp.Diagnostics.Append(d...); resp.Diagnostics.HasError() {

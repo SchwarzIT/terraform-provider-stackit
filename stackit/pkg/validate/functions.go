@@ -139,7 +139,7 @@ func Prefixes() *Validator {
 		description: "validate prefixes",
 		validateList: func(ctx context.Context, req validator.ListRequest, resp *validator.ListResponse) {
 			for _, v := range req.ConfigValue.Elements() {
-				if err := clientValidate.Prefix(v.String()); err != nil {
+				if err := clientValidate.IsIP(v.String()); err != nil {
 					resp.Diagnostics.AddError(err.Error(), err.Error())
 				}
 			}
