@@ -16,14 +16,6 @@ The STACKIT provider is a project developed and maintained by the STACKIT commun
 
 &nbsp;
 
-## Reporting Issues
-
-If you encounter any issues or have suggestions for improvements, please open an issue in the repository. We appreciate your feedback and will do our best to address any problems as soon as possible.
-
-The provider is built and maintained by the STACKIT community in Schwarz IT and is not an official STACKIT provider
-
-&nbsp;
-
 ## Usage Example
 
 ```hcl
