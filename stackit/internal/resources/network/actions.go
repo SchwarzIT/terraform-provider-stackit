@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"net/http"
 	"reflect"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -59,6 +60,9 @@ func (r Resource) createNetwork(ctx context.Context, resp *resource.CreateRespon
 
 		ns = append(ns, nsVal)
 	}
+
+	// ensure we have the Nameservers sorted
+	sort.Strings(ns)
 
 	pl := int(plan.PrefixLengthV4.ValueInt64())
 	name := plan.Name.ValueString()
@@ -147,9 +151,14 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		}
 	}
 
+	// ensure we have the nameservers sorted
+
 	nameservers := make([]attr.Value, 0)
 	if n.Nameservers != nil && len(*n.Nameservers) > 0 {
-		for _, ns := range *n.Nameservers {
+		nsData := *n.Nameservers
+		sort.Strings(nsData)
+
+		for _, ns := range nsData {
 			nameservers = append(nameservers, types.StringValue(ns))
 		}
 	}
