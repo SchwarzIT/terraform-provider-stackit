@@ -3,7 +3,7 @@ package network
 import (
 	"context"
 	"fmt"
-	iaas "github.com/SchwarzIT/community-stackit-go-client/pkg/services/iaas-api/v1alpha"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/iaas-api/v1"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/baseurl"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services"

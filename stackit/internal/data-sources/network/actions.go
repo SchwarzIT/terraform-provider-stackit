@@ -26,7 +26,7 @@ func (d DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	projectID, _ := uuid.Parse(config.ProjectID.ValueString())
 	id, _ := uuid.Parse(config.ID.ValueString())
 
-	resNetwork, err := c.IAAS.V1GetNetwork(ctx, projectID, id)
+	resNetwork, err := c.IAAS.Network.V1GetNetwork(ctx, projectID, id)
 	if agg := common.Validate(&resp.Diagnostics, resNetwork, err, "JSON200"); agg != nil {
 		resp.Diagnostics.AddError("failed instance read", agg.Error())
 		return
@@ -42,8 +42,8 @@ func (d DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	network := resNetwork.JSON200
 
 	prefixes := make([]attr.Value, 0)
-	if len(network.Prefixes) > 0 {
-		for _, pr := range network.Prefixes {
+	if network.Prefixes != nil && len(*network.Prefixes) > 0 {
+		for _, pr := range *network.Prefixes {
 			prefixes = append(prefixes, types.StringValue(pr))
 		}
 	}
@@ -63,8 +63,10 @@ func (d DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	config.NameServers = types.ListValueMust(types.StringType, nameservers)
 
 	// get the Prefix Length in a hacky way, otherwise fall back to default
-	if len(network.Prefixes) > 0 {
-		cidrSplit := strings.Split(network.Prefixes[0], "/")
+	if network.Prefixes != nil && len(*network.Prefixes) > 0 {
+		prefixData := *network.Prefixes
+
+		cidrSplit := strings.Split(prefixData[0], "/")
 		if len(cidrSplit) != 2 {
 			resp.Diagnostics.AddError("Processing CIDR Prefix Length",
 				"Processing CIDR Prefix Length")

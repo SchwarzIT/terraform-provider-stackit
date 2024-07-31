@@ -3,7 +3,7 @@ package network
 import (
 	"context"
 	"fmt"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/iaas-api/v1alpha"
+	iaas_network "github.com/SchwarzIT/community-stackit-go-client/pkg/services/iaas-api/v1/network"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
@@ -46,7 +46,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Description: "the name of the network",
 				Required:    true,
 				Validators: []validator.String{
-					validate.StringWith(iaas.ValidateNetworkName, "validate network name"),
+					validate.StringWith(iaas_network.ValidateNetworkName, "validate network name"),
 				},
 			},
 			"nameservers": schema.ListAttribute{
