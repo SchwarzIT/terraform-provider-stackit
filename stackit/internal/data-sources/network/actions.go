@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -49,8 +50,14 @@ func (d DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	}
 
 	nameservers := make([]attr.Value, 0)
+
 	if network.Nameservers != nil && len(*network.Nameservers) > 0 {
-		for _, ns := range *network.Nameservers {
+		// ensure we have a sorted list, stackit seems to give us
+		// things randomly back which confuses TF
+		nsData := *network.Nameservers
+		sort.Strings(nsData)
+
+		for _, ns := range nsData {
 			nameservers = append(nameservers, types.StringValue(ns))
 		}
 	}
