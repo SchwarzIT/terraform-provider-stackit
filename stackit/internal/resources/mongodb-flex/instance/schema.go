@@ -87,7 +87,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Default: stringdefault.StaticString(DefaultType),
 			},
 			"version": schema.StringAttribute{
-				Description: "MongoDB version. Version `5.0` and `6.0` are supported. ",
+				Description: "MongoDB version. Version `5.0`, `6.0`, `7.0` are supported. ",
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []planmodifier.String{
