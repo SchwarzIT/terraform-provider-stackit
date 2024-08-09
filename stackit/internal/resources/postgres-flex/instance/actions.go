@@ -35,7 +35,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	acl := []string{}
+	acl := make([]string, 0)
 	for _, v := range plan.ACL.Elements() {
 		nv, err := common.ToString(context.Background(), v)
 		if err != nil {
@@ -195,7 +195,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		return
 	}
 
-	acl := []string{}
+	acl := make([]string, 0)
 	for _, v := range plan.ACL.Elements() {
 		nv, err := common.ToString(context.Background(), v)
 		if err != nil {
@@ -296,10 +296,37 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	c := r.client.PostgresFlex.Instance
-	res, err := c.Delete(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
-	if agg := common.Validate(&resp.Diagnostics, res, err); agg != nil {
-		if validate.StatusEquals(res, http.StatusNotFound) {
+	// init client
+	c := r.client.PostgresFlex
+
+	// check first of all if this resource is already deleted
+	resExists, err := c.Instance.Get(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
+	if agg := common.Validate(&resp.Diagnostics, resExists, err, "JSON200"); agg != nil {
+		if validate.StatusEquals(resExists, http.StatusNotFound) {
+			resp.State.RemoveResource(ctx)
+			return
+		}
+
+		// STACKIT API sometimes uses uppercase .. sometimes lower .. sometimes mixed
+		if resExists.JSON200.Item.Status != nil && strings.ToUpper(*resExists.JSON200.Item.Status) != "DELETED" {
+			resp.State.RemoveResource(ctx)
+			return
+		}
+
+		resp.Diagnostics.AddError("failed to read instance", agg.Error())
+
+		return
+	}
+
+	if err := applyClientResponse(&state, resExists.JSON200.Item); err != nil {
+		resp.Diagnostics.AddError("failed to process client response", err.Error())
+		return
+	}
+
+	resDelete, err := c.Instance.Delete(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
+
+	if agg := common.Validate(&resp.Diagnostics, resDelete, err); agg != nil {
+		if validate.StatusEquals(resDelete, http.StatusNotFound) {
 			resp.State.RemoveResource(ctx)
 			return
 		}
@@ -311,7 +338,7 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 	if resp.Diagnostics.Append(d...); resp.Diagnostics.HasError() {
 		return
 	}
-	process := res.WaitHandler(ctx, c, state.ProjectID.ValueString(), state.ID.ValueString()).SetTimeout(timeout)
+	process := resDelete.WaitHandler(ctx, c.Instance, state.ProjectID.ValueString(), state.ID.ValueString()).SetTimeout(timeout)
 	if _, err := process.WaitWithContext(ctx); err != nil {
 		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.State.RemoveResource(ctx)
