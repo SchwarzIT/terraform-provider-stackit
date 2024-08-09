@@ -298,10 +298,11 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 
 	// init client
 	c := r.client.PostgresFlex
-	resDelete, err := c.Instance.Delete(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
+	res, err := c.Instance.Delete(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
 
-	if agg := common.Validate(&resp.Diagnostics, resDelete, err); agg != nil {
-		if validate.StatusEquals(resDelete, http.StatusNotFound) {
+	if agg := common.Validate(&resp.Diagnostics, res, err); agg != nil {
+		if validate.StatusEquals(res, http.StatusNotFound) ||
+			(validate.StatusEquals(res, http.StatusBadRequest) && res.JSON400 != nil && strings.Contains(*res.JSON400.Message, "already marked for deletion")) {
 			resp.State.RemoveResource(ctx)
 			return
 		}
@@ -309,36 +310,14 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	timeout, d := state.Timeouts.Delete(ctx, 1*time.Hour)
+	timeout, d := state.Timeouts.Delete(ctx, 30*time.Minute)
+
 	if resp.Diagnostics.Append(d...); resp.Diagnostics.HasError() {
 		return
 	}
-	process := resDelete.WaitHandler(ctx, c.Instance, state.ProjectID.ValueString(), state.ID.ValueString()).SetTimeout(timeout)
+
+	process := res.WaitHandler(ctx, c.Instance, state.ProjectID.ValueString(), state.ID.ValueString()).SetTimeout(timeout)
 	if _, err := process.WaitWithContext(ctx); err != nil {
-		// check first of all if this resource is already deleted
-		resExists, err := c.Instance.Get(ctx, state.ProjectID.ValueString(), state.ID.ValueString())
-		if agg := common.Validate(&resp.Diagnostics, resExists, err, "JSON200"); agg != nil {
-			if validate.StatusEquals(resExists, http.StatusNotFound) {
-				resp.State.RemoveResource(ctx)
-				return
-			}
-
-			// STACKIT API sometimes uses uppercase .. sometimes lower .. sometimes mixed
-			if resExists.JSON200.Item.Status != nil && strings.ToUpper(*resExists.JSON200.Item.Status) != "DELETED" {
-				resp.State.RemoveResource(ctx)
-				return
-			}
-
-			resp.Diagnostics.AddError("failed to read instance", agg.Error())
-
-			return
-		}
-
-		if err := applyClientResponse(&state, resExists.JSON200.Item); err != nil {
-			resp.Diagnostics.AddError("failed to process client response", err.Error())
-			return
-		}
-
 		if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 			resp.State.RemoveResource(ctx)
 			return
