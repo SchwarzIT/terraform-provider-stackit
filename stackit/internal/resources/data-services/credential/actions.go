@@ -78,6 +78,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 
 	if res.JSON200 == nil {
 		resp.Diagnostics.AddError("failed to process client response", "Credentials response is empty")
+		return
 	}
 
 	if err := r.applyClientResponse(ctx, &cred, res.JSON200); err != nil {
