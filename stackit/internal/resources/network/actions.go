@@ -58,7 +58,7 @@ func (r Resource) createNetwork(ctx context.Context, resp *resource.CreateRespon
 			continue
 		}
 
-		ns = append(ns, nsVal)
+		ns = appendIfMissting(ns, nsVal)
 	}
 
 	// ensure we have the Nameservers sorted
@@ -152,8 +152,8 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	}
 
 	// ensure we have the nameservers sorted
-
 	nameservers := make([]attr.Value, 0)
+
 	if n.Nameservers != nil && len(*n.Nameservers) > 0 {
 		nsData := *n.Nameservers
 		sort.Strings(nsData)
@@ -243,8 +243,11 @@ func (r Resource) updateNetwork(ctx context.Context, plan, state Network, resp *
 			continue
 		}
 
-		ns = append(ns, s.String())
+		ns = appendIfMissting(ns, s.String())
 	}
+
+	// ensure we have the Nameservers sorted
+	sort.Strings(ns)
 
 	name := plan.Name.ValueString()
 
@@ -326,4 +329,14 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 	// set main attributes
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project_id"), projectID)...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), networkID)...)
+}
+
+func appendIfMissting(valueList []string, value string) []string {
+	for _, v := range valueList {
+		if v == value {
+			return valueList
+		}
+	}
+
+	return append(valueList, value)
 }
