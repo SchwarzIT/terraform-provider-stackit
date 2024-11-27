@@ -20,7 +20,7 @@ import (
 type Network struct {
 	ID             types.String   `tfsdk:"id"`
 	Name           types.String   `tfsdk:"name"`
-	NameServers    types.List     `tfsdk:"nameservers"`
+	NameServers    types.Set      `tfsdk:"nameservers"`
 	Prefixes       types.List     `tfsdk:"prefixes"`
 	PrefixLengthV4 types.Int64    `tfsdk:"prefix_length_v4"`
 	PublicIp       types.String   `tfsdk:"public_ip"`
@@ -31,6 +31,7 @@ type Network struct {
 // Schema returns terraform schema structure
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
+
 		MarkdownDescription: fmt.Sprintf("Manages STACKIT network\n%s",
 			common.EnvironmentInfo(r.urls),
 		),
@@ -49,13 +50,11 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 					validate.StringWith(iaas_network.ValidateNetworkName, "validate network name"),
 				},
 			},
-			"nameservers": schema.ListAttribute{
+			"nameservers": schema.SetAttribute{
 				Description: "List of DNS Servers/Nameservers.",
-				Required:    true,
+				Optional:    true,
+				Computed:    true,
 				ElementType: types.StringType,
-				Validators: []validator.List{
-					validate.NameServers(),
-				},
 			},
 			"prefixes": schema.ListAttribute{
 				Computed:    true,

@@ -168,7 +168,8 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	state.Name = types.StringValue(n.Name)
 	state.PublicIp = types.StringPointerValue(n.PublicIp)
 	state.Prefixes = types.ListValueMust(types.StringType, prefixes)
-	state.NameServers = types.ListValueMust(types.StringType, nameservers)
+
+	state.NameServers = types.SetValueMust(types.StringType, nameservers)
 
 	// get the Prefix Length in a hacky way, otherwise fall back to default
 	if n.Prefixes != nil && len(*n.Prefixes) > 0 {
@@ -269,7 +270,7 @@ func (r Resource) updateNetwork(ctx context.Context, plan, state Network, resp *
 	networkID, _ := uuid.Parse(state.ID.ValueString())
 
 	res, err := r.client.IAAS.Network.V1UpdateNetwork(ctx, projectID, networkID, iaas_network.V1UpdateNetworkJSONRequestBody(body))
-	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200"); agg != nil {
+	if agg := common.Validate(&resp.Diagnostics, res, err); agg != nil {
 		resp.Diagnostics.AddError("failed updating project", agg.Error())
 		return
 	}
