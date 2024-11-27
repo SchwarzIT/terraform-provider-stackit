@@ -243,7 +243,12 @@ func (r Resource) updateNetwork(ctx context.Context, plan, state Network, resp *
 			continue
 		}
 
-		ns = appendIfMissting(ns, s.String())
+		nsValue, err := common.ToString(ctx, s)
+		if err != nil {
+			continue
+		}
+
+		ns = appendIfMissting(ns, nsValue)
 	}
 
 	// ensure we have the Nameservers sorted
