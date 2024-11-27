@@ -7,24 +7,22 @@ import (
 	"testing"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
 const run_this_test = false
 
 func TestAcc_Network(t *testing.T) {
-	if !common.ShouldAccTestRun(run_this_test) {
-		t.Skip()
-		return
-	}
+	//if !common.ShouldAccTestRun(run_this_test) {
+	//	t.Skip()
+	//	return
+	//}
+	//name := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
+	name := "RHTEST"
 
-	name := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
-
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: map[string]func() (tfprotov6.ProviderServer, error){
 			"stackit": providerserver.NewProtocol6WithError(stackit.New("test")()),
 		},
@@ -34,7 +32,7 @@ func TestAcc_Network(t *testing.T) {
 				Config: config(name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("stackit_network.example", "name", name),
-					resource.TestCheckResourceAttr("stackit_network.example", "project_id", common.GetAcceptanceTestsProjectID()),
+					resource.TestCheckResourceAttr("stackit_network.example", "project_id", "bfcb2b28-d552-400c-86f9-a939f7e64c54"),
 					resource.TestCheckResourceAttrSet("stackit_network.example", "id"),
 					resource.TestCheckResourceAttr("stackit_network.example", "name", name),
 				),
@@ -52,7 +50,7 @@ func TestAcc_Network(t *testing.T) {
 						return "", errors.New("couldn't find attribute id")
 					}
 
-					return fmt.Sprintf("%s,%s", common.GetAcceptanceTestsProjectID(), id), nil
+					return fmt.Sprintf("%s,%s", "bfcb2b28-d552-400c-86f9-a939f7e64c54", id), nil
 				},
 				ImportState:       true,
 				ImportStateVerify: true,
@@ -72,7 +70,7 @@ resource "stackit_network" "example" {
 	]
 }
 	  `,
-		common.GetAcceptanceTestsProjectID(),
+		"bfcb2b28-d552-400c-86f9-a939f7e64c54",
 		name,
 	)
 }

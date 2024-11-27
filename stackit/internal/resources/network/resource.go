@@ -50,3 +50,9 @@ func (r *Resource) Configure(ctx context.Context, req resource.ConfigureRequest,
 
 	r.client = c
 }
+
+func (r *Resource) UpgradeState(ctx context.Context) map[int64]resource.StateUpgrader {
+	return map[int64]resource.StateUpgrader{
+		0: {PriorSchema: getSchemaV0(ctx), StateUpgrader: upgradeV0},
+	}
+}
