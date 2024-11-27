@@ -24,11 +24,11 @@ Manages STACKIT network
 ### Required
 
 - `name` (String) the name of the network
-- `nameservers` (List of String) List of DNS Servers/Nameservers.
 - `project_id` (String) The project UUID.
 
 ### Optional
 
+- `nameservers` (Set of String) List of DNS Servers/Nameservers.
 - `prefix_length_v4` (Number) prefix length
 - `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
 
