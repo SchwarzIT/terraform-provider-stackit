@@ -7,7 +7,6 @@ import (
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
-	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -31,7 +30,6 @@ type User struct {
 	Host       types.String   `tfsdk:"host"`
 	Port       types.Int64    `tfsdk:"port"`
 	URI        types.String   `tfsdk:"uri"`
-	Roles      types.List     `tfsdk:"roles"`
 	RoleSet    types.Set      `tfsdk:"role_set"`
 	Timeouts   timeouts.Value `tfsdk:"timeouts"`
 }
@@ -96,19 +94,6 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Description: "Specifies connection URI",
 				Computed:    true,
 				Sensitive:   true,
-			},
-			// @TODO: remove in later release
-			"roles": schema.ListAttribute{
-				Description:        "Specifies the roles assigned to the user, valid options are: `login`, `createdb`",
-				DeprecationMessage: "The `roles` attribute is deprecated, use `role_set` instead.",
-				Optional:           true,
-				Computed:           true,
-				ElementType:        types.StringType,
-				Validators: []validator.List{
-					listvalidator.ValueStringsAre(
-						stringvalidator.OneOf("login", "createdb"),
-					),
-				},
 			},
 			"role_set": schema.SetAttribute{
 				Description: "Specifies the roles assigned to the user, valid options are: `login`, `createdb`",

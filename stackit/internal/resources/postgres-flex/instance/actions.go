@@ -137,7 +137,7 @@ func checkStatus(ctx context.Context, diags *diag.Diagnostics, instance *instanc
 	if err = common.Validate(diags, res, err, "JSON200.Item.Status"); err == nil {
 		status := *res.JSON200.Item.Status
 		if !strings.EqualFold(status, wantStatus) {
-			return fmt.Errorf("expected status %s for instance ID %s in project %s, received status %s instead.", wantStatus, instanceID, projectID, status)
+			return fmt.Errorf("expected status %s for instance ID %s in project %s, received status %s instead", wantStatus, instanceID, projectID, status)
 		}
 	}
 	return err

@@ -33,22 +33,10 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	}
 
 	var roles []string
-	var usingRoleSet bool = plan.Roles.IsUnknown()
-	if usingRoleSet {
-		resp.Diagnostics.Append(plan.RoleSet.ElementsAs(ctx, &roles, true)...)
-		if resp.Diagnostics.HasError() {
-			return
-		}
-	} else {
-		// @TODO: remove roles in future release
-		resp.Diagnostics.Append(plan.Roles.ElementsAs(ctx, &roles, true)...)
-		if resp.Diagnostics.HasError() {
-			return
-		}
-	}
 
-	if len(roles) == 0 {
-		roles = []string{"login"}
+	resp.Diagnostics.Append(plan.RoleSet.ElementsAs(ctx, &roles, true)...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
 
 	body := users.UserCreateUserRequest{
@@ -64,12 +52,13 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	item := *res.JSON201.Item
 
-	elems := []attr.Value{}
+	elems := make([]attr.Value, 0)
 	if item.Roles != nil {
 		for _, v := range *item.Roles {
 			elems = append(elems, types.StringValue(v))
 		}
 	}
+
 	if item.Password == nil {
 		resp.Diagnostics.AddError("received an empty password", fmt.Sprintf("full response: %+v", item))
 		return
@@ -79,6 +68,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		resp.Diagnostics.AddError("received an empty ID", fmt.Sprintf("full response: %+v", item))
 		return
 	}
+
 	plan.ID = nullOrValStr(item.ID)
 	plan.Password = nullOrValStr(item.Password)
 	plan.Host = nullOrValStr(item.Host)
@@ -86,11 +76,9 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	plan.URI = nullOrValStr(item.URI)
 	plan.RoleSet = types.SetValueMust(types.StringType, elems)
 
-	// @TODO: remove roles in future release
-	plan.Roles = types.ListValueMust(types.StringType, elems)
-
 	// update state with user
 	diags = resp.State.Set(ctx, &plan)
+
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -116,16 +104,19 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 				resp.Diagnostics.AddError("failed verifying instance status", agg2.Error())
 				return
 			}
+
 			for _, item := range *res.JSON200.Items {
 				if item.ID != nil && *item.ID == state.InstanceID.ValueString() {
 					resp.Diagnostics.AddError("failed making read user request", agg.Error())
 					return
 				}
 			}
+
 			// instance doesn't exists:
 			resp.State.RemoveResource(ctx)
 			return
 		}
+
 		resp.Diagnostics.AddError("failed making read user request", agg.Error())
 		return
 	}
@@ -134,20 +125,20 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	state.Username = nullOrValStr(item.Username)
 	state.Host = nullOrValStr(item.Host)
 	state.Port = nullOrValInt64(item.Port)
-	roles := []attr.Value{}
+
+	roles := make([]attr.Value, 0)
 	if r := item.Roles; r != nil {
 		for _, v := range *r {
 			roles = append(roles, types.StringValue(v))
 		}
 	}
-	state.RoleSet = types.SetValueMust(types.StringType, roles)
 
-	// @TODO: remove roles in future release
-	state.Roles = types.ListValueMust(types.StringType, roles)
+	state.RoleSet = types.SetValueMust(types.StringType, roles)
 
 	if state.URI.IsUnknown() {
 		state.URI = types.StringNull()
 	}
+
 	if state.Password.IsUnknown() {
 		state.Password = types.StringNull()
 	}
@@ -189,7 +180,8 @@ func (r Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *
 		return
 	}
 
-	process := res.WaitHandler(ctx, r.client.PostgresFlex.Users, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString()).SetTimeout(timeout)
+	process := res.WaitHandler(ctx, r.client.PostgresFlex.Users, state.ProjectID.ValueString(),
+		state.InstanceID.ValueString(), state.ID.ValueString()).SetTimeout(timeout)
 	if _, err := process.WaitWithContext(ctx); err != nil {
 		resp.Diagnostics.AddError("failed to verify user deletion", err.Error())
 		return
