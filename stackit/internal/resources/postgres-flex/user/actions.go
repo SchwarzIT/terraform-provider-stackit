@@ -105,9 +105,10 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 		return
 	}
 
-	// read cluster
+	// read user
 	res, err := r.client.PostgresFlex.Users.Get(ctx, state.ProjectID.ValueString(), state.InstanceID.ValueString(), state.ID.ValueString())
 	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON200.Item"); agg != nil {
+
 		if validate.StatusEquals(res, http.StatusBadRequest, http.StatusInternalServerError) {
 			// verify the instance exists
 			res, err := r.client.PostgresFlex.Instance.List(ctx, state.ProjectID.ValueString())
@@ -116,6 +117,7 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 				resp.Diagnostics.AddError("failed verifying instance status", agg2.Error())
 				return
 			}
+
 			for _, item := range *res.JSON200.Items {
 				if item.ID != nil && *item.ID == state.InstanceID.ValueString() {
 					resp.Diagnostics.AddError("failed making read user request", agg.Error())
@@ -126,6 +128,13 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 			resp.State.RemoveResource(ctx)
 			return
 		}
+
+		// remove resources when we get a 404 - so user deleted the postgresql user...
+		if validate.StatusEquals(res, http.StatusNotFound) {
+			resp.State.RemoveResource(ctx)
+			return
+		}
+
 		resp.Diagnostics.AddError("failed making read user request", agg.Error())
 		return
 	}
