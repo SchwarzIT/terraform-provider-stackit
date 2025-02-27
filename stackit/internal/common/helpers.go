@@ -3,6 +3,7 @@ package common
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
 	"os"
 	"reflect"
 
@@ -13,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/defaults"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -99,12 +99,12 @@ func Timeouts(ctx context.Context, opts timeouts.Opts) schema.SingleNestedAttrib
 	return timeout
 }
 
-func GetDefaultACL() defaults.List {
+func GetDefaultACL() defaults.Set {
 	av := []attr.Value{}
 	for _, r := range KnownRanges {
 		av = append(av, types.StringValue(r))
 	}
-	return listdefault.StaticValue(types.ListValueMust(types.StringType, av))
+	return setdefault.StaticValue(types.SetValueMust(types.StringType, av))
 }
 
 func Validate(d *diag.Diagnostics, res interface{}, err error, checkNullFields ...string) error {

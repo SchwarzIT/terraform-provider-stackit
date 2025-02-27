@@ -135,7 +135,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 
 				Optional: true,
 			},
-			"acl": schema.ListAttribute{
+			"acl": schema.SetAttribute{
 				Description: fmt.Sprintf("Whitelist IP address ranges. Default is %v", common.KnownRanges),
 				ElementType: types.StringType,
 				Optional:    true,
