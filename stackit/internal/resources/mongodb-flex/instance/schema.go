@@ -30,7 +30,7 @@ type Instance struct {
 	Replicas       types.Int64       `tfsdk:"replicas"`
 	BackupSchedule types.String      `tfsdk:"backup_schedule"`
 	Labels         map[string]string `tfsdk:"labels"`
-	ACL            types.List        `tfsdk:"acl"`
+	ACL            types.Set         `tfsdk:"acl"`
 	Storage        types.Object      `tfsdk:"storage"`
 	Timeouts       timeouts.Value    `tfsdk:"timeouts"`
 }
@@ -135,7 +135,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 
 				Optional: true,
 			},
-			"acl": schema.ListAttribute{
+			"acl": schema.SetAttribute{
 				Description: fmt.Sprintf("Whitelist IP address ranges. Default is %v", common.KnownRanges),
 				ElementType: types.StringType,
 				Optional:    true,

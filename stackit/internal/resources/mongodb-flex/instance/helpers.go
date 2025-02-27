@@ -154,7 +154,7 @@ func applyClientResponse(pi *Instance, i *instance.InstancesSingleInstance) erro
 			}
 		}
 	}
-	pi.ACL = types.ListValueMust(types.StringType, elems)
+	pi.ACL = types.SetValueMust(types.StringType, elems)
 	if i.BackupSchedule != nil {
 		pi.BackupSchedule = nullOrValStr(i.BackupSchedule)
 	}
