@@ -3,56 +3,24 @@ package postgresinstance
 import (
 	"context"
 	"fmt"
-
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit/internal/common"
-	"github.com/SchwarzIT/terraform-provider-stackit/stackit/pkg/validate"
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-// Instance is the schema model
-type Instance struct {
-	ID             types.String      `tfsdk:"id"`
-	Name           types.String      `tfsdk:"name"`
-	ProjectID      types.String      `tfsdk:"project_id"`
-	MachineType    types.String      `tfsdk:"machine_type"`
-	Version        types.String      `tfsdk:"version"`
-	Replicas       types.Int64       `tfsdk:"replicas"`
-	BackupSchedule types.String      `tfsdk:"backup_schedule"`
-	Options        map[string]string `tfsdk:"options"`
-	Labels         map[string]string `tfsdk:"labels"`
-	ACL            types.Set         `tfsdk:"acl"`
-	Storage        types.Object      `tfsdk:"storage"`
-	Timeouts       timeouts.Value    `tfsdk:"timeouts"`
-}
-
-// Storage represent instance storage
-type Storage struct {
-	Class types.String `tfsdk:"class"`
-	Size  types.Int64  `tfsdk:"size"`
-}
-
-// Schema returns the terraform schema structure
-func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
-	resp.Schema = schema.Schema{
-		MarkdownDescription: fmt.Sprintf("Manages Postgres Flex instances\n%s",
-			common.EnvironmentInfo(r.urls),
-		),
+func getSchemaV0(ctx context.Context) *schema.Schema {
+	return &schema.Schema{
+		Version: 1,
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "Specifies the resource ID",
 				Computed:    true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
 			},
 			"name": schema.StringAttribute{
 				Description: "Specifies the instance name.",
@@ -61,12 +29,6 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			"project_id": schema.StringAttribute{
 				Description: "The project ID the instance runs in. Changing this value requires the resource to be recreated.",
 				Required:    true,
-				Validators: []validator.String{
-					validate.ProjectID(),
-				},
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
-				},
 			},
 			"machine_type": schema.StringAttribute{
 				Description: "The Machine Type. Available options: `2.4` (2 CPU, 4 Memory), `2.16` (2 CPU, 16 Memory), `4.8` (4 CPU, 8 Memory), `4.32` (4 CPU, 32 Memory), `8.16` (8 CPU, 16 Memory), `16.32` (16 CPU, 32 Memory), `16.128` (16 CPU, 128 Memory)",
@@ -76,25 +38,16 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Description: "Postgres version. Options: `12`, `13`, `14`. Changing this value requires the resource to be recreated.",
 				Optional:    true,
 				Computed:    true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
-				Default: stringdefault.StaticString(DefaultVersion),
 			},
 			"replicas": schema.Int64Attribute{
 				Description: "Number of replicas (Default is `1`).",
 				Optional:    true,
 				Computed:    true,
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
-				},
-				Default: int64default.StaticInt64(DefaultReplicas),
 			},
 			"backup_schedule": schema.StringAttribute{
 				Description: "Specifies the backup schedule (cron style)",
 				Optional:    true,
 				Computed:    true,
-				Default:     stringdefault.StaticString(DefaultBackupSchedule),
 			},
 			"storage": schema.SingleNestedAttribute{
 				Description: "A single `storage` block as defined below.",
@@ -128,12 +81,11 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				ElementType: types.StringType,
 				Optional:    true,
 			},
-			"acl": schema.SetAttribute{
+			"acl": schema.ListAttribute{
 				Description: fmt.Sprintf("Whitelist IP address ranges. Default is %v", common.KnownRanges),
 				ElementType: types.StringType,
 				Optional:    true,
 				Computed:    true,
-				Default:     common.GetDefaultACL(),
 			},
 			"timeouts": common.Timeouts(ctx, timeouts.Opts{
 				Create: true,
@@ -142,4 +94,52 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			}),
 		},
 	}
+}
+
+func upgradeV0(ctx context.Context, req resource.UpgradeStateRequest, resp *resource.UpgradeStateResponse) {
+	type InstanceV0 struct {
+		ID             types.String      `tfsdk:"id"`
+		Name           types.String      `tfsdk:"name"`
+		ProjectID      types.String      `tfsdk:"project_id"`
+		MachineType    types.String      `tfsdk:"machine_type"`
+		Version        types.String      `tfsdk:"version"`
+		Replicas       types.Int64       `tfsdk:"replicas"`
+		BackupSchedule types.String      `tfsdk:"backup_schedule"`
+		Options        map[string]string `tfsdk:"options"`
+		Labels         map[string]string `tfsdk:"labels"`
+		ACL            types.List        `tfsdk:"acl"`
+		Storage        types.Object      `tfsdk:"storage"`
+		Timeouts       timeouts.Value    `tfsdk:"timeouts"`
+	}
+
+	var oldState InstanceV0
+
+	diags := req.State.Get(ctx, &oldState)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	acl, ds := types.SetValueFrom(ctx, types.StringType, oldState.ACL.Elements())
+	if ds.HasError() {
+		resp.Diagnostics.Append(ds...)
+		return
+	}
+
+	newState := Instance{
+		ID:             oldState.ID,
+		Name:           oldState.Name,
+		ProjectID:      oldState.ProjectID,
+		MachineType:    oldState.MachineType,
+		Version:        oldState.Version,
+		Replicas:       oldState.Replicas,
+		BackupSchedule: oldState.BackupSchedule,
+		Options:        oldState.Options,
+		Labels:         oldState.Labels,
+		ACL:            acl,
+		Storage:        oldState.Storage,
+		Timeouts:       oldState.Timeouts,
+	}
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, newState)...)
 }
