@@ -42,7 +42,7 @@ resource "stackit_postgres_flex_instance" "example" {
 
 ### Optional
 
-- `acl` (List of String) Whitelist IP address ranges. Default is [193.148.160.0/19 45.129.40.0/21 45.135.244.0/22]
+- `acl` (Set of String) Whitelist IP address ranges. Default is [193.148.160.0/19 45.129.40.0/21 45.135.244.0/22]
 - `backup_schedule` (String) Specifies the backup schedule (cron style)
 - `labels` (Map of String) Instance Labels
 - `options` (Map of String) Specifies postgres instance options
