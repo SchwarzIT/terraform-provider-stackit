@@ -30,7 +30,7 @@ type Instance struct {
 	Replicas       types.Int64       `tfsdk:"replicas"`
 	BackupSchedule types.String      `tfsdk:"backup_schedule"`
 	Labels         map[string]string `tfsdk:"labels"`
-	ACL            types.List        `tfsdk:"acl"`
+	ACL            types.Set         `tfsdk:"acl"`
 	Storage        types.Object      `tfsdk:"storage"`
 	Timeouts       timeouts.Value    `tfsdk:"timeouts"`
 }
