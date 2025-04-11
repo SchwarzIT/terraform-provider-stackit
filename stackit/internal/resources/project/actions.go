@@ -3,6 +3,7 @@ package project
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"time"
 
 	rmv2 "github.com/SchwarzIT/community-stackit-go-client/pkg/services/resource-management/v2.0"
@@ -181,7 +182,7 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 }
 
 func (r Resource) updateProject(ctx context.Context, plan, state Project, resp *resource.UpdateResponse) {
-	if plan.Name.Equal(state.Name) && plan.BillingRef.Equal(state.BillingRef) {
+	if plan.Name.Equal(state.Name) && plan.BillingRef.Equal(state.BillingRef) && reflect.DeepEqual(plan.Labels, state.Labels) {
 		return
 	}
 

@@ -1,4 +1,4 @@
-HOSTNAME=github.com
+HOSTNAME=registry.terraform.io
 NAMESPACE=schwarzit
 NAME=stackit
 BINARY=terraform-provider-${NAME}
