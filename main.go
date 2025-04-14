@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
 
 	"github.com/SchwarzIT/terraform-provider-stackit/stackit"
@@ -14,9 +15,16 @@ var (
 )
 
 func main() {
-	err := providerserver.Serve(context.Background(), stackit.New(version), providerserver.ServeOpts{
+	var debug bool
+	flag.BoolVar(&debug, "debug", false, "set to true to run the provider with support for debuggers like delve")
+	flag.Parse()
+
+	opts := providerserver.ServeOpts{
 		Address: "registry.terraform.io/schwarzit/stackit",
-	})
+		Debug:   debug,
+	}
+
+	err := providerserver.Serve(context.Background(), stackit.New(version), opts)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
