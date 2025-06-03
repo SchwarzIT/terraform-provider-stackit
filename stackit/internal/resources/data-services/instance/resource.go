@@ -3,10 +3,11 @@ package instance
 import (
 	"context"
 	"fmt"
-
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/baseurl"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services"
 	dataservices "github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0"
+	"github.com/hashicorp/go-version"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 )
 
@@ -131,6 +132,50 @@ func (r *Resource) Configure(ctx context.Context, req resource.ConfigureRequest,
 	}
 
 	r.setClient(c)
+}
+
+// ModifyPlan only for RABBITMQ
+func (r *Resource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
+	// we just do things for RabbitMQ!
+	if r.service != RabbitMQ {
+		return
+	}
+
+	// Return early if we are deleting (plan is null) or creating (state is null)
+	if req.Plan.Raw.IsNull() || req.State.Raw.IsNull() {
+		return
+	}
+
+	var planData, stateData *Instance
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &planData)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &stateData)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	stateVersion, err := version.NewVersion(stateData.Version.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError("Error parsing state version", "Error parsing state version: "+err.Error())
+		return
+	}
+
+	planVersion, err := version.NewVersion(planData.Version.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError("Error parsing plan version", "Error parsing plan version: "+err.Error())
+		return
+	}
+
+	if stateVersion == nil || planVersion == nil {
+		resp.Diagnostics.AddError("StateVersion or PlanVersion is nil", "StateVersion or PlanVersion is nil.")
+		return
+	}
+
+	if stateVersion.Segments()[0] != planVersion.Segments()[0] {
+		resp.RequiresReplace = append(resp.RequiresReplace, path.Root("version"))
+		resp.Diagnostics.AddAttributeWarning(path.Root("version"), "Changing Version on RabbitMQ require replacement", "Changing Version on RabbitMQ require replacement")
+	}
+
 }
 
 func (r *Resource) setClient(c *services.Services) {
