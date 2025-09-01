@@ -3,6 +3,7 @@ package instance
 import (
 	"context"
 	"fmt"
+
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/baseurl"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services"
 	dataservices "github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0"
@@ -14,41 +15,27 @@ import (
 type ResourceService string
 
 const (
-	ElasticSearch ResourceService = "elasticsearch"
-	LogMe         ResourceService = "logme"
-	MariaDB       ResourceService = "mariadb"
-	Opensearch    ResourceService = "opensearch"
-	Postgres      ResourceService = "postgres"
-	Redis         ResourceService = "redis"
-	RabbitMQ      ResourceService = "rabbitmq"
+	LogMe      ResourceService = "logme"
+	MariaDB    ResourceService = "mariadb"
+	Opensearch ResourceService = "opensearch"
+	Redis      ResourceService = "redis"
+	RabbitMQ   ResourceService = "rabbitmq"
 )
 
 func (s ResourceService) Display() string {
 	switch s {
-	case ElasticSearch:
-		return "ElasticSearch"
 	case LogMe:
 		return "LogMe"
 	case MariaDB:
 		return "MariaDB"
 	case Opensearch:
 		return "Opensearch"
-	case Postgres:
-		return "Postgres"
 	case Redis:
 		return "Redis"
 	case RabbitMQ:
 		return "RabbitMQ"
 	}
 	return ""
-}
-
-// NewElasticSearch returns a new configured resource
-func NewElasticSearch() resource.Resource {
-	return &Resource{
-		service: ElasticSearch,
-		urls:    dataservices.GetBaseURLs(dataservices.ElasticSearch),
-	}
 }
 
 // NewLogMe returns a new configured resource
@@ -64,14 +51,6 @@ func NewMariaDB() resource.Resource {
 	return &Resource{
 		service: MariaDB,
 		urls:    dataservices.GetBaseURLs(dataservices.MariaDB),
-	}
-}
-
-// NewPostgres returns a new configured resource
-func NewPostgres() resource.Resource {
-	return &Resource{
-		service: Postgres,
-		urls:    dataservices.GetBaseURLs(dataservices.PostgresDB),
 	}
 }
 
@@ -180,16 +159,12 @@ func (r *Resource) ModifyPlan(ctx context.Context, req resource.ModifyPlanReques
 
 func (r *Resource) setClient(c *services.Services) {
 	switch r.service {
-	case ElasticSearch:
-		r.client = c.ElasticSearch
 	case LogMe:
 		r.client = c.LogMe
 	case MariaDB:
 		r.client = c.MariaDB
 	case Opensearch:
 		r.client = c.Opensearch
-	case Postgres:
-		r.client = c.PostgresDB
 	case Redis:
 		r.client = c.Redis
 	case RabbitMQ:
