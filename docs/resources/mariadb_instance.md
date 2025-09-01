@@ -12,7 +12,6 @@ description: |-
 
 Manages MariaDB instances
 
-
 <br />
 
 -> __Environment support__<small>To set a custom API base URL, set <code>STACKIT_MARIADB_BASEURL</code> environment variable </small>
@@ -39,7 +38,7 @@ resource "stackit_mariadb_instance" "example" {
 - `acl` (List of String) Access Control rules to whitelist IP addresses
 - `plan` (String) The MariaDB Plan. Default is `stackit-mariadb-1.4.10-single`
 - `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
-- `version` (String) MariaDB version. Default is 10.6
+- `version` (String) MariaDB version. Default is 10.11
 
 ### Read-Only
 

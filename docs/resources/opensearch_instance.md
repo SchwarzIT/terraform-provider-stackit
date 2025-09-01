@@ -12,7 +12,6 @@ description: |-
 
 Manages Opensearch instances
 
-
 <br />
 
 -> __Environment support__<small>To set a custom API base URL, set <code>STACKIT_REDIS_BASEURL</code> environment variable </small>
