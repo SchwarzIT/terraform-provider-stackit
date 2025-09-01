@@ -9,8 +9,8 @@ github.com/Microsoft/go-winio v0.6.1/go.mod h1:LRdKpFKfdobln8UmuiYcKPot9D2v6svN5
 github.com/ProtonMail/go-crypto v1.1.0-alpha.2 h1:bkyFVUP+ROOARdgCiJzNQo2V2kiB97LyUpzH9P6Hrlg=
 github.com/ProtonMail/go-crypto v1.1.0-alpha.2/go.mod h1:rA3QumHc/FZ8pAHreoekgiAbzpNsfQAosU5td4SnOrE=
 github.com/RaveNoX/go-jsoncommentstrip v1.0.0/go.mod h1:78ihd09MekBnJnxpICcwzCMzGrKSKYe4AqU6PDYYpjk=
-github.com/SchwarzIT/community-stackit-go-client v1.31.0 h1:kn5VS4Q4WZ6nekT5W9vmoFhAQdwNhdLRTei4f9XbWP4=
-github.com/SchwarzIT/community-stackit-go-client v1.31.0/go.mod h1:hlTfBNOKE1fokWE8g3KrI0AHo0SqzTKkS+LrIdhH8Qg=
+github.com/SchwarzIT/community-stackit-go-client v1.32.3 h1:0gZosXu3aqz9NcrHKG8fohBGVRYF12AZKD0Uzs5/XUs=
+github.com/SchwarzIT/community-stackit-go-client v1.32.3/go.mod h1:hlTfBNOKE1fokWE8g3KrI0AHo0SqzTKkS+LrIdhH8Qg=
 github.com/agext/levenshtein v1.2.2 h1:0S/Yg6LYmFJ5stwQeRp6EeOcCbj7xiqQSdNelsXvaqE=
 github.com/agext/levenshtein v1.2.2/go.mod h1:JEDfjyjHDjOF/1e4FlBE/PkbqA9OfWu2ki2W0IB5558=
 github.com/apapsch/go-jsonmerge/v2 v2.0.0 h1:axGnT1gRIfimI7gJifB699GoE/oq+F2MU7Dml6nw9rQ=
