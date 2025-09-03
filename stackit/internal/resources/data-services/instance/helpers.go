@@ -16,36 +16,28 @@ import (
 
 func (r Resource) getDefaultVersion() string {
 	switch r.service {
-	case ElasticSearch:
-		return "7"
 	case LogMe:
 		return "2"
 	case MariaDB:
-		return "10.6"
+		return "10.11"
 	case Opensearch:
 		return "2"
-	case Postgres:
-		return "13"
 	case Redis:
-		return "6"
+		return "7"
 	case RabbitMQ:
-		return "3.10"
+		return "4.0"
 	}
 	return ""
 }
 
 func (r Resource) getDefaultPlan() string {
 	switch r.service {
-	case ElasticSearch:
-		return "stackit-elasticsearch-1.4.10-single"
 	case LogMe:
 		return "stackit-logme2-1.4.10-single"
 	case MariaDB:
 		return "stackit-mariadb-1.4.10-single"
 	case Opensearch:
 		return "stackit-opensearch-1.4.10-single"
-	case Postgres:
-		return "stackit-postgresql-1.4.10-single"
 	case Redis:
 		return "stackit-redis-1.4.10-single"
 	case RabbitMQ:
@@ -107,17 +99,25 @@ func (r Resource) validatePlan(ctx context.Context, offers []offerings.Offering,
 
 func (r Resource) applyClientResponse(ctx context.Context, pi *Instance, i *instances.Instance) error {
 	elems := []attr.Value{}
+
 	if acl, ok := i.Parameters["sgw_acl"]; ok {
 		aclString, ok := acl.(string)
 		if !ok {
 			return errors.New("couldn't parse acl interface as string")
 		}
+
 		items := strings.Split(aclString, ",")
+
 		for _, v := range items {
-			elems = append(elems, types.StringValue(v))
+			// only include correctly formatted CIDR range
+			// this is to overcome a current bug in the API
+			if strings.Contains(v, "/") {
+				elems = append(elems, types.StringValue(v))
+			}
 		}
 	}
-	pi.ACL = types.ListValueMust(types.StringType, elems)
+	pi.ACL = types.SetValueMust(types.StringType, elems)
+
 	pi.Name = types.StringValue(i.Name)
 	pi.PlanID = types.StringValue(i.PlanID)
 	pi.DashboardURL = types.StringValue(i.DashboardUrl)
@@ -127,6 +127,7 @@ func (r Resource) applyClientResponse(ctx context.Context, pi *Instance, i *inst
 	if i.OrganizationGUID != nil {
 		pi.CFOrganizationGUID = types.StringValue(*i.OrganizationGUID)
 	}
+
 	return nil
 }
 
