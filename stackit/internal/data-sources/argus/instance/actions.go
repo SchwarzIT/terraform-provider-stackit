@@ -45,9 +45,9 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 	config.AlertingURL = types.StringValue(b.Instance.AlertingURL)
 	config.LogsURL = types.StringValue(b.Instance.LogsURL)
 	config.LogsPushURL = types.StringValue(b.Instance.LogsPushURL)
-	config.JaegerTracesURL = types.StringValue(b.Instance.JaegerTracesURL)
-	config.JaegerUIURL = types.StringValue(b.Instance.JaegerUiURL)
-	config.OtlpTracesURL = types.StringValue(b.Instance.OtlpTracesURL)
+	config.JaegerTracesURL = types.StringValue(b.Instance.JaegerHttpURL)
+	config.OtlpTracesHttpURL = types.StringValue(b.Instance.OtlpHttpTracesURL)
+	config.OtlpTracesGRPCUrl = types.StringValue(b.Instance.OtlpGrpcTracesURL)
 	config.ZipkinSpansURL = types.StringValue(b.Instance.ZipkinSpansURL)
 	config.Grafana = &instance.Grafana{
 		EnablePublicAccess: types.BoolValue(b.Instance.GrafanaPublicReadAccess),

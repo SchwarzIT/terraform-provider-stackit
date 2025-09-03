@@ -74,9 +74,9 @@ func updateByAPIResult(s *Instance, res *instances.ProjectInstanceUI) {
 	s.AlertingURL = types.StringValue(res.Instance.AlertingURL)
 	s.LogsURL = types.StringValue(res.Instance.LogsURL)
 	s.LogsPushURL = types.StringValue(res.Instance.LogsPushURL)
-	s.JaegerTracesURL = types.StringValue(res.Instance.JaegerTracesURL)
-	s.JaegerUIURL = types.StringValue(res.Instance.JaegerUiURL)
-	s.OtlpTracesURL = types.StringValue(res.Instance.OtlpTracesURL)
+	s.JaegerTracesURL = types.StringValue(res.Instance.JaegerHttpURL)
+	s.OtlpTracesHttpURL = types.StringValue(res.Instance.OtlpHttpTracesURL)
+	s.OtlpTracesHttpURL = types.StringValue(res.Instance.OtlpGrpcTracesURL)
 	s.ZipkinSpansURL = types.StringValue(res.Instance.ZipkinSpansURL)
 }
 
