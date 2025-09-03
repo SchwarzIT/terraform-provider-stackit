@@ -40,8 +40,8 @@ type Instance struct {
 	LogsURL                     types.String   `tfsdk:"logs_url"`
 	LogsPushURL                 types.String   `tfsdk:"logs_push_url"`
 	JaegerTracesURL             types.String   `tfsdk:"jaeger_traces_url"`
-	JaegerUIURL                 types.String   `tfsdk:"jaeger_ui_url"`
-	OtlpTracesURL               types.String   `tfsdk:"otlp_traces_url"`
+	OtlpTracesHttpURL           types.String   `tfsdk:"otlp_traces_http_url"`
+	OtlpTracesGRPCUrl           types.String   `tfsdk:"otlp_traces_grpc_url"`
 	ZipkinSpansURL              types.String   `tfsdk:"zipkin_spans_url"`
 	Timeouts                    timeouts.Value `tfsdk:"timeouts"`
 }
@@ -236,13 +236,13 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Optional: false,
 			},
 
-			"jaeger_ui_url": schema.StringAttribute{
+			"otlp_traces_http_url": schema.StringAttribute{
 				Computed: true,
 				Required: false,
 				Optional: false,
 			},
 
-			"otlp_traces_url": schema.StringAttribute{
+			"otlp_traces_grpc_url": schema.StringAttribute{
 				Computed: true,
 				Required: false,
 				Optional: false,

@@ -6,7 +6,7 @@ toolchain go1.24.3
 
 require (
 	github.com/Masterminds/semver v1.5.0
-	github.com/SchwarzIT/community-stackit-go-client v1.32.3
+	github.com/SchwarzIT/community-stackit-go-client v1.33.0
 	github.com/go-test/deep v1.0.3
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/go-version v1.7.0
