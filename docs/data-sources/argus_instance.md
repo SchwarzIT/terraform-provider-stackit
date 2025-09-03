@@ -43,14 +43,14 @@ data "stackit_argus_instance" "example" {
 - `grafana_url` (String) Specifies Grafana URL.
 - `is_updatable` (Boolean) Specifies if the instance can be updated.
 - `jaeger_traces_url` (String)
-- `jaeger_ui_url` (String)
 - `logs_push_url` (String) Specifies URL for pushing logs.
 - `logs_url` (String) Specifies Logs URL.
 - `metrics` (Attributes) Metrics configuration block (see [below for nested schema](#nestedatt--metrics))
 - `metrics_push_url` (String) Specifies URL for pushing metrics.
 - `metrics_url` (String) Specifies metrics URL.
 - `name` (String) Specifies the name of the Argus instance.
-- `otlp_traces_url` (String)
+- `otlp_traces_grpc_url` (String)
+- `otlp_traces_http_url` (String)
 - `plan` (String) Specifies the Argus plan.
 - `plan_id` (String) Specifies Argus Plan ID.
 - `targets_url` (String) Specifies Targets URL.

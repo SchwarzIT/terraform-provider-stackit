@@ -51,12 +51,12 @@ resource "stackit_argus_instance" "example" {
 - `id` (String) Specifies the Argus instance ID
 - `is_updatable` (Boolean) Specifies if the instance can be updated.
 - `jaeger_traces_url` (String)
-- `jaeger_ui_url` (String)
 - `logs_push_url` (String) Specifies URL for pushing logs.
 - `logs_url` (String) Specifies Logs URL.
 - `metrics_push_url` (String) Specifies URL for pushing metrics.
 - `metrics_url` (String) Specifies metrics URL.
-- `otlp_traces_url` (String)
+- `otlp_traces_grpc_url` (String)
+- `otlp_traces_http_url` (String)
 - `plan_id` (String) Specifies Argus Plan ID.
 - `targets_url` (String) Specifies Targets URL.
 - `zipkin_spans_url` (String)
