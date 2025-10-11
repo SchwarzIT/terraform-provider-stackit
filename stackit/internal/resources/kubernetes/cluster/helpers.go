@@ -26,7 +26,7 @@ const (
 	DefaultVolumeSizeGB           int64 = 20
 	DefaultCRI                          = "containerd"
 	DefaultZone                         = "eu01-m"
-	DefaultVersion                      = "1.26"
+	DefaultVersion                      = "1.31"
 )
 
 func (r Resource) loadAvaiableVersions(ctx context.Context, diags *diag.Diagnostics) ([]*semver.Version, error) {
@@ -49,6 +49,7 @@ func (r Resource) loadAvaiableVersions(ctx context.Context, diags *diag.Diagnost
 		}
 		versionOptions = append(versionOptions, versionOption)
 	}
+
 	return versionOptions, nil
 }
 
@@ -57,17 +58,29 @@ func (c *Cluster) clusterConfig(versionOptions []*semver.Version) (cluster.Kuber
 		c.KubernetesVersion = types.StringValue(DefaultVersion)
 	}
 
+	clusterCurrentVersionUsed, err := semver.NewVersion(c.KubernetesVersionUsed.ValueString())
+	if err != nil {
+		return cluster.Kubernetes{}, err
+	}
+
 	clusterConfigVersion, err := semver.NewVersion(c.KubernetesVersion.ValueString())
 	if err != nil {
 		return cluster.Kubernetes{}, err
 	}
-	clusterVersionConstraint, err := toVersionConstraint(clusterConfigVersion)
-	if err != nil {
-		return cluster.Kubernetes{}, err
-	}
-	clusterConfigVersion = maxVersionOption(clusterVersionConstraint, versionOptions)
-	if clusterConfigVersion == nil {
-		return cluster.Kubernetes{}, fmt.Errorf("returned version is nil\nthe options were: %+v", versionOptions)
+
+	// catch manual updates from STACKIT UI or Maintenance window, so we dont fail
+	if clusterCurrentVersionUsed.GreaterThan(clusterConfigVersion) {
+		clusterConfigVersion = clusterCurrentVersionUsed
+	} else {
+		clusterVersionConstraint, err := toVersionConstraint(clusterConfigVersion)
+		if err != nil {
+			return cluster.Kubernetes{}, err
+		}
+
+		clusterConfigVersion = maxVersionOption(clusterVersionConstraint, versionOptions)
+		if clusterConfigVersion == nil {
+			return cluster.Kubernetes{}, fmt.Errorf("returned version is nil\nthe options were: %+v", versionOptions)
+		}
 	}
 
 	pvlg := c.AllowPrivilegedContainers.ValueBool()
@@ -87,7 +100,9 @@ func toVersionConstraint(version *semver.Version) (*semver.Constraints, error) {
 	if version.String() == version.Original() { // patch version given
 		return semver.NewConstraint(fmt.Sprintf("= %s", version.String()))
 	}
+
 	nextVersion := version.IncMinor()
+
 	return semver.NewConstraint(fmt.Sprintf(">= %s, < %s", version.String(), nextVersion.String()))
 }
 
