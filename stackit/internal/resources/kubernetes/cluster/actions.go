@@ -3,11 +3,12 @@ package cluster
 import (
 	"context"
 	"fmt"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.1/credentials"
-	serviceenablement "github.com/SchwarzIT/community-stackit-go-client/pkg/services/service-enablement/v1"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.1/credentials"
+	serviceenablement "github.com/SchwarzIT/community-stackit-go-client/pkg/services/service-enablement/v1"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.1/cluster"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
@@ -163,10 +164,7 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 		}
 	}
 
-	resp, err := c.Kubernetes.Cluster.CreateOrUpdate(ctx,
-		projectID,
-		clusterName, clusterData,
-	)
+	resp, err := c.Kubernetes.Cluster.CreateOrUpdate(ctx, projectID, clusterName, clusterData)
 	if agg := common.Validate(diags, resp, err); agg != nil {
 		diags.AddError("failed during SKE create/update", agg.Error())
 		return
