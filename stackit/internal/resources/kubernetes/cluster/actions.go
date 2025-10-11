@@ -70,13 +70,16 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 func (r Resource) preProcessConfig(diags *diag.Diagnostics, cl *Cluster) {
 	projectID := cl.ProjectID.ValueString()
 	kubernetesProjectID := cl.KubernetesProjectID.ValueString()
+
 	if projectID == "" && kubernetesProjectID == "" {
 		diags.AddError("project_id or kubernetes_project_id must be set", "please note that kubernetes_project_id is deprecated and will be removed in a future release")
 		return
 	}
+
 	if projectID == "" {
 		cl.ProjectID = cl.KubernetesProjectID
 	}
+
 	if kubernetesProjectID == "" {
 		cl.KubernetesProjectID = cl.ProjectID
 	}
@@ -118,6 +121,7 @@ func (r Resource) enableProject(ctx context.Context, diags *diag.Diagnostics, cl
 
 func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnostics, cl *Cluster, timeout time.Duration) {
 	c := r.client
+
 	versions, err := r.loadAvaiableVersions(ctx, diags)
 	if err != nil {
 		diags.AddError("failed while loading version options", err.Error())
@@ -127,15 +131,29 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 	// cluster vars
 	projectID := cl.ProjectID.ValueString()
 	clusterName := cl.Name.ValueString()
+
+	// check if we have already a cluster
+	respDiscovery, err := c.Kubernetes.Cluster.Get(ctx, projectID, clusterName)
+	if agg := common.Validate(diags, respDiscovery, err, "JSON200"); agg != nil {
+		if !validate.StatusEquals(respDiscovery, http.StatusNotFound) {
+			diags.AddError("failed doing check if cluster exists already", err.Error())
+			return
+		}
+	} else if common.Validate(diags, respDiscovery, err, "JSON200") == nil {
+		cl.KubernetesVersionUsed = types.StringValue(respDiscovery.JSON200.Kubernetes.Version)
+	}
+
 	clusterConfig, err := cl.clusterConfig(versions)
-	networkID := cl.NetworkID.ValueString()
 	if err != nil {
 		diags.AddError("Failed to create cluster config", err.Error())
 		return
 	}
+
+	networkID := cl.NetworkID.ValueString()
 	nodePools := setNodepoolDefaults(cl.nodePools())
 	maintenance := cl.maintenance()
 	hibernations := cl.hibernations()
+
 	extensions, diag := cl.extensions(ctx)
 	diags.Append(diag...)
 	if diags.HasError() {
@@ -176,11 +194,13 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 		diags.AddError("failed to validate SKE create/update", agg.Error())
 		return
 	}
+
 	result, ok := res.(*cluster.GetResponse)
 	if !ok {
 		diags.AddError("failed to parse Wait() response", "response is not *cluster.GetClusterResponse")
 		return
 	}
+
 	cl.Status = types.StringValue(string(*result.JSON200.Status.Aggregated))
 	cl.Transform(*result.JSON200)
 }

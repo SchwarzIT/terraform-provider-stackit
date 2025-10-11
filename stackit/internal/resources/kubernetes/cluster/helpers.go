@@ -58,19 +58,20 @@ func (c *Cluster) clusterConfig(versionOptions []*semver.Version) (cluster.Kuber
 		c.KubernetesVersion = types.StringValue(DefaultVersion)
 	}
 
-	clusterCurrentVersionUsed, err := semver.NewVersion(c.KubernetesVersionUsed.ValueString())
-	if err != nil {
-		return cluster.Kubernetes{}, err
-	}
-
 	clusterConfigVersion, err := semver.NewVersion(c.KubernetesVersion.ValueString())
 	if err != nil {
 		return cluster.Kubernetes{}, err
 	}
 
-	// catch manual updates from STACKIT UI or Maintenance window, so we dont fail
-	if clusterCurrentVersionUsed.GreaterThan(clusterConfigVersion) {
-		clusterConfigVersion = clusterCurrentVersionUsed
+	if c.KubernetesVersionUsed.ValueString() != "" {
+		clusterCurrentVersionUsed, err := semver.NewVersion(c.KubernetesVersionUsed.ValueString())
+		if err != nil {
+			return cluster.Kubernetes{}, err
+		}
+
+		if clusterCurrentVersionUsed.GreaterThan(clusterConfigVersion) {
+			clusterConfigVersion = clusterCurrentVersionUsed
+		}
 	} else {
 		clusterVersionConstraint, err := toVersionConstraint(clusterConfigVersion)
 		if err != nil {
@@ -305,14 +306,18 @@ func (c *Cluster) Transform(cl cluster.Cluster) {
 	if c.KubernetesVersion.IsNull() || c.KubernetesVersion.IsUnknown() {
 		c.KubernetesVersion = types.StringValue(cl.Kubernetes.Version)
 	}
+
 	c.KubernetesVersionUsed = types.StringValue(cl.Kubernetes.Version)
+
 	if cl.Kubernetes.AllowPrivilegedContainers != nil {
 		c.AllowPrivilegedContainers = types.BoolValue(*cl.Kubernetes.AllowPrivilegedContainers)
 	} else {
 		c.AllowPrivilegedContainers = types.BoolValue(DefaultAllowPrivileged)
 	}
+
 	c.Status = types.StringValue(string(*cl.Status.Aggregated))
 	c.NodePools = []NodePool{}
+
 	for _, np := range cl.Nodepools {
 		maimna := types.StringNull()
 		if np.Machine.Image.Name != nil {
@@ -350,6 +355,7 @@ func (c *Cluster) Transform(cl cluster.Cluster) {
 			ContainerRuntime: crin,
 			Zones:            types.ListNull(types.StringType),
 		}
+
 		if np.Labels != nil {
 			elems := map[string]attr.Value{}
 			for k, v := range *np.Labels {
@@ -357,6 +363,7 @@ func (c *Cluster) Transform(cl cluster.Cluster) {
 			}
 			n.Labels = types.MapValueMust(types.StringType, elems)
 		}
+
 		if np.Taints != nil {
 			for _, v := range *np.Taints {
 				if n.Taints == nil {
@@ -373,10 +380,12 @@ func (c *Cluster) Transform(cl cluster.Cluster) {
 				})
 			}
 		}
+
 		elems := []attr.Value{}
 		for _, v := range np.AvailabilityZones {
 			elems = append(elems, types.StringValue(v))
 		}
+
 		n.Zones = types.ListValueMust(types.StringType, elems)
 		c.NodePools = append(c.NodePools, n)
 	}
