@@ -3,9 +3,10 @@ package common
 import (
 	"context"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
 	"os"
 	"reflect"
+
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/baseurl"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
@@ -114,10 +115,12 @@ func Validate(d *diag.Diagnostics, res interface{}, err error, checkNullFields .
 		if resValue.Kind() == reflect.Ptr {
 			resValue = resValue.Elem()
 		}
+
 		if resValue.Kind() != reflect.Struct {
 			return agg
 		}
 		body := resValue.FieldByName("Body")
+
 		if body.IsValid() && !body.IsNil() {
 			if b, ok := body.Interface().([]byte); ok {
 				Dump(d, b)
