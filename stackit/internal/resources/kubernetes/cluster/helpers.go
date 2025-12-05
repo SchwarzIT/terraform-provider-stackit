@@ -396,11 +396,12 @@ func (c *Cluster) Transform(cl cluster.Cluster) {
 }
 
 func (c *Cluster) transformHibernations(cl cluster.Cluster) {
-	if c.Hibernations == nil || cl.Hibernation == nil {
+	if cl.Hibernation == nil {
 		return
 	}
 
 	c.Hibernations = []Hibernation{}
+
 	for _, h := range cl.Hibernation.Schedules {
 		c.Hibernations = append(c.Hibernations, Hibernation{
 			Start:    types.StringValue(h.Start),
@@ -411,7 +412,7 @@ func (c *Cluster) transformHibernations(cl cluster.Cluster) {
 }
 
 func (c *Cluster) transformMaintenance(cl cluster.Cluster) {
-	if c.Maintenance == nil || cl.Maintenance == nil {
+	if cl.Maintenance == nil {
 		return
 	}
 
