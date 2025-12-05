@@ -141,8 +141,6 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 		}
 	} else if common.Validate(diags, respDiscovery, err, "JSON200") == nil {
 		cl.KubernetesVersionUsed = types.StringValue(respDiscovery.JSON200.Kubernetes.Version)
-
-		cl.Hibernations = respDiscovery.JSON200.Hibernation
 	}
 
 	clusterConfig, err := cl.clusterConfig(versions)
