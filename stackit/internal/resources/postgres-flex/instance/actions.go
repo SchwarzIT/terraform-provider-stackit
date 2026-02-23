@@ -86,6 +86,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		},
 		Version: &v,
 	}
+
 	res, err := c.Instance.Create(ctx, plan.ProjectID.ValueString(), body)
 	if agg := common.Validate(&resp.Diagnostics, res, err, "JSON201.ID"); agg != nil {
 		resp.Diagnostics.AddError("failed creating Postgres flex instance", agg.Error())
@@ -94,15 +95,18 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 
 	// set state
 	plan.ID = types.StringValue(*res.JSON201.ID)
+
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), *res.JSON201.ID)...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("project_id"), plan.ProjectID.ValueString())...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
 	timeout, d := plan.Timeouts.Create(ctx, 1*time.Hour)
 	if resp.Diagnostics.Append(d...); resp.Diagnostics.HasError() {
 		return
 	}
+
 	process := res.WaitHandler(ctx, c.Instance, plan.ProjectID.ValueString(), *res.JSON201.ID).SetTimeout(timeout)
 	ins, err := process.WaitWithContext(ctx)
 	if err != nil {
