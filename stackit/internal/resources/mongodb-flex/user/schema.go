@@ -107,7 +107,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				ElementType: types.StringType,
 				Validators: []validator.List{
 					listvalidator.ValueStringsAre(
-						stringvalidator.OneOf("readWrite", "read"),
+						stringvalidator.OneOf("readWrite", "read", "readAnyDatabase", "readWriteAnyDatabase", "stackitAdmin"),
 					),
 					listvalidator.SizeAtMost(1),
 				},
