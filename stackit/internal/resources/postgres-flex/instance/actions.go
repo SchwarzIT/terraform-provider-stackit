@@ -110,9 +110,12 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 	process := res.WaitHandler(ctx, c.Instance, plan.ProjectID.ValueString(), *res.JSON201.ID).SetTimeout(timeout)
 	ins, err := process.WaitWithContext(ctx)
 	if err != nil {
+		waitErr := err // preserve the wait err
+
 		// last check
-		if err := checkStatus(ctx, &resp.Diagnostics, c.Instance, plan.ProjectID.ValueString(), *res.JSON201.ID, instance.STATUS_READY); err != nil {
-			resp.Diagnostics.AddError("failed Postgres flex instance creation validation", err.Error())
+		if statusErr := checkStatus(ctx, &resp.Diagnostics, c.Instance, plan.ProjectID.ValueString(), *res.JSON201.ID, instance.STATUS_READY); statusErr != nil {
+			resp.Diagnostics.AddError("failed Postgres flex instance creation validation",
+				fmt.Sprintf("%s (wait handler error: %s)", statusErr.Error(), waitErr.Error()))
 			return
 		}
 	}
