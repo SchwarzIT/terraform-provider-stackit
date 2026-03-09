@@ -107,7 +107,15 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	process := res.WaitHandler(ctx, c.Instance, plan.ProjectID.ValueString(), *res.JSON201.ID).SetTimeout(timeout)
+	process := res.WaitHandler(ctx, c.Instance, plan.ProjectID.ValueString(), *res.JSON201.ID).
+		SetTimeout(timeout)
+
+	_, err = process.SetThrottle(10 * time.Second)
+	if err != nil {
+		resp.Diagnostics.AddError("failed setting throttling", err.Error())
+		return
+	}
+
 	ins, err := process.WaitWithContext(ctx)
 	if err != nil {
 		waitErr := err // preserve the wait err
@@ -143,6 +151,7 @@ func checkStatus(ctx context.Context, diags *diag.Diagnostics, instance *instanc
 	res, err := instance.Get(ctx, projectID, instanceID)
 	if err = common.Validate(diags, res, err, "JSON200.Item.Status"); err == nil {
 		status := *res.JSON200.Item.Status
+
 		if !strings.EqualFold(status, wantStatus) {
 			if status == "" {
 				return fmt.Errorf("expected status %s for instance ID %s in project %s, received empty status instead: %q", wantStatus, instanceID, projectID, string(res.Body))
@@ -151,6 +160,7 @@ func checkStatus(ctx context.Context, diags *diag.Diagnostics, instance *instanc
 			return fmt.Errorf("expected status %s for instance ID %s in project %s, received status %q instead", wantStatus, instanceID, projectID, status)
 		}
 	}
+
 	return err
 }
 
