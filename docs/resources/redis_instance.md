@@ -12,7 +12,6 @@ description: |-
 
 Manages Redis instances
 
-
 <br />
 
 -> __Environment support__<small>To set a custom API base URL, set <code>STACKIT_REDIS_BASEURL</code> environment variable </small>
@@ -39,7 +38,7 @@ resource "stackit_redis_instance" "example" {
 - `acl` (List of String) Access Control rules to whitelist IP addresses
 - `plan` (String) The Redis Plan. Default is `stackit-redis-1.4.10-single`
 - `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
-- `version` (String) Redis version. Default is 6
+- `version` (String) Redis version. Default is 7
 
 ### Read-Only
 
