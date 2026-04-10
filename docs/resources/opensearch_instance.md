@@ -36,7 +36,7 @@ resource "stackit_opensearch_instance" "example" {
 
 ### Optional
 
-- `acl` (List of String) Access Control rules to whitelist IP addresses
+- `acl` (Set of String) Access Control rules to whitelist IP addresses
 - `plan` (String) The Opensearch Plan. Default is `stackit-opensearch-1.4.10-single`
 - `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
 - `version` (String) Opensearch version. Default is 2

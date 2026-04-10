@@ -36,7 +36,7 @@ resource "stackit_postgres_instance" "example" {
 
 ### Optional
 
-- `acl` (List of String) Access Control rules to whitelist IP addresses
+- `acl` (Set of String) Access Control rules to whitelist IP addresses
 - `plan` (String) The Postgres Plan. Default is `stackit-postgresql-1.4.10-single`
 - `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
 - `version` (String) Postgres version. Default is 13

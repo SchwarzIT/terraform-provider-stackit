@@ -117,7 +117,7 @@ func (r Resource) applyClientResponse(ctx context.Context, pi *Instance, i *inst
 			elems = append(elems, types.StringValue(v))
 		}
 	}
-	pi.ACL = types.ListValueMust(types.StringType, elems)
+	pi.ACL = types.SetValueMust(types.StringType, elems)
 	pi.Name = types.StringValue(i.Name)
 	pi.PlanID = types.StringValue(i.PlanID)
 	pi.DashboardURL = types.StringValue(i.DashboardUrl)
