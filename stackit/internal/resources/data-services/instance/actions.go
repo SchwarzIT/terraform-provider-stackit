@@ -32,7 +32,7 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		return
 	}
 
-	acl := []string{}
+	acl := make([]string, 0)
 	for _, v := range plan.ACL.Elements() {
 		nv, err := common.ToString(ctx, v)
 		if err != nil {

@@ -9,7 +9,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -25,7 +24,7 @@ type Instance struct {
 	Plan               types.String   `tfsdk:"plan"`
 	PlanID             types.String   `tfsdk:"plan_id"`
 	Version            types.String   `tfsdk:"version"`
-	ACL                types.List     `tfsdk:"acl"`
+	ACL                types.Set      `tfsdk:"acl"`
 	DashboardURL       types.String   `tfsdk:"dashboard_url"`
 	CFGUID             types.String   `tfsdk:"cf_guid"`
 	CFSpaceGUID        types.String   `tfsdk:"cf_space_guid"`
@@ -83,14 +82,12 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Computed:            true,
 				Default:             stringdefault.StaticString(r.getDefaultVersion()),
 			},
-			"acl": schema.ListAttribute{
+			"acl": schema.SetAttribute{
 				Description: "Access Control rules to whitelist IP addresses",
 				ElementType: types.StringType,
 				Optional:    true,
 				Computed:    true,
-				PlanModifiers: []planmodifier.List{
-					listplanmodifier.UseStateForUnknown(),
-				},
+				Default:     common.GetDefaultACL(),
 			},
 			"dashboard_url": schema.StringAttribute{
 				Description: "Dashboard URL",
