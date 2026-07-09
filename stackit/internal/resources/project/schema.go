@@ -25,6 +25,8 @@ type Project struct {
 	OwnerEmail        types.String      `tfsdk:"owner_email"`
 	Timeouts          timeouts.Value    `tfsdk:"timeouts"`
 	Labels            map[string]string `tfsdk:"labels"`
+	CreationTime      types.String      `tfsdk:"creation_time"`
+	UpdateTime        types.String      `tfsdk:"update_time"`
 }
 
 // Schema returns the terraform schema structure
@@ -97,6 +99,16 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Validators: []validator.Map{
 					validate.ReserveProjectLabels(),
 				},
+			},
+
+			"creation_time": schema.StringAttribute{
+				Description: "Date-time at which the project was created.",
+				Computed:    true,
+			},
+
+			"update_time": schema.StringAttribute{
+				Description: "Date-time at which the project was last modified.",
+				Computed:    true,
 			},
 		},
 	}

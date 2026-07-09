@@ -38,6 +38,8 @@ func (r Resource) Create(ctx context.Context, req resource.CreateRequest, resp *
 		OwnerEmail:        types.StringValue(plan.OwnerEmail.ValueString()),
 		Timeouts:          plan.Timeouts,
 		Labels:            plan.Labels,
+		CreationTime:      types.StringValue(plan.CreationTime.ValueString()),
+		UpdateTime:        types.StringValue(plan.UpdateTime.ValueString()),
 	}
 	// update state
 	diags = resp.State.Set(ctx, p)
@@ -98,6 +100,9 @@ func (r Resource) createProject(ctx context.Context, resp *resource.CreateRespon
 
 	plan.ID = types.StringValue(res.JSON201.ProjectID.String())
 	plan.ContainerID = types.StringValue(res.JSON201.ContainerID)
+	plan.CreationTime = types.StringValue(res.JSON201.CreationTime)
+	plan.UpdateTime = types.StringValue(res.JSON201.UpdateTime)
+
 	return plan
 }
 
@@ -122,6 +127,8 @@ func (r Resource) Read(ctx context.Context, req resource.ReadRequest, resp *reso
 	p.ContainerID = types.StringValue(res.JSON200.ContainerID)
 	p.ParentContainerID = types.StringValue(res.JSON200.Parent.ContainerID)
 	p.Name = types.StringValue(res.JSON200.Name)
+	p.CreationTime = types.StringValue(res.JSON200.CreationTime)
+	p.UpdateTime = types.StringValue(res.JSON200.UpdateTime)
 
 	if res.JSON200.Labels != nil {
 		l := *res.JSON200.Labels
