@@ -45,7 +45,9 @@ resource "stackit_project" "example" {
 ### Read-Only
 
 - `container_id` (String) the project container ID
+- `creation_time` (String) Date-time at which the project was created.
 - `id` (String) the project ID
+- `update_time` (String) Date-time at which the project was last modified.
 
 <a id="nestedatt--timeouts"></a>
 ### Nested Schema for `timeouts`
