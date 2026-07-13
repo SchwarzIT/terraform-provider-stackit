@@ -180,6 +180,10 @@ func (r Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *
 		return
 	}
 
+	// Ensure computed attributes are carried over during update to prevent "known after apply" provider bugs
+	plan.CreationTime = state.CreationTime
+	plan.UpdateTime = state.UpdateTime
+
 	// update state
 	diags = resp.State.Set(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
