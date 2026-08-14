@@ -106,6 +106,9 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 						Optional:    true,
 						Computed:    true,
 						Default:     stringdefault.StaticString(DefaultStorageClass),
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.RequiresReplace(),
+						},
 					},
 					"size": schema.Int64Attribute{
 						Description: "The storage size in GB (min of 5 is required)",
