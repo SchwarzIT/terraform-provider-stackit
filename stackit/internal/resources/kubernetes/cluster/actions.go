@@ -184,7 +184,13 @@ func (r Resource) createOrUpdateCluster(ctx context.Context, diags *diag.Diagnos
 
 	resp, err := c.Kubernetes.Cluster.CreateOrUpdate(ctx, projectID, clusterName, clusterData)
 	if agg := common.Validate(diags, resp, err); agg != nil {
-		diags.AddError("failed during SKE create/update", agg.Error())
+		summary := "failed during SKE create/update"
+		if resp != nil && resp.StatusCode() == http.StatusBadRequest && resp.JSON400 != nil {
+			if msg, ok := (*resp.JSON400)["message"].(string); ok && msg != "" {
+				summary = fmt.Sprintf("%s: %s", summary, msg)
+			}
+		}
+		diags.AddError(summary, agg.Error())
 		return
 	}
 
